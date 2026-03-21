@@ -2,6 +2,12 @@
 
 استخدمها مرة واحدة عند إنشاء الموقع أو للمراجعة.
 
+## لوحة الفريق على Netlify (إدارة المواقع)
+
+- **فريق dr-talal:** [app.netlify.com/teams/dr-talal/projects](https://app.netlify.com/teams/dr-talal/projects)  
+  من هنا تضيف مواقع، تربط GitHub، وترى عمليات النشر.  
+- هذا **ليس** رابط الموقع العام للزوار — رابط الزوار يكون مثل `https://اسم-الموقع.netlify.app` بعد إنشاء الموقع.
+
 ## 1) المستودع على GitHub
 
 - الرابط: **https://github.com/alzahrani6020/iif-web**
