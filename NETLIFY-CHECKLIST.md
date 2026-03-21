@@ -8,6 +8,16 @@
   من هنا تضيف مواقع، تربط GitHub، وترى عمليات النشر.  
 - هذا **ليس** رابط الموقع العام للزوار — رابط الزوار يكون مثل `https://اسم-الموقع.netlify.app` بعد إنشاء الموقع.
 
+### موقع المشروع المربوط حالياً (مثال من إعدادك)
+
+| | |
+|---|---|
+| **اسم الموقع على Netlify** | `fluffy-meerkat-eff966` |
+| **رابط الزوار (الشكل المعتاد)** | [https://fluffy-meerkat-eff966.netlify.app](https://fluffy-meerkat-eff966.netlify.app) |
+| **لوحة المشروع** | من [projects](https://app.netlify.com/teams/dr-talal/projects) → اختر الموقع |
+
+> **وكيل Claude (Agent):** إن ظهر *Configuring environment* أو *Claude Agent is working* — **انتظر** حتى ينتهي ولا تغلق الصفحة. إن ذُكر `http://localhost:3333/` فهذا للتطوير على جهازك؛ **العالم الخارجي** يفتح رابط `*.netlify.app` بعد نشر ناجح.
+
 ## 1) المستودع على GitHub
 
 - الرابط: **https://github.com/alzahrani6020/iif-web**
