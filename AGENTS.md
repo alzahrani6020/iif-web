@@ -11,7 +11,7 @@
 | `financial-consulting/government-search/` | المنصة الحكومية، `government-data.json` → يُولَّد `government-data.js` |
 | `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) |
 | `financial-consulting/fund-site/` | واجهة أبسط |
-| `scripts/dev-server.js` | خادم التطوير (افتراضي المنفذ `3333`) |
+| `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `8080` |
 | `engines/searxng/` | **مشروع منفصل** (Docker) — **غير مدمج** في صفحات المنصة حالياً |
 
 ## الأوامر (من جذر المشروع)

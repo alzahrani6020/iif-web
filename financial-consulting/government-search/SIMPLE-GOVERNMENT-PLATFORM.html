@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- محرك الويب (SearXNG) مشروع منفصل — engines/searxng/ — لا يُربط بالمنصة حتى اكتمال البناء -->
+    <!-- SearXNG: engines/searxng/ — على localhost + npm start يُستخدم بروكسي /api/searx -->
     <title>المنصة الحكومية العالمية - بحث متقدم</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -594,10 +594,10 @@
                 <div class="filter-group filter-full" id="webSearchGroup" hidden>
                     <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;font-weight:600;">
                         <input type="checkbox" id="includeWebSearch" style="margin-top:0.25rem;">
-                        <span>تضمين نتائج الويب (محرك منفصل — غير مفعّل حالياً)</span>
+                        <span>تضمين نتائج الويب (SearXNG — يعمل على جهاز التطوير مع <code>npm start</code> + Docker)</span>
                     </label>
                     <small style="color: var(--light-text); display:block; margin-top:0.35rem;">
-                        عند الجاهزية: راجع <code>engines/searxng/</code> ثم فعّل <code>ENGINE_WEB_SEARCH_ENABLED</code> في هذا الملف.
+                        شغّل المحرك: <code>cd engines/searxng && docker compose up -d</code> ثم افتح هذه الصفحة من <code>http://127.0.0.1:3333/…</code>
                     </small>
                 </div>
             </div>
@@ -626,8 +626,11 @@
     <script>
         let governmentData = window.__GOVERNMENT_DATA__ || [];
 
-        /** عند اكتمال مشروع المحرك (`engines/searxng`) وربط المنصة: عيّن true وأظهر قسم الويب (#webSearchGroup) */
-        const ENGINE_WEB_SEARCH_ENABLED = false;
+        /** بحث الويب: مفعّل على localhost فقط (خادم التطوير + بروكسي /api/searx). على Netlify يُعطّل تلقائياً. */
+        const ENGINE_WEB_SEARCH_ENABLED = (function () {
+            var h = window.location.hostname;
+            return h === 'localhost' || h === '127.0.0.1';
+        })();
 
         const PAGE_SIZE = 20;
         let lastLocalResults = [];
@@ -638,13 +641,17 @@
         let lastViewMode = 'idle';
 
         /**
-         * عند تفعيل ENGINE_WEB_SEARCH_ENABLED لاحقاً — عنوان SearXNG (بدون / أخيرة):
-         *   window.__IIF_CONFIG__ = { searxngBase: 'http://127.0.0.1:8080', searxngEnabled: true };
+         * localhost: يمر عبر بروكسي npm start → /api/searx (يتفادى CORS).
+         * يمكن التجاوز: window.__IIF_CONFIG__ = { searxngBase: 'https://…' };
          */
         const SEARCH_CONFIG = {
             get searxngBase() {
                 if (window.__IIF_CONFIG__ && window.__IIF_CONFIG__.searxngBase) {
                     return String(window.__IIF_CONFIG__.searxngBase).replace(/\/$/, '');
+                }
+                var h = window.location.hostname;
+                if (h === 'localhost' || h === '127.0.0.1') {
+                    return window.location.origin + '/api/searx';
                 }
                 return 'http://127.0.0.1:8080';
             }
@@ -812,7 +819,7 @@
             });
             const url = `${base}/search?${params.toString()}`;
             try {
-                const res = await fetch(url, { method: 'GET', mode: 'cors' });
+                const res = await fetch(url, { method: 'GET', credentials: 'omit' });
                 if (!res.ok) {
                     return { ok: false, results: [], error: 'HTTP ' + res.status };
                 }
