@@ -1,0 +1,15 @@
+{
+  "name": "iif-fund-demo",
+  "private": true,
+  "description": "منصة حكومية + واجهة صندوق — محرك بحث منفصل (engines/searxng)",
+  "scripts": {
+    "start": "node scripts/dev-server.js",
+    "dev": "node scripts/dev-server.js",
+    "check-urls": "node scripts/check-urls.js",
+    "build:gov-data": "node financial-consulting/government-search/build-government-data.mjs",
+    "build": "npm run build:gov-data"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- محرك الويب (SearXNG) مشروع منفصل — engines/searxng/ — لا يُربط بالمنصة حتى اكتمال البناء -->
+    <title>المنصة الحكومية العالمية - بحث متقدم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --light-text: #7f8c8d;
+            --border-color: #bdc3c7;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 2rem 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            color: var(--light-text);
+            font-size: 1.1rem;
+        }
+
+        .search-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-secondary {
+            background: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdd;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .filter-select {
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .results-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .results-content {
+            padding: 2rem;
+            min-height: 400px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--light-text);
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-block-title {
+            font-size: 1.15rem;
+            color: var(--primary-color);
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .web-result-card {
+            background: #f8fafc;
+            border-left: 4px solid var(--secondary-color);
+        }
+        .web-result-card .engine-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+        .web-error {
+            background: #fdecea;
+            color: #c0392b;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+        }
+        .filter-full {
+            grid-column: 1 / -1;
+        }
+        .no-inline {
+            color: var(--light-text);
+            margin: 0.5rem 0 1rem 0;
+        }
+
+        .result-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+            border-color: var(--secondary-color);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light-bg);
+            border-radius: 12px;
+        }
+
+        .result-info h3 {
+            color: var(--dark-text);
+            margin-bottom: 0.25rem;
+            font-size: 1.3rem;
+        }
+
+        .result-info p {
+            color: var(--light-text);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .result-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .result-type, .result-region, .result-country {
+            background: var(--light-bg);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .result-type {
+            background: #e8f4fd;
+            color: #2980b9;
+        }
+
+        .result-region {
+            background: #f0f3f4;
+            color: #7f8c8d;
+        }
+
+        .result-country {
+            background: #e8f8f5;
+            color: #27ae60;
+        }
+
+        .result-contact {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .result-contact a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .result-contact a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .result-contact span {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .result-contact {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--light-text);
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.25rem 0 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination-meta {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        mark.search-hit {
+            background: #fff3cd;
+            color: inherit;
+            padding: 0 0.15em;
+            border-radius: 4px;
+        }
+
+        .results-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-toolbar label {
+            font-weight: 600;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--dark-text);
+        }
+
+        .btn-ghost:hover {
+            background: var(--light-bg);
+            border-color: var(--secondary-color);
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-hover);
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .copy-toast.visible {
+            opacity: 1;
+        }
+
+        /* يظهر فقط عند فتح المنصة مباشرة (بدون إطار موقع الصندوق) */
+        .iif-standalone-bar {
+            background: linear-gradient(90deg, #0d1b2a 0%, #1b263b 100%);
+            color: #e0e1dd;
+            padding: 0.65rem 1rem;
+            border-bottom: 3px solid #c9a227;
+            font-size: 0.95rem;
+        }
+        .iif-standalone-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+        .iif-standalone-bar a {
+            color: #c9a227;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .iif-standalone-bar a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="iif-standalone-bar" class="iif-standalone-bar" hidden>
+        <div class="iif-standalone-inner">
+            <span><strong>صندوق الاستثمار الدولي (IIF)</strong> — عرض المنصة خارج إطار الموقع الرئيسي</span>
+            <a href="/financial-consulting/fund-site/index.html">← موقع الصندوق الكامل (هيدر + واجهة)</a>
+        </div>
+    </div>
+    <script>
+        (function () {
+            if (window.self === window.top) {
+                var b = document.getElementById('iif-standalone-bar');
+                if (b) b.hidden = false;
+            }
+        })();
+    </script>
+    <div class="container">
+        <header>
+            <div class="logo">🏛️ المنصة الحكومية العالمية</div>
+            <div class="tagline">قائمة محلية للجهات — بحث الويب عبر المحرك يُفعَّل لاحقاً بعد اكتمال مشروعه المنفصل</div>
+        </header>
+
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEntities">—</div>
+                <div class="stat-label">جهة حكومية</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCountries">—</div>
+                <div class="stat-label">دولة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRegions">—</div>
+                <div class="stat-label">منطقة / مدينة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalTypes">—</div>
+                <div class="stat-label">تصنيف نوع</div>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن جهة حكومية...">
+                <button class="btn btn-primary" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                    بحث
+                </button>
+                <button class="btn btn-secondary" onclick="showAllResults()">
+                    <i class="fas fa-list"></i>
+                    عرض الكل
+                </button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="typeFilter">النوع</label>
+                    <select id="typeFilter" class="filter-select" onchange="performSearch()">
+                        <option value="">الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="countryFilter">الدولة</label>
+                    <select id="countryFilter" class="filter-select" onchange="performSearch()">
+                        <option value="">الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="serviceFilter">الخدمة</label>
+                    <select id="serviceFilter" class="filter-select" onchange="performSearch()">
+                        <option value="">الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortLocal">ترتيب النتائج المحلية</label>
+                    <select id="sortLocal" class="filter-select" onchange="onSortChange()">
+                        <option value="default">الافتراضي (حسب المعرف)</option>
+                        <option value="title">حسب الاسم</option>
+                        <option value="country">حسب الدولة ثم الاسم</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-full" id="webSearchGroup" hidden>
+                    <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;font-weight:600;">
+                        <input type="checkbox" id="includeWebSearch" style="margin-top:0.25rem;">
+                        <span>تضمين نتائج الويب (محرك منفصل — غير مفعّل حالياً)</span>
+                    </label>
+                    <small style="color: var(--light-text); display:block; margin-top:0.35rem;">
+                        عند الجاهزية: راجع <code>engines/searxng/</code> ثم فعّل <code>ENGINE_WEB_SEARCH_ENABLED</code> في هذا الملف.
+                    </small>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-section">
+            <div class="results-header">
+                <h2>النتائج</h2>
+                <div class="results-count">
+                    <span id="resultsCount">0</span> نتيجة
+                </div>
+            </div>
+            <div class="results-content" id="resultsContent" aria-live="polite" aria-busy="false">
+                <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <h3>ابحث للبدء</h3>
+                    <p>استخدم حقل البحث أعلاه أو اضغط على "عرض الكل" لرؤية جميع الجهات الحكومية</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="copyToast" class="copy-toast" role="status" aria-live="polite"></div>
+
+    <script src="government-data.js"></script>
+    <script>
+        let governmentData = window.__GOVERNMENT_DATA__ || [];
+
+        /** عند اكتمال مشروع المحرك (`engines/searxng`) وربط المنصة: عيّن true وأظهر قسم الويب (#webSearchGroup) */
+        const ENGINE_WEB_SEARCH_ENABLED = false;
+
+        const PAGE_SIZE = 20;
+        let lastLocalResults = [];
+        let lastWebPack = { ok: true, results: [] };
+        let lastIncludeWeb = false;
+        let localPage = 1;
+        /** @type {'idle'|'search'|'all'} */
+        let lastViewMode = 'idle';
+
+        /**
+         * عند تفعيل ENGINE_WEB_SEARCH_ENABLED لاحقاً — عنوان SearXNG (بدون / أخيرة):
+         *   window.__IIF_CONFIG__ = { searxngBase: 'http://127.0.0.1:8080', searxngEnabled: true };
+         */
+        const SEARCH_CONFIG = {
+            get searxngBase() {
+                if (window.__IIF_CONFIG__ && window.__IIF_CONFIG__.searxngBase) {
+                    return String(window.__IIF_CONFIG__.searxngBase).replace(/\/$/, '');
+                }
+                return 'http://127.0.0.1:8080';
+            }
+        };
+
+        function escapeHtml(text) {
+            if (text == null || text === undefined) return '';
+            const d = document.createElement('div');
+            d.textContent = String(text);
+            return d.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text == null ? '' : text)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function highlightText(text, query) {
+            if (!query || !text) return escapeHtml(text);
+            const t = String(text);
+            const q = String(query).trim();
+            if (!q) return escapeHtml(t);
+            const lower = t.toLowerCase();
+            const ql = q.toLowerCase();
+            let out = '';
+            let i = 0;
+            while (i < t.length) {
+                const j = lower.indexOf(ql, i);
+                if (j === -1) {
+                    out += escapeHtml(t.slice(i));
+                    break;
+                }
+                out += escapeHtml(t.slice(i, j)) + '<mark class="search-hit">' + escapeHtml(t.slice(j, j + q.length)) + '</mark>';
+                i = j + q.length;
+            }
+            return out;
+        }
+
+        function writeUrlState() {
+            const p = new URLSearchParams();
+            if (lastViewMode === 'all') {
+                p.set('all', '1');
+            } else if (lastViewMode === 'search') {
+                const q = document.getElementById('searchInput').value.trim();
+                if (q) p.set('q', q);
+                const type = document.getElementById('typeFilter').value;
+                if (type) p.set('type', type);
+                const country = document.getElementById('countryFilter').value;
+                if (country) p.set('country', country);
+                const service = document.getElementById('serviceFilter').value;
+                if (service) p.set('service', service);
+                if (!document.getElementById('includeWebSearch').checked) p.set('web', '0');
+            }
+            const sort = document.getElementById('sortLocal').value;
+            if (sort && sort !== 'default') p.set('sort', sort);
+            if (localPage > 1) p.set('page', String(localPage));
+            const qs = p.toString();
+            const newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+            history.replaceState(null, '', newUrl);
+        }
+
+        function applyStateFromUrl() {
+            const p = new URLSearchParams(window.location.search);
+            if (!p.toString()) return;
+            const sort = p.get('sort');
+            if (sort) document.getElementById('sortLocal').value = sort;
+            const page = Math.max(1, parseInt(p.get('page') || '1', 10) || 1);
+            localPage = page;
+            if (p.get('all') === '1') {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('typeFilter').value = '';
+                document.getElementById('countryFilter').value = '';
+                document.getElementById('serviceFilter').value = '';
+                lastViewMode = 'all';
+                displayCombinedResults(governmentData, { ok: true, results: [] }, false, false);
+                writeUrlState();
+                return;
+            }
+            document.getElementById('searchInput').value = p.get('q') || '';
+            document.getElementById('typeFilter').value = p.get('type') || '';
+            document.getElementById('countryFilter').value = p.get('country') || '';
+            document.getElementById('serviceFilter').value = p.get('service') || '';
+            document.getElementById('includeWebSearch').checked = ENGINE_WEB_SEARCH_ENABLED && p.get('web') !== '0';
+            lastViewMode = 'search';
+            performSearch({ resetPage: false });
+        }
+
+        function showToast(msg) {
+            const el = document.getElementById('copyToast');
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('visible');
+            clearTimeout(window._govToastTimer);
+            window._govToastTimer = setTimeout(function() {
+                el.classList.remove('visible');
+            }, 2200);
+        }
+
+        function copySearchLink() {
+            writeUrlState();
+            const url = window.location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showToast('تم نسخ الرابط');
+                }).catch(function() {
+                    showToast('تعذر النسخ — انسخ من شريط العنوان');
+                });
+            } else {
+                showToast('انسخ الرابط من شريط العنوان');
+            }
+        }
+
+        function onSortChange() {
+            localPage = 1;
+            if (lastViewMode === 'idle') return;
+            renderResultsContent();
+            writeUrlState();
+        }
+
+        function getSortedLocal(local) {
+            const sort = document.getElementById('sortLocal').value;
+            const arr = local.slice();
+            if (sort === 'title') {
+                arr.sort(function(a, b) { return a.title.localeCompare(b.title, 'ar'); });
+            } else if (sort === 'country') {
+                arr.sort(function(a, b) {
+                    const c = a.country.localeCompare(b.country, 'ar');
+                    return c !== 0 ? c : a.title.localeCompare(b.title, 'ar');
+                });
+            } else {
+                arr.sort(function(a, b) { return (a.id || 0) - (b.id || 0); });
+            }
+            return arr;
+        }
+
+        function buildSearxQuery() {
+            const parts = [];
+            const q = document.getElementById('searchInput').value.trim();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const countryFilter = document.getElementById('countryFilter').value;
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            if (q) parts.push(q);
+            if (countryFilter) parts.push(countryFilter);
+            if (typeFilter) parts.push(typeFilter);
+            if (serviceFilter) parts.push(serviceFilter);
+            return parts.join(' ');
+        }
+
+        async function fetchWebResults(queryString) {
+            if (!ENGINE_WEB_SEARCH_ENABLED) {
+                return { ok: true, results: [], error: null };
+            }
+            if (!queryString.trim()) {
+                return { ok: true, results: [], error: null };
+            }
+            const base = SEARCH_CONFIG.searxngBase;
+            const params = new URLSearchParams({
+                q: queryString,
+                format: 'json',
+                language: 'ar',
+                categories: 'general'
+            });
+            const url = `${base}/search?${params.toString()}`;
+            try {
+                const res = await fetch(url, { method: 'GET', mode: 'cors' });
+                if (!res.ok) {
+                    return { ok: false, results: [], error: 'HTTP ' + res.status };
+                }
+                const data = await res.json();
+                return { ok: true, results: data.results || [], error: null };
+            } catch (e) {
+                return { ok: false, results: [], error: e.message || 'network' };
+            }
+        }
+
+        function filterLocalData() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const countryFilter = document.getElementById('countryFilter').value;
+            const serviceFilter = document.getElementById('serviceFilter').value;
+
+            return governmentData.filter(entity => {
+                const matchesSearch = !searchInput ||
+                    entity.title.toLowerCase().includes(searchInput) ||
+                    entity.description.toLowerCase().includes(searchInput) ||
+                    (entity.keywords && entity.keywords.some(keyword => keyword.toLowerCase().includes(searchInput)));
+
+                const matchesType = !typeFilter || entity.type === typeFilter;
+                const matchesCountry = !countryFilter || entity.country === countryFilter;
+                const matchesService = !serviceFilter || (entity.services && entity.services.includes(serviceFilter));
+
+                return matchesSearch && matchesType && matchesCountry && matchesService;
+            });
+        }
+
+        function renderLocalCard(entity, highlightQuery) {
+            const ws = escapeAttr(entity.website);
+            const hq = highlightQuery && String(highlightQuery).trim() ? String(highlightQuery).trim() : '';
+            const titleHtml = hq ? highlightText(entity.title, hq) : escapeHtml(entity.title);
+            const descHtml = hq ? highlightText(entity.description, hq) : escapeHtml(entity.description);
+            return `
+                <div class="result-card result-card-local" data-website="${ws}" role="button" tabindex="0">
+                    <div class="result-header">
+                        <div class="result-icon">${entity.icon}</div>
+                        <div class="result-info">
+                            <h3>${titleHtml}</h3>
+                            <p>${descHtml}</p>
+                        </div>
+                    </div>
+                    <div class="result-details">
+                        <span class="result-type">${escapeHtml(entity.type)}</span>
+                        <span class="result-region">${escapeHtml(entity.region)}</span>
+                        <span class="result-country">${escapeHtml(entity.country)}</span>
+                    </div>
+                    <div class="result-contact">
+                        <a href="${ws}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">
+                            <i class="fas fa-external-link-alt"></i>
+                            الموقع الإلكتروني
+                        </a>
+                        <span>
+                            <i class="fas fa-phone"></i>
+                            ${escapeHtml(entity.phone)}
+                        </span>
+                    </div>
+                </div>`;
+        }
+
+        function renderWebCard(r) {
+            const title = r.title || r.url || '';
+            const url = r.url || '#';
+            const content = r.content || '';
+            const engine = (r.engine || r.parsed_url || 'web').toString();
+            return `
+                <div class="result-card web-result-card">
+                    <div class="engine-badge">${escapeHtml(engine)}</div>
+                    <div class="result-info">
+                        <h3><a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
+                        <p style="font-size:0.95rem;color:#555;">${escapeHtml(content)}</p>
+                    </div>
+                </div>`;
+        }
+
+        function bindLocalCardClicks(container) {
+            container.querySelectorAll('.result-card-local').forEach(card => {
+                card.addEventListener('click', function(ev) {
+                    if (ev.target.closest('a')) return;
+                    const w = this.getAttribute('data-website');
+                    if (w) window.open(w, '_blank', 'noopener,noreferrer');
+                });
+                card.addEventListener('keydown', function(ev) {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        card.click();
+                    }
+                });
+            });
+        }
+
+        function renderLocalPagination(currentPage, totalPages) {
+            if (totalPages <= 1) return '';
+            const prev = currentPage > 1 ? currentPage - 1 : 1;
+            const next = currentPage < totalPages ? currentPage + 1 : totalPages;
+            const prevDisabled = currentPage <= 1 ? ' disabled' : '';
+            const nextDisabled = currentPage >= totalPages ? ' disabled' : '';
+            return `
+                <div class="pagination-bar" role="navigation" aria-label="ترقيم صفحات النتائج المحلية">
+                    <button type="button" class="btn btn-secondary pagination-btn"${prevDisabled} onclick="goLocalPage(${prev})">السابق</button>
+                    <span class="pagination-meta">صفحة ${currentPage} من ${totalPages}</span>
+                    <button type="button" class="btn btn-secondary pagination-btn"${nextDisabled} onclick="goLocalPage(${next})">التالي</button>
+                </div>`;
+        }
+
+        function renderResultsContent() {
+            const resultsContainer = document.getElementById('resultsContent');
+            const resultsCount = document.getElementById('resultsCount');
+            const localSorted = getSortedLocal(lastLocalResults);
+            const webPack = lastWebPack;
+            const includeWeb = lastIncludeWeb;
+
+            const webCount = includeWeb && webPack.ok ? webPack.results.length : 0;
+            const total = localSorted.length + webCount;
+            resultsCount.textContent = total;
+
+            const totalLocalPages = Math.max(1, Math.ceil(localSorted.length / PAGE_SIZE));
+            if (localPage > totalLocalPages) localPage = totalLocalPages;
+            const slice = localSorted.slice((localPage - 1) * PAGE_SIZE, localPage * PAGE_SIZE);
+            const highlightQ = document.getElementById('searchInput').value.trim();
+
+            let html = '';
+            html += '<div class="results-toolbar" id="resultsToolbar"><button type="button" class="btn btn-secondary btn-ghost" onclick="copySearchLink()"><i class="fas fa-link"></i> نسخ رابط البحث</button></div>';
+            html += '<h3 class="result-block-title">الجهات من القائمة المحلية</h3>';
+            if (localSorted.length === 0) {
+                html += '<p class="no-inline">لا توجد جهات مطابقة في القائمة المحلية لهذا الاستعلام.</p>';
+            } else {
+                slice.forEach(function(entity) { html += renderLocalCard(entity, highlightQ); });
+                html += renderLocalPagination(localPage, totalLocalPages);
+            }
+
+            if (includeWeb) {
+                html += '<h3 class="result-block-title" style="margin-top:2rem;">نتائج الويب (SearXNG)</h3>';
+                if (!webPack.ok) {
+                    html += `<div class="web-error">تعذر جلب نتائج الويب. تأكد أن SearXNG يعمل على <code>${escapeHtml(SEARCH_CONFIG.searxngBase)}</code><br><small>${escapeHtml(webPack.error || '')}</small></div>`;
+                } else if (!webPack.results.length) {
+                    html += '<p class="no-inline">لا توجد نتائج ويب (أو اترك حقل البحث/الفلاتر لبناء استعلام).</p>';
+                } else {
+                    webPack.results.forEach(r => { html += renderWebCard(r); });
+                }
+            }
+
+            resultsContainer.innerHTML = html;
+            bindLocalCardClicks(resultsContainer);
+        }
+
+        function displayCombinedResults(local, webPack, includeWeb, resetPage) {
+            lastLocalResults = local;
+            lastWebPack = webPack;
+            lastIncludeWeb = includeWeb;
+            if (resetPage !== false) localPage = 1;
+            renderResultsContent();
+        }
+
+        function goLocalPage(page) {
+            const localSorted = getSortedLocal(lastLocalResults);
+            const totalLocalPages = Math.max(1, Math.ceil(localSorted.length / PAGE_SIZE));
+            const p = Math.min(Math.max(1, parseInt(page, 10) || 1), totalLocalPages);
+            localPage = p;
+            renderResultsContent();
+            writeUrlState();
+        }
+        window.goLocalPage = goLocalPage;
+
+        async function performSearch(options) {
+            lastViewMode = 'search';
+            const resetPage = !(options && options.resetPage === false);
+            const includeWeb = ENGINE_WEB_SEARCH_ENABLED && document.getElementById('includeWebSearch').checked;
+            const resultsContainer = document.getElementById('resultsContent');
+            resultsContainer.setAttribute('aria-busy', 'true');
+            resultsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>جاري البحث...</p></div>';
+
+            const local = filterLocalData();
+            let webPack = { ok: true, results: [] };
+            if (includeWeb) {
+                const q = buildSearxQuery();
+                webPack = await fetchWebResults(q);
+            }
+            displayCombinedResults(local, webPack, includeWeb, resetPage);
+            resultsContainer.setAttribute('aria-busy', 'false');
+            writeUrlState();
+        }
+
+        function showAllResults() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('countryFilter').value = '';
+            document.getElementById('serviceFilter').value = '';
+            localPage = 1;
+            lastViewMode = 'all';
+            displayCombinedResults(governmentData, { ok: true, results: [] }, false, true);
+            writeUrlState();
+        }
+
+        function populateFiltersFromData() {
+            const types = [...new Set(governmentData.map(e => e.type).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ar'));
+            const countries = [...new Set(governmentData.map(e => e.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ar'));
+            const services = [...new Set(governmentData.flatMap(e => e.services || []))].sort((a, b) => a.localeCompare(b, 'ar'));
+
+            function fillSelect(id, values) {
+                const sel = document.getElementById(id);
+                const prev = sel.value;
+                sel.innerHTML = '<option value="">الكل</option>';
+                values.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v;
+                    opt.textContent = v;
+                    sel.appendChild(opt);
+                });
+                if (values.includes(prev)) sel.value = prev;
+            }
+
+            fillSelect('typeFilter', types);
+            fillSelect('countryFilter', countries);
+            fillSelect('serviceFilter', services);
+        }
+
+        function updateStats() {
+            const countries = [...new Set(governmentData.map(entity => entity.country))];
+            const regions = [...new Set(governmentData.map(entity => entity.region))];
+            const types = [...new Set(governmentData.map(entity => entity.type))];
+
+            document.getElementById('totalEntities').textContent = governmentData.length;
+            document.getElementById('totalCountries').textContent = countries.length;
+            document.getElementById('totalRegions').textContent = regions.length;
+            document.getElementById('totalTypes').textContent = types.length;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            governmentData = window.__GOVERNMENT_DATA__ || [];
+            if (ENGINE_WEB_SEARCH_ENABLED) {
+                var wg = document.getElementById('webSearchGroup');
+                if (wg) wg.hidden = false;
+                document.getElementById('includeWebSearch').checked = true;
+            }
+            if (!governmentData.length) {
+                const el = document.getElementById('resultsContent');
+                el.innerHTML = '<div class="web-error">تعذر تحميل البيانات. تأكد من وجود الملف <code>government-data.js</code> بجانب هذه الصفحة.</div>';
+            } else {
+                populateFiltersFromData();
+                updateStats();
+                applyStateFromUrl();
+            }
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') performSearch();
+            });
+            document.getElementById('includeWebSearch').addEventListener('change', function() {
+                if (!ENGINE_WEB_SEARCH_ENABLED) return;
+                if (lastViewMode === 'search' || document.getElementById('searchInput').value.trim() || document.getElementById('countryFilter').value) {
+                    performSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

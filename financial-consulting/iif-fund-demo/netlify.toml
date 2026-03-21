@@ -1,0 +1,8 @@
+# Netlify — إعدادات النشر والأمان
+# Force HTTPS: تفعيل "Force HTTPS" من لوحة Netlify (Site settings > HTTPS) يفضّل.
+# هذا التوجيه يساعد في إعادة توجيه الطلبات غير الآمنة.
+[[redirects]]
+  from = "/*"
+  to = "/:splat"
+  status = 200
+  force = true

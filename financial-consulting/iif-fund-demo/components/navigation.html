@@ -1,0 +1,52 @@
+<!-- Navigation Component -->
+<nav class="site-nav" id="site-nav">
+  <div class="site-nav__inner">
+    <!-- Main Navigation Links -->
+    <ul class="site-nav__links" id="site-nav-links">
+      <li><a href="/" class="site-nav__link" data-page="home" data-i18n="navHome">Home</a></li>
+      <li><a href="/about" class="site-nav__link btn--about" data-page="about" data-i18n="navAbout">About</a></li>
+      <li><a href="/services" class="site-nav__link" data-page="services" data-i18n="navServices">Services</a></li>
+      <li><a href="/sectors" class="site-nav__link" data-page="sectors" data-i18n="navSectors">Sectors</a></li>
+      <li><a href="/contact" class="site-nav__link" data-page="contact" data-i18n="navContact">Contact</a></li>
+    </ul>
+
+    <!-- Search Bar -->
+    <div class="header-search" id="iif-search-wrap-outer">
+      <input type="search" id="iif-search" autocomplete="off" data-i18n="searchPlaceholder" placeholder="Search site…"
+        aria-label="Search">
+      <div id="iif-search-wrap" class="search-results"></div>
+    </div>
+
+    <!-- User Navigation (shown when logged in) -->
+    <div class="site-nav__user" id="site-nav-user" style="display: none;">
+      <a href="/dashboard" class="btn btn--ghost btn-sm nav-dashboard-link" id="nav-dashboard" aria-label="Dashboard"
+        style="display: none; text-decoration: none;">
+        <span data-i18n="dashboard">Dashboard</span>
+      </a>
+      <a href="/profile" class="btn btn--ghost btn-sm nav-user-dashboard-link" id="nav-user-dashboard"
+        aria-label="User Profile" style="display: none; text-decoration: none;">
+        <span data-i18n="myProfile">My Profile</span>
+      </a>
+      <button type="button" class="btn btn--ghost btn-sm nav-logout-link" id="nav-logout" aria-label="Sign out"
+        style="display: none;">
+        <span data-i18n="signOut">Sign out</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- News Ticker -->
+<div class="site-header__tickers">
+  <div class="ticker-wrap">
+    <span class="ticker-label lang-en" data-i18n="globalMarkets">Global Markets</span>
+    <span class="ticker-label lang-ar" data-i18n="globalMarketsAr">الأسواق العالمية</span>
+    <div class="ticker-track" id="ticker-track">
+      <div class="ticker-track__copy" id="ticker-copy-1">
+        <!-- Ticker items will be populated by JavaScript -->
+      </div>
+      <div class="ticker-track__copy" id="ticker-copy-2" aria-hidden="true">
+        <!-- Duplicate for seamless scrolling -->
+      </div>
+    </div>
+  </div>
+</div>

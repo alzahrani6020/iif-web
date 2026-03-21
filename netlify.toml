@@ -1,0 +1,19 @@
+# Netlify — نشر الموقع الثابت من جذر المستودع
+# في واجهة Netlify: اترك Build command و Publish فارغين إن أمكن (يُقرأ من هنا).
+
+[build]
+  command = "npm ci --no-audit --fund=false && npm run build"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "20"
+  NODE_ENV = "production"
+  CI = "true"
+
+# أمان أساسي — عدّل حسب الحاجة بعد الاختبار
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

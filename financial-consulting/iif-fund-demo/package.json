@@ -1,0 +1,34 @@
+{
+  "name": "government-search-system",
+  "version": "1.0.0",
+  "description": "Comprehensive Government Search System with Backend Database",
+  "main": "backend-server.js",
+  "scripts": {
+    "start": "node backend-server.js",
+    "dev": "nodemon backend-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "government",
+    "search",
+    "database",
+    "arabic",
+    "english",
+    "bilingual"
+  ],
+  "author": "Government Search Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

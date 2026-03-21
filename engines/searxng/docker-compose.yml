@@ -1,0 +1,13 @@
+# SearXNG — مشروع مستقل (لا يُدمج حالياً مع صفحات IIF)
+# التشغيل من هذا المجلد: docker compose up -d
+# الواجهة: http://127.0.0.1:8080
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: iif-searxng-standalone
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # volumes:
+    #   - ./searxng-settings:/etc/searxng:ro

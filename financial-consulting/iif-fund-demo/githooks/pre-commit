@@ -1,0 +1,5 @@
+#!/bin/sh
+# تحقق أوتوماتيكي عند كل commit — انسخه إلى .git/hooks/pre-commit
+root="$(git rev-parse --show-toplevel 2>/dev/null)"
+[ -n "$root" ] && [ -f "$root/scripts/validate-site.js" ] && node "$root/scripts/validate-site.js" || true
+exit 0

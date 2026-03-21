@@ -1,0 +1,30 @@
+# نشر يدوي إلى Netlify (نفس منطق netlify.toml)
+# أضف في GitHub → Settings → Secrets and variables → Actions:
+#   NETLIFY_AUTH_TOKEN  ← Netlify → User settings → Applications → Personal access tokens
+#   NETLIFY_SITE_ID     ← Site settings → Site details → Site ID
+#
+# ثم: Actions → Deploy Netlify → Run workflow
+
+name: Deploy Netlify
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install + build (مطابق لـ netlify.toml)
+        run: npm ci --no-audit --fund=false && npm run build
+
+      - name: Deploy
+        run: npx --yes netlify-cli deploy --prod --dir .
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
