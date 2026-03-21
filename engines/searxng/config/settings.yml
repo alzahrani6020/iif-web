@@ -1,7 +1,7 @@
-# SearXNG — إعدادات IIF (تعتمد على الإعدادات الافتراضية + تجاوزات)
-# التوثيق: https://docs.searxng.org/admin/settings/settings.html
+# SearXNG — إعدادات IIF (افتراضيات + تجاوزات)
+# https://docs.searxng.org/admin/settings/settings.html
 #
-# غيّر secret_key في أي بيئة عامة.
+# ⚠️ غيّر secret_key قبل أي نشر على الإنترنت.
 
 use_default_settings: true
 
@@ -11,10 +11,21 @@ general:
 
 search:
   default_lang: "ar"
+  safe_search: 0
   formats:
     - html
     - json
 
+ui:
+  default_locale: "ar"
+  query_in_title: false
+  default_theme: simple
+
 server:
-  secret_key: "iif-dev-change-in-production"
+  secret_key: "iif-dev-change-in-production-use-openssl-rand-hex-32"
   base_url: http://127.0.0.1:8080/
+  # ضروري لاستقبال الاتصالات من خارج الحاوية (Docker)
+  bind_address: "0.0.0.0"
+  port: 8080
+  image_proxy: true
+  limiter: false
