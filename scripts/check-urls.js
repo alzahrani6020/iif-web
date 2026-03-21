@@ -16,6 +16,9 @@ const PATHS = [
   '/financial-consulting/government-search/iif-config.js',
 ];
 
+/** مسارات اختيارية: فشلها لا يوقف السكربت (مثلاً SearXNG غير مشغّل) */
+const SOFT_PATHS = [{ path: '/api/searx/', note: 'بروكسي → SearXNG (شغّل Docker من engines/searxng)' }];
+
 function get(path) {
   return new Promise((resolve, reject) => {
     const req = http.request(
@@ -53,7 +56,21 @@ async function main() {
   }
 
   console.log('');
-  console.log('  (محرك SearXNG منفصل — engines/searxng/ — لا يُتحقق منه هنا)');
+  console.log('  اختياري — بروكسي المحرك:');
+  for (const item of SOFT_PATHS) {
+    try {
+      const { status } = await get(item.path);
+      if (status === 200) {
+        console.log('  OK', status, item.path, '← SearXNG يستجيب عبر البروكسي');
+      } else if (status === 502) {
+        console.log('  …', status, item.path, '—', item.note);
+      } else {
+        console.log('  ?', status, item.path);
+      }
+    } catch (e) {
+      console.log('  …', item.path, '—', e.message, '(طبيعي إن لم يُشغَّل الخادم أو Docker)');
+    }
+  }
   console.log('');
   if (failed) {
     console.log('بعض الطلبات فشلت. تأكد: npm start يعمل من مجلد المشروع.');
