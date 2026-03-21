@@ -7,7 +7,8 @@
     "dev": "node scripts/dev-server.js",
     "check-urls": "node scripts/check-urls.js",
     "build:gov-data": "node financial-consulting/government-search/build-government-data.mjs",
-    "build": "npm run build:gov-data"
+    "build": "npm run build:gov-data",
+    "validate": "npm run build"
   },
   "engines": {
     "node": ">=20"

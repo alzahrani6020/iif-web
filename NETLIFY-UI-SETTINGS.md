@@ -14,4 +14,11 @@
 
 بعد ربط GitHub: **Deploy** أو انتظار البناء التلقائي عند الـ push.
 
+**اختصارات (معرّفة في `netlify.toml`):**
+
+| المسار | يوجّه إلى |
+|--------|-----------|
+| `/fund` | واجهة الصندوق |
+| `/gov` | المنصة الحكومية |
+
 للنشر اليدوي من GitHub Actions: أضف الأسرار `NETLIFY_AUTH_TOKEN` و `NETLIFY_SITE_ID` ثم شغّل workflow **Deploy Netlify**.

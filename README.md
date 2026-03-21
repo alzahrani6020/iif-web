@@ -4,6 +4,8 @@
 
 **للمبتدئين — رفع المشروع إلى GitHub ثم Netlify (بدون مصطلحات معقدة):** [دليل-المبتدئ-النشر.md](./دليل-المبتدئ-النشر.md)
 
+**المستودع على GitHub:** [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)
+
 ## موقع المشروع (اتفاق)
 
 | | |
@@ -20,7 +22,7 @@
 
 ### 1) خادم التطوير (الواجهات الثابتة)
 
-يتطلب **Node.js 18+**:
+يتطلب **Node.js 20+** (انظر `.nvmrc`):
 
 ```bash
 npm start
@@ -84,9 +86,13 @@ docker compose up -d
 
 ## Netlify (ربط GitHub)
 
-- الإعدادات الافتراضية في **`netlify.toml`** (أمر البناء: `npm ci && npm run build`، النشر: **`.`**).
-- في لوحة Netlify يمكن ترك حقول البناء فارغة، أو نسخ القيم من **`NETLIFY-UI-SETTINGS.md`**.
-- نشر يدوي من GitHub: workflow **`Deploy Netlify`** يحتاج الأسرار `NETLIFY_AUTH_TOKEN` و `NETLIFY_SITE_ID`.
+- الإعدادات في **`netlify.toml`** (أمر البناء: `npm ci && npm run build`، النشر: **`.`**).
+- **قائمة خطوات جاهزة:** [NETLIFY-CHECKLIST.md](./NETLIFY-CHECKLIST.md)
+- لصق حقول الواجهة يدوياً: [NETLIFY-UI-SETTINGS.md](./NETLIFY-UI-SETTINGS.md)
+- **اختصارات بعد النشر:** `/fund` → واجهة الصندوق، `/gov` → المنصة الحكومية
+- نشر يدوي من GitHub: workflow **`Deploy Netlify`** (اختياري) يحتاج الأسرار `NETLIFY_AUTH_TOKEN` و `NETLIFY_SITE_ID`.
+
+> **ملاحظة:** إذا ربطت Netlify بمستودع `iif-web` على الفرع `main`، كل **push** يُعيد بناء الموقع تلقائياً — لا تحتاج أسرار Actions لذلك.
 
 ---
 

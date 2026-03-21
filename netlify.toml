@@ -1,5 +1,7 @@
 # Netlify — نشر الموقع الثابت من جذر المستودع
 # في واجهة Netlify: اترك Build command و Publish فارغين إن أمكن (يُقرأ من هنا).
+# قائمة تحقق: NETLIFY-CHECKLIST.md
+# صفحة 404: ضع ملف 404.html في الجذر — Netlify يخدمه تلقائياً للمسارات غير الموجودة.
 
 [build]
   command = "npm ci --no-audit --fund=false && npm run build"
@@ -10,10 +12,30 @@
   NODE_ENV = "production"
   CI = "true"
 
-# أمان أساسي — عدّل حسب الحاجة بعد الاختبار
+[context.deploy-preview]
+  command = "npm ci --no-audit --fund=false && npm run build"
+
+[context.branch-deploy]
+  command = "npm ci --no-audit --fund=false && npm run build"
+
+[[redirects]]
+  from = "/fund"
+  to = "/financial-consulting/iif-fund-demo/index.html"
+  status = 302
+
+[[redirects]]
+  from = "/gov"
+  to = "/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html"
+  status = 302
+
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/financial-consulting/government-search/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
