@@ -23,12 +23,14 @@
 - الرابط: **https://github.com/alzahrani6020/iif-web**
 - الفرع الافتراضي: **`main`**
 
-## 2) إنشاء الموقع في Netlify
+## 2) إنشاء الموقع في Netlify / ربط مستودع GitHub
 
-1. [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import an existing project**
-2. **GitHub** → امنح الصلاحية إن طُلب → اختر **`alzahrani6020/iif-web`**
+**دليل خطوة بخطوة (من المتصفح):** [اربط-المستودع-الآن.md](./اربط-المستودع-الآن.md)
+
+1. [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import an existing project** — أو من موقع موجود: **Build & deploy** → **Link repository**.
+2. **GitHub** → امنح الصلاحية إن طُلب → اختر **`alzahrani6020/iif-web`** والفرع **`main`**.
 3. **Build settings:** اتركها فارغة إن قرأت من المستودع، أو انسخ من [NETLIFY-UI-SETTINGS.md](./NETLIFY-UI-SETTINGS.md)
-4. **Deploy site**
+4. **Deploy site** (يفضّل **Clear cache and deploy** بعد أول ربط).
 
 ## 3) بعد أول نشر ناجح
 
