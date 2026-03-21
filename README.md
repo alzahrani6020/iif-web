@@ -6,6 +6,8 @@
 
 **المستودع على GitHub:** [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)
 
+**للمساعد الذكاء الاصطناعي (Cursor / غيره):** اقرأ [AGENTS.md](./AGENTS.md) ومجلد `.cursor/rules/`.
+
 ## موقع المشروع (اتفاق)
 
 | | |

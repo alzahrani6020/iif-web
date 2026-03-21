@@ -1,0 +1,11 @@
+---
+description: تعديل بيانات الجهات الحكومية
+globs: financial-consulting/government-search/**/*
+alwaysApply: false
+---
+
+# بيانات المنصة الحكومية
+
+- عدّل **`government-data.json`** ثم شغّل من الجذر: `npm run build`.
+- **`government-data.js`** مُولَّد — لا يُعدَّل يدوياً كمصدر حقيقة.
+- الصفحة الرئيسية للمنصة: `SIMPLE-GOVERNMENT-PLATFORM.html`.
