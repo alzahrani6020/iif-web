@@ -23,6 +23,10 @@ docker compose down
 
 - ربط المنصة أو بروكسي الإنتاج يُوثَّق في `financial-consulting/government-search/README-IIF-INTEGRATION.md` عند تفعيل التكامل.
 
+## خطة التطوير
+
+مراحل العمل التفصيلية: **[خطة-التطوير.md](./خطة-التطوير.md)**
+
 ## ملاحظة
 
 اسم الحاوية: `iif-searxng-standalone` لتفريقها عن أي إعداد قديم.
