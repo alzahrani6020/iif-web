@@ -8,15 +8,20 @@
 
 **للمساعد الذكاء الاصطناعي (Cursor / غيره):** اقرأ [AGENTS.md](./AGENTS.md) ومجلد `.cursor/rules/`.
 
+**تعريف «أكمل اللازم» (للمساعد وللمستخدم):** [اكمل-اللازم-قائمة.md](./اكمل-اللازم-قائمة.md)  
+
+**فهرسة Cursor أسرع:** انسخ [cursorignore.example](./cursorignore.example) إلى `.cursorignore` في الجذر.
+
 ## موقع المشروع (اتفاق)
 
 | | |
 |---|---|
-| **العمل والتخزين** | **`D:\iif-fund-demo` فقط** — لا نكرّر المشروع على **C:** (نُبقي مساحة C: حرة). |
+| **العمل والتخزين (مفضّل)** | **`D:\iif-fund-demo`** — لا تكرّر المشروع على **C:** بلا داعٍ (توفير مساحة). |
+| **نسخة على C: (مثلاً Cursor)** | **`C:\Users\...\iif-fund-demo`** مقبولة إن كان هذا المجلد المفتوح في Cursor — نعمل على **المجلد المفتوح فعلياً**. |
 | **البرامج** | استخدم **Node، Docker، Cursor، Git**… كالمعتاد؛ تثبيتها على C: طبيعي. |
-| **Cursor** | **Open Folder → `D:\iif-fund-demo`** دائماً. |
-| **Git** | من **D:**. تفاصيل: [WORKSPACE-D-DRIVE.md](./WORKSPACE-D-DRIVE.md). |
-| **نسخة قديمة على C:** | يمكن حذفها بعد التأكد من D — `scripts/optional-remove-c-copy.bat` (اختياري). |
+| **Cursor** | **Open Folder** → مجلد المشروع (D: أو C: حسب نسختك). |
+| **Git** | من مجلد المشروع. تفاصيل: [WORKSPACE-D-DRIVE.md](./WORKSPACE-D-DRIVE.md). |
+| **نسخة قديمة على C:** | بعد التأكد من النسخة الصحيحة — [scripts/optional-remove-c-copy.bat](./scripts/optional-remove-c-copy.bat) (قالب آمن، لا يحذف تلقائياً). |
 
 ---
 
