@@ -13,6 +13,19 @@ docker compose up -d
 - **واجهة المحرك:** [http://127.0.0.1:8080](http://127.0.0.1:8080)
 - يتطلب **Docker Desktop** شغّالاً.
 
+### الإعدادات (`config/settings.yml`)
+
+- تُحمَّل فوق الإعدادات الافتراضية (`use_default_settings: true`).
+- **اسم المثيل**، **اللغة الافتراضية للبحث (ar)**، **تفعيل JSON** لواجهة المنصة، **تعطيل metrics** محلياً.
+- **غيّر `secret_key`** قبل أي نشر عام.
+
+إن كانت لديك حاوية قديمة **بدون** مجلدات `config`/`data`:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
 ## الإيقاف
 
 ```bash

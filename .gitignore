@@ -4,3 +4,7 @@ node_modules/
 .env
 .env.local
 .netlify/
+
+# كاش SearXNG محلياً (يُبقى المجلد فقط)
+engines/searxng/data/*
+!engines/searxng/data/.gitkeep

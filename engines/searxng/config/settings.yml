@@ -1,0 +1,20 @@
+# SearXNG — إعدادات IIF (تعتمد على الإعدادات الافتراضية + تجاوزات)
+# التوثيق: https://docs.searxng.org/admin/settings/settings.html
+#
+# غيّر secret_key في أي بيئة عامة.
+
+use_default_settings: true
+
+general:
+  instance_name: "IIF — SearXNG"
+  enable_metrics: false
+
+search:
+  default_lang: "ar"
+  formats:
+    - html
+    - json
+
+server:
+  secret_key: "iif-dev-change-in-production"
+  base_url: http://127.0.0.1:8080/
