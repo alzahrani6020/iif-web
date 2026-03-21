@@ -62,12 +62,19 @@ function proxySearx(req, res) {
       path: targetPath,
       method: req.method,
       headers,
+      timeout: 30000,
     },
     (pres) => {
       res.writeHead(pres.statusCode, pres.headers);
       pres.pipe(res);
     }
   );
+  preq.on('timeout', () => {
+    preq.destroy();
+    if (!res.headersSent) {
+      send(res, 504, 'انتهت مهلة الاتصال بـ SearXNG', { 'Content-Type': 'text/plain; charset=utf-8' });
+    }
+  });
   preq.on('error', (e) => {
     if (!res.headersSent) {
       send(

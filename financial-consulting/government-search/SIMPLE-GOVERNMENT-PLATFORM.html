@@ -594,7 +594,7 @@
                 <div class="filter-group filter-full" id="webSearchGroup" hidden>
                     <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;font-weight:600;">
                         <input type="checkbox" id="includeWebSearch" style="margin-top:0.25rem;">
-                        <span>تضمين نتائج الويب (SearXNG — يعمل على جهاز التطوير مع <code>npm start</code> + Docker)</span>
+                        <span>تضمين نتائج الويب (اختياري — SearXNG + <code>npm start</code> + Docker)</span>
                     </label>
                     <small style="color: var(--light-text); display:block; margin-top:0.35rem;">
                         شغّل المحرك: <code>cd engines/searxng && docker compose up -d</code> ثم افتح هذه الصفحة من <code>http://127.0.0.1:3333/…</code>
@@ -706,7 +706,11 @@
                 if (country) p.set('country', country);
                 const service = document.getElementById('serviceFilter').value;
                 if (service) p.set('service', service);
-                if (!document.getElementById('includeWebSearch').checked) p.set('web', '0');
+                if (document.getElementById('includeWebSearch').checked) {
+                    p.set('web', '1');
+                } else {
+                    p.set('web', '0');
+                }
             }
             const sort = document.getElementById('sortLocal').value;
             if (sort && sort !== 'default') p.set('sort', sort);
@@ -737,7 +741,8 @@
             document.getElementById('typeFilter').value = p.get('type') || '';
             document.getElementById('countryFilter').value = p.get('country') || '';
             document.getElementById('serviceFilter').value = p.get('service') || '';
-            document.getElementById('includeWebSearch').checked = ENGINE_WEB_SEARCH_ENABLED && p.get('web') !== '0';
+            document.getElementById('includeWebSearch').checked =
+                ENGINE_WEB_SEARCH_ENABLED && p.get('web') === '1';
             lastViewMode = 'search';
             performSearch({ resetPage: false });
         }
@@ -819,14 +824,23 @@
             });
             const url = `${base}/search?${params.toString()}`;
             try {
-                const res = await fetch(url, { method: 'GET', credentials: 'omit' });
+                var fetchOpts = { method: 'GET', credentials: 'omit' };
+                if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+                    fetchOpts.signal = AbortSignal.timeout(20000);
+                } else if (typeof AbortController !== 'undefined') {
+                    var ac = new AbortController();
+                    setTimeout(function() { ac.abort(); }, 20000);
+                    fetchOpts.signal = ac.signal;
+                }
+                const res = await fetch(url, fetchOpts);
                 if (!res.ok) {
                     return { ok: false, results: [], error: 'HTTP ' + res.status };
                 }
                 const data = await res.json();
                 return { ok: true, results: data.results || [], error: null };
             } catch (e) {
-                return { ok: false, results: [], error: e.message || 'network' };
+                const msg = e && e.name === 'TimeoutError' ? 'انتهت مهلة الانتظار (20 ث)' : (e.message || 'network');
+                return { ok: false, results: [], error: msg };
             }
         }
 
@@ -1059,7 +1073,7 @@
             if (ENGINE_WEB_SEARCH_ENABLED) {
                 var wg = document.getElementById('webSearchGroup');
                 if (wg) wg.hidden = false;
-                document.getElementById('includeWebSearch').checked = true;
+                document.getElementById('includeWebSearch').checked = false;
             }
             if (!governmentData.length) {
                 const el = document.getElementById('resultsContent');
