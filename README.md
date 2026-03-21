@@ -94,6 +94,8 @@ docker compose up -d
 
 > **ملاحظة:** إذا ربطت Netlify بمستودع `iif-web` على الفرع `main`، كل **push** يُعيد بناء الموقع تلقائياً — لا تحتاج أسرار Actions لذلك.
 
+**توفير الطبقة المجانية (Netlify / Actions):** [NETLIFY-FREE-TIER.md](./NETLIFY-FREE-TIER.md)
+
 ---
 
 ## متغيرات اختيارية

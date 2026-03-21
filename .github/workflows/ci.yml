@@ -1,10 +1,24 @@
-# تحقق من البناء عند كل push / PR (بدون أسرار)
+# تحقق من البناء عند push / PR — يُتخطى عند تغيير التوثيق فقط (توفير دقائق Actions)
+# انظر: NETLIFY-FREE-TIER.md
+
 name: CI
 
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "robots.txt"
+      - "404.html"
   pull_request:
+    paths-ignore:
+      - "**.md"
+      - "robots.txt"
+      - "404.html"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
