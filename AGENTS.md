@@ -20,6 +20,7 @@
 npm start          # خادم التطوير
 npm run build      # توليد government-data.js من JSON
 npm run validate   # نفس البناء
+npm run verify       # build + فحص صياغة dev-server و check-urls (بدون تشغيل الخادم)
 npm run check-urls # بعد تشغيل الخادم — التحقق من الروابط
 ```
 

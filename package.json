@@ -9,7 +9,8 @@
     "check:dev": "node scripts/check-urls.js",
     "build:gov-data": "node financial-consulting/government-search/build-government-data.mjs",
     "build": "npm run build:gov-data",
-    "validate": "npm run build"
+    "validate": "npm run build",
+    "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js"
   },
   "engines": {
     "node": ">=20"
