@@ -36,6 +36,7 @@ async function main() {
         '<base id="iif-document-base"',
         'assets/emblem.jpg',
         'id="dashboard-overlay"',
+        'iif-dashboard-fullpage-critical-head',
         'تحقق-النشر-iif-dashboard-fullpage',
       ],
       label: 'واجهة الصندوق (index)',

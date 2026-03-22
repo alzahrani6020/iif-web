@@ -61,6 +61,53 @@
   <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
+  <!-- تحقق-النشر: iif-dashboard-fullpage-v3 — إن لم يظهر هذا التعليق في Ctrl+U على Vercel فالنشر قديم -->
+  <style id="iif-dashboard-fullpage-critical-head">
+    /* لوحة التحكم: ملء الشاشة — نسخة مبكّرة في <head> (تُكمّلها iif-dashboard-fullpage-lock في آخر body) */
+    #dashboard-overlay.dashboard-overlay.is-open {
+      position: fixed !important;
+      inset: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: auto !important;
+      min-width: 100% !important;
+      max-width: none !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      max-height: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      transform: none !important;
+      box-sizing: border-box !important;
+      z-index: 2147483647 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      background: linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%) !important;
+    }
+    #dashboard-overlay.is-open #dashboard-page-shell {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 auto !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+    }
+    #dashboard-overlay.is-open .dashboard-main,
+    #dashboard-overlay.is-open .dashboard-header-bar .site-header__inner {
+      max-width: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    body:has(#dashboard-overlay.is-open) #main-content {
+      display: none !important;
+    }
+  </style>
   <style>
     :root {
       --color-primary: #0a0e18;
@@ -4337,7 +4384,10 @@
     }
 
     .dashboard-overlay.is-open {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
     }
 
     .dashboard-overlay.is-open:focus {
@@ -7036,7 +7086,11 @@
       display: none !important;
     }
 
-    #dashboard-overlay.is-open ~ #main-content,
+    /*
+      إخفاء المحتوى العام عند فتح اللوحة:
+      — لا تعتمد على ~ #main-content لأن JS ينقل #dashboard-overlay لآخر body فيصبح #main-content *قبل* اللوحة فلا يطابق المحدد الأخوي.
+    */
+    body:has(#dashboard-overlay.is-open) #main-content,
     html.iif-dashboard-open #main-content,
     /*
       وضع embed: لا تُخفِ #main-content حتى تُفتح اللوحة أو نافذة الدخول — يمنع شاشة سوداء إذا تأخّر JS.
@@ -7047,7 +7101,7 @@
       display: none !important;
     }
 
-    #dashboard-overlay.is-open ~ footer,
+    body:has(#dashboard-overlay.is-open) > footer,
     html.iif-dashboard-open body > footer,
     html.iif-admin-embed body > footer {
       display: none !important;
@@ -18290,8 +18344,9 @@ Generated: ${new Date().toLocaleString()}
           s.setProperty('left', '0', 'important');
           s.setProperty('right', '0', 'important');
           s.setProperty('bottom', '0', 'important');
-          s.setProperty('width', '100vw', 'important');
-          s.setProperty('min-width', '100vw', 'important');
+          /* left+right+width:auto يملأ viewport حتى لو كانت حاوية fixed معطوبة؛ 100vw وحده قد يُقاس من عنصر ضيق */
+          s.setProperty('width', 'auto', 'important');
+          s.setProperty('min-width', '100%', 'important');
           s.setProperty('max-width', 'none', 'important');
           s.setProperty('min-height', '100dvh', 'important');
           s.setProperty('height', '100dvh', 'important');
@@ -18302,22 +18357,66 @@ Generated: ${new Date().toLocaleString()}
           s.setProperty('box-shadow', 'none', 'important');
           s.setProperty('transform', 'none', 'important');
           s.setProperty('z-index', '2147483647', 'important');
-          s.setProperty('display', 'block', 'important');
+          /* عمود/نافذة ضيقة: flex + stretch يضمن امتداد الحاويات الداخلية بعرض اللوحة */
+          s.setProperty('display', 'flex', 'important');
+          s.setProperty('flex-direction', 'column', 'important');
+          s.setProperty('align-items', 'stretch', 'important');
+          s.setProperty('justify-content', 'flex-start', 'important');
           s.setProperty('box-sizing', 'border-box', 'important');
           s.setProperty('background', 'linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%)', 'important');
         } catch (e2) { }
+        try {
+          var rootEl = document.documentElement;
+          var bodyEl = document.body;
+          if (rootEl && rootEl.style) {
+            rootEl.style.setProperty('transform', 'none', 'important');
+            rootEl.style.setProperty('filter', 'none', 'important');
+            rootEl.style.setProperty('perspective', 'none', 'important');
+            rootEl.style.setProperty('contain', 'none', 'important');
+          }
+          if (bodyEl && bodyEl.style) {
+            bodyEl.style.setProperty('transform', 'none', 'important');
+            bodyEl.style.setProperty('filter', 'none', 'important');
+            bodyEl.style.setProperty('perspective', 'none', 'important');
+            bodyEl.style.setProperty('contain', 'none', 'important');
+          }
+        } catch (eRoot) { }
         try {
           var modal = document.getElementById('dashboard-page-shell');
           if (modal) {
             var m = modal.style;
             m.setProperty('width', '100%', 'important');
+            m.setProperty('min-width', '100%', 'important');
             m.setProperty('max-width', 'none', 'important');
+            m.setProperty('flex', '1 1 auto', 'important');
             m.setProperty('min-height', '100dvh', 'important');
             m.setProperty('margin', '0', 'important');
             m.setProperty('border-radius', '0', 'important');
             m.setProperty('box-shadow', 'none', 'important');
+            m.setProperty('box-sizing', 'border-box', 'important');
           }
         } catch (e3) { }
+        try {
+          var dm = el.querySelector && el.querySelector('main.dashboard-main');
+          if (dm) {
+            var dmS = dm.style;
+            dmS.setProperty('max-width', 'none', 'important');
+            dmS.setProperty('width', '100%', 'important');
+            dmS.setProperty('min-width', '0', 'important');
+            dmS.setProperty('margin-left', '0', 'important');
+            dmS.setProperty('margin-right', '0', 'important');
+            dmS.setProperty('box-sizing', 'border-box', 'important');
+          }
+          var hi = el.querySelector && el.querySelector('.dashboard-header-bar .site-header__inner');
+          if (hi) {
+            var hiS = hi.style;
+            hiS.setProperty('max-width', 'none', 'important');
+            hiS.setProperty('width', '100%', 'important');
+            hiS.setProperty('margin-left', '0', 'important');
+            hiS.setProperty('margin-right', '0', 'important');
+            hiS.setProperty('box-sizing', 'border-box', 'important');
+          }
+        } catch (e4) { }
       }
       try { window.IIF_applyDashboardFullpageLayout = IIF_applyDashboardFullpageLayout; } catch (eW) { }
       /** إعادة تطبيق ملء الشاشة بعد تأخيرات قصيرة — دالة واحدة بدل تكرار setTimeout (أسهل صيانة، نفس السلوك) */
@@ -18358,16 +18457,38 @@ Generated: ${new Date().toLocaleString()}
       function IIF_clearDashboardFullpageLayout() {
         var el = document.getElementById('dashboard-overlay');
         if (el) {
-          ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'min-width', 'max-width', 'min-height', 'height', 'max-height', 'margin', 'padding', 'border-radius', 'box-shadow', 'transform', 'z-index', 'display', 'box-sizing', 'background'].forEach(function (p) {
+          ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'min-width', 'max-width', 'min-height', 'height', 'max-height', 'margin', 'padding', 'border-radius', 'box-shadow', 'transform', 'z-index', 'display', 'flex-direction', 'align-items', 'justify-content', 'flex', 'box-sizing', 'background'].forEach(function (p) {
             try { el.style.removeProperty(p); } catch (e) { }
           });
         }
+        try {
+          var rootEl = document.documentElement;
+          var bodyEl = document.body;
+          ['transform', 'filter', 'perspective', 'contain'].forEach(function (p) {
+            try { if (rootEl && rootEl.style) rootEl.style.removeProperty(p); } catch (e) { }
+            try { if (bodyEl && bodyEl.style) bodyEl.style.removeProperty(p); } catch (e) { }
+          });
+        } catch (eRootClr) { }
         var modal = document.getElementById('dashboard-page-shell');
         if (modal) {
-          ['width', 'max-width', 'min-height', 'margin', 'border-radius', 'box-shadow'].forEach(function (p) {
+          ['width', 'min-width', 'max-width', 'min-height', 'flex', 'margin', 'border-radius', 'box-shadow', 'box-sizing'].forEach(function (p) {
             try { modal.style.removeProperty(p); } catch (e) { }
           });
         }
+        try {
+          var dm = document.querySelector('#dashboard-overlay main.dashboard-main');
+          if (dm) {
+            ['max-width', 'width', 'min-width', 'margin-left', 'margin-right', 'box-sizing'].forEach(function (p) {
+              try { dm.style.removeProperty(p); } catch (e) { }
+            });
+          }
+          var hi = document.querySelector('#dashboard-overlay .dashboard-header-bar .site-header__inner');
+          if (hi) {
+            ['max-width', 'width', 'margin-left', 'margin-right', 'box-sizing'].forEach(function (p) {
+              try { hi.style.removeProperty(p); } catch (e) { }
+            });
+          }
+        } catch (eClrInner) { }
       }
 
       function openDashboard() {
@@ -23932,8 +24053,8 @@ Generated: ${new Date().toLocaleString()}
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      width: 100vw !important;
-      min-width: 100vw !important;
+      width: auto !important;
+      min-width: 100% !important;
       max-width: none !important;
       min-height: 100vh !important;
       min-height: 100dvh !important;
@@ -23947,8 +24068,17 @@ Generated: ${new Date().toLocaleString()}
       transform: none !important;
       box-sizing: border-box !important;
       z-index: 2147483647 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
       background-color: #070a10 !important;
       background: linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%) !important;
+    }
+
+    /* بعد نقل اللوحة لآخر body: إخفاء #main-content لا يعمل بـ ~ — استخدم :has */
+    body:has(#dashboard-overlay.is-open) #main-content {
+      display: none !important;
     }
 
     html.iif-dashboard-open body::before,
@@ -23958,21 +24088,35 @@ Generated: ${new Date().toLocaleString()}
     }
 
     html.iif-dashboard-open,
-    html.iif-dashboard-open body {
+    html.iif-dashboard-open body,
+    html.iif-admin-embed:has(#dashboard-overlay.is-open),
+    html.iif-admin-embed:has(#dashboard-overlay.is-open) body {
       transform: none !important;
       filter: none !important;
       perspective: none !important;
+      contain: none !important;
     }
 
     #dashboard-overlay.is-open #dashboard-page-shell.dashboard-page-shell {
       width: 100% !important;
+      min-width: 100% !important;
       max-width: none !important;
+      flex: 1 1 auto !important;
       min-height: 100vh !important;
       min-height: 100dvh !important;
       height: auto !important;
       margin: 0 !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      box-sizing: border-box !important;
+    }
+
+    #dashboard-overlay.is-open .dashboard-header-bar {
+      width: 100% !important;
+      max-width: none !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      box-sizing: border-box !important;
     }
 
     #dashboard-overlay.is-open .dashboard-main {
