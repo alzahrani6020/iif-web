@@ -31,8 +31,6 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
-      - name: Install + build
-        run: npm ci --no-audit --fund=false && npm run build
-
-      - name: Syntax check (خادم التطوير)
-        run: node --check scripts/dev-server.js && node --check scripts/check-urls.js
+      - name: Install + verify
+        # يطابق محلياً: npm run verify (بناء + فحص صياغة السكربتات)
+        run: npm ci --no-audit --fund=false && npm run verify

@@ -1,6 +1,12 @@
 # IIF Fund Demo — المنصة الحكومية + الصندوق
 
-> **محرك البحث (SearXNG)** في `engines/searxng/` — على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك.
+> **محرك البحث (SearXNG)** في `engines/searxng/` — يشغّل **Tor + SearXNG** عبر Docker؛ على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك.
+
+## الرؤية / Vision
+
+**العربية:** نعمل لخدمة المستخدمين في مختلف أنحاء العالم، مع احترام تنوّع الثقافات والأنظمة القانونية، ونسعى لتقديم خدمة تُفيد البشرية بشفافية ومسؤولية — بما يتوافق مع الخصوصية والامتثال حيثما ينطبق.
+
+**English:** We build for people everywhere, honoring diverse cultures and legal frameworks, and we strive to deliver services that serve humanity with transparency and responsibility — aligned with privacy and compliance where it applies.
 
 **ماذا تفعل أنت على جهازك وحساباتك حتى يكون كل شيء جاهزاً للبدء:** [للبدء-ما-عليك-أنت.md](./للبدء-ما-عليك-أنت.md)
 
@@ -12,7 +18,11 @@
 
 **تعريف «أكمل اللازم» (للمساعد وللمستخدم):** [اكمل-اللازم-قائمة.md](./اكمل-اللازم-قائمة.md)
 
+**مسارات الملفات ليست روابط ويب — لا تُدخلها في Google:** [PATHS-NOT-GOOGLE.md](./PATHS-NOT-GOOGLE.md)
+
 **متابعة التطوير (أولويات مقترحة):** [تطوير-الخطوات-التالية.md](./تطوير-الخطوات-التالية.md)  
+
+**عندما يكتمل المحتوى — قبل النشر:** [قبل-النشر.md](./قبل-النشر.md)
 
 **فهرسة Cursor أسرع:** انسخ [cursorignore.example](./cursorignore.example) إلى `.cursorignore` في الجذر.
 
@@ -26,6 +36,25 @@
 | **Cursor** | **Open Folder** → مجلد المشروع (D: أو C: حسب نسختك). |
 | **Git** | من مجلد المشروع. تفاصيل: [WORKSPACE-D-DRIVE.md](./WORKSPACE-D-DRIVE.md). |
 | **نسخة قديمة على C:** | بعد التأكد من النسخة الصحيحة — [scripts/optional-remove-c-copy.bat](./scripts/optional-remove-c-copy.bat) (قالب آمن، لا يحذف تلقائياً). |
+
+**نقاط الدخول المعتمدة:** واجهة الصندوق [`financial-consulting/iif-fund-demo/index.html`](./financial-consulting/iif-fund-demo/index.html)؛ الفهرس الحكومي المرجعي [`financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html`](./financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html). نسخ `index-*.html` التجريبية القديمة مؤرشفة في [`financial-consulting/iif-fund-demo/archive/previous-index-variants/`](./financial-consulting/iif-fund-demo/archive/previous-index-variants/).
+
+**للاطلاع الرسمي / المستويات الرفيعة:** [`executive-brief.html`](./executive-brief.html) (أو `/executive`) — موجز مؤسسي ثنائي اللغة؛ [`sovereign-standards.html`](./sovereign-standards.html) (أو `/sovereign`) — معايير الجودة والحوكمة بما يليق بالقيادات السيادية؛ دليل الاستضافة: [`EXECUTIVE-HOSTING-GUIDE.md`](./EXECUTIVE-HOSTING-GUIDE.md).
+
+### أين أقرأ ماذا؟
+
+| إن كنت تبحث عن… | ابدأ من |
+|------------------|---------|
+| عرض للمستويات الرفيعة / موجز مؤسسي | [`executive-brief.html`](./executive-brief.html) و [`EXECUTIVE-HOSTING-GUIDE.md`](./EXECUTIVE-HOSTING-GUIDE.md) |
+| معايير الجودة بما يليق بالقيادات السيادية | [`sovereign-standards.html`](./sovereign-standards.html) و [`SOVEREIGN-STANDARDS.md`](./SOVEREIGN-STANDARDS.md) |
+| تشغيل المشروع وروابط التطوير | هذا الملف (README) — قسم **التشغيل السريع** |
+| قائمة قبل النشر (محتوى + تقنية) | [`قبل-النشر.md`](./قبل-النشر.md) |
+| مسارات الملفات ≠ بحث Google | [`PATHS-NOT-GOOGLE.md`](./PATHS-NOT-GOOGLE.md) |
+| خطوات Netlify والاختصارات `/fund` و `/gov` | [`NETLIFY-CHECKLIST.md`](./NETLIFY-CHECKLIST.md) و [`netlify.toml`](./netlify.toml) |
+| ربط المنصة الحكومية بالصندوق | [`financial-consulting/government-search/README-IIF-INTEGRATION.md`](./financial-consulting/government-search/README-IIF-INTEGRATION.md) |
+| واجهة الصندوق (تفاصيل المجلد) | [`financial-consulting/iif-fund-demo/README.md`](./financial-consulting/iif-fund-demo/README.md) |
+| إطار مبسّط + iframe للمنصة الحكومية | [`financial-consulting/fund-site/index.html`](./financial-consulting/fund-site/index.html) — **للمعاينة**؛ الإنتاج يفضّل الواجهة الكاملة أعلاه |
+| تعليمات للمساعد (Cursor) | [`AGENTS.md`](./AGENTS.md) |
 
 ---
 
@@ -44,7 +73,10 @@ npm start
 
 ```bash
 npm run check-urls
+# أو فحصاً أوسع (نفس المتطلبات — الخادم يعمل على 3333):
+npm run health
 ```
+(`health` = `check-urls` + `smoke:html`: التحقق من محتوى الصفحات الحرجة وروابط iframe والمعرّفات العميقة.)
 
 ثم افتح:
 
@@ -77,31 +109,39 @@ docker compose up -d
 
 | المسار | الوظيفة |
 |--------|---------|
+| `قبل-النشر.md` | قائمة تحقق قبل النشر العام (محتوى + تقنية) |
+| `PREPUBLISH-COMPLETE.md` | ملخص ما أُعدّ للنشر (وثائق، اختصارات، فحص روابط) |
+| [فحص-الأداء-خطوة-بخطوة.md](./فحص-الأداء-خطوة-بخطوة.md) | دليل فحص الواجهات والأداء والمحرك خطوة بخطوة |
+| `legal/` | صفحات الخصوصية وإخلاء المسؤولية والتواصل + فهرس |
 | `financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html` | المنصة الحكومية (بحث محلي؛ محرك الويب لاحقاً) |
+| `financial-consulting/government-search/SITE-GLOBAL-STANDARDS.md` | معايير الجودة العالمية للمنصة الحكومية (SEO، a11y، أداء) |
 | `financial-consulting/government-search/government-data.json` | بيانات الجهات |
 | `financial-consulting/government-search/government-data.js` | يُولَّد من JSON |
-| `financial-consulting/government-search/iif-config.js` | جاهز للتكامل لاحقاً مع المحرك (حالياً بدون ربط) |
+| `financial-consulting/government-search/iif-config.js` | يُحمَّل من المنصة — تفعيل بحث الويب على `localhost`/`127.0.0.1` |
 | `financial-consulting/iif-fund-demo/` | **واجهة الصندوق الأصلية** |
 | `financial-consulting/fund-site/index.html` | واجهة تجريبية أبسط |
-| `scripts/dev-server.js` | خادم تطوير ثابت (بدون بروكسي محرك) |
-| `engines/searxng/` | **Docker + توثيق المحرك المستقل** |
+| `scripts/dev-server.js` | خادم تطوير (`3333`) + بروكسي **`/api/searx`** → SearXNG على `8080` |
+| `engines/searxng/` | **Docker (Tor + SearXNG) + توثيق المحرك** |
 
 تفاصيل الربط المستقبلي: [financial-consulting/government-search/README-IIF-INTEGRATION.md](./financial-consulting/government-search/README-IIF-INTEGRATION.md).
 
 ### تحديث بيانات الجهات
 
-1. عدّل `government-data.json`.
+1. عدّل `government-data.json` (أو استخدم `npm run expand:gov-un195` لتغطية دول إضافية وفق نموذج الأمم المتحدة).
 2. من جذر المشروع: `npm run build:gov-data` لتوليد `government-data.js`.
-3. أعد تحميل الصفحة.
+3. **إكمال السياق:** الفهرس المحلي لا يُغني عن الويب؛ مع `npm start` + SearXNG يُكمّل المحرك النتائج (راجع [README-IIF-INTEGRATION.md](./financial-consulting/government-search/README-IIF-INTEGRATION.md)).
+4. **روابط البنك الدولي:** إن تغيّرت صيغة الموقع، شغّل `npm run fix:worldbank-urls` لتحديث مسارات `data.worldbank.org/country/*`.
+5. أعد تحميل الصفحة.
 
 ---
 
 ## Netlify (ربط GitHub)
 
+- **قبل أول نشر عام:** راجع [قبل-النشر.md](./قبل-النشر.md) (محتوى + تقنية + توقّعات بحث الويب).
 - الإعدادات في **`netlify.toml`** (أمر البناء: `npm ci && npm run build`، النشر: **`.`**).
 - **قائمة خطوات جاهزة:** [NETLIFY-CHECKLIST.md](./NETLIFY-CHECKLIST.md)
 - لصق حقول الواجهة يدوياً: [NETLIFY-UI-SETTINGS.md](./NETLIFY-UI-SETTINGS.md)
-- **اختصارات بعد النشر:** `/fund` → واجهة الصندوق، `/gov` → المنصة الحكومية
+- **اختصارات بعد النشر:** `/fund` → واجهة الصندوق، `/gov` → المنصة الحكومية، `/legal` → الوثائق، `/privacy` / `/disclaimer` / `/contact` → صفحات قانونية (انظر `netlify.toml`)
 - نشر يدوي من GitHub: workflow **`Deploy Netlify`** (اختياري) يحتاج الأسرار `NETLIFY_AUTH_TOKEN` و `NETLIFY_SITE_ID`.
 
 > **ملاحظة:** إذا ربطت Netlify بمستودع `iif-web` على الفرع `main`، كل **push** يُعيد بناء الموقع تلقائياً — لا تحتاج أسرار Actions لذلك.

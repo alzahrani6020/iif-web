@@ -2,6 +2,20 @@
 
 منصة متكاملة لإدارة الصناديق الاستثمارية والتحليل المالي المتقدم.
 
+> **لا تبحث في Google عن** `financial-consulting/...` — هذا **مسار داخل المشروع** وليس موقعاً. افتح الملف من Cursor أو من GitHub. التفاصيل: [**PATHS-NOT-GOOGLE.md**](../../PATHS-NOT-GOOGLE.md).
+
+> **موقع هذا الملف في المستودع:** `financial-consulting/iif-fund-demo/README.md`  
+> الروابط إلى **جذر المستودع** تستخدم **`../../`** (مستويان للأعلى: `iif-fund-demo` ← `financial-consulting` ← جذر الريبو).  
+> **لا** تستخدم `../README.md` وحدها — سيشير خطأً إلى مجلد `financial-consulting` وليس إلى `README.md` في الجذر.
+
+| يهمك | رابط |
+|------|------|
+| مسارات الملفات ≠ Google | [`../../PATHS-NOT-GOOGLE.md`](../../PATHS-NOT-GOOGLE.md) |
+| README الرئيسي للمستودع | [`../../README.md`](../../README.md) |
+| قائمة الجاهزية (لوحة / إدارة) | [`./QA-PRE-RELEASE.md`](./QA-PRE-RELEASE.md) |
+| فحص HTML الآلي | [`../../scripts/smoke-html-check.mjs`](../../scripts/smoke-html-check.mjs) |
+| قبل النشر (عام) | [`../../قبل-النشر.md`](../../قبل-النشر.md) |
+
 ## 🎯 **المشروع**
 
 منصة IIF Fund هي منصة شاملة لإدارة الصناديق الاستثمارية مع تحليلات متقدمة وواجهة مستخدم احترافية.
@@ -18,6 +32,18 @@
 4. **SearXNG** (اختياري): من `engines/searxng` نفّذ `docker compose up -d` — راجع [engines/searxng/README.md](../../engines/searxng/README.md).
 
 **الرؤية والاتجاه العام:** [README الجذر](../../README.md) (قسم الرؤية / Vision).
+
+### الجاهزية قبل النشر (مسارات حرجة)
+
+- **[QA-PRE-RELEASE.md](./QA-PRE-RELEASE.md)** — قائمة تحقق: `npm run smoke:html` بعد `npm start`، فحص يدوي لـ `?iif_admin_embed=1` و`admin.html`، ونشر Vercel.
+- أي تعديل على **`index.html`** يمس لوحة التحكم أو وضع الإدارة: شغّل **`npm run health`** (خادم يعمل) قبل الدمج.
+
+### ما هي «صفحة الأدمن» في هذا المشروع؟
+
+- **لا يوجد** ملف منفصل اسمه `admin` يعرض واجهة مختلفة عن الموقع. **لوحة الإدارة = لوحة التحكم** داخل نفس **`index.html`** (`#dashboard-overlay`).
+- الرابط **`index.html?iif_admin_embed=1`** يحمّل **نفس الصفحة** مع معامل يطلب: إخفاء واجهة الموقع العامة قدر الإمكان، ثم **فتح نافذة تسجيل الدخول** إن لم تكن مسجّلاً، أو **فتح لوحة التحكم** إن كان لديك صلاحية.
+- **`admin.html`** مجرد **إطار (iframe)** يحمّل `index.html?iif_admin_embed=1` — المحتوى واحد؛ عنوان التبويب في المتصفح يصبح أوضح عند استخدام `?iif_admin_embed=1` (يُضبط من JS).
+- مع الكود الحديث: وضع `?iif_admin_embed=1` يعرض أولاً **شاشة «لوحة التحكم — جاري التحميل»** (`#iif-embed-entry-screen`) وليس الهيرو العام. إن رأيت **الهيرو مباشرة** فالكاش قديم أو نسخة منشورة قديمة — **Ctrl+F5** أو راجع النشر.
 
 ### نشر Vercel — مسار `admin.html` (مهم)
 
@@ -40,8 +66,11 @@
 `<base>` في `index.html` يُضبط **تلقائياً** من مسار الصفحة (`#iif-document-base`) حتى تعمل روابط **`assets/`** (الشعار والصور) من جذر النطاق **أو** من مجلد فرعي دون اختفاء الشعار.
 
 **لوحة مباشرة:**  
-- نطاق GitHub/Vercel الشائع: `https://iif-fund.vercel.app/index.html?iif_admin_embed=1`  
+- **للجمهور (بدون تسجيل):** `https://iif-fund.vercel.app/index.html?iif_admin_embed=1`  
 - نطاق النشر عبر CLI من هذا المجلد: **`https://iif-fund-demo.vercel.app`** (يُحدَّث بـ `vercel deploy --prod`؛ الريبو نفسه يدفع إلى GitHub فيُعاد نشر مشاريع أخرى إن وُجد الربط).
+
+**تنبيه — شاشة سوداء على رابط مثل `*-dr-talal.vercel.app`:**  
+أسماء النشر/الفريق على Vercel قد تكون مفعّلاً عليها **Deployment Protection** (مصادقة Vercel). الطلب يعيد **401** وليس `index.html` — قد يظهر كصفحة داكنة أو فارغة. **لا تستخدمها كرابط عام.** إما سجّل دخولك بحساب Vercel المدعو، أو عطّل/خفّف الحماية من **Project → Settings → Deployment Protection**، أو افتح **نطاق الإنتاج العام** (`iif-fund.vercel.app`) الذي يعيد **200**.
 
 **لوحة التحكم بملء الشاشة (إخفاء هيدر الموقع):**  
 تُخفى واجهة الموقع العامة عبر CSS + دوال `IIF_hidePublicSiteChrome` / `IIF_restorePublicSiteChrome` في أوائل `<body>`. بعد كل تحديث على Vercel: **أعد النشر** ثم جرّب **تحديثاً قوياً** (Ctrl+F5) أو نافذة خاصة حتى لا يُخدم `index.html` من الكاش.

@@ -8,3 +8,5 @@ node_modules/
 # كاش SearXNG محلياً (يُبقى المجلد فقط)
 engines/searxng/data/*
 !engines/searxng/data/.gitkeep
+# نسخة مرجعية من الإعداد الافتراضي (لتوليد جدول المحركات)
+!engines/searxng/data/upstream-settings-default.yml

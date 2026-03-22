@@ -7,12 +7,21 @@
     "dev": "node scripts/dev-server.js",
     "check-urls": "node scripts/check-urls.js",
     "check:dev": "node scripts/check-urls.js",
+    "smoke:html": "node scripts/smoke-html-check.mjs",
     "build:gov-data": "node financial-consulting/government-search/build-government-data.mjs",
+    "expand:gov-un195": "node financial-consulting/government-search/expand-government-data-to-un195.mjs",
+    "fix:worldbank-urls": "node financial-consulting/government-search/fix-worldbank-country-urls.mjs",
     "build": "npm run build:gov-data",
     "validate": "npm run build",
-    "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js"
+    "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js",
+    "health": "npm run check-urls && npm run smoke:html",
+    "qa:iif-fund": "node scripts/smoke-html-check.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "i18n-iso-countries": "^7.14.0",
+    "world-countries": "^5.1.0"
   }
 }

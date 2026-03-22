@@ -1,17 +1,22 @@
 /**
  * إعداد IIF — تكامل محرك الويب (SearXNG)
  *
- * حالياً: **مُعطّل** — المحرك مشروع مستقل تحت `engines/searxng/` ولا يُحمَّل من صفحات المنصة.
+ * يُحمَّل من `SIMPLE-GOVERNMENT-PLATFORM.html` قبل السكربت الرئيسي.
  *
- * عند إعادة الربط لاحقاً:
- * - أعد تفعيل التحميل من `SIMPLE-GOVERNMENT-PLATFORM.html` إن لزم.
- * - عيّن `window.__IIF_CONFIG__ = { searxngBase: '...', searxngEnabled: true };`
- *   قبل سكربت المنصة، أو أعد تفعيل `ENGINE_WEB_SEARCH_ENABLED` داخل الصفحة.
+ * **الفكرة:** الفهرس المحلي (government-data.js) + المحرك = استعلام «كامل»:
+ * مرجع ثابت + مصادر ويب عبر SearXNG (لا يُخزَّن الإنترنت كاملاً في JSON).
+ *
+ * - **localhost / 127.0.0.1:** `searxngEnabled` يكون `true` افتراضياً (مع `npm start` + Docker).
+ * - **أي نطاق آخر (مثل Netlify):** `false` افتراضياً — بحث الويب عبر المحرك يحتاج بروكسي/خادماً لاحقاً.
+ *
+ * تجاوز يدوي (قبل تحميل هذه الوحدة أو مباشرة بعدها):
+ *   window.__IIF_CONFIG__ = { searxngEnabled: true, searxngBase: 'https://مثال/مسار-بروكسي' };
  */
 (function () {
   'use strict';
   window.__IIF_CONFIG__ = window.__IIF_CONFIG__ || {};
   if (typeof window.__IIF_CONFIG__.searxngEnabled === 'undefined') {
-    window.__IIF_CONFIG__.searxngEnabled = false;
+    var h = typeof location !== 'undefined' ? String(location.hostname || '') : '';
+    window.__IIF_CONFIG__.searxngEnabled = h === 'localhost' || h === '127.0.0.1';
   }
 })();

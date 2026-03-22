@@ -92,6 +92,24 @@ function proxySearx(req, res) {
 
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
+  /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */
+  if (urlPath !== '/' && urlPath.endsWith('/')) {
+    urlPath = urlPath.slice(0, -1) + '/index.html';
+  }
+  /** اختصارات مثل netlify.toml — للتطوير المحلي */
+  const shortPaths = {
+    '/privacy': '/legal/privacy.html',
+    '/disclaimer': '/legal/disclaimer.html',
+    '/contact': '/legal/contact.html',
+    '/legal': '/legal/index.html',
+    '/executive': '/executive-brief.html',
+    '/brief': '/executive-brief.html',
+    '/sovereign': '/sovereign-standards.html',
+    '/charter': '/sovereign-standards.html',
+  };
+  if (shortPaths[urlPath]) {
+    urlPath = shortPaths[urlPath];
+  }
   if (urlPath === '/' || urlPath === '/index.html') {
     const primary = path.join(ROOT, 'financial-consulting', 'iif-fund-demo', 'index.html');
     urlPath = fs.existsSync(primary)
@@ -136,6 +154,8 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log('');
   console.log('  الواجهة: http://127.0.0.1:' + PORT + '/');
+  console.log('  موجز للمستويات الرفيعة: /executive-brief.html أو /executive');
+  console.log('  معايير سيادية: /sovereign-standards.html أو /sovereign');
   console.log('  المنصة: …/government-search/SIMPLE-GOVERNMENT-PLATFORM.html');
   console.log('  بروكسي SearXNG: /api/searx/*  →  ' + SEARX_UPSTREAM.origin + '/*');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');

@@ -2,13 +2,23 @@
 # التشغيل من هذا المجلد: docker compose up -d
 # الواجهة: http://127.0.0.1:8080
 #
+# محركات Tor (.onion): تتطلب خدمة tor أدناه (SOCKS5 على 9050 داخل الشبكة).
+#
 # بعد أول تشغيل أو تغيير الإعدادات:
 #   docker compose down && docker compose up -d
 
 services:
+  # بروكسي SOCKS5 لـ SearXNG — محركات ahmia / torch (شبكة البصل)
+  tor:
+    image: dperson/torproxy:latest
+    container_name: iif-tor-socks
+    restart: unless-stopped
+
   searxng:
     image: searxng/searxng:latest
     container_name: iif-searxng-standalone
+    depends_on:
+      - tor
     ports:
       - "8080:8080"
     restart: unless-stopped

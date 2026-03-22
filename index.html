@@ -2,14 +2,50 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=financial-consulting/iif-fund-demo/index.html">
-    <title>توجيه — صندوق الاستثمار الدولي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="صندوق الاستثمار الدولي (IIF) — بوابة الوصول إلى واجهة الصندوق والمنصة الحكومية المرجعية.">
+    <meta name="robots" content="index, follow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>صندوق الاستثمار الدولي (IIF) — توجيه</title>
+    <!-- لا تستخدم meta refresh إلى مسار فرعي ثابت: على Vercel غالباً يُنشر مجلد iif-fund-demo كجذر فيصبح المسار الطويل 404 -->
+    <script>
+      (function () {
+        var sub = 'financial-consulting/iif-fund-demo/index.html';
+        function go(url) {
+          var q = window.location.search || '';
+          window.location.replace(url + q);
+        }
+        if (typeof fetch === 'undefined') {
+          go('/index.html');
+          return;
+        }
+        fetch(sub, { method: 'HEAD', cache: 'no-store' })
+          .then(function (r) {
+            go(r.ok ? sub : '/index.html');
+          })
+          .catch(function () {
+            go('/index.html');
+          });
+      })();
+    </script>
 </head>
 <body>
-    <p style="font-family: sans-serif; padding: 1rem;">
-        <a href="financial-consulting/iif-fund-demo/index.html">الواجهة الأصلية للصندوق</a>
-        — <a href="financial-consulting/fund-site/index.html">fund-site</a>
-    </p>
+    <main id="main" style="font-family: system-ui, 'Segoe UI', Tahoma, sans-serif; padding: 1.25rem; max-width: 40rem; line-height: 1.65;">
+        <h1 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 0.75rem;">جاري التوجيه…</h1>
+        <p style="margin: 0 0 1rem; color: #334155;">إن لم يُعاد التوجيه تلقائياً، اختر الوجهة:</p>
+        <nav aria-label="روابط رئيسية">
+            <ul style="margin: 0; padding-inline-start: 1.25rem;">
+                <li><a href="executive-brief.html">موجز للمستويات الرفيعة (Executive Brief)</a></li>
+                <li><a href="sovereign-standards.html">معايير المستوى السيادي (Sovereign-tier standards)</a></li>
+                <li><a href="financial-consulting/iif-fund-demo/index.html">الواجهة الرئيسية للصندوق (FII) — مسار المستودع الكامل</a></li>
+                <li><a href="/index.html">الواجهة الرئيسية — نشر Vercel (جذر المشروع = iif-fund-demo)</a></li>
+                <li><a href="financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html">الفهرس الحكومي المرجعي</a></li>
+                <li><a href="financial-consulting/fund-site/index.html">بوابة fund-site</a></li>
+                <li><a href="legal/index.html">الوثائق (خصوصية · إخلاء مسؤولية · تواصل)</a></li>
+            </ul>
+        </nav>
+    </main>
 </body>
 </html>

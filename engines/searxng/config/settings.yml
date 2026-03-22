@@ -2,8 +2,24 @@
 # https://docs.searxng.org/admin/settings/settings.html
 #
 # ⚠️ غيّر secret_key قبل أي نشر على الإنترنت.
+#
+# محركات ahmia و torch (شبكة البصل) تُوجَّه عبر SOCKS5 → حاوية tor في docker-compose.
 
 use_default_settings: true
+
+engines:
+  - name: ahmia
+    using_tor_proxy: true
+    proxies:
+      all://:
+        - socks5h://tor:9050
+    timeout: 35.0
+  - name: torch
+    using_tor_proxy: true
+    proxies:
+      all://:
+        - socks5h://tor:9050
+    timeout: 60.0
 
 general:
   instance_name: "IIF — SearXNG"
@@ -11,7 +27,10 @@ general:
 
 search:
   default_lang: "ar"
-  safe_search: 0
+  # 0 = إيقاف | 1 = متوسط (مُوصى للاستخدام العام) | 2 = صارم
+  safe_search: 1
+  # إكمال تلقائي للاستعلام (يعتمد على الاتصال بالإنترنت)
+  autocomplete: "duckduckgo"
   formats:
     - html
     - json
@@ -28,4 +47,11 @@ server:
   bind_address: "0.0.0.0"
   port: 8080
   image_proxy: true
+  # للتطوير المحلي؛ فعّل limiter عند تعريض المثيل للإنترنت
   limiter: false
+
+# موثوقية الاتصال — أوقات أطول لأن Tor أبطأ من الاتصال المباشر
+outgoing:
+  request_timeout: 10.0
+  max_request_timeout: 60.0
+  extra_proxy_timeout: 15

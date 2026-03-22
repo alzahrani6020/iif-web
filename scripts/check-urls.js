@@ -1,6 +1,7 @@
 /**
  * تحقق أن خادم التطوير يقدّم الصفحات (شغّل بعد: npm start)
  * الاستخدام: npm run check-urls
+ * المسارات الحرجة: الجذر، iif-fund-demo، fund-site، المنصة الحكومية، iif-config.js
  */
 'use strict';
 
@@ -11,9 +12,21 @@ const PORT = Number(process.env.PORT) || 3333;
 
 const PATHS = [
   '/',
+  '/executive-brief.html',
+  '/executive',
+  '/sovereign-standards.html',
+  '/sovereign',
+  '/charter',
+  '/financial-consulting/iif-fund-demo/index.html',
   '/financial-consulting/fund-site/index.html',
   '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
   '/financial-consulting/government-search/iif-config.js',
+  '/legal/index.html',
+  '/legal/privacy.html',
+  '/legal/disclaimer.html',
+  '/legal/contact.html',
+  '/assets/og-cover.svg',
+  '/financial-consulting/iif-fund-demo/assets/emblem.jpg',
 ];
 
 /** مسارات اختيارية: فشلها لا يوقف السكربت (مثلاً SearXNG غير مشغّل) */

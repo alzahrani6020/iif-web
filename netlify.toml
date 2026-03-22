@@ -25,12 +25,55 @@
   to = "/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html"
   status = 302
 
+[[redirects]]
+  from = "/legal"
+  to = "/legal/index.html"
+  status = 302
+
+[[redirects]]
+  from = "/privacy"
+  to = "/legal/privacy.html"
+  status = 302
+
+[[redirects]]
+  from = "/disclaimer"
+  to = "/legal/disclaimer.html"
+  status = 302
+
+[[redirects]]
+  from = "/contact"
+  to = "/legal/contact.html"
+  status = 302
+
+[[redirects]]
+  from = "/executive"
+  to = "/executive-brief.html"
+  status = 302
+
+[[redirects]]
+  from = "/brief"
+  to = "/executive-brief.html"
+  status = 302
+
+[[redirects]]
+  from = "/sovereign"
+  to = "/sovereign-standards.html"
+  status = 302
+
+[[redirects]]
+  from = "/charter"
+  to = "/sovereign-standards.html"
+  status = 302
+
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+    # تقوية إضافية للعرض المؤسسي (HTTPS يفرضه Netlify)
+    Cross-Origin-Opener-Policy = "same-origin"
 
 [[headers]]
   for = "/financial-consulting/government-search/*"

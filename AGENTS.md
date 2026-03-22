@@ -4,15 +4,20 @@
 
 مشروع **واجهات ثابتة** (HTML/CSS/JS) + خادم تطوير Node — **بدون إطار عمل** في الجذر. المستودع على GitHub: **`alzahrani6020/iif-web`**.
 
+**مسارات مثل** `financial-consulting/.../README.md` **ليست روابط ويب** — لا تُبحث في Google؛ راجع [PATHS-NOT-GOOGLE.md](./PATHS-NOT-GOOGLE.md).
+
+**الرؤية (للمستخدمين والثقافات والأنظمة):** مذكورة في [README.md](./README.md) — عند إضافة ميزات، راعِ الخصوصية والامتثال حيث ينطبق.
+
 ## أين الملفات المهمة
 
 | المسار | المحتوى |
 |--------|---------|
 | `financial-consulting/government-search/` | المنصة الحكومية، `government-data.json` → يُولَّد `government-data.js` |
-| `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) |
+| `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) — **قبل نشر تغييرات حرجة:** [QA-PRE-RELEASE.md](./financial-consulting/iif-fund-demo/QA-PRE-RELEASE.md) |
 | `financial-consulting/fund-site/` | واجهة أبسط |
+| `executive-brief.html`، `sovereign-standards.html` (جذر المستودع) | موجز للمستويات الرفيعة + معايير سيادية؛ اختصارات `/executive`، `/sovereign`، `/charter` |
 | `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `8080` |
-| `engines/searxng/` | **مشروع منفصل** (Docker) — **غير مدمج** في صفحات المنصة حالياً |
+| `engines/searxng/` | **Tor + SearXNG** (Docker) — `npm start` → `/api/searx`؛ محركات `.onion` عبر حاوية `tor` |
 
 ## الأوامر (من جذر المشروع)
 
@@ -21,7 +26,9 @@ npm start          # خادم التطوير
 npm run build      # توليد government-data.js من JSON
 npm run validate   # نفس البناء
 npm run verify       # build + فحص صياغة dev-server و check-urls (بدون تشغيل الخادم)
-npm run check-urls # بعد تشغيل الخادم — التحقق من الروابط
+npm run check-urls # بعد تشغيل الخادم — يتحقق من `/` و`iif-fund-demo/index.html` والمنصة وغيرها (انظر scripts/check-urls.js)
+npm run health        # بعد `npm start`: check-urls + smoke:html (يشمل index + ?iif_admin_embed=1 + admin.html + صفحات أخرى)
+npm run qa:iif-fund   # نفس smoke:html — اسم صريح لواجهة الصندوق
 ```
 
 - **Node:** `>=20` (`.nvmrc`).
@@ -53,3 +60,7 @@ npm run check-urls # بعد تشغيل الخادم — التحقق من الر
 ### عندما يقول المستخدم «أكمل اللازم»
 
 راجع **[اكمل-اللازم-قائمة.md](./اكمل-اللازم-قائمة.md)** — البناء، Git نظيف، دفع، عدم إخفاء الأخطاء.
+
+### عندما يقترب النشر أو يقول «المحتوى مكتمل»
+
+راجع **[قبل-النشر.md](./قبل-النشر.md)** — محتوى، `npm run verify`، توقّعات Netlify/SearXNG.

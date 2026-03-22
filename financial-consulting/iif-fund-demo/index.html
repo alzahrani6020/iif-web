@@ -7038,7 +7038,12 @@
 
     #dashboard-overlay.is-open ~ #main-content,
     html.iif-dashboard-open #main-content,
-    html.iif-admin-embed #main-content {
+    /*
+      وضع embed: لا تُخفِ #main-content حتى تُفتح اللوحة أو نافذة الدخول — يمنع شاشة سوداء إذا تأخّر JS.
+      (يُكمّلها iifHidePublicSiteChrome بعدم فرض display:none على main قبل فتح إحدى النافذتين)
+    */
+    html.iif-admin-embed:has(#dashboard-overlay.is-open) #main-content,
+    html.iif-admin-embed:has(#auth-overlay.is-open) #main-content {
       display: none !important;
     }
 
@@ -7068,6 +7073,50 @@
     html.iif-dashboard-open #https-warning {
       display: none !important;
     }
+
+    /*
+      وضع ?iif_admin_embed=1: لا نعرض هيرو «رؤية ملكية» أثناء انتظار فتح الدخول/اللوحة —
+      طبقة ثابتة تُزال عند فتح #auth-overlay أو #dashboard-overlay
+    */
+    #iif-embed-entry-screen {
+      position: fixed;
+      inset: 0;
+      /* أقل من .auth-overlay (100) ولوحة التحكم حتى تظهر نافذة الدخول/اللوحة فوقها */
+      z-index: 50;
+      background: linear-gradient(165deg, #03050a 0%, #0b1018 45%, #070a10 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+      box-sizing: border-box;
+      font-family: var(--font-sans, system-ui, sans-serif);
+      color: #e2e8f0;
+      pointer-events: none;
+    }
+
+    #iif-embed-entry-screen h1 {
+      font-size: clamp(1.05rem, 3vw, 1.35rem);
+      font-weight: 650;
+      margin: 0 0 0.5rem;
+      color: #c9a227;
+      letter-spacing: 0.02em;
+    }
+
+    #iif-embed-entry-screen p {
+      margin: 0.35rem 0 0;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: #94a3b8;
+      max-width: 26rem;
+    }
+
+    #iif-embed-entry-screen .iif-embed-entry-note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
   </style>
 </head>
 
@@ -7078,6 +7127,10 @@
         if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1') {
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
+          /* نفس الملف index.html — ليس صفحة أخرى؛ يُفتح منها لوحة التحكم أو الدخول */
+          try {
+            document.title = 'IIF · لوحة الإدارة — لوحة التحكم (نفس index.html)';
+          } catch (eTitle) { }
         }
       } catch (e) { }
       /* إخفاء هيكل الموقع بأنماط مضمّنة — لا يعتمد على ترتيب تحميل CSS (مهم على Vercel/الكاش) */
@@ -7086,6 +7139,9 @@
           var sp = new URLSearchParams(window.location.search);
           var ov = document.getElementById('dashboard-overlay');
           var dashOpen = ov && ov.classList && ov.classList.contains('is-open');
+          var authOv = document.getElementById('auth-overlay');
+          var authOpen = authOv && authOv.classList && authOv.classList.contains('is-open');
+          var embedParam = sp.get('iif_admin_embed') === '1';
           /* عند إغلاق اللوحة: إزالة إخفاء كامل-الخلفية (يعمل حتى بدون دعم CSS :has) */
           if (!dashOpen) {
             document.querySelectorAll('[data-iif-dash-bg-suppress]').forEach(function (node) {
@@ -7097,9 +7153,15 @@
           var h = document.querySelector('body > header.site-header');
           if (h) h.style.setProperty('display', 'none', 'important');
           var m = document.getElementById('main-content');
-          if (m) m.style.setProperty('display', 'none', 'important');
           var f = document.querySelector('body > footer');
-          if (f) f.style.setProperty('display', 'none', 'important');
+          /* embed: لا تُفرض إخفاء main/footer قبل فتح اللوحة أو نافذة الدخول — وإلا شاشة سوداء */
+          if (embedParam && !dashOpen && !authOpen) {
+            if (m) m.style.removeProperty('display');
+            if (f) f.style.removeProperty('display');
+          } else {
+            if (m) m.style.setProperty('display', 'none', 'important');
+            if (f) f.style.setProperty('display', 'none', 'important');
+          }
           var sl = document.querySelector('a.skip-link');
           if (sl) sl.style.setProperty('display', 'none', 'important');
           var btop = document.getElementById('iif-back-to-top');
@@ -7117,6 +7179,12 @@
               node.setAttribute('data-iif-dash-bg-suppress', '1');
               node.style.setProperty('display', 'none', 'important');
             }
+          }
+          /* إزالة طبقة «جاري التحميل» عند فتح الدخول أو اللوحة */
+          if (embedParam && (authOpen || dashOpen)) {
+            try {
+              if (typeof iifRemoveEmbedEntryScreen === 'function') iifRemoveEmbedEntryScreen();
+            } catch (eRem) { }
           }
         } catch (e2) { }
       }
@@ -7144,6 +7212,40 @@
       }
       window.IIF_hidePublicSiteChrome = iifHidePublicSiteChrome;
       window.IIF_restorePublicSiteChrome = iifRestorePublicSiteChrome;
+
+      function iifRemoveEmbedEntryScreen() {
+        try {
+          var el = document.getElementById('iif-embed-entry-screen');
+          if (el && el.parentNode) el.parentNode.removeChild(el);
+        } catch (eR) { }
+      }
+      window.IIF_removeEmbedEntryScreen = iifRemoveEmbedEntryScreen;
+
+      function iifInjectEmbedEntryScreen() {
+        try {
+          if (new URLSearchParams(window.location.search).get('iif_admin_embed') !== '1') return;
+          if (document.getElementById('iif-embed-entry-screen')) return;
+          var el = document.createElement('div');
+          el.id = 'iif-embed-entry-screen';
+          el.setAttribute('role', 'status');
+          el.setAttribute('aria-live', 'polite');
+          el.innerHTML =
+            '<h1 dir="rtl">لوحة التحكم — جاري التحميل</h1>' +
+            '<p dir="rtl">ليس هذا الهيرو العام («رؤية ملكية»). يتم فتح نافذة تسجيل الدخول أو اللوحة.</p>' +
+            '<p dir="ltr" lang="en">Dashboard mode — opening login or control panel (not the public hero).</p>' +
+            '<p class="iif-embed-entry-note" dir="rtl">إن تعلّق العرض، انتظر ثانٍ أو حدّث الصفحة (Ctrl+F5).</p>';
+          if (document.body) document.body.appendChild(el);
+        } catch (eInj) { }
+      }
+
+      if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1') {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', iifInjectEmbedEntryScreen);
+        } else {
+          iifInjectEmbedEntryScreen();
+        }
+      }
+
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', iifHidePublicSiteChrome);
       } else {
@@ -14221,6 +14323,8 @@ Generated: ${new Date().toLocaleString()}
         dropdownClose: 340,
         deferShort: 150,
         deferMedium: 500,
+        /** تأخير فتح لوحة/دخول وضع ?iif_admin_embed=1 — 0 يقلّل شاشة الانتظار */
+        adminEmbedOpen: 0,
         toastShort: 2500,
         toastLong: 5000,
         openDashboardAfterLogin: 800,
@@ -18492,8 +18596,7 @@ Generated: ${new Date().toLocaleString()}
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
           setTimeout(function () {
-            if (typeof openDashboardEnhanced !== 'function') return;
-            if (typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard()) {
+            if (typeof openDashboardEnhanced === 'function' && typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard()) {
               openDashboardEnhanced();
               try {
                 IIF_scheduleDashboardFullpageRetries([400, 1000]);
@@ -18508,7 +18611,21 @@ Generated: ${new Date().toLocaleString()}
             try {
               if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
             } catch (eH4) { }
-          }, (window.IIF_TIMING && window.IIF_TIMING.deferMedium) || 550);
+          }, (window.IIF_TIMING && window.IIF_TIMING.adminEmbedOpen !== undefined && window.IIF_TIMING.adminEmbedOpen !== null)
+            ? window.IIF_TIMING.adminEmbedOpen
+            : ((window.IIF_TIMING && window.IIF_TIMING.deferMedium) || 550));
+          /* احتياط: إن بقيت اللوحة والدخول مغلقتين — افتح نافذة الحساب */
+          setTimeout(function () {
+            try {
+              var d = document.getElementById('dashboard-overlay');
+              var a = document.getElementById('auth-overlay');
+              var dOk = d && d.classList && d.classList.contains('is-open');
+              var aOk = a && a.classList && a.classList.contains('is-open');
+              if (dOk || aOk) return;
+              if (typeof openAuth === 'function') openAuth();
+              if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
+            } catch (eFb) { }
+          }, 2200);
         } catch (e) { }
       })();
 

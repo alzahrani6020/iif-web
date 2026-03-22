@@ -7,7 +7,7 @@ alwaysApply: true
 
 - **نوع المشروع:** موقع ثابت + `scripts/dev-server.js` (منفذ افتراضي **3333**). **Node 20+**.
 - **بيانات الجهات:** المصدر `financial-consulting/government-search/government-data.json` → بعد التعديل شغّل `npm run build` لتوليد `government-data.js`.
-- **الصندوق:** `financial-consulting/iif-fund-demo/` — **SearXNG** في `engines/searxng/`؛ خادم التطوير يمرّر `/api/searx` → المنفذ 8080؛ بحث الويب على المنصة يعمل على `localhost` فقط.
+- **الصندوق:** `financial-consulting/iif-fund-demo/` — **Tor + SearXNG** في `engines/searxng/` (Docker Compose). خادم التطوير: `/api/searx` → `8080`. المنصة تحمّل `iif-config.js`؛ بحث الويب على `localhost`/`127.0.0.1` فقط ما لم يُضف بروكسي إنتاج.
 - **Netlify:** الإعداد الرئيسي `netlify.toml` في **الجذر**؛ لتوفير الطبقة المجانية راجع `NETLIFY-FREE-TIER.md` واستخدم `[skip netlify]` في رسالة الـ commit لتعديلات التوثيق فقط.
 - **اللغة:** اشرح للمستخدم بالعربية؛ نفّذ أوامر الاختبار/البناء عند الإصلاح.
 - **المسارات:** اعتمد مجلد العمل المفتوح في Cursor (قد يكون على C: أو D:).
