@@ -25,7 +25,9 @@
 npm start          # خادم التطوير
 npm run build      # توليد government-data.js من JSON
 npm run validate   # نفس البناء
-npm run verify       # build + فحص صياغة dev-server و check-urls (بدون تشغيل الخادم)
+npm run verify       # build + فحص صياغة dev-server و check-urls و smoke-with-server (بدون تشغيل خادم)
+npm run verify:full  # نفس verify ثم تشغيل خادم مؤقت + smoke:html (تحقق كامل بأمر واحد)
+npm run smoke:with-server  # خادم مؤقت + smoke فقط (إن كان المنفذ 3333 مشغولاً: `set PORT=3334` ثم نفس الأمر)
 npm run check-urls # بعد تشغيل الخادم — يتحقق من `/` و`iif-fund-demo/index.html` والمنصة وغيرها (انظر scripts/check-urls.js)
 npm run health        # بعد `npm start`: check-urls + smoke:html (يشمل index + ?iif_admin_embed=1 + admin.html + صفحات أخرى)
 npm run qa:iif-fund   # نفس smoke:html — اسم صريح لواجهة الصندوق

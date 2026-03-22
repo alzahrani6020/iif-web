@@ -62,7 +62,8 @@ function proxySearx(req, res) {
       path: targetPath,
       method: req.method,
       headers,
-      timeout: 30000,
+      /** أطول من مهلة المتصفح في SIMPLE-GOVERNMENT-PLATFORM (SearXNG قد يستغرق >30 ث مع عدة محركات / Tor) */
+      timeout: 100000,
     },
     (pres) => {
       res.writeHead(pres.statusCode, pres.headers);

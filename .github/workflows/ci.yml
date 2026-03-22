@@ -34,3 +34,11 @@ jobs:
       - name: Install + verify
         # يطابق محلياً: npm run verify (بناء + فحص صياغة السكربتات)
         run: npm ci --no-audit --fund=false && npm run verify
+
+      - name: Smoke HTML (لوحة الصندوق + مسارات حرجة)
+        run: |
+          node scripts/dev-server.js &
+          echo $! > /tmp/iif-dev-server.pid
+          sleep 3
+          npm run smoke:html
+          kill $(cat /tmp/iif-dev-server.pid) 2>/dev/null || true

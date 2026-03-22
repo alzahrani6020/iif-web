@@ -944,6 +944,9 @@
             return h === 'localhost' || h === '127.0.0.1';
         })();
 
+        /** مهلة جلب نتائج SearXNG — أطول من مهلة المتصفح السابقة (20 ث) لتتوافق مع outgoing.max_request_timeout والمحركات البطيئة (مثل Tor). */
+        const SEARX_FETCH_TIMEOUT_MS = 90000;
+
         const PAGE_SIZE = 20;
         let lastLocalResults = [];
         let lastWebPack = { ok: true, results: [] };
@@ -1146,10 +1149,10 @@
             try {
                 var fetchOpts = { method: 'GET', credentials: 'omit' };
                 if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
-                    fetchOpts.signal = AbortSignal.timeout(20000);
+                    fetchOpts.signal = AbortSignal.timeout(SEARX_FETCH_TIMEOUT_MS);
                 } else if (typeof AbortController !== 'undefined') {
                     var ac = new AbortController();
-                    setTimeout(function() { ac.abort(); }, 20000);
+                    setTimeout(function() { ac.abort(); }, SEARX_FETCH_TIMEOUT_MS);
                     fetchOpts.signal = ac.signal;
                 }
                 const res = await fetch(url, fetchOpts);
@@ -1159,7 +1162,9 @@
                 const data = await res.json();
                 return { ok: true, results: data.results || [], error: null };
             } catch (e) {
-                const msg = e && e.name === 'TimeoutError' ? 'انتهت مهلة الانتظار (20 ث)' : (e.message || 'network');
+                const msg = e && e.name === 'TimeoutError'
+                    ? ('انتهت مهلة الانتظار (' + Math.round(SEARX_FETCH_TIMEOUT_MS / 1000) + ' ث)')
+                    : (e.message || 'network');
                 return { ok: false, results: [], error: msg };
             }
         }
