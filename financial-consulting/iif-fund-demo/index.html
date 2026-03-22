@@ -8407,6 +8407,7 @@
   <!-- تحقق النشر: افتح موقعك (مثل iif-fund.vercel.app) ثم Ctrl+U لعرض المصدر وابحث عن كلمة «تحقق-النشر» هنا — لا تبحث عن هذا في جوجل -->
   <!-- تحقق-النشر-iif-dashboard-fullpage -->
   <!-- Dashboard: manage investment projects (visible when logged in) -->
+  <!-- مهم: main.dashboard-main يُغلق بـ </main> ثم dashboard-page-shell ثم dashboard-overlay — إغلاق بـ </div> فقط يفسد DOM ويُظهر اللوحة كعمود. -->
   <!-- أنماط مضمّنة على اللوحة: تعمل حتى لو كان CSS قديماً أو الكاش — العرض يُحدَّد بـ display من الصفحة (.dashboard-overlay / .is-open) وليس هنا -->
   <div class="dashboard-overlay" id="dashboard-overlay" aria-hidden="true" role="region"
     aria-label="IIF Dashboard" data-iif-dashboard-root="true" data-iif-build="v8-fix-main-close"
