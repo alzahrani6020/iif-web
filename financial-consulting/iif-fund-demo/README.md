@@ -39,8 +39,9 @@
 
 `<base>` في `index.html` يُضبط **تلقائياً** من مسار الصفحة (`#iif-document-base`) حتى تعمل روابط **`assets/`** (الشعار والصور) من جذر النطاق **أو** من مجلد فرعي دون اختفاء الشعار.
 
-**لوحة مباشرة (تعمل على النشر من `iif-fund-demo`):**  
-`https://iif-fund.vercel.app/index.html?iif_admin_embed=1`
+**لوحة مباشرة:**  
+- نطاق GitHub/Vercel الشائع: `https://iif-fund.vercel.app/index.html?iif_admin_embed=1`  
+- نطاق النشر عبر CLI من هذا المجلد: **`https://iif-fund-demo.vercel.app`** (يُحدَّث بـ `vercel deploy --prod`؛ الريبو نفسه يدفع إلى GitHub فيُعاد نشر مشاريع أخرى إن وُجد الربط).
 
 **لوحة التحكم بملء الشاشة (إخفاء هيدر الموقع):**  
 تُخفى واجهة الموقع العامة عبر CSS + دوال `IIF_hidePublicSiteChrome` / `IIF_restorePublicSiteChrome` في أوائل `<body>`. بعد كل تحديث على Vercel: **أعد النشر** ثم جرّب **تحديثاً قوياً** (Ctrl+F5) أو نافذة خاصة حتى لا يُخدم `index.html` من الكاش.
