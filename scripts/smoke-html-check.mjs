@@ -37,6 +37,8 @@ async function main() {
         'assets/emblem.jpg',
         'id="dashboard-overlay"',
         'iif-dashboard-fullpage-critical-head',
+        'dashboard-fullpage-v5-inline',
+        'data-iif-build="v5-inline-fullpage"',
         'تحقق-النشر-iif-dashboard-fullpage',
       ],
       label: 'واجهة الصندوق (index)',

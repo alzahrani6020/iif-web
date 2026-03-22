@@ -50,6 +50,7 @@
   <title>International Investment Fund · FII · Paris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e18" />
+  <meta name="iif-build" content="dashboard-fullpage-v5-inline" />
   <meta name="description"
     content="International Investment Fund (FII) — Financing for global prosperity. Registered in the EU Transparency Register. Licensed in France & USA. European & African Parliament recognition. Sovereign & institutional capital." />
   <meta name="iif-funcs-base" content="https://iif-fund.vercel.app" />
@@ -8400,9 +8401,11 @@
   <!-- تحقق النشر: افتح موقعك (مثل iif-fund.vercel.app) ثم Ctrl+U لعرض المصدر وابحث عن كلمة «تحقق-النشر» هنا — لا تبحث عن هذا في جوجل -->
   <!-- تحقق-النشر-iif-dashboard-fullpage -->
   <!-- Dashboard: manage investment projects (visible when logged in) -->
+  <!-- أنماط مضمّنة على اللوحة: تعمل حتى لو كان CSS قديماً أو الكاش — العرض يُحدَّد بـ display من الصفحة (.dashboard-overlay / .is-open) وليس هنا -->
   <div class="dashboard-overlay" id="dashboard-overlay" aria-hidden="true" role="region"
-    aria-label="IIF Dashboard" data-iif-dashboard-root="true">
-    <div class="dashboard-page-shell" id="dashboard-page-shell">
+    aria-label="IIF Dashboard" data-iif-dashboard-root="true" data-iif-build="v5-inline-fullpage"
+    style="position:fixed;left:0;top:0;right:0;bottom:0;width:auto;min-width:100%;max-width:none;min-height:100vh;min-height:100dvh;margin:0;padding:0;border-radius:0;box-shadow:none;box-sizing:border-box;z-index:2147483647;transform:none;background:linear-gradient(165deg,#03050a 0%,#0b1018 38%,#070a10 100%);">
+    <div class="dashboard-page-shell" id="dashboard-page-shell" style="width:100%;min-width:100%;max-width:none;margin:0;box-sizing:border-box;">
       <header class="dashboard-header-bar site-header">
         <div class="site-header__inner">
           <div class="site-header__brand">
@@ -18455,9 +18458,10 @@ Generated: ${new Date().toLocaleString()}
       }
       try { window.IIF_assertDashboardFullViewport = IIF_assertDashboardFullViewport; } catch (eW2) { }
       function IIF_clearDashboardFullpageLayout() {
+        /* لا نمسح أنماط #dashboard-overlay المضمّنة في HTML — تضمن ملء الشاشة حتى مع كاش قديم */
         var el = document.getElementById('dashboard-overlay');
         if (el) {
-          ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'min-width', 'max-width', 'min-height', 'height', 'max-height', 'margin', 'padding', 'border-radius', 'box-shadow', 'transform', 'z-index', 'display', 'flex-direction', 'align-items', 'justify-content', 'flex', 'box-sizing', 'background'].forEach(function (p) {
+          ['display', 'flex-direction', 'align-items', 'justify-content', 'flex', 'min-height', 'height', 'max-height'].forEach(function (p) {
             try { el.style.removeProperty(p); } catch (e) { }
           });
         }
