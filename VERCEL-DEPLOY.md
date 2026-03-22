@@ -21,7 +21,7 @@
 
 ## بعد نشر ناجح
 
-- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v7-preopen-layout`** أو **`dashboard-fullpage-v7-preopen-layout`**.  
+- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v8-fix-main-close`** أو **`dashboard-fullpage-v8-fix-main-close`**.  
 - إن وُجد → النسخة الجديدة وصلت. إن لم يوجد → ما زال الـ deploy أو المسار خاطئاً.
 
 ## أوامر (اختياري)
