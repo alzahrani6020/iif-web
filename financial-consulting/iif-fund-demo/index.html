@@ -50,7 +50,7 @@
   <title>International Investment Fund · FII · Paris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e18" />
-  <meta name="iif-build" content="dashboard-fullpage-v6-vw-dashopen" />
+  <meta name="iif-build" content="dashboard-fullpage-v7-preopen-layout" />
   <meta name="description"
     content="International Investment Fund (FII) — Financing for global prosperity. Registered in the EU Transparency Register. Licensed in France & USA. European & African Parliament recognition. Sovereign & institutional capital." />
   <meta name="iif-funcs-base" content="https://iif-fund.vercel.app" />
@@ -8409,7 +8409,7 @@
   <!-- Dashboard: manage investment projects (visible when logged in) -->
   <!-- أنماط مضمّنة على اللوحة: تعمل حتى لو كان CSS قديماً أو الكاش — العرض يُحدَّد بـ display من الصفحة (.dashboard-overlay / .is-open) وليس هنا -->
   <div class="dashboard-overlay" id="dashboard-overlay" aria-hidden="true" role="region"
-    aria-label="IIF Dashboard" data-iif-dashboard-root="true"     data-iif-build="v6-fullpage-vw-dashopen"
+    aria-label="IIF Dashboard" data-iif-dashboard-root="true" data-iif-build="v7-preopen-layout"
     style="position:fixed;left:0;top:0;right:0;bottom:0;width:100vw;min-width:100vw;max-width:none;min-height:100vh;min-height:100dvh;margin:0;padding:0;border-radius:0;box-shadow:none;box-sizing:border-box;z-index:2147483647;transform:none;background:linear-gradient(165deg,#03050a 0%,#0b1018 38%,#070a10 100%);">
     <div class="dashboard-page-shell" id="dashboard-page-shell" style="width:100%;min-width:100%;max-width:none;margin:0;box-sizing:border-box;">
       <header class="dashboard-header-bar site-header">
@@ -18538,11 +18538,17 @@ Generated: ${new Date().toLocaleString()}
           try {
             if (typeof closeAuth === 'function') closeAuth();
           } catch (eAuth) { }
+          /* مهم: نقل اللوحة لـ body + أنماط ملء الشاشة *قبل* is-open — وإلا تُرسم لإطار بعرض عمود (سلف داخل main/حاوية transform) */
+          try {
+            IIF_applyDashboardFullpageLayout();
+          } catch (ePreLayout) { }
           dashOverlay.classList.add('is-open');
           try {
             if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
           } catch (eH) { }
-          IIF_applyDashboardFullpageLayout();
+          try {
+            IIF_applyDashboardFullpageLayout();
+          } catch (ePostLayout) { }
           try {
             requestAnimationFrame(function () {
               IIF_applyDashboardFullpageLayout();
