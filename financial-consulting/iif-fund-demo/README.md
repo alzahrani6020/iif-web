@@ -6,6 +6,79 @@
 
 منصة IIF Fund هي منصة شاملة لإدارة الصناديق الاستثمارية مع تحليلات متقدمة وواجهة مستخدم احترافية.
 
+## ضمن مستودع IIF (الموصى به)
+
+هذا المجلد جزء من **[المشروع في الجذر](../../README.md)**. التشغيل الموحّد من **جذر المستودع**:
+
+1. **`npm start`** — خادم التطوير على **http://127.0.0.1:3333/** (مع بروكسي **`/api/searx`** إذا كان SearXNG يعمل على `8080`).
+2. **واجهة الصندوق (هذا المجلد):**  
+   **http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html**
+3. **المنصة الحكومية (بحث محلي + ويب اختياري):**  
+   **http://127.0.0.1:3333/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html**
+4. **SearXNG** (اختياري): من `engines/searxng` نفّذ `docker compose up -d` — راجع [engines/searxng/README.md](../../engines/searxng/README.md).
+
+**الرؤية والاتجاه العام:** [README الجذر](../../README.md) (قسم الرؤية / Vision).
+
+### نشر Vercel — مسار `admin.html` (مهم)
+
+يعتمد الرابط على **إعداد Root Directory** في مشروع Vercel:
+
+| إعداد Vercel (Root Directory) | روابط تعمل عادةً |
+|------------------------------|-------------------|
+| **`financial-consulting/iif-fund-demo`** (المجلد الذي يحتوي `index.html` الكبير و`vercel.json`) | **الواجهة:** `https://<نطاقك>/index.html` · **لوحة مباشرة:** `https://<نطاقك>/index.html?iif_admin_embed=1` · **إطار إداري:** `https://<نطاقك>/admin.html` |
+| **جذر المستودع الكامل** | قد يعمل **`/financial-consulting/iif-fund-demo/index.html`** إذا كان الملف مُرفوعاً على النطاق؛ إن ظهر **404** للمسار الطويل فالنشر يُعامل كالصفحة السابقة (فقط محتوى `iif-fund-demo` في الجذر). |
+
+**تحقق على `iif-fund.vercel.app` (حوالي 2025):**  
+- `/` و `/index.html` → **200** (واجهة الصندوق).  
+- `/index.html?iif_admin_embed=1` → **200** (لوحة التحكم مباشرة).  
+- `/financial-consulting/iif-fund-demo/index.html` → غالباً **404** إذا كان **Root Directory** = `iif-fund-demo` وليس المستودع كاملاً.
+
+**لا تعتمد** على المسار الطويل إلا إذا تأكدت أن الملفات تحت `financial-consulting/...` مُنشرة على نفس النطاق.
+
+**إن ظهرت اللوحة كنافذة في المنتصف:** غالباً `position: fixed` يُحسب داخل حاوية ضيقة لأن أحد الأسلاف له `transform`/`filter`. في الكود يُلغى ذلك على `html`/`body` عند `iif-dashboard-open`، ويُستدعى `IIF_assertDashboardFullViewport` لإعادة فرض العرض إذا كان صندوق اللوحة أضيق من النافذة.
+
+`<base>` في `index.html` يُضبط **تلقائياً** من مسار الصفحة (`#iif-document-base`) حتى تعمل روابط **`assets/`** (الشعار والصور) من جذر النطاق **أو** من مجلد فرعي دون اختفاء الشعار.
+
+**لوحة مباشرة (تعمل على النشر من `iif-fund-demo`):**  
+`https://iif-fund.vercel.app/index.html?iif_admin_embed=1`
+
+**لوحة التحكم بملء الشاشة (إخفاء هيدر الموقع):**  
+تُخفى واجهة الموقع العامة عبر CSS + دوال `IIF_hidePublicSiteChrome` / `IIF_restorePublicSiteChrome` في أوائل `<body>`. بعد كل تحديث على Vercel: **أعد النشر** ثم جرّب **تحديثاً قوياً** (Ctrl+F5) أو نافذة خاصة حتى لا يُخدم `index.html` من الكاش.
+
+**كيف تتأكد أن النشر يضم آخر التعديلات؟**  
+- **ليس** عبر البحث في Google أو Bing.  
+- افتح **رابط موقعك المنشور** (مثل `https://iif-fund.vercel.app/index.html`) في المتصفح، ثم اضغط **Ctrl+U** (عرض المصدر / View Page Source)، وابحث داخل الصفحة عن النص: **`تحقق-النشر-iif-dashboard-fullpage`**.  
+- إن **لم** يظهر، فإما الكاش أو أن **Root Directory** في Vercel لا يشير إلى مجلد `financial-consulting/iif-fund-demo`.
+
+### ملخص التعديلات (لوحة ملء الشاشة / `?iif_admin_embed=1`)
+
+| الموضوع | ماذا يفعل |
+|--------|-----------|
+| **CSS** | قفل `#dashboard-overlay` بملء الشاشة، إخفاء `#main-content` والهيدر في وضع الإدارة، وخلفية `body` داكنة؛ إخفاء عناصر `body` عند فتح اللوحة (`:has` + إخفاء إضافي). |
+| **JS** | `IIF_applyDashboardFullpageLayout` يضبط أبعاد اللوحة inline وينقل العقدة لآخر `body`؛ `IIF_hidePublicSiteChrome` يخفي العناصر العامة ويضع `data-iif-dash-bg-suppress` عند فتح اللوحة؛ `IIF_scheduleDashboardFullpageRetries` يعيد التطبيق بعد 350/900/1600 ms. |
+| **إغلاق** | `closeAuth` عند فتح اللوحة؛ بعد الإغلاق استدعاء `IIF_hidePublicSiteChrome` لتنظيف الحالة؛ `IIF_restorePublicSiteChrome` يزيل `data-iif-dash-bg-suppress`. |
+| **تعليق HTML** | تعليق `تحقق-النشر-iif-dashboard-fullpage` للتحقق من أن الملف المنشور هو نفس المستودع (ليس للبحث في محركات). |
+
+### هل «المحاولات الفاشلة» تتراكم على الموقع؟
+
+**لا.** كل نشر على Vercel يستبدل الملفات بالكامل؛ لا يوجد «تراكم» لمحاولات قديمة على الخادم.  
+إن نُشر كود فيه خطأ، يكفي **إعادة نشر نسخة صحيحة** أو **`git revert`** للكومِت المناسب.  
+**التأثير الوحيد** المحتمل: لقطات كاش لدى الزوار حتى تنتهي صلاحية الكاش أو يعملوا **تحديثاً قوياً** (Ctrl+F5).
+
+إذا ظهر **404** على `admin.html`: تأكد من أن **`admin.html`** موجود في **مجلد نشر Vercel** (نفس مجلد `index.html`)، ثم **دفع Git** و**إعادة النشر**. راجع: **Settings → General → Root Directory**.
+
+### وثائق المستويات الرفيعة (من جذر المستودع)
+
+صفحات ثابتة في **الجذر** وليست داخل هذا المجلد — تُفتح عبر الخادم الموحّد:
+
+| | |
+|---|---|
+| موجز تنفيذي | [`/executive-brief.html`](../../executive-brief.html) · اختصار `/executive` |
+| معايير المستوى السيادي | [`/sovereign-standards.html`](../../sovereign-standards.html) · `/sovereign` أو `/charter` |
+| دليل استضافة العرض | [`EXECUTIVE-HOSTING-GUIDE.md`](../../EXECUTIVE-HOSTING-GUIDE.md) |
+
+في **هذه الواجهة** يظهر في الهيدر رابط «Executive Brief» و«معايير سيادية» يشيران إلى نفس المسارات أعلاه.
+
 ## ✨ **المميزات الرئيسية**
 
 ### 📊 **تحليلات مالية متقدمة**
@@ -58,8 +131,8 @@
 ```
 iif-fund-demo/
 ├── 📄 README.md                    # وثائق المشروع
-├── 📄 index.html                   # الصفحة الرئيسية
-├── 📄 index-*.html                 # نسخ مختلفة من الصفحة
+├── 📄 index.html                   # الصفحة الرئيسية (المسار الوحيد المعتمد)
+├── 📁 archive/previous-index-variants/  # نسخ قديمة من index (مرجع فقط)
 ├── 📁 assets/                      # الموارد الثابتة
 │   ├── 📁 css/                     # ملفات التصميم
 │   ├── 📁 js/                      # ملفات JavaScript
@@ -75,23 +148,31 @@ iif-fund-demo/
 
 ## 🎯 **الاستخدام**
 
-### **التشغيل المحلي**
+### **التشغيل المحلي (ضمن جذر IIF)**
 ```bash
-# باستخدام Netlify CLI
-npm install -g netlify-cli
-netlify dev
+# من جذر المستودع (ليس من داخل iif-fund-demo فقط)
+cd /path/to/iif-fund-demo
+npm start
+```
+ثم افتح **http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html**
 
-# أو باستخدام Node.js
+### **تشغيل معزول لهذا المجلد (بديل)**
+```bash
+# من مجلد iif-fund-demo — قد لا يوفّر بروكسي SearXNG
 node server.js
+# أو
+python -m http.server 8080
+```
+المنفذ يعتمد على السكربت؛ راجع `server.js` إن وُجد.
 
-# أو باستخدام Python
-python -m http.server 8000
-```
+### **الوصول عبر Netlify (إن وُجد النشر)**
+راجع **[netlify.toml](../../netlify.toml)** في الجذر واختصارات مثل `/fund` و`/gov` في [README الجذر](../../README.md).
 
-### **الوصول إلى المنصة**
-```
-http://localhost:8000
-```
+### **واجهة مبسّطة (`fund-site`)**
+[`../fund-site/index.html`](../fund-site/index.html) يعرض المنصة الحكومية داخل iframe — للمعاينة السريعة. **الواجهة المعتمدة للصندوق** هي `index.html` في هذا المجلد.
+
+### **الاطلاع الرسمي (رؤساء دول / وفود)**
+[`../../executive-brief.html`](../../executive-brief.html) — موجز ثنائي اللغة؛ دليل الاستضافة: [`../../EXECUTIVE-HOSTING-GUIDE.md`](../../EXECUTIVE-HOSTING-GUIDE.md).
 
 ## 📊 **البيانات المتاحة**
 
