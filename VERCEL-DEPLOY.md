@@ -21,7 +21,7 @@
 
 ## بعد نشر ناجح
 
-- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v5-inline-fullpage`**.  
+- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v6-fullpage-vw-dashopen`** أو **`dashboard-fullpage-v6-vw-dashopen`**.  
 - إن وُجد → النسخة الجديدة وصلت. إن لم يوجد → ما زال الـ deploy أو المسار خاطئاً.
 
 ## أوامر (اختياري)

@@ -50,7 +50,7 @@
   <title>International Investment Fund · FII · Paris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e18" />
-  <meta name="iif-build" content="dashboard-fullpage-v5-inline" />
+  <meta name="iif-build" content="dashboard-fullpage-v6-vw-dashopen" />
   <meta name="description"
     content="International Investment Fund (FII) — Financing for global prosperity. Registered in the EU Transparency Register. Licensed in France & USA. European & African Parliament recognition. Sovereign & institutional capital." />
   <meta name="iif-funcs-base" content="https://iif-fund.vercel.app" />
@@ -65,15 +65,17 @@
   <!-- تحقق-النشر: iif-dashboard-fullpage-v3 — إن لم يظهر هذا التعليق في Ctrl+U على Vercel فالنشر قديم -->
   <style id="iif-dashboard-fullpage-critical-head">
     /* لوحة التحكم: ملء الشاشة — نسخة مبكّرة في <head> (تُكمّلها iif-dashboard-fullpage-lock في آخر body) */
-    #dashboard-overlay.dashboard-overlay.is-open {
+    #dashboard-overlay.dashboard-overlay.is-open,
+    html.iif-dashboard-open #dashboard-overlay.dashboard-overlay.is-open {
       position: fixed !important;
       inset: 0 !important;
       left: 0 !important;
       right: 0 !important;
       top: 0 !important;
       bottom: 0 !important;
-      width: auto !important;
-      min-width: 100% !important;
+      /* 100vw يتجاوز حاوية fixed ضيقة حيث يفشل width:auto + min-width:100% */
+      width: 100vw !important;
+      min-width: 100vw !important;
       max-width: none !important;
       min-height: 100vh !important;
       min-height: 100dvh !important;
@@ -106,6 +108,10 @@
       box-sizing: border-box !important;
     }
     body:has(#dashboard-overlay.is-open) #main-content {
+      display: none !important;
+    }
+    /* بدون :has — يعتمد على صنف html.iif-dashboard-open من openDashboard() */
+    html.iif-dashboard-open body > *:not(#dashboard-overlay):not(script) {
       display: none !important;
     }
   </style>
@@ -8403,8 +8409,8 @@
   <!-- Dashboard: manage investment projects (visible when logged in) -->
   <!-- أنماط مضمّنة على اللوحة: تعمل حتى لو كان CSS قديماً أو الكاش — العرض يُحدَّد بـ display من الصفحة (.dashboard-overlay / .is-open) وليس هنا -->
   <div class="dashboard-overlay" id="dashboard-overlay" aria-hidden="true" role="region"
-    aria-label="IIF Dashboard" data-iif-dashboard-root="true" data-iif-build="v5-inline-fullpage"
-    style="position:fixed;left:0;top:0;right:0;bottom:0;width:auto;min-width:100%;max-width:none;min-height:100vh;min-height:100dvh;margin:0;padding:0;border-radius:0;box-shadow:none;box-sizing:border-box;z-index:2147483647;transform:none;background:linear-gradient(165deg,#03050a 0%,#0b1018 38%,#070a10 100%);">
+    aria-label="IIF Dashboard" data-iif-dashboard-root="true"     data-iif-build="v6-fullpage-vw-dashopen"
+    style="position:fixed;left:0;top:0;right:0;bottom:0;width:100vw;min-width:100vw;max-width:none;min-height:100vh;min-height:100dvh;margin:0;padding:0;border-radius:0;box-shadow:none;box-sizing:border-box;z-index:2147483647;transform:none;background:linear-gradient(165deg,#03050a 0%,#0b1018 38%,#070a10 100%);">
     <div class="dashboard-page-shell" id="dashboard-page-shell" style="width:100%;min-width:100%;max-width:none;margin:0;box-sizing:border-box;">
       <header class="dashboard-header-bar site-header">
         <div class="site-header__inner">
@@ -18347,9 +18353,9 @@ Generated: ${new Date().toLocaleString()}
           s.setProperty('left', '0', 'important');
           s.setProperty('right', '0', 'important');
           s.setProperty('bottom', '0', 'important');
-          /* left+right+width:auto يملأ viewport حتى لو كانت حاوية fixed معطوبة؛ 100vw وحده قد يُقاس من عنصر ضيق */
-          s.setProperty('width', 'auto', 'important');
-          s.setProperty('min-width', '100%', 'important');
+          /* 100vw يملأ viewport حتى لو فشل width:auto + min-width:100% مع حاوية ضيقة */
+          s.setProperty('width', '100vw', 'important');
+          s.setProperty('min-width', '100vw', 'important');
           s.setProperty('max-width', 'none', 'important');
           s.setProperty('min-height', '100dvh', 'important');
           s.setProperty('height', '100dvh', 'important');
@@ -24050,15 +24056,16 @@ Generated: ${new Date().toLocaleString()}
 
   <!-- قفل ملء الشفّافة: يُحمّل بعد كل الأنماط في <head> فيفوق التعارضات -->
   <style id="iif-dashboard-fullpage-lock">
-    #dashboard-overlay.dashboard-overlay.is-open {
+    #dashboard-overlay.dashboard-overlay.is-open,
+    html.iif-dashboard-open #dashboard-overlay.dashboard-overlay.is-open {
       position: fixed !important;
       inset: 0 !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      width: auto !important;
-      min-width: 100% !important;
+      width: 100vw !important;
+      min-width: 100vw !important;
       max-width: none !important;
       min-height: 100vh !important;
       min-height: 100dvh !important;
@@ -24142,6 +24149,10 @@ Generated: ${new Date().toLocaleString()}
 
     /* إخفاء كل محتوى الصفحة خلف اللوحة عند الفتح — لا يبقى هيدر/محتوى ظاهراً كخلفية */
     body:has(#dashboard-overlay.is-open) > *:not(#dashboard-overlay):not(script) {
+      display: none !important;
+    }
+    /* بدون :has() — Safari/متصفحات قديمة؛ الصنف iif-dashboard-open يُضاف مع فتح اللوحة فقط */
+    html.iif-dashboard-open body > *:not(#dashboard-overlay):not(script) {
       display: none !important;
     }
   </style>
