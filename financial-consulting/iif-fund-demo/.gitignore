@@ -169,3 +169,4 @@ api-keys/
 *.key
 *.pem
 *.p12
+.vercel

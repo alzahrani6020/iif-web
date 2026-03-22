@@ -340,30 +340,40 @@ updateLanguage() {
 }
 
 initClock() {
+  if (typeof window !== 'undefined' && typeof window.IIF_siteClockTick === 'function') {
+    return;
+  }
   const updateClock = () => {
     const now = new Date();
     const timeElement = document.getElementById('site-clock-time');
     const dateElement = document.getElementById('site-clock-date');
     const tzElement = document.getElementById('site-clock-tz');
+    const lang = (document.documentElement && document.documentElement.getAttribute('data-lang')) || 'en';
+    const localeMap = { ar: 'ar-SA-u-nu-latn', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', es: 'es-ES' };
+    const loc = localeMap[lang] || (typeof navigator !== 'undefined' && navigator.language) || 'en-GB';
 
     if (timeElement) {
-      timeElement.textContent = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+      try {
+        timeElement.textContent = now.toLocaleTimeString(loc, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+      } catch (e) {
+        timeElement.textContent = now.toLocaleTimeString();
+      }
     }
 
     if (dateElement) {
-      dateElement.textContent = now.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
+      try {
+        dateElement.textContent = now.toLocaleDateString(loc, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+      } catch (e) {
+        dateElement.textContent = now.toLocaleDateString();
+      }
     }
 
     if (tzElement) {
-      tzElement.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      try {
+        tzElement.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch (e2) {
+        tzElement.textContent = '';
+      }
     }
   };
 

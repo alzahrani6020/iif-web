@@ -208,9 +208,9 @@ function serveStaticFile(req, res, pathname) {
     fs.readFile(filePath, function(error, content) {
         if (error) {
             if(error.code === 'ENOENT') {
-                // Try serving index-refactored.html for root
+                // Try serving index.html for root
                 if (pathname === '/') {
-                    fs.readFile(path.join(__dirname, 'index-refactored.html'), function(error, content) {
+                    fs.readFile(path.join(__dirname, 'index.html'), function(error, content) {
                         if (error) {
                             res.writeHead(404, { 'Content-Type': 'text/html' });
                             res.end('<h1>404 Not Found</h1><p>No index file found</p>', 'utf-8');
@@ -257,7 +257,7 @@ server.listen(PORT, () => {
     console.log(`🚀 Government Search Server running on http://localhost:${PORT}`);
     console.log('');
     console.log('📁 Available files:');
-    console.log('  / - Main page (index-refactored.html)');
+    console.log('  / - Main page (index.html)');
     console.log('  /styles.css - Stylesheet');
     console.log('  /script-backend.js - Frontend JavaScript');
     console.log('');
