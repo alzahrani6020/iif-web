@@ -1,5 +1,8 @@
 # إذا ظهر «لا جديد» على iif-fund.vercel.app
 
+> ملاحظة تشغيل حالية: إذا كان `iif-fund.vercel.app` محجوزاً خارج فريقك، استخدم مؤقتاً:
+> `https://iif-fund-six.vercel.app/index.html`
+
 ## التحقق السريع
 
 - **GitHub** `main` يحتوي آخر التعديلات (مثلاً كومِت `fix(dashboard): ... v5 markers`).
@@ -21,7 +24,7 @@
 
 ## بعد نشر ناجح
 
-- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v8-fix-main-close`** أو **`dashboard-fullpage-v8-fix-main-close`**.  
+- افتح: `https://iif-fund-six.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v8-fix-main-close`** أو **`dashboard-fullpage-v8-fix-main-close`**.  
 - إن وُجد → النسخة الجديدة وصلت. إن لم يوجد → ما زال الـ deploy أو المسار خاطئاً.
 
 ## أوامر (اختياري)
