@@ -12,6 +12,21 @@ const ROOT = path.join(__dirname, '..');
 const PORT = Number(process.env.PORT) || 3333;
 const HOST = process.env.CHECK_HOST || '127.0.0.1';
 
+function isServerUp(timeoutMs = 800) {
+  return new Promise((resolve) => {
+    const req = http.request({ hostname: HOST, port: PORT, path: '/', method: 'GET', timeout: timeoutMs }, (res) => {
+      res.resume();
+      resolve(true);
+    });
+    req.on('error', () => resolve(false));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(false);
+    });
+    req.end();
+  });
+}
+
 function waitForPort(ms = 20000) {
   const start = Date.now();
   return new Promise((resolve, reject) => {
@@ -44,34 +59,40 @@ function waitForPort(ms = 20000) {
   });
 }
 
-const child = spawn(process.execPath, [path.join(ROOT, 'scripts', 'dev-server.js')], {
-  cwd: ROOT,
-  stdio: 'inherit',
-  env: { ...process.env, PORT: String(PORT) },
-  detached: false,
-});
+let child = null;
+const usingExternalServer = await isServerUp();
+if (!usingExternalServer) {
+  child = spawn(process.execPath, [path.join(ROOT, 'scripts', 'dev-server.js')], {
+    cwd: ROOT,
+    stdio: 'inherit',
+    env: { ...process.env, PORT: String(PORT) },
+    detached: false,
+  });
+}
 
 let exiting = false;
 let serverReady = false;
 
-child.on('exit', (code) => {
-  if (exiting) return;
-  if (!serverReady) {
-    console.error(
-      `dev-server exited before smoke (code ${code}). إن كان المنفذ ${PORT} مستخدماً: أوقف الخادم الآخر أو استخدم PORT=3334 npm run smoke:with-server`
-    );
-    process.exit(code ?? 1);
-  }
-});
+if (child) {
+  child.on('exit', (code) => {
+    if (exiting) return;
+    if (!serverReady) {
+      console.error(
+        `dev-server exited before smoke (code ${code}). إن كان المنفذ ${PORT} مستخدماً: أوقف الخادم الآخر أو استخدم PORT=3334 npm run smoke:with-server`
+      );
+      process.exit(code ?? 1);
+    }
+  });
+}
 function shutdown(code) {
   if (exiting) return;
   exiting = true;
   try {
-    child.kill('SIGTERM');
+    child && child.kill('SIGTERM');
   } catch (_) {}
   setTimeout(() => {
     try {
-      child.kill('SIGKILL');
+      child && child.kill('SIGKILL');
     } catch (_) {}
     process.exit(code ?? 0);
   }, 800);
@@ -80,13 +101,17 @@ function shutdown(code) {
 process.on('SIGINT', () => shutdown(130));
 process.on('SIGTERM', () => shutdown(143));
 
-child.on('error', (err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (child) {
+  child.on('error', (err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
 
 try {
-  await waitForPort();
+  if (!usingExternalServer) {
+    await waitForPort();
+  }
   serverReady = true;
 } catch (e) {
   console.error(e.message || e);

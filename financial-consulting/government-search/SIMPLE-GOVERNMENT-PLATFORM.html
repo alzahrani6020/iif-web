@@ -880,7 +880,7 @@
                         <span>إكمال الاستعلام عبر محرك الويب (SearXNG) — يُفعّل افتراضياً على الجهاز المحلي</span>
                     </label>
                     <small style="color: var(--light-text); display:block; margin-top:0.35rem;">
-                        يضيف نتائج ويب إلى جانب الفهرس المحلي لاستكمال التفاصيل والمصادر. يتطلب: <code>docker compose</code> في <code>engines/searxng</code> ثم <code>npm start</code> (البروكسي <code>/api/searx</code> → المنفذ 8080). عطّل المربع إن أردت الفهرس المحلي فقط.
+                        يضيف نتائج ويب إلى جانب الفهرس المحلي لاستكمال التفاصيل والمصادر. يتطلب: <code>docker compose</code> في <code>engines/searxng</code> ثم <code>npm start</code> (البروكسي <code>/api/searx</code> → SearXNG على المنفذ <code>18080</code>). عطّل المربع إن أردت الفهرس المحلي فقط.
                     </small>
                 </div>
             </div>
@@ -968,7 +968,7 @@
                 if (h === 'localhost' || h === '127.0.0.1') {
                     return window.location.origin + '/api/searx';
                 }
-                return 'http://127.0.0.1:8080';
+                return 'http://127.0.0.1:18080';
             }
         };
 

@@ -16,10 +16,12 @@
 | `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) — **قبل نشر تغييرات حرجة:** [QA-PRE-RELEASE.md](./financial-consulting/iif-fund-demo/QA-PRE-RELEASE.md) |
 | `financial-consulting/fund-site/` | واجهة أبسط |
 | `executive-brief.html`، `sovereign-standards.html` (جذر المستودع) | موجز للمستويات الرفيعة + معايير سيادية؛ اختصارات `/executive`، `/sovereign`، `/charter` |
-| `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `8080` |
+| `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `18080` |
 | `engines/searxng/` | **Tor + SearXNG** (Docker) — `npm start` → `/api/searx`؛ محركات `.onion` عبر حاوية `tor` |
 
 ## الأوامر (من جذر المشروع)
+
+**ويندوز — تشغيل كامل:** `START-IIF-FULL.bat` (Docker + خادم 3333 + فتح المنصة الحكومية).
 
 ```bash
 npm start          # خادم التطوير
@@ -29,7 +31,9 @@ npm run verify       # build + فحص صياغة dev-server و check-urls و smo
 npm run verify:full  # نفس verify ثم تشغيل خادم مؤقت + smoke:html (تحقق كامل بأمر واحد)
 npm run smoke:with-server  # خادم مؤقت + smoke فقط (إن كان المنفذ 3333 مشغولاً: `set PORT=3334` ثم نفس الأمر)
 npm run check-urls # بعد تشغيل الخادم — يتحقق من `/` و`iif-fund-demo/index.html` والمنصة وغيرها (انظر scripts/check-urls.js)
-npm run health        # بعد `npm start`: check-urls + smoke:html (يشمل index + ?iif_admin_embed=1 + admin.html + صفحات أخرى)
+npm run health        # بعد `npm start`: check-urls + smoke:html (يشمل index + صفحات حرجة أخرى)
+npm run verify:searx  # هل SearXNG يستجيب على 18080؟ (بعد docker compose)
+npm run verify:stack  # verify + verify:searx
 npm run qa:iif-fund   # نفس smoke:html — اسم صريح لواجهة الصندوق
 ```
 

@@ -27,15 +27,6 @@
           "value": "no-store, no-cache, must-revalidate, max-age=0"
         }
       ]
-    },
-    {
-      "source": "/financial-consulting/iif-fund-demo/admin.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, no-cache, must-revalidate, max-age=0"
-        }
-      ]
     }
   ]
 }

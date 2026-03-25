@@ -24,7 +24,7 @@
 
 هذا المجلد جزء من **[المشروع في الجذر](../../README.md)**. التشغيل الموحّد من **جذر المستودع**:
 
-1. **`npm start`** — خادم التطوير على **http://127.0.0.1:3333/** (مع بروكسي **`/api/searx`** إذا كان SearXNG يعمل على `8080`).
+1. **`npm start`** — خادم التطوير على **http://127.0.0.1:3333/** (مع بروكسي **`/api/searx`** إذا كان SearXNG يعمل على `18080`).
 2. **واجهة الصندوق (هذا المجلد):**  
    **http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html**
 3. **المنصة الحكومية (بحث محلي + ويب اختياري):**  
@@ -35,28 +35,27 @@
 
 ### الجاهزية قبل النشر (مسارات حرجة)
 
-- **[QA-PRE-RELEASE.md](./QA-PRE-RELEASE.md)** — قائمة تحقق: `npm run smoke:html` بعد `npm start`، فحص يدوي لـ `?iif_admin_embed=1` و`admin.html`، ونشر Vercel.
+- **[QA-PRE-RELEASE.md](./QA-PRE-RELEASE.md)** — قائمة تحقق: `npm run smoke:html` بعد `npm start`، فحص يدوي لمسار اللوحة المعتمد `#dashboard`، ونشر Vercel.
 - أي تعديل على **`index.html`** يمس لوحة التحكم أو وضع الإدارة: شغّل **`npm run health`** (خادم يعمل) قبل الدمج.
 
 ### ما هي «صفحة الأدمن» في هذا المشروع؟
 
 - **لا يوجد** ملف منفصل اسمه `admin` يعرض واجهة مختلفة عن الموقع. **لوحة الإدارة = لوحة التحكم** داخل نفس **`index.html`** (`#dashboard-overlay`).
-- الرابط **`index.html?iif_admin_embed=1`** يحمّل **نفس الصفحة** مع معامل يطلب: إخفاء واجهة الموقع العامة قدر الإمكان، ثم **فتح نافذة تسجيل الدخول** إن لم تكن مسجّلاً، أو **فتح لوحة التحكم** إن كان لديك صلاحية.
-- **`admin.html`** مجرد **إطار (iframe)** يحمّل `index.html?iif_admin_embed=1` — المحتوى واحد؛ عنوان التبويب في المتصفح يصبح أوضح عند استخدام `?iif_admin_embed=1` (يُضبط من JS).
-- مع الكود الحديث: وضع `?iif_admin_embed=1` يعرض أولاً **شاشة «لوحة التحكم — جاري التحميل»** (`#iif-embed-entry-screen`) وليس الهيرو العام. إن رأيت **الهيرو مباشرة** فالكاش قديم أو نسخة منشورة قديمة — **Ctrl+F5** أو راجع النشر.
+- **الرابط المعتمد لفتح اللوحة:** `index.html#dashboard` (على الإنتاج: `https://iif-fund.vercel.app/index.html#dashboard`).
+- أي روابط أخرى مثل معاملات `?iif_admin_embed=1` تعتبر **غير معتمدة** (قد تُترك لأسباب توافق/اختبار، لكن لا تُستخدم كرابط لوحة).
 
-### نشر Vercel — مسار `admin.html` (مهم)
+### نشر Vercel — رابط اللوحة (المعتمد)
 
 يعتمد الرابط على **إعداد Root Directory** في مشروع Vercel:
 
 | إعداد Vercel (Root Directory) | روابط تعمل عادةً |
 |------------------------------|-------------------|
-| **`financial-consulting/iif-fund-demo`** (المجلد الذي يحتوي `index.html` الكبير و`vercel.json`) | **الواجهة:** `https://<نطاقك>/index.html` · **لوحة مباشرة:** `https://<نطاقك>/index.html?iif_admin_embed=1` · **إطار إداري:** `https://<نطاقك>/admin.html` |
+| **`financial-consulting/iif-fund-demo`** (المجلد الذي يحتوي `index.html` الكبير و`vercel.json`) | **الواجهة:** `https://<نطاقك>/index.html` · **اللوحة (المعتمد):** `https://<نطاقك>/index.html#dashboard` |
 | **جذر المستودع الكامل** | قد يعمل **`/financial-consulting/iif-fund-demo/index.html`** إذا كان الملف مُرفوعاً على النطاق؛ إن ظهر **404** للمسار الطويل فالنشر يُعامل كالصفحة السابقة (فقط محتوى `iif-fund-demo` في الجذر). |
 
 **تحقق على `iif-fund.vercel.app` (حوالي 2025):**  
 - `/` و `/index.html` → **200** (واجهة الصندوق).  
-- `/index.html?iif_admin_embed=1` → **200** (لوحة التحكم مباشرة).  
+- `/index.html#dashboard` → **يفتح لوحة التحكم** (المعتمد).  
 - `/financial-consulting/iif-fund-demo/index.html` → غالباً **404** إذا كان **Root Directory** = `iif-fund-demo` وليس المستودع كاملاً.
 
 **لا تعتمد** على المسار الطويل إلا إذا تأكدت أن الملفات تحت `financial-consulting/...` مُنشرة على نفس النطاق.
@@ -65,8 +64,8 @@
 
 `<base>` في `index.html` يُضبط **تلقائياً** من مسار الصفحة (`#iif-document-base`) حتى تعمل روابط **`assets/`** (الشعار والصور) من جذر النطاق **أو** من مجلد فرعي دون اختفاء الشعار.
 
-**لوحة مباشرة:**  
-- **للجمهور (بدون تسجيل):** `https://iif-fund.vercel.app/index.html?iif_admin_embed=1`  
+**لوحة مباشرة (المعتمد):**  
+- `https://iif-fund.vercel.app/index.html#dashboard`
 - نطاق النشر عبر CLI من هذا المجلد: **`https://iif-fund-demo.vercel.app`** (يُحدَّث بـ `vercel deploy --prod`؛ الريبو نفسه يدفع إلى GitHub فيُعاد نشر مشاريع أخرى إن وُجد الربط).
 
 **تنبيه — شاشة سوداء على رابط مثل `*-dr-talal.vercel.app`:**  
@@ -80,7 +79,7 @@
 - افتح **رابط موقعك المنشور** (مثل `https://iif-fund.vercel.app/index.html`) في المتصفح، ثم اضغط **Ctrl+U** (عرض المصدر / View Page Source)، وابحث داخل الصفحة عن النص: **`تحقق-النشر-iif-dashboard-fullpage`**.  
 - إن **لم** يظهر، فإما الكاش أو أن **Root Directory** في Vercel لا يشير إلى مجلد `financial-consulting/iif-fund-demo`.
 
-### ملخص التعديلات (لوحة ملء الشاشة / `?iif_admin_embed=1`)
+### ملخص التعديلات (لوحة ملء الشاشة / `#dashboard`)
 
 | الموضوع | ماذا يفعل |
 |--------|-----------|
@@ -95,7 +94,7 @@
 إن نُشر كود فيه خطأ، يكفي **إعادة نشر نسخة صحيحة** أو **`git revert`** للكومِت المناسب.  
 **التأثير الوحيد** المحتمل: لقطات كاش لدى الزوار حتى تنتهي صلاحية الكاش أو يعملوا **تحديثاً قوياً** (Ctrl+F5).
 
-إذا ظهر **404** على `admin.html`: تأكد من أن **`admin.html`** موجود في **مجلد نشر Vercel** (نفس مجلد `index.html`)، ثم **دفع Git** و**إعادة النشر**. راجع: **Settings → General → Root Directory**.
+إذا لم تفتح اللوحة على `#dashboard`: جرّب تحديثاً قوياً (Ctrl+F5) وتأكد أن **Root Directory** في Vercel يشير للمجلد الصحيح الذي يحتوي `index.html`.
 
 ### وثائق المستويات الرفيعة (من جذر المستودع)
 

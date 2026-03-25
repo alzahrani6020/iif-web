@@ -12,9 +12,11 @@
 docker compose up -d
 ```
 
+**كانت الحاوية قديماً على المنفذ 8080؟** نفّذ `docker compose down` ثم `docker compose up -d` لاعتماد التعيين **`18080:8080`** (المتصفح يفتح **18080**؛ داخل الحاوية لا يزال **8080**).
+
 يشغّل **خدمتين:** **`tor`** (بروكسي SOCKS5 لشبكة Tor) + **`searxng`**. محركات **ahmia** و**torch** (مواقع `.onion`) تُوجَّه عبر `socks5h://tor:9050` — راجع `config/settings.yml`.
 
-- **واجهة المحرك:** [http://127.0.0.1:8080](http://127.0.0.1:8080)
+- **واجهة المحرك:** [http://127.0.0.1:18080](http://127.0.0.1:18080) (على المضيف؛ الحاوية تستمع داخلياً على 8080)
 - يتطلب **Docker Desktop** شغّالاً.
 - **المنصة الحكومية** (بحث ويب): من جذر المشروع `npm start` ثم افتح `…/government-search/SIMPLE-GOVERNMENT-PLATFORM.html` على `127.0.0.1:3333` — راجع [README-IIF-INTEGRATION.md](../../financial-consulting/government-search/README-IIF-INTEGRATION.md).
 
@@ -67,4 +69,4 @@ docker compose down
 | الحاوية | الدور |
 |---------|--------|
 | `iif-tor-socks` | بروكسي Tor (SOCKS5 داخل الشبكة على `tor:9050`) |
-| `iif-searxng-standalone` | واجهة SearXNG على المنفذ **8080** |
+| `iif-searxng-standalone` | SearXNG داخل الحاوية على **8080**؛ من المتصفح على المضيف **18080** |

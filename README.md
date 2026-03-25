@@ -60,6 +60,15 @@
 
 ## التشغيل السريع
 
+### ويندوز — «كل شيء» بنقرة واحدة
+
+1. شغّل **Docker Desktop** وانتظر حتى يصبح جاهزاً.
+2. انقر نقراً مزدوجاً **[`START-IIF-FULL.bat`](./START-IIF-FULL.bat)** في جذر المشروع.  
+   يشغّل **SearXNG + Tor** (`engines/searxng`)، ثم **خادم التطوير** على **3333** في نافذة منفصلة، ثم يفتح **المنصة الحكومية** في المتصفح.
+3. للتحقق من المحرك من الطرفية: `npm run verify:searx` (يجب أن يطبع `OK`).
+
+**بدون Docker** (واجهات فقط): **[`START-IIF-DEMO.bat`](./START-IIF-DEMO.bat)** — يشغّل `npm start` ويفتح **http://127.0.0.1:3333/** (المجلد الصحيح مضمون عبر `/D`).
+
 ### 1) خادم التطوير (الواجهات الثابتة)
 
 يتطلب **Node.js 20+** (انظر `.nvmrc`):
@@ -85,7 +94,7 @@ npm run health
 
 > **للمطورين:** المنصة الحكومية مباشرة:  
 > `…/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html`  
-> (بحث **محلي** في الجهات؛ نتائج الويب مُعطّلة حتى ربط المحرك لاحقاً.)
+> (بحث **محلي** دائماً؛ **نتائج الويب** عبر SearXNG عند تشغيل **`START-IIF-FULL.bat`** أو `engines/searxng` + `npm start` — انظر [README-IIF-INTEGRATION.md](./financial-consulting/government-search/README-IIF-INTEGRATION.md).)
 
 ### 2) محرك البحث (اختياري — مشروع مستقل)
 
@@ -96,12 +105,13 @@ cd engines/searxng
 docker compose up -d
 ```
 
-- الواجهة: [http://127.0.0.1:8080](http://127.0.0.1:8080)  
+- الواجهة: [http://127.0.0.1:18080](http://127.0.0.1:18080) (المضيف؛ داخل الحاوية 8080)  
 - التفاصيل: [engines/searxng/README.md](./engines/searxng/README.md)
 
 ### 3) ويندوز — تشغيل ومتصفح
 
-انقر نقراً مزدوجاً **`START-IIF-DEMO.bat`** (يفتح الخادم ثم الصفحة).
+- **`START-IIF-FULL.bat`** — Docker + الخادم + فتح المنصة الحكومية (موصى به للبحث الويب).  
+- **`START-IIF-DEMO.bat`** — الخادم + الصفحة الرئيسية فقط.
 
 ---
 
@@ -120,7 +130,7 @@ docker compose up -d
 | `financial-consulting/government-search/iif-config.js` | يُحمَّل من المنصة — تفعيل بحث الويب على `localhost`/`127.0.0.1` |
 | `financial-consulting/iif-fund-demo/` | **واجهة الصندوق الأصلية** |
 | `financial-consulting/fund-site/index.html` | واجهة تجريبية أبسط |
-| `scripts/dev-server.js` | خادم تطوير (`3333`) + بروكسي **`/api/searx`** → SearXNG على `8080` |
+| `scripts/dev-server.js` | خادم تطوير (`3333`) + بروكسي **`/api/searx`** → SearXNG على `18080` |
 | `engines/searxng/` | **Docker (Tor + SearXNG) + توثيق المحرك** |
 
 تفاصيل الربط المستقبلي: [financial-consulting/government-search/README-IIF-INTEGRATION.md](./financial-consulting/government-search/README-IIF-INTEGRATION.md).

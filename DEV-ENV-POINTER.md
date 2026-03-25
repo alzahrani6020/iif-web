@@ -1,7 +1,8 @@
 # مؤشر بيئة التطوير
 
+- **`START-IIF-FULL.bat`** (جذر المشروع) — ويندوز: Docker + `npm start` + فتح المنصة الحكومية.
 - **`README.md`** — تشغيل الواجهات (`npm start`) + المحرك المنفصل (`engines/searxng/`).
-- **`engines/searxng/README.md`** — SearXNG كمشروع مستقل (Docker، المنفذ 8080).
+- **`engines/searxng/README.md`** — SearXNG كمشروع مستقل (Docker، المضيف **18080**).
 
 ## بيئة عامة (Docker + أدوات)
 
@@ -11,4 +12,4 @@
 ## عناوين سريعة
 
 - خادم IIF: **http://127.0.0.1:3333/**
-- SearXNG (إن شغّلت المشروع المنفصل): **http://127.0.0.1:8080/**
+- SearXNG (إن شغّلت المشروع المنفصل): **http://127.0.0.1:18080/**

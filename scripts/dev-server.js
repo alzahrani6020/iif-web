@@ -1,7 +1,7 @@
 /**
  * خادم تطوير للصفحات الثابتة + بروكسي SearXNG على /api/searx
  * الاستخدام: npm start  →  http://localhost:3333
- * المحرك: engines/searxng/  →  docker compose up -d  (منفذ 8080)
+ * المحرك: engines/searxng/  →  docker compose up -d  (المضيف 18080 → الحاوية 8080)
  */
 'use strict';
 
@@ -13,7 +13,7 @@ const { URL } = require('url');
 const PORT = Number(process.env.PORT) || 3333;
 const ROOT = path.join(__dirname, '..');
 /** upstream SearXNG (Docker) */
-const SEARX_UPSTREAM = new URL(process.env.SEARXNG_URL || 'http://127.0.0.1:8080');
+const SEARX_UPSTREAM = new URL(process.env.SEARXNG_URL || 'http://127.0.0.1:18080');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -47,7 +47,7 @@ function proxySearx(req, res) {
   const u = new URL(req.url, 'http://127.0.0.1');
   const subPath = u.pathname.replace(/^\/api\/searx/, '') || '/';
   const targetPath = subPath + u.search;
-  const port = Number(SEARX_UPSTREAM.port) || 8080;
+  const port = Number(SEARX_UPSTREAM.port) || 18080;
   const headers = {};
   for (const k of Object.keys(req.headers)) {
     const lk = k.toLowerCase();
@@ -93,6 +93,16 @@ function proxySearx(req, res) {
 
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
+  /** تم إلغاء الاختصارات المكررة: استخدم الرابط المعتمد للوحة */
+  if (urlPath === '/dashboard' || urlPath === '/admin') {
+    send(
+      res,
+      404,
+      'Not found\n\nاستخدم لوحة التحكم عبر الرابط المعتمد:\n/financial-consulting/iif-fund-demo/index.html#dashboard\n',
+      { 'Content-Type': 'text/plain; charset=utf-8' }
+    );
+    return;
+  }
   /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */
   if (urlPath !== '/' && urlPath.endsWith('/')) {
     urlPath = urlPath.slice(0, -1) + '/index.html';

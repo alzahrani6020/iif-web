@@ -17,6 +17,8 @@
     "validate": "npm run build",
     "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js && node --check scripts/smoke-with-server.mjs",
     "health": "npm run check-urls && npm run smoke:html",
+    "verify:searx": "node scripts/verify-searx.js",
+    "verify:stack": "npm run verify && npm run verify:searx",
     "qa:iif-fund": "node scripts/smoke-html-check.mjs"
   },
   "engines": {

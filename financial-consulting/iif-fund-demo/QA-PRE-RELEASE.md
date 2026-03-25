@@ -24,8 +24,7 @@ npm run smoke:html
 | المسار | المعنى |
 |--------|--------|
 | `.../iif-fund-demo/index.html` | وجود لوحة التحكم في المصدر، علامة النشر، base، شعار |
-| `.../index.html?iif_admin_embed=1` | وجود شاشة دخول الإدارة `#iif-embed-entry-screen`، `#dashboard-overlay`، `#auth-overlay` |
-| `.../admin.html` | iframe يحمّل `index.html?iif_admin_embed=1` |
+| `.../index.html#dashboard` | فتح لوحة التحكم (Hash) — هذا هو الرابط المعتمد |
 
 **خرج `0`** = نجاح؛ **خرج `1`** = توقف ولا تنشر حتى يُصلح.
 
@@ -48,14 +47,10 @@ npm run health
    — يجب أن تظهر واجهة الزائر (هيرو)، وليس خطأ 404.
 
 2. [ ] **وضع الإدارة:**  
-   `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html?iif_admin_embed=1`  
-   — **لا** يجب أن يظهر هيرو «رؤية ملكية» كأول شاشة دون تفسير؛ يجب أن ترى **شاشة «لوحة التحكم — جاري التحميل»** ثم **نافذة تسجيل الدخول** أو **اللوحة** حسب الجلسة.
+   `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html#dashboard`  
+   — يجب أن تفتح اللوحة (قد يطلب تسجيل الدخول حسب الجلسة/الصلاحية).
 
-3. [ ] **admin.html:**  
-   `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/admin.html`  
-   — إطار كامل؛ إن ظهرت شاشة بيضاء راجع `vercel.json` / `X-Frame-Options` على الإنتاج فقط.
-
-4. [ ] **علامة النشر (إنتاج):** على النطاق المنشور، افتح الصفحة → **Ctrl+U** → ابحث عن  
+3. [ ] **علامة النشر (إنتاج):** على النطاق المنشور، افتح الصفحة → **Ctrl+U** → ابحث عن  
    `تحقق-النشر-iif-dashboard-fullpage`  
    — إن لم يوجد: كاش أو **Root Directory** خاطئ في Vercel.
 
@@ -74,7 +69,7 @@ npm run health
 | العرض | تحقق |
 |--------|------|
 | شاشة سوداء طويلة | JS معطّل؟ وحدة تحكم F12 |
-| هيرو عام مع `?iif_admin_embed=1` | الكود الحديث يضيف `#iif-embed-entry-screen` — أعد النشر والكاش |
+| هيرو عام مع رابط اللوحة `#dashboard` | قد يكون كاش قديم أو تم إلغاء فتح اللوحة تلقائياً — جرّب Ctrl+F5 أو نافذة خاصة |
 | 401 على نطاق `*-team.vercel.app` | Deployment Protection — استخدم نطاق الإنتاج أو عطّل الحماية للمعاينة |
 | `ERR_CONNECTION_REFUSED` على 127.0.0.1:3333 | لم يُشغَّل `npm start` |
 
@@ -83,6 +78,6 @@ npm run health
 ## 5) مراجع
 
 - [PATHS-NOT-GOOGLE.md](../../PATHS-NOT-GOOGLE.md) — لا تُدخل مسارات المشروع في بحث Google
-- [README.md](./README.md) — روابط Vercel و`admin.html`
+- [README.md](./README.md) — روابط Vercel ورابط اللوحة المعتمد
 - [قبل-النشر.md](../../قبل-النشر.md) — قائمة المستودع العامة
 - [AGENTS.md](../../AGENTS.md) — أوامر `npm run health` و`smoke:html`

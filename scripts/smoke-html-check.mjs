@@ -1,6 +1,6 @@
 /**
  * فحص سريع: يجلب HTML رئيسية ويتأكد من وجود base وشعار وعدم نقص government-data
- * + مسارات حرجة لواجهة الصندوق: ?iif_admin_embed=1 و admin.html
+ * + مسارات حرجة لواجهة الصندوق: لوحة التحكم (Hash)
  * الاستخدام: node scripts/smoke-html-check.mjs (بعد npm start على 3333)
  */
 import http from 'http';
@@ -42,22 +42,6 @@ async function main() {
         'تحقق-النشر-iif-dashboard-fullpage',
       ],
       label: 'واجهة الصندوق (index)',
-    },
-    {
-      path: '/financial-consulting/iif-fund-demo/index.html?iif_admin_embed=1',
-      mustInclude: [
-        'iif-embed-entry-screen',
-        'iifInjectEmbedEntryScreen',
-        'id="dashboard-overlay"',
-        'id="auth-overlay"',
-        'تحقق-النشر-iif-dashboard-fullpage',
-      ],
-      label: 'وضع الإدارة ?iif_admin_embed=1 (لوحة + دخول)',
-    },
-    {
-      path: '/financial-consulting/iif-fund-demo/admin.html',
-      mustInclude: ['iif-admin-frame', 'index.html?iif_admin_embed=1', '<iframe'],
-      label: 'admin.html — إطار لوحة الإدارة',
     },
     {
       path: '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',

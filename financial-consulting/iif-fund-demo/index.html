@@ -53,7 +53,7 @@
   <meta name="iif-build" content="dashboard-fullpage-v8-fix-main-close" />
   <meta name="description"
     content="International Investment Fund (FII) — Financing for global prosperity. Registered in the EU Transparency Register. Licensed in France & USA. European & African Parliament recognition. Sovereign & institutional capital." />
-  <meta name="iif-funcs-base" content="https://iif-fund-six.vercel.app" />
+  <meta name="iif-funcs-base" content="https://iif-fund.vercel.app" />
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
   <link rel="apple-touch-icon" href="assets/emblem.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -7185,6 +7185,26 @@
   <script>
     (function () {
       try {
+        if (new URLSearchParams(window.location.search).get('iif_admin_portal') === '1') {
+          document.documentElement.classList.add('iif-admin-portal');
+          window.IIF_ADMIN_PORTAL = true;
+          try { document.title = 'IIF · بوابة الإدارة / Admin Portal'; } catch (eTitlePortal) { }
+        }
+        /* أي روابط قديمة مثل ?iif_admin_embed=1 ⇒ وحّدها إلى الرابط المعتمد #dashboard */
+        if (
+          window.top === window.self &&
+          new URLSearchParams(window.location.search).get('iif_admin_embed') === '1' &&
+          new URLSearchParams(window.location.search).get('iif_allow_direct') !== '1'
+        ) {
+          try {
+            var adminUrl = new URL(window.location.href);
+            adminUrl.searchParams.delete('iif_admin_embed');
+            adminUrl.searchParams.delete('iif_allow_direct');
+            adminUrl.hash = '#dashboard';
+            window.location.replace(adminUrl.toString());
+            return;
+          } catch (eRedirectAdmin) { }
+        }
         if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1') {
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
@@ -7198,6 +7218,7 @@
       function iifHidePublicSiteChrome() {
         try {
           var sp = new URLSearchParams(window.location.search);
+          var portalParam = sp.get('iif_admin_portal') === '1';
           var ov = document.getElementById('dashboard-overlay');
           var dashOpen = ov && ov.classList && ov.classList.contains('is-open');
           var authOv = document.getElementById('auth-overlay');
@@ -7210,19 +7231,14 @@
               try { node.style.removeProperty('display'); } catch (e0) { }
             });
           }
-          if (sp.get('iif_admin_embed') !== '1' && !dashOpen) return;
+          if (!portalParam && sp.get('iif_admin_embed') !== '1' && !dashOpen) return;
           var h = document.querySelector('body > header.site-header');
           if (h) h.style.setProperty('display', 'none', 'important');
           var m = document.getElementById('main-content');
           var f = document.querySelector('body > footer');
-          /* embed: لا تُفرض إخفاء main/footer قبل فتح اللوحة أو نافذة الدخول — وإلا شاشة سوداء */
-          if (embedParam && !dashOpen && !authOpen) {
-            if (m) m.style.removeProperty('display');
-            if (f) f.style.removeProperty('display');
-          } else {
-            if (m) m.style.setProperty('display', 'none', 'important');
-            if (f) f.style.setProperty('display', 'none', 'important');
-          }
+          /* بوابة الإدارة/وضع الإدارة المضمّن: أخفِ المحتوى العام دائماً لتفادي ظهور الصفحة العامة */
+          if (m) m.style.setProperty('display', 'none', 'important');
+          if (f) f.style.setProperty('display', 'none', 'important');
           var sl = document.querySelector('a.skip-link');
           if (sl) sl.style.setProperty('display', 'none', 'important');
           var btop = document.getElementById('iif-back-to-top');
@@ -7282,6 +7298,25 @@
       }
       window.IIF_removeEmbedEntryScreen = iifRemoveEmbedEntryScreen;
 
+      function iifForcePortalLoginOverlay() {
+        try {
+          if (new URLSearchParams(window.location.search).get('iif_admin_portal') !== '1') return false;
+          var auth = document.getElementById('auth-overlay');
+          if (!auth) return false;
+          auth.classList.add('is-open');
+          auth.setAttribute('aria-hidden', 'false');
+          try { document.body.style.overflow = 'hidden'; } catch (eOv) { }
+          var loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+          if (loginTab && typeof loginTab.click === 'function') loginTab.click();
+          var loginPanel = document.getElementById('auth-panel-login');
+          if (loginPanel) loginPanel.classList.add('is-active');
+          var regPanel = document.getElementById('auth-panel-register');
+          if (regPanel) regPanel.classList.remove('is-active');
+          return true;
+        } catch (ePortalOpen) { return false; }
+      }
+      window.IIF_forcePortalLoginOverlay = iifForcePortalLoginOverlay;
+
       function iifInjectEmbedEntryScreen() {
         try {
           if (new URLSearchParams(window.location.search).get('iif_admin_embed') !== '1') return;
@@ -7305,6 +7340,20 @@
         } else {
           iifInjectEmbedEntryScreen();
         }
+      }
+
+      if (new URLSearchParams(window.location.search).get('iif_admin_portal') === '1') {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () {
+            iifForcePortalLoginOverlay();
+          });
+        } else {
+          iifForcePortalLoginOverlay();
+        }
+        setTimeout(iifForcePortalLoginOverlay, 120);
+        setTimeout(iifForcePortalLoginOverlay, 400);
+        setTimeout(iifForcePortalLoginOverlay, 900);
+        setTimeout(iifForcePortalLoginOverlay, 1600);
       }
 
       if (document.readyState === 'loading') {
@@ -8404,7 +8453,7 @@
     </div>
   </div>
 
-  <!-- تحقق النشر: افتح موقعك (مثل iif-fund-six.vercel.app) ثم Ctrl+U لعرض المصدر وابحث عن كلمة «تحقق-النشر» هنا — لا تبحث عن هذا في جوجل -->
+  <!-- تحقق النشر: افتح موقعك (مثل iif-fund.vercel.app) ثم Ctrl+U لعرض المصدر وابحث عن كلمة «تحقق-النشر» هنا — لا تبحث عن هذا في جوجل -->
   <!-- تحقق-النشر-iif-dashboard-fullpage -->
   <!-- Dashboard: manage investment projects (visible when logged in) -->
   <!-- مهم: main.dashboard-main يُغلق بـ </main> ثم dashboard-page-shell ثم dashboard-overlay — إغلاق بـ </div> فقط يفسد DOM ويُظهر اللوحة كعمود. -->
@@ -14287,7 +14336,7 @@ Generated: ${new Date().toLocaleString()}
          * مثال: https://your-domain.com/.../admin.html
          * الملف: admin.html — يعرض index.html?iif_admin_embed=1 داخل iframe.
          */
-        adminPageFile: 'admin.html',
+        adminPageFile: null,
         /**
          * الحفاظ على الشعار والصور (مجلد assets/) وبيانات الزوار والمستخدمين والأعضاء والمالك عند أي إضافة/تعديل/تحديث.
          * جذر الموقع للمسارات النسبية يُحسب تلقائياً من عنوان الصفحة (#iif-document-base) — لا تغيّر يدوياً إلى / فقط إن كان المشروع تحت مجلد فرعي.
@@ -17356,6 +17405,18 @@ Generated: ${new Date().toLocaleString()}
           var un = (opts.name || localStorage.getItem('iif-user-name') || '').trim() || loginEmail;
           upsertSiteUser(loginEmail, un);
         }
+        /* دخول من بوابة الإدارة: افتح اللوحة مباشرة بعد نجاح تسجيل الدخول */
+        try {
+          if (new URLSearchParams(window.location.search).get('iif_admin_portal') === '1') {
+            setTimeout(function () {
+              try {
+                if (typeof openDashboardEnhanced === 'function') {
+                  openDashboardEnhanced();
+                }
+              } catch (eOpenDashPortal) { }
+            }, (window.IIF_TIMING && window.IIF_TIMING.openDashboardAfterLogin) || 800);
+          }
+        } catch (ePortalAfterLogin) { }
       }
       function hasTrustedDevice() {
         try {
@@ -18519,21 +18580,10 @@ Generated: ${new Date().toLocaleString()}
           alert(isAr ? 'تم تغيير الجهاز أو المتصفح. يرجى تسجيل الدخول مرة أخرى.' : 'Device or browser changed. Please sign in again.');
           return;
         }
-        /* صفحة كاملة كوضع الإدارة: إعادة تحميل مع ?iif_admin_embed=1 حتى تُطبَّق كل قواعد الـ embed من أول السطر */
-        try {
-          var sp = new URLSearchParams(window.location.search);
-          if (sp.get('iif_admin_embed') !== '1') {
-            var u = new URL(window.location.href);
-            u.searchParams.set('iif_admin_embed', '1');
-            window.location.replace(u.toString());
-            return;
-          }
-        } catch (eRedirDash) { }
         if (dashOverlay) {
           try { dashOverlay.scrollTop = 0; } catch (e) { }
-          /* صفحة كاملة: إخفاء هيكل الموقع العام مثل وضع iif_admin_embed */
+          /* فتح اللوحة من نفس الصفحة بدون إعادة توجيه */
           try {
-            document.documentElement.classList.add('iif-admin-embed');
             document.documentElement.classList.add('iif-dashboard-open');
             window.IIF_DASHBOARD_FULLPAGE_ACTIVE = true;
           } catch (eFull) { }
@@ -18629,41 +18679,22 @@ Generated: ${new Date().toLocaleString()}
             document.documentElement.classList.remove('iif-dashboard-open');
           } catch (eDashOpen) { }
           try {
-            var isEmbedParam = new URLSearchParams(window.location.search).get('iif_admin_embed') === '1';
-            if (!window.IIF_ADMIN_EMBED && !isEmbedParam) {
-              document.documentElement.classList.remove('iif-admin-embed');
-              window.IIF_DASHBOARD_FULLPAGE_ACTIVE = false;
-              try {
-                if (typeof window.IIF_restorePublicSiteChrome === 'function') window.IIF_restorePublicSiteChrome();
-              } catch (eRest) { }
-            }
+            document.documentElement.classList.remove('iif-admin-embed');
+            window.IIF_DASHBOARD_FULLPAGE_ACTIVE = false;
+            try {
+              if (typeof window.IIF_restorePublicSiteChrome === 'function') window.IIF_restorePublicSiteChrome();
+            } catch (eRest) { }
           } catch (eCls) { }
           dashOverlay.classList.remove('is-open');
           dashOverlay.setAttribute('aria-hidden', 'true');
           document.body.style.overflow = '';
           try {
-            if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
+            if (typeof window.IIF_restorePublicSiteChrome === 'function') window.IIF_restorePublicSiteChrome();
           } catch (eHAfterClose) { }
           try {
             document.querySelectorAll('#dashboard-toc-nav a.is-active').forEach(function (a) { a.classList.remove('is-active'); });
           } catch (e) { }
-          // العودة للصفحة الرئيسية بعد فترة قصيرة
-          setTimeout(function () {
-            try {
-              if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1' || window.IIF_ADMIN_EMBED) {
-                if (window.parent && window.parent !== window) {
-                  try {
-                    window.parent.location.href = 'index.html';
-                    return;
-                  } catch (eParent) { /* نفس المنشأ فقط */ }
-                }
-                window.location.href = 'index.html';
-                return;
-              }
-            } catch (eRedir) { }
-            window.location.hash = '';
-            window.location.href = window.location.pathname;
-          }, 100);
+          try { window.location.hash = ''; } catch (eHash) { }
         }
       }
 
@@ -18728,12 +18759,78 @@ Generated: ${new Date().toLocaleString()}
       }
       setTimeout(openDashboardIfHash, (window.IIF_TIMING && window.IIF_TIMING.hashOpen) || 100);
 
+      /* دخول من admin.html بعد التحويل: افتح تسجيل الدخول مباشرةً */
+      (function initAdminPortalFromQuery() {
+        try {
+          if (new URLSearchParams(window.location.search).get('iif_admin_portal') !== '1') return;
+          document.documentElement.classList.add('iif-admin-embed');
+          window.IIF_ADMIN_EMBED = true;
+          function iifForceAdminPortalUi() {
+            try {
+              if (typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard() && typeof openDashboardEnhanced === 'function') {
+                openDashboardEnhanced();
+                return true;
+              }
+              if (typeof openAuth === 'function') {
+                try { openAuth('login'); } catch (eOA) { }
+              }
+              var authOverlay = document.getElementById('auth-overlay');
+              if (authOverlay) {
+                authOverlay.classList.add('is-open');
+                authOverlay.setAttribute('aria-hidden', 'false');
+                try { document.body.style.overflow = 'hidden'; } catch (eOv) { }
+              }
+              var loginTabBtn = document.querySelector('.auth-tab[data-tab="login"]');
+              if (loginTabBtn && typeof loginTabBtn.click === 'function') loginTabBtn.click();
+              var loginPanel = document.getElementById('auth-panel-login');
+              if (loginPanel) loginPanel.classList.add('is-active');
+              var regPanel = document.getElementById('auth-panel-register');
+              if (regPanel) regPanel.classList.remove('is-active');
+              try {
+                if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
+              } catch (eHide) { }
+              return false;
+            } catch (ePortalUi) { return false; }
+          }
+          setTimeout(iifForceAdminPortalUi, 120);
+          setTimeout(iifForceAdminPortalUi, 450);
+          setTimeout(iifForceAdminPortalUi, 900);
+          setTimeout(iifForceAdminPortalUi, 1600);
+        } catch (e0) { }
+      })();
+
       /* فتح لوحة الإدارة تلقائياً عند التحميل في وضع admin المنفصل (iframe من admin.html) */
       (function initAdminEmbedFromQuery() {
         try {
           if (new URLSearchParams(window.location.search).get('iif_admin_embed') !== '1') return;
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
+          function iifForceOpenAuthLogin() {
+            try {
+              if (typeof openAuth === 'function') {
+                try { openAuth('login'); } catch (eOpenAuth) { }
+              }
+              var authOverlay = document.getElementById('auth-overlay');
+              if (!authOverlay) return false;
+              authOverlay.classList.add('is-open');
+              authOverlay.setAttribute('aria-hidden', 'false');
+              try { document.body.style.overflow = 'hidden'; } catch (eOv) { }
+              var loginTabBtn = document.querySelector('.auth-tab[data-tab="login"]');
+              if (loginTabBtn && typeof loginTabBtn.click === 'function') loginTabBtn.click();
+              var loginPanel = document.getElementById('auth-panel-login');
+              if (loginPanel) loginPanel.classList.add('is-active');
+              var regPanel = document.getElementById('auth-panel-register');
+              if (regPanel) regPanel.classList.remove('is-active');
+              try {
+                var emailInput = document.getElementById('login-email');
+                if (emailInput && typeof emailInput.focus === 'function') emailInput.focus();
+              } catch (eFocus) { }
+              try {
+                if (typeof window.IIF_removeEmbedEntryScreen === 'function') window.IIF_removeEmbedEntryScreen();
+              } catch (eRm) { }
+              return true;
+            } catch (eForce) { return false; }
+          }
           setTimeout(function () {
             if (typeof openDashboardEnhanced === 'function' && typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard()) {
               openDashboardEnhanced();
@@ -18744,12 +18841,13 @@ Generated: ${new Date().toLocaleString()}
                   if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
                 }, 120);
               } catch (eH3) { }
-            } else if (typeof openAuth === 'function') {
-              openAuth();
+            } else {
+              iifForceOpenAuthLogin();
             }
             try {
               if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
             } catch (eH4) { }
+            try { iifForceOpenAuthLogin(); } catch (eForceAfter) { }
           }, (window.IIF_TIMING && window.IIF_TIMING.adminEmbedOpen !== undefined && window.IIF_TIMING.adminEmbedOpen !== null)
             ? window.IIF_TIMING.adminEmbedOpen
             : ((window.IIF_TIMING && window.IIF_TIMING.deferMedium) || 550));
@@ -18761,10 +18859,37 @@ Generated: ${new Date().toLocaleString()}
               var dOk = d && d.classList && d.classList.contains('is-open');
               var aOk = a && a.classList && a.classList.contains('is-open');
               if (dOk || aOk) return;
-              if (typeof openAuth === 'function') openAuth();
+              iifForceOpenAuthLogin();
               if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
             } catch (eFb) { }
           }, 2200);
+
+          /* ضمان إضافي: كرّر المحاولة عدة مرات حتى لا يبقى embed على صفحة عامة ثابتة */
+          (function ensureEmbedEntryFlow() {
+            var tries = 0;
+            var maxTries = 30; /* ~12 ثانية */
+            var timer = setInterval(function () {
+              tries += 1;
+              try {
+                var d2 = document.getElementById('dashboard-overlay');
+                var a2 = document.getElementById('auth-overlay');
+                var d2Ok = d2 && d2.classList && d2.classList.contains('is-open');
+                var a2Ok = a2 && a2.classList && a2.classList.contains('is-open');
+                if (d2Ok || a2Ok) {
+                  clearInterval(timer);
+                  return;
+                }
+                if (typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard() && typeof openDashboardEnhanced === 'function') {
+                  openDashboardEnhanced();
+                } else {
+                  iifForceOpenAuthLogin();
+                }
+                if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
+                try { iifForceOpenAuthLogin(); } catch (eEnsure2) { }
+              } catch (eEnsure) { }
+              if (tries >= maxTries) clearInterval(timer);
+            }, 400);
+          })();
         } catch (e) { }
       })();
 

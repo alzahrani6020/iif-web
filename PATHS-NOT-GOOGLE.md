@@ -26,7 +26,7 @@
 بعد `npm start`:
 
 - واجهة الصندوق: `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html`
-- لوحة الإدارة (معامل): `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html?iif_admin_embed=1`
+- لوحة التحكم/الإدارة (المعتمد): `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html#dashboard`
 
 ---
 

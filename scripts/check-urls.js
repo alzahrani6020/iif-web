@@ -30,7 +30,8 @@ const PATHS = [
 ];
 
 /** مسارات اختيارية: فشلها لا يوقف السكربت (مثلاً SearXNG غير مشغّل) */
-const SOFT_PATHS = [{ path: '/api/searx/', note: 'بروكسي → SearXNG (شغّل Docker من engines/searxng)' }];
+const SOFT_PATHS = [{ path: '/api/searx/', note: 'بروكسي → SearXNG على 127.0.0.1:18080 (Docker من engines/searxng)' }];
+const CHECK_OPTIONAL = process.env.CHECK_OPTIONAL === '1';
 
 function get(path) {
   return new Promise((resolve, reject) => {
@@ -69,22 +70,22 @@ async function main() {
   }
 
   console.log('');
-  console.log('  اختياري — بروكسي المحرك:');
-  for (const item of SOFT_PATHS) {
-    try {
-      const { status } = await get(item.path);
-      if (status === 200) {
-        console.log('  OK', status, item.path, '← SearXNG يستجيب عبر البروكسي');
-      } else if (status === 502) {
-        console.log('  …', status, item.path, '—', item.note);
-      } else {
-        console.log('  ?', status, item.path);
+  if (CHECK_OPTIONAL) {
+    console.log('  اختياري — بروكسي المحرك:');
+    for (const item of SOFT_PATHS) {
+      try {
+        const { status } = await get(item.path);
+        if (status === 200) {
+          console.log('  OK', status, item.path, '← SearXNG يستجيب عبر البروكسي');
+        } else {
+          console.log('  SKIP', status, item.path, '—', item.note);
+        }
+      } catch (e) {
+        console.log('  SKIP', item.path, '—', item.note);
       }
-    } catch (e) {
-      console.log('  …', item.path, '—', e.message, '(طبيعي إن لم يُشغَّل الخادم أو Docker)');
     }
+    console.log('');
   }
-  console.log('');
   if (failed) {
     console.log('بعض الطلبات فشلت. تأكد: npm start يعمل من مجلد المشروع.');
     process.exit(1);
