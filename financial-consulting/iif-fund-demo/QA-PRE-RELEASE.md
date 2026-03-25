@@ -58,7 +58,7 @@ npm run health
 
 ## 3) بعد النشر (Vercel أو غيره)
 
-- [ ] النطاق **العام** (مثل `iif-fund.vercel.app`) يعيد **200** لـ `/index.html` — وليس نشراً محمياً بـ 401 لروابط المعاينة فقط.
+- [ ] النطاق **العام** (مثل `iif-fund-dr-talal.vercel.app` أو Netlify `fluffy-meerkat-eff966.netlify.app`) يعيد **200** لـ `/index.html` — وليس نشراً محمياً بـ 401 لروابط المعاينة فقط.
 - [ ] **Settings → General → Root Directory** يشير إلى المجلد الذي يحتوي `index.html` المنشور فعلياً.
 - [ ] تحديث قوي للمتصفح **Ctrl+F5** بعد النشر.
 

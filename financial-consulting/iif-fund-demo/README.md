@@ -41,7 +41,7 @@
 ### ما هي «صفحة الأدمن» في هذا المشروع؟
 
 - **لا يوجد** ملف منفصل اسمه `admin` يعرض واجهة مختلفة عن الموقع. **لوحة الإدارة = لوحة التحكم** داخل نفس **`index.html`** (`#dashboard-overlay`).
-- **الرابط المعتمد لفتح اللوحة:** `index.html#dashboard` (على الإنتاج: `https://iif-fund.vercel.app/index.html#dashboard`).
+- **الرابط المعتمد لفتح اللوحة:** `index.html#dashboard` (على إنتاج Vercel الحالي: `https://iif-fund-dr-talal.vercel.app/index.html#dashboard`؛ على Netlify: `https://fluffy-meerkat-eff966.netlify.app/fund#dashboard`).
 - أي روابط أخرى مثل معاملات `?iif_admin_embed=1` تعتبر **غير معتمدة** (قد تُترك لأسباب توافق/اختبار، لكن لا تُستخدم كرابط لوحة).
 
 ### نشر Vercel — رابط اللوحة (المعتمد)
@@ -53,7 +53,7 @@
 | **`financial-consulting/iif-fund-demo`** (المجلد الذي يحتوي `index.html` الكبير و`vercel.json`) | **الواجهة:** `https://<نطاقك>/index.html` · **اللوحة (المعتمد):** `https://<نطاقك>/index.html#dashboard` |
 | **جذر المستودع الكامل** | قد يعمل **`/financial-consulting/iif-fund-demo/index.html`** إذا كان الملف مُرفوعاً على النطاق؛ إن ظهر **404** للمسار الطويل فالنشر يُعامل كالصفحة السابقة (فقط محتوى `iif-fund-demo` في الجذر). |
 
-**تحقق على `iif-fund.vercel.app` (حوالي 2025):**  
+**تحقق على إنتاج Vercel (`iif-fund-dr-talal.vercel.app`):**  
 - `/` و `/index.html` → **200** (واجهة الصندوق).  
 - `/index.html#dashboard` → **يفتح لوحة التحكم** (المعتمد).  
 - `/financial-consulting/iif-fund-demo/index.html` → غالباً **404** إذا كان **Root Directory** = `iif-fund-demo` وليس المستودع كاملاً.
@@ -64,19 +64,20 @@
 
 `<base>` في `index.html` يُضبط **تلقائياً** من مسار الصفحة (`#iif-document-base`) حتى تعمل روابط **`assets/`** (الشعار والصور) من جذر النطاق **أو** من مجلد فرعي دون اختفاء الشعار.
 
-**لوحة مباشرة (المعتمد):**  
-- `https://iif-fund.vercel.app/index.html#dashboard`
-- نطاق النشر عبر CLI من هذا المجلد: **`https://iif-fund-demo.vercel.app`** (يُحدَّث بـ `vercel deploy --prod`؛ الريبو نفسه يدفع إلى GitHub فيُعاد نشر مشاريع أخرى إن وُجد الربط).
+**لوحة مباشرة (المعتمد على Vercel الحالي):**  
+- `https://iif-fund-dr-talal.vercel.app/index.html#dashboard`
 
-**تنبيه — شاشة سوداء على رابط مثل `*-dr-talal.vercel.app`:**  
-أسماء النشر/الفريق على Vercel قد تكون مفعّلاً عليها **Deployment Protection** (مصادقة Vercel). الطلب يعيد **401** وليس `index.html` — قد يظهر كصفحة داكنة أو فارغة. **لا تستخدمها كرابط عام.** إما سجّل دخولك بحساب Vercel المدعو، أو عطّل/خفّف الحماية من **Project → Settings → Deployment Protection**، أو افتح **نطاق الإنتاج العام** (`iif-fund.vercel.app`) الذي يعيد **200**.
+**ملاحظة — اسم `iif-fund.vercel.app`:** قد يكون مربوطاً بمشروع Vercel آخر؛ الإنتاج المحدَّث من فريق **`dr-talal`** يظهر على **`iif-fund-dr-talal.vercel.app`**. لاستخدام الاسم القصير `iif-fund.vercel.app` انقل الـ alias من المشروع القديم في لوحة Vercel.
+
+**تنبيه — روابط معاينة أو حماية نشر:**  
+بعض نطاقات `*.vercel.app` قد تكون عليها **Deployment Protection** فيعيد الطلب **401**. استخدم دومين الإنتاج الذي يعيد **200** لـ `index.html` (مثل `iif-fund-dr-talal.vercel.app` بعد التحقق).
 
 **لوحة التحكم بملء الشاشة (إخفاء هيدر الموقع):**  
 تُخفى واجهة الموقع العامة عبر CSS + دوال `IIF_hidePublicSiteChrome` / `IIF_restorePublicSiteChrome` في أوائل `<body>`. بعد كل تحديث على Vercel: **أعد النشر** ثم جرّب **تحديثاً قوياً** (Ctrl+F5) أو نافذة خاصة حتى لا يُخدم `index.html` من الكاش.
 
 **كيف تتأكد أن النشر يضم آخر التعديلات؟**  
 - **ليس** عبر البحث في Google أو Bing.  
-- افتح **رابط موقعك المنشور** (مثل `https://iif-fund.vercel.app/index.html`) في المتصفح، ثم اضغط **Ctrl+U** (عرض المصدر / View Page Source)، وابحث داخل الصفحة عن النص: **`تحقق-النشر-iif-dashboard-fullpage`**.  
+- افتح **رابط موقعك المنشور** (مثل `https://iif-fund-dr-talal.vercel.app/index.html` أو Netlify أعلاه) في المتصفح، ثم اضغط **Ctrl+U** (عرض المصدر / View Page Source)، وابحث داخل الصفحة عن النص: **`تحقق-النشر-iif-dashboard-fullpage`**.  
 - إن **لم** يظهر، فإما الكاش أو أن **Root Directory** في Vercel لا يشير إلى مجلد `financial-consulting/iif-fund-demo`.
 
 ### ملخص التعديلات (لوحة ملء الشاشة / `#dashboard`)
@@ -305,7 +306,7 @@ gh-pages -d dist
 ### **فريق التطوير**
 - **المطور**: فريق IIF Fund
 - **البريد**: info@iif-fund.com
-- **الموقع**: https://iif-fund-demo.netlify.app
+- **الموقع (Netlify)**: https://fluffy-meerkat-eff966.netlify.app
 - **GitHub**: https://github.com/your-username/iif-fund-demo
 
 ### **الدعم الفني**

@@ -1,39 +1,38 @@
-# إذا ظهر «لا جديد» على iif-fund.vercel.app
+# نشر Vercel والتحقق من آخر نسخة
 
-> ملاحظة تشغيل حالية: الرابط المعتمد للتشغيل واللوحة هو:
-> `https://iif-fund.vercel.app/index.html`
+## الروابط المعتمدة حالياً (2026)
+
+| المنصة | رابط الإنتاج الفعلي |
+|--------|---------------------|
+| **Vercel (فريق `dr-talal`، مشروع `iif-fund`)** | `https://iif-fund-dr-talal.vercel.app/index.html` |
+| **Netlify (موقع مربوط بالريبو)** | `https://fluffy-meerkat-eff966.netlify.app` |
+
+**لوحة التحكم (المعتمد):** أضف `#dashboard` إلى `index.html` على أي من النطاقين أعلاه.
+
+### عن `iif-fund.vercel.app`
+
+قد يكون الاسم `iif-fund.vercel.app` **مخصصاً لمشروع Vercel آخر**؛ إن حاولت ربط alias بنفس الاسم يظهر: *«already in use»*.  
+لتوحيد الاسم: من حساب Vercel الذي يملك **`iif-fund.vercel.app`** احذف الـ alias من المشروع القديم أو انقل النطاق إلى مشروع `dr-talal/iif-fund`، ثم عيّن الـ alias من لوحة Vercel.
 
 ## التحقق السريع
 
-- **GitHub** `main` يحتوي آخر التعديلات (مثلاً كومِت `fix(dashboard): ... v5 markers`).
-- **Vercel** قد يعرض **نسخة قديمة** إذا لم يُنفَّذ deploy جديد بعد الدفع.
+1. بعد الـ deploy، افتح الرابط أعلاه ثم **Ctrl+U** (عرض المصدر).
+2. ابحث عن **`v8-fix-main-close`** أو **`dashboard-fullpage-v8-fix-main-close`** أو التعليق **`تحقق-النشر-iif-dashboard-fullpage`**.
 
-## ماذا تفعل في لوحة Vercel
+## إعداد المشروع في Vercel
 
-1. ادخل **Vercel → المشروع المرتبط بـ `iif-fund.vercel.app`**.
-2. تبويب **Settings → Git**  
-   - تأكد أن **Repository** = `alzahrani6020/iif-web` (أو نفس الريبو الذي تدفع إليه).  
-   - **Production Branch** = `main`.  
-   - فعّل **Automatic deployments** لفرع الإنتاج.
-3. تبويب **Deployments**  
-   - هل يوجد deployment **بعد** وقت آخر `git push`؟  
-   - إن **لا**: اضغط **Redeploy** على آخر deployment، أو **Deploy** من آخر commit على `main`.
-4. إن كان المشروع يستخدم **Root Directory**  
-   - إن وُجد: يجب أن يكون **`financial-consulting/iif-fund-demo`** (حيث يوجد `index.html` الكبير و`vercel.json`).  
-   - جذر المستودع وحده يحتوي `index.html` صغيراً للتوجيه — لا تستخدمه كجذر لواجهة الصندوق.
+1. **Settings → Git:** المستودع `alzahrani6020/iif-web`، الفرع **`main`**, تفعيل **Automatic deployments**.
+2. **Root Directory:** `financial-consulting/iif-fund-demo` (حيث `index.html` الكبير و`vercel.json`).
+3. **Deployments:** إن لم يتحدث الإنتاج بعد `git push`، استخدم **Redeploy**.
 
-## بعد نشر ناجح
-
-- افتح: `https://iif-fund.vercel.app/index.html` → **Ctrl+U** → **Ctrl+F** → ابحث عن **`v8-fix-main-close`** أو **`dashboard-fullpage-v8-fix-main-close`**.  
-- إن وُجد → النسخة الجديدة وصلت. إن لم يوجد → ما زال الـ deploy أو المسار خاطئاً.
-
-## أوامر (اختياري)
-
-إن كان عندك [Vercel CLI](https://vercel.com/docs/cli):
+## أوامر CLI (من مجلد الواجهة)
 
 ```bash
 cd financial-consulting/iif-fund-demo
-vercel --prod
+npx vercel deploy --prod --yes
 ```
 
-(من المجلد الصحيح حسب إعداد المشروع.)
+## نشر اختياري من GitHub Actions
+
+الملف: `.github/workflows/vercel-deploy.yml`  
+يحتاج أسرار: `VERCEL_TOKEN`، `VERCEL_ORG_ID`، `VERCEL_PROJECT_ID` (يمكن إنشاء التوكن من [Vercel → Account → Tokens](https://vercel.com/account/tokens)).
