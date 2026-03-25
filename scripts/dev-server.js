@@ -128,35 +128,60 @@ function serveStatic(req, res) {
       ? '/financial-consulting/iif-fund-demo/index.html'
       : '/financial-consulting/fund-site/index.html';
   }
-  const filePath = safeJoin(ROOT, urlPath);
+  let filePath = safeJoin(ROOT, urlPath);
   if (!filePath) {
     send(res, 403, 'Forbidden', { 'Content-Type': 'text/plain; charset=utf-8' });
     return;
   }
+  function pipeFile(fp) {
+    const ext = path.extname(fp).toLowerCase();
+    const type = MIME[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
+    fs.createReadStream(fp).pipe(res);
+  }
   fs.stat(filePath, (err, st) => {
-    if (err || !st.isFile()) {
+    if (err) {
       send(res, 404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
       return;
     }
-    const ext = path.extname(filePath).toLowerCase();
-    const type = MIME[ext] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
-    fs.createReadStream(filePath).pipe(res);
+    if (st.isDirectory()) {
+      const indexInDir = path.join(filePath, 'index.html');
+      fs.stat(indexInDir, (e2, st2) => {
+        if (!e2 && st2.isFile()) pipeFile(indexInDir);
+        else send(res, 404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
+      });
+      return;
+    }
+    if (!st.isFile()) {
+      send(res, 404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
+      return;
+    }
+    pipeFile(filePath);
   });
 }
 
 const server = http.createServer((req, res) => {
   const urlPath = new URL(req.url, 'http://localhost').pathname;
+  const method = String(req.method || 'GET').toUpperCase();
+  /** CORS / إضافات قد ترسل OPTIONS — بدون ردّ مناسب قد يظهر «Method Not Allowed» */
+  if (method === 'OPTIONS') {
+    send(res, 204, '', {
+      Allow: 'GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Headers': req.headers['access-control-request-headers'] || '*',
+    });
+    return;
+  }
   if (urlPath.startsWith('/api/searx')) {
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-      send(res, 405, 'Method Not Allowed');
+    if (method !== 'GET' && method !== 'HEAD') {
+      send(res, 405, 'Method Not Allowed', { 'Content-Type': 'text/plain; charset=utf-8' });
       return;
     }
     proxySearx(req, res);
     return;
   }
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    send(res, 405, 'Method Not Allowed');
+  if (method !== 'GET' && method !== 'HEAD') {
+    send(res, 405, 'Method Not Allowed', { 'Content-Type': 'text/plain; charset=utf-8' });
     return;
   }
 
