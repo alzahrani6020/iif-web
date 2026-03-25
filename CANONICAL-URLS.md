@@ -8,6 +8,18 @@
 - **محلياً:** يمكن أيضاً `http://127.0.0.1:3333/dashboard` أو `/admin` (خادم التطوير فقط) — **أعد تشغيل `npm start`** بعد تحديث `dev-server.js`.
 - **إن بقي الموقع الرئيسي فقط:** حدّث قوياً (**Ctrl+F5**) أو نافذة خاصة؛ على الإنتاج انتظر نشراً ناجحاً ثم أعد المحاولة.
 
+### حلّان شائعان (خطأ في العنوان أو خادم قديم)
+
+1. **`ERR_NAME_NOT_RESOLVED` واسم مضيف مثل `financial-consulting`**  
+   وضعتَ في الشريط **مسار الملف فقط** (`financial-consulting/iif-fund-demo/index.html#dashboard`) دون عنوان الخادم. المتصفح يفسر `financial-consulting` كاسم موقع على الإنترنت — وليس مجلداً.  
+   **الصحيح محلياً:** الصق الرابط **كاملاً** (مع `http://` والمنفذ):
+
+   `http://127.0.0.1:3333/financial-consulting/iif-fund-demo/index.html#dashboard`
+
+2. **`127.0.0.1:3333/dashboard` يعرض «Not found» ونصاً قديماً عن الرابط المعتمد**  
+   عملية **`node`** التي تشغّل المنفذ 3333 ما زالت من **نسخة قديمة** من `scripts/dev-server.js` (قبل اختصار `/dashboard`).  
+   **الحل:** من جذر المشروع نفّذ `git pull` إن لزم، ثم **أوقف** الخادم (Ctrl+C في نافذة `npm start`) و**شغّل من جديد** `npm start`. بعدها جرّب مرة أخرى `/dashboard` أو الرابط الكامل أعلاه.
+
 | المنصة | الرابط المعتمد |
 |--------|----------------|
 | **Vercel** (فريق `dr-talal`، مشروع `iif-fund`) | `https://iif-fund-dr-talal.vercel.app/index.html` — اللوحة: `…/index.html#dashboard` |
