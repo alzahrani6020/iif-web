@@ -95,7 +95,9 @@ function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
   /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
   if (urlPath === '/dashboard' || urlPath === '/admin') {
-    const dashPath = '/financial-consulting/iif-fund-demo/index.html#dashboard';
+    /* ?iif_admin_portal=1 يخفِ واجهة الموقع العامة ويبرز مسار الدخول/اللوحة (انظر index.html) */
+    const dashPath =
+      '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1#dashboard';
     const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لوحة التحكم</title><script>location.replace(${JSON.stringify(
       dashPath
     )});</script></head><body><p><a href="${dashPath}">متابعة إلى لوحة التحكم</a></p></body></html>`;
