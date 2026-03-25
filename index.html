@@ -17,16 +17,24 @@
           var q = window.location.search || '';
           window.location.replace(url + q);
         }
+        function showManual() {
+          var h1 = document.querySelector('#main h1');
+          if (h1) { h1.textContent = 'اختر الوجهة'; }
+        }
         if (typeof fetch === 'undefined') {
-          go('/index.html');
+          showManual();
           return;
         }
         fetch(sub, { method: 'HEAD', cache: 'no-store' })
           .then(function (r) {
-            go(r.ok ? sub : '/index.html');
+            if (r.ok) {
+              go(sub);
+            } else {
+              showManual();
+            }
           })
           .catch(function () {
-            go('/index.html');
+            showManual();
           });
       })();
     </script>

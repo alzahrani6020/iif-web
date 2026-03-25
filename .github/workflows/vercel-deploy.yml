@@ -1,0 +1,59 @@
+# نشر اختياري إلى Vercel من GitHub Actions (عندما تُضاف الأسرار).
+# أضف في GitHub → Settings → Secrets and variables → Actions:
+#   VERCEL_TOKEN          ← Vercel → Account Settings → Tokens
+#   VERCEL_ORG_ID         ← Project → Settings → General
+#   VERCEL_PROJECT_ID     ← Project → Settings → General
+#
+# ثم: Actions → Deploy Vercel (optional) → Run workflow
+# أو يدوياً من مجلد الواجهة: npx vercel deploy --prod --token …
+
+name: Deploy Vercel (optional)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: vercel-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Vercel secrets
+        id: vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Vercel secrets missing (VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID). Skipping deploy."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.vercel.outputs.ok == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.vercel.outputs.ok == 'true'
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install + build (مطابق لـ netlify.toml / جذر الريبو)
+        if: steps.vercel.outputs.ok == 'true'
+        run: npm ci --no-audit --fund=false && npm run build
+
+      - name: Deploy to Vercel (production)
+        if: steps.vercel.outputs.ok == 'true'
+        working-directory: financial-consulting/iif-fund-demo
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"

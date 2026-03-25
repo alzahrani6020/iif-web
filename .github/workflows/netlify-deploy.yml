@@ -1,14 +1,17 @@
-# نشر يدوي إلى Netlify (نفس منطق netlify.toml)
+# نشر إلى Netlify (نفس منطق netlify.toml)
 # أضف في GitHub → Settings → Secrets and variables → Actions:
 #   NETLIFY_AUTH_TOKEN  ← Netlify → User settings → Applications → Personal access tokens
 #   NETLIFY_SITE_ID     ← Site settings → Site details → Site ID
 #
-# ثم: Actions → Deploy Netlify → Run workflow
+# التشغيل: يدوياً من Actions → Deploy Netlify، أو تلقائياً مع كل push إلى main
+# إذا لم تُعرّف الأسرار: يُعرض إشعار ويُتخطى النشر بدون فشل.
 
 name: Deploy Netlify
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 concurrency:
   group: netlify-deploy-${{ github.ref }}
@@ -18,17 +21,34 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Netlify secrets
+        id: netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -n "$NETLIFY_AUTH_TOKEN" ] && [ -n "$NETLIFY_SITE_ID" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Netlify secrets missing (NETLIFY_AUTH_TOKEN / NETLIFY_SITE_ID). Skipping deploy."
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.netlify.outputs.ok == 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.netlify.outputs.ok == 'true'
         with:
           node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install + build (مطابق لـ netlify.toml)
+        if: steps.netlify.outputs.ok == 'true'
         run: npm ci --no-audit --fund=false && npm run build
 
       - name: Deploy
+        if: steps.netlify.outputs.ok == 'true'
         run: npx --yes netlify-cli deploy --prod --dir .
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
