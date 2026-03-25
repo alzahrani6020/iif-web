@@ -24,7 +24,7 @@
 
 **عندما يكتمل المحتوى — قبل النشر:** [قبل-النشر.md](./قبل-النشر.md)
 
-**فهرسة Cursor أسرع:** انسخ [cursorignore.example](./cursorignore.example) إلى `.cursorignore` في الجذر.
+**فهرسة Cursor أسرع:** يوجد [`.cursorignore`](./.cursorignore) في الجذر (يمكن التخصيص انطلاقاً من [cursorignore.example](./cursorignore.example)).
 
 ## موقع المشروع (اتفاق)
 

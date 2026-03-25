@@ -19,3 +19,7 @@
 1. من جذر المشروع: `npm run verify` (أو `npm run verify:full`).
 2. تأكد أن **CI** على `main` أخضر بعد `git push`.
 3. في PowerShell على ويندوز: فضّل الفصل بـ **`;`** بين الأوامر بدل **`&&`** إن ظهرت أخطاء.
+4. إن اعتمدت على SearXNG محلياً (Docker): `npm run verify:stack`.
+5. عند إضافة حزم: `npm audit` من حين لآخر.
+
+تفاصيل إضافية: [AGENTS.md](./AGENTS.md) (قسم «صيانة دورية»).
