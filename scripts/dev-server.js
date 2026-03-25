@@ -93,14 +93,13 @@ function proxySearx(req, res) {
 
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
-  /** تم إلغاء الاختصارات المكررة: استخدم الرابط المعتمد للوحة */
+  /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
   if (urlPath === '/dashboard' || urlPath === '/admin') {
-    send(
-      res,
-      404,
-      'Not found\n\nاستخدم لوحة التحكم عبر الرابط المعتمد:\n/financial-consulting/iif-fund-demo/index.html#dashboard\n',
-      { 'Content-Type': 'text/plain; charset=utf-8' }
-    );
+    const dashPath = '/financial-consulting/iif-fund-demo/index.html#dashboard';
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لوحة التحكم</title><script>location.replace(${JSON.stringify(
+      dashPath
+    )});</script></head><body><p><a href="${dashPath}">متابعة إلى لوحة التحكم</a></p></body></html>`;
+    send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
   /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */

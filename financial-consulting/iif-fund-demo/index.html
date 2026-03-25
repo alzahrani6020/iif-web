@@ -14348,7 +14348,7 @@ Generated: ${new Date().toLocaleString()}
          */
         dashboardSecretHash: 'iif-cp-k9m2x7q',
         /** إذا كان dashboardSecretHash معبّأ: السماح أيضاً بـ #dashboard للتوافق (false = تعطيل الرابط العام) */
-        dashboardAllowLegacyHash: false,
+        dashboardAllowLegacyHash: true,
         langStorageKey: 'iif-lang',
         storageKeys: {
           loggedIn: 'iif-logged-in',
@@ -18751,7 +18751,25 @@ Generated: ${new Date().toLocaleString()}
           return;
         }
         if (typeof window.IIF_hashOpensDashboard !== 'function' || !window.IIF_hashOpensDashboard(window.location.hash || '')) return;
-        if (typeof isLoggedIn === 'function' && !isLoggedIn()) return;
+        if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
+          try {
+            if (typeof openAuth === 'function') openAuth('login');
+            var authOverlay = document.getElementById('auth-overlay');
+            if (authOverlay) {
+              authOverlay.classList.add('is-open');
+              authOverlay.setAttribute('aria-hidden', 'false');
+              try { document.body.style.overflow = 'hidden'; } catch (eOv) { }
+            }
+            var loginTabBtn = document.querySelector('.auth-tab[data-tab="login"]');
+            if (loginTabBtn && typeof loginTabBtn.click === 'function') loginTabBtn.click();
+            var loginPanel = document.getElementById('auth-panel-login');
+            if (loginPanel) loginPanel.classList.add('is-active');
+            var regPanel = document.getElementById('auth-panel-register');
+            if (regPanel) regPanel.classList.remove('is-active');
+            if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
+          } catch (eLogin) { }
+          return;
+        }
         if (typeof openDashboardEnhanced === 'function') openDashboardEnhanced();
       }
       if (window.addEventListener) {
