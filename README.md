@@ -49,6 +49,7 @@
 | معايير الجودة بما يليق بالقيادات السيادية | [`sovereign-standards.html`](./sovereign-standards.html) و [`SOVEREIGN-STANDARDS.md`](./SOVEREIGN-STANDARDS.md) |
 | تشغيل المشروع وروابط التطوير | هذا الملف (README) — قسم **التشغيل السريع** |
 | قائمة قبل النشر (محتوى + تقنية) | [`قبل-النشر.md`](./قبل-النشر.md) |
+| **روابط الإنتاج المعتمدة** (Vercel / Netlify) | [`CANONICAL-URLS.md`](./CANONICAL-URLS.md) |
 | مسارات الملفات ≠ بحث Google | [`PATHS-NOT-GOOGLE.md`](./PATHS-NOT-GOOGLE.md) |
 | خطوات Netlify والاختصارات `/fund` و `/gov` | [`NETLIFY-CHECKLIST.md`](./NETLIFY-CHECKLIST.md) و [`netlify.toml`](./netlify.toml) |
 | ربط المنصة الحكومية بالصندوق | [`financial-consulting/government-search/README-IIF-INTEGRATION.md`](./financial-consulting/government-search/README-IIF-INTEGRATION.md) |
