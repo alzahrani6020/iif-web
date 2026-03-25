@@ -17335,7 +17335,7 @@ Generated: ${new Date().toLocaleString()}
           }
         } catch (eDash) { }
         try {
-          if (loggedIn && typeof openDashboardIfHash === 'function') {
+          if (typeof openDashboardIfHash === 'function' && typeof window.IIF_hashOpensDashboard === 'function' && window.IIF_hashOpensDashboard(window.location.hash || '')) {
             setTimeout(openDashboardIfHash, (window.IIF_TIMING && window.IIF_TIMING.hashOpen) || 100);
           }
         } catch (eHash) { }
@@ -18753,6 +18753,10 @@ Generated: ${new Date().toLocaleString()}
         if (typeof window.IIF_hashOpensDashboard !== 'function' || !window.IIF_hashOpensDashboard(window.location.hash || '')) return;
         if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
           try {
+            var authOvEarly = document.getElementById('auth-overlay');
+            if (authOvEarly && authOvEarly.classList.contains('is-open')) return;
+          } catch (eDup) { }
+          try {
             if (typeof openAuth === 'function') openAuth('login');
             var authOverlay = document.getElementById('auth-overlay');
             if (authOverlay) {
@@ -18775,7 +18779,6 @@ Generated: ${new Date().toLocaleString()}
       if (window.addEventListener) {
         window.addEventListener('hashchange', openDashboardIfHash);
       }
-      setTimeout(openDashboardIfHash, (window.IIF_TIMING && window.IIF_TIMING.hashOpen) || 100);
 
       /* دخول من admin.html بعد التحويل: افتح تسجيل الدخول مباشرةً */
       (function initAdminPortalFromQuery() {
