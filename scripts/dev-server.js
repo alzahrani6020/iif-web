@@ -93,10 +93,23 @@ function proxySearx(req, res) {
 
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
+  /**
+   * محلياً فقط: اجعل /admin يذهب مباشرة إلى /admin-direct
+   * لتفادي: iframe + تكرار تسجيل الدخول + صفحات فارغة.
+   */
+  if (urlPath === '/admin') {
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لوحة الإدارة</title>
+<script>location.replace('/admin-direct');</script></head><body><a href="/admin-direct">متابعة إلى لوحة الإدارة</a></body></html>`;
+    send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
+    return;
+  }
   /** دخول مباشر محلي (تطوير فقط): يضبط جلسة المالك ثم يفتح /admin */
   if (urlPath === '/admin-direct') {
     const ownerEmail = String(process.env.IIF_OWNER_EMAIL || 'talalkenani@gmail.com').trim().toLowerCase();
-    const adminUrl = 'http://127.0.0.1:' + PORT + '/admin';
+    const adminUrl =
+      'http://127.0.0.1:' +
+      PORT +
+      '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1';
     const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>دخول الإدارة (محلي)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
@@ -139,7 +152,6 @@ function serveStatic(req, res) {
   }
   /** اختصارات مثل netlify.toml — للتطوير المحلي */
   const shortPaths = {
-    '/admin': '/financial-consulting/iif-fund-demo/admin.html',
     '/privacy': '/legal/privacy.html',
     '/disclaimer': '/legal/disclaimer.html',
     '/contact': '/legal/contact.html',
