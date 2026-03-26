@@ -9,7 +9,8 @@ REM - يفتح رابط لوحة الإدارة في المتصفح
 cd /d "%~dp0"
 
 set "PORT=3333"
-set "ADMIN_URL=http://127.0.0.1:%PORT%/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
+REM ملاحظة: في CMD قد تُعامل علامة & كفاصل أوامر — اهربها بـ ^&
+set "ADMIN_URL=http://127.0.0.1:%PORT%/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1^&open_dashboard=1"
 
 echo.
 echo [IIF] Restart dev server on port %PORT% ...
@@ -23,10 +24,11 @@ REM شغّل الخادم في نافذة منفصلة
 start "IIF Dev Server" cmd /k "set PORT=%PORT%&& npm start"
 
 REM انتظر قليلاً ثم افتح اللوحة
-timeout /t 2 >nul
+REM timeout قد يفشل إذا كانت الإدخالات/الإخراجات مُعاد توجيهها؛ استخدم ping كبديل
+ping 127.0.0.1 -n 3 >nul
 start "" "%ADMIN_URL%"
 
 echo.
-echo [IIF] Opened: %ADMIN_URL%
+echo [IIF] Opened: "%ADMIN_URL%"
 echo.
 endlocal
