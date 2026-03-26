@@ -26,6 +26,11 @@
   status = 302
 
 [[redirects]]
+  from = "/admin"
+  to = "/financial-consulting/iif-fund-demo/admin.html"
+  status = 302
+
+[[redirects]]
   from = "/gov"
   to = "/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html"
   status = 302

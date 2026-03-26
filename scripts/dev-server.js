@@ -94,7 +94,7 @@ function proxySearx(req, res) {
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
   /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
-  if (urlPath === '/dashboard' || urlPath === '/admin' || urlPath === '/cp') {
+  if (urlPath === '/dashboard' || urlPath === '/cp') {
     /* بدون # في العنوان — يُفتح من الاستعلام + sessionStorage (تفادي سقوط الهاش من PowerShell/اختصارات) */
     const dashPath =
       '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1';
