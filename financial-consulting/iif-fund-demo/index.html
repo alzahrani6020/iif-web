@@ -31,7 +31,14 @@
          * scripts/dev-server.js يقدّم / و /index.html من financial-consulting/iif-fund-demo/index.html
          * بينما pathname يبقى / — فيجب جذر المشروع وليس جذر النطاق حتى تُحمّل assets/emblem.jpg
          */
-        if (isLocal && port === '3333' && (path === '/' || path === '/index.html')) {
+        if (
+          isLocal &&
+          port === '3333' &&
+          (path === '/' ||
+            path === '/index.html' ||
+            path === '/cp' ||
+            path === '/dashboard')
+        ) {
           baseHref = '/financial-consulting/iif-fund-demo/';
         } else if (path !== '/' && path !== '') {
           if (/\.html?$/i.test(path)) {
