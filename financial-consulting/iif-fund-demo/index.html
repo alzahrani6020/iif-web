@@ -7235,6 +7235,8 @@
         try {
           var sp = new URLSearchParams(window.location.search);
           var portalParam = sp.get('iif_admin_portal') === '1';
+          var portalSticky = false;
+          try { portalSticky = sessionStorage.getItem('iif_admin_portal_mode') === '1'; } catch (eSt) { }
           var ov = document.getElementById('dashboard-overlay');
           var dashOpen = ov && ov.classList && ov.classList.contains('is-open');
           var authOv = document.getElementById('auth-overlay');
@@ -7247,7 +7249,7 @@
               try { node.style.removeProperty('display'); } catch (e0) { }
             });
           }
-          if (!portalParam && sp.get('iif_admin_embed') !== '1' && !dashOpen) return;
+          if (!portalParam && !portalSticky && sp.get('iif_admin_embed') !== '1' && !dashOpen) return;
           var h = document.querySelector('body > header.site-header');
           if (h) h.style.setProperty('display', 'none', 'important');
           var m = document.getElementById('main-content');
