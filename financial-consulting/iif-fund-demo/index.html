@@ -22970,6 +22970,15 @@ Generated: ${new Date().toLocaleString()}
           restoreSessionIfLoggedIn();
           renderActivitiesSection();
           updateDashboardNav();
+          /* إذا كنت المالك: افتح لوحة التحكم تلقائياً حتى لو فتح المستخدم الصفحة العادية */
+          try {
+            var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+            var ownerEmail = (window.IIF_CONFIG && window.IIF_CONFIG.ownerEmail) ? String(window.IIF_CONFIG.ownerEmail).toLowerCase() : 'talalkenani@gmail.com';
+            if (email && email === ownerEmail && typeof openDashboardEnhanced === 'function') {
+              try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eSs) { }
+              openDashboardEnhanced();
+            }
+          } catch (eAuto) { }
           if (typeof updateFeasibilityGate === 'function') updateFeasibilityGate();
         }
         if (load) load().then(doInit); else doInit();
@@ -22981,6 +22990,15 @@ Generated: ${new Date().toLocaleString()}
           if (load) load().then(function () {
             restoreSessionIfLoggedIn();
             if (typeof updateDashboardNav === 'function') updateDashboardNav();
+            /* تكرار نفس المنطق بعد DOMContentLoaded */
+            try {
+              var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+              var ownerEmail = (window.IIF_CONFIG && window.IIF_CONFIG.ownerEmail) ? String(window.IIF_CONFIG.ownerEmail).toLowerCase() : 'talalkenani@gmail.com';
+              if (email && email === ownerEmail && typeof openDashboardEnhanced === 'function') {
+                try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eSs2) { }
+                openDashboardEnhanced();
+              }
+            } catch (eAuto2) { }
           }); else {
             restoreSessionIfLoggedIn();
             if (typeof updateDashboardNav === 'function') updateDashboardNav();
