@@ -193,11 +193,10 @@ const server = http.createServer((req, res) => {
     proxySearx(req, res);
     return;
   }
-  if (method !== 'GET' && method !== 'HEAD') {
-    send(res, 405, 'Method Not Allowed', { 'Content-Type': 'text/plain; charset=utf-8' });
-    return;
-  }
-
+  /**
+   * للملفات الثابتة في التطوير: تساهل مع طرق HTTP غير المتوقعة (إضافات/برامج)
+   * حتى لا تتوقف الواجهة برسالة 405. نتعامل معها كـ GET عملياً.
+   */
   serveStatic(req, res);
 });
 
