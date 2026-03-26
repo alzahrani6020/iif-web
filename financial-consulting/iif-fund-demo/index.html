@@ -18893,6 +18893,18 @@ Generated: ${new Date().toLocaleString()}
         try {
           var sticky = false;
           try { sticky = sessionStorage.getItem('iif_admin_portal_mode') === '1'; } catch (eS) { }
+          if (!sticky) {
+            try {
+              if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+                var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+                var ownerEmail = (window.IIF_CONFIG && window.IIF_CONFIG.ownerEmail) ? String(window.IIF_CONFIG.ownerEmail).toLowerCase() : 'talalkenani@gmail.com';
+                if (email && email === ownerEmail) {
+                  sticky = true;
+                  try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eSetSticky) { }
+                }
+              }
+            } catch (eOwnerSticky) { }
+          }
           if (!sticky) return;
           // لا نغيّر URL ولا نعتمد على # أو query — فقط نجعل فتح اللوحة دائماً متاحاً
           function ensureBtn() {
