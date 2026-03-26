@@ -30,6 +30,7 @@
   </head>
   <body>
     <iframe
+      id="admin-frame"
       class="frame"
       title="IIF Admin"
       allow="clipboard-read; clipboard-write; camera"
@@ -43,11 +44,21 @@
       </div>
     </div>
     <script>
-      // إذا منع المتصفح iframe (سياسة/إضافات)، أظهر رابطاً مباشراً
+      // لا نغطي الـ iframe إلا إذا فشل تحميله (حتى لا "تتجمد" الأزرار داخل صفحة الدخول).
+      const frame = document.getElementById('admin-frame');
+      const fb = document.getElementById('fallback');
+      let loaded = false;
+
+      if (frame) {
+        frame.addEventListener('load', () => {
+          loaded = true;
+          if (fb) fb.style.display = 'none';
+        });
+      }
+
       setTimeout(() => {
-        const fb = document.getElementById('fallback');
-        if (fb) fb.style.display = 'flex';
-      }, 2500);
+        if (!loaded && fb) fb.style.display = 'flex';
+      }, 3000);
     </script>
   </body>
 </html>
