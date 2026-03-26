@@ -97,9 +97,15 @@ function serveStatic(req, res) {
   if (urlPath === '/admin-direct') {
     const ownerEmail = String(process.env.IIF_OWNER_EMAIL || 'talalkenani@gmail.com').trim().toLowerCase();
     const adminUrl = 'http://127.0.0.1:' + PORT + '/admin';
-    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>دخول الإدارة (محلي)</title></head>
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>دخول الإدارة (محلي)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
 <body style="background:#05070c;color:#e9ddbf;font-family:system-ui,-apple-system,Segoe UI,Arial;padding:18px;">
-<p>يتم فتح لوحة الإدارة محلياً…</p>
+<h2 style="margin:0 0 10px;font-size:18px;">دخول الإدارة (محلي)</h2>
+<p style="margin:0 0 12px;opacity:.9">سيتم فتح لوحة الإدارة تلقائياً. إذا بقيت هذه الصفحة، اضغط الزر:</p>
+<p style="margin:0 0 14px;">
+  <a href="${adminUrl}" style="display:inline-block;padding:10px 12px;border-radius:12px;border:1px solid rgba(201,162,39,.55);background:rgba(12,14,18,.82);color:#f5e7b6;text-decoration:none;">فتح لوحة الإدارة</a>
+</p>
 <script>
 (function(){
   try {
@@ -108,7 +114,7 @@ function serveStatic(req, res) {
     localStorage.setItem('iif-is-admin', '1');
     try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (e) {}
   } catch (e) {}
-  location.replace(${JSON.stringify(adminUrl)});
+  try { location.replace(${JSON.stringify(adminUrl)}); } catch (e3) { location.href = ${JSON.stringify(adminUrl)}; }
 })();
 </script>
 <noscript>فعّل JavaScript ثم افتح: <a href="${adminUrl}">${adminUrl}</a></noscript>
