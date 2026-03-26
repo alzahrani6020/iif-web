@@ -18802,6 +18802,54 @@ Generated: ${new Date().toLocaleString()}
           if (!portalFlag && !wantDashFromQs) return;
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
+
+          /** زر طوارئ داخل الصفحة لتفادي الحاجة للـ Console */
+          (function ensureAdminQuickOpenButton() {
+            try {
+              if (document.getElementById('iif-admin-quick-open')) return;
+              var btn = document.createElement('button');
+              btn.id = 'iif-admin-quick-open';
+              btn.type = 'button';
+              btn.textContent = 'فتح لوحة التحكم الآن';
+              btn.setAttribute('aria-label', 'Open dashboard now');
+              btn.style.cssText =
+                'position:fixed;z-index:2147483647;bottom:16px;left:16px;max-width:calc(100vw - 32px);' +
+                'padding:10px 12px;border-radius:12px;border:1px solid rgba(201,162,39,.55);' +
+                'background:rgba(12,14,18,.82);color:#f5e7b6;font-family:system-ui,-apple-system,Segoe UI,Arial;' +
+                'font-size:13px;line-height:1.2;cursor:pointer;backdrop-filter:blur(6px)';
+              btn.addEventListener('click', function () {
+                try {
+                  if (typeof openDashboardEnhanced === 'function') {
+                    openDashboardEnhanced();
+                    return;
+                  }
+                } catch (e) { }
+                try {
+                  if (typeof openAuth === 'function') openAuth('login');
+                } catch (e2) { }
+              });
+              document.body.appendChild(btn);
+            } catch (eBtn) { }
+          })();
+
+          /** إن كان open_dashboard=1: أعد المحاولة عدة مرات بعد الدخول/التهيئة */
+          if (wantDashFromQs) {
+            try {
+              var tries = 0;
+              var maxTries = 30; // ~15 ثانية
+              var t = setInterval(function () {
+                tries++;
+                try {
+                  if (typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard() && typeof openDashboardEnhanced === 'function') {
+                    openDashboardEnhanced();
+                    clearInterval(t);
+                  }
+                } catch (eTry) { }
+                if (tries >= maxTries) clearInterval(t);
+              }, 500);
+            } catch (eInt) { }
+          }
+
           function iifForceAdminPortalUi() {
             try {
               if (typeof isLoggedIn === 'function' && isLoggedIn() && typeof canAccessDashboard === 'function' && canAccessDashboard() && typeof openDashboardEnhanced === 'function') {
