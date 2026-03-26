@@ -17339,6 +17339,16 @@ Generated: ${new Date().toLocaleString()}
             setTimeout(openDashboardIfHash, (window.IIF_TIMING && window.IIF_TIMING.hashOpen) || 100);
           }
         } catch (eHash) { }
+        try {
+          var pendDash = false;
+          try { pendDash = sessionStorage.getItem('iif_pending_open_dashboard') === '1'; } catch (ePs) { }
+          if (pendDash && loggedIn && typeof canAccessDashboard === 'function' && canAccessDashboard()) {
+            try { sessionStorage.removeItem('iif_pending_open_dashboard'); } catch (ePr) { }
+            setTimeout(function () {
+              if (typeof openDashboardEnhanced === 'function') openDashboardEnhanced();
+            }, (window.IIF_TIMING && window.IIF_TIMING.hashOpen) || 120);
+          }
+        } catch (ePend) { }
       }
       var navLogoutBtn = document.getElementById('nav-logout');
       if (navLogoutBtn) {
@@ -18783,7 +18793,13 @@ Generated: ${new Date().toLocaleString()}
       /* دخول من admin.html بعد التحويل: افتح تسجيل الدخول مباشرةً */
       (function initAdminPortalFromQuery() {
         try {
-          if (new URLSearchParams(window.location.search).get('iif_admin_portal') !== '1') return;
+          var qsPortal = new URLSearchParams(window.location.search);
+          var portalFlag = qsPortal.get('iif_admin_portal') === '1';
+          var wantDashFromQs = qsPortal.get('open_dashboard') === '1' || qsPortal.get('iif_open_dashboard') === '1';
+          if (wantDashFromQs) {
+            try { sessionStorage.setItem('iif_pending_open_dashboard', '1'); } catch (eSq) { }
+          }
+          if (!portalFlag && !wantDashFromQs) return;
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
           function iifForceAdminPortalUi() {
