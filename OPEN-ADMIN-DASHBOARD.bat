@@ -15,6 +15,13 @@ set "ADMIN_URL=http://127.0.0.1:%PORT%/financial-consulting/iif-fund-demo/index.
 echo.
 echo [IIF] Restart dev server on port %PORT% ...
 
+REM تأكد من أنك على أحدث نسخة في الريبو لتجنب "تغييرات تختفي بعد أيام"
+echo [IIF] Git sync (pull) ...
+powershell -NoProfile -Command "git rev-parse --short HEAD" 
+git pull --rebase
+echo [IIF] Running commit:
+powershell -NoProfile -Command "git rev-parse --short HEAD"
+
 REM حاول إيقاف العملية التي تستمع على PORT (قد تفشل إن لم توجد)
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$p = (Get-NetTCPConnection -LocalPort %PORT% -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess); if ($p) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }" ^
