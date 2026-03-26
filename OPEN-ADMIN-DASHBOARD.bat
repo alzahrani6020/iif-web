@@ -35,8 +35,8 @@ REM انتظر حتى يصبح الخادم جاهزاً (تجنب ERR_CONNECTIO
 powershell -NoProfile -Command ^
   "$u='%ADMIN_URL%'; $ok=$false; for($i=0;$i -lt 60;$i++){ try{ $r=Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 2; if($r.StatusCode -eq 200){ $ok=$true; break } } catch{}; Start-Sleep -Milliseconds 300 }; if(-not $ok){ Write-Host 'Server not ready in time' }"
 
-REM افتح مدخل الأدمن
-Start-Process "%ADMIN_URL%"
+REM افتح مدخل الأدمن (PowerShell لفتح المتصفح)
+powershell -NoProfile -Command "Start-Process -FilePath '%ADMIN_URL%'"
 
 echo.
 echo [IIF] Opened: %ADMIN_URL%
