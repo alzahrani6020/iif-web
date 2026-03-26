@@ -94,10 +94,10 @@ function proxySearx(req, res) {
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
   /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
-  if (urlPath === '/dashboard' || urlPath === '/admin') {
-    /* ?iif_admin_portal=1 يخفِ واجهة الموقع العامة ويبرز مسار الدخول/اللوحة (انظر index.html) */
+  if (urlPath === '/dashboard' || urlPath === '/admin' || urlPath === '/cp') {
+    /* بدون # في العنوان — يُفتح من الاستعلام + sessionStorage (تفادي سقوط الهاش من PowerShell/اختصارات) */
     const dashPath =
-      '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1#dashboard';
+      '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1';
     const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لوحة التحكم</title><script>location.replace(${JSON.stringify(
       dashPath
     )});</script></head><body><p><a href="${dashPath}">متابعة إلى لوحة التحكم</a></p></body></html>`;
@@ -163,6 +163,19 @@ function serveStatic(req, res) {
 const server = http.createServer((req, res) => {
   const urlPath = new URL(req.url, 'http://localhost').pathname;
   const method = String(req.method || 'GET').toUpperCase();
+  /**
+   * توحيد المضيف محلياً لتفادي "عدم حفظ الدخول" بسبب اختلاف الـ origin:
+   * localhost:3333 ≠ 127.0.0.1:3333 (localStorage منفصل لكل واحد).
+   */
+  try {
+    const host = String(req.headers.host || '');
+    if (host.toLowerCase().startsWith('localhost:')) {
+      const port = host.split(':')[1] || String(PORT);
+      res.writeHead(302, { Location: `http://127.0.0.1:${port}${req.url || '/'}` });
+      res.end();
+      return;
+    }
+  } catch (e) { }
   /** CORS / إضافات قد ترسل OPTIONS — بدون ردّ مناسب قد يظهر «Method Not Allowed» */
   if (method === 'OPTIONS') {
     send(res, 204, '', {
@@ -196,5 +209,6 @@ server.listen(PORT, () => {
   console.log('  المنصة: …/government-search/SIMPLE-GOVERNMENT-PLATFORM.html');
   console.log('  بروكسي SearXNG: /api/searx/*  →  ' + SEARX_UPSTREAM.origin + '/*');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');
+  console.log('  لوحة (اختصار): /dashboard أو /cp  →  واجهة الصندوق + open_dashboard=1');
   console.log('');
 });
