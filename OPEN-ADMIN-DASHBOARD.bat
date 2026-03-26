@@ -9,8 +9,7 @@ REM - يفتح رابط لوحة الإدارة في المتصفح
 cd /d "%~dp0"
 
 set "PORT=3333"
-REM ملاحظة: في CMD قد تُعامل علامة & كفاصل أوامر — اهربها بـ ^&
-set "ADMIN_URL=http://127.0.0.1:%PORT%/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1^&open_dashboard=1"
+set "ADMIN_URL_BASE=http://127.0.0.1:%PORT%/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1"
 
 echo.
 echo [IIF] Restart dev server on port %PORT% ...
@@ -33,9 +32,10 @@ start "IIF Dev Server" cmd /k "set PORT=%PORT%&& npm start"
 REM انتظر قليلاً ثم افتح اللوحة
 REM timeout قد يفشل إذا كانت الإدخالات/الإخراجات مُعاد توجيهها؛ استخدم ping كبديل
 ping 127.0.0.1 -n 3 >nul
-start "" "%ADMIN_URL%"
+REM افتح الرابط عبر PowerShell لتجنب مشاكل هروب '&' في CMD
+powershell -NoProfile -Command "Start-Process -FilePath '%ADMIN_URL_BASE%&open_dashboard=1'"
 
 echo.
-echo [IIF] Opened: "%ADMIN_URL%"
+echo [IIF] Opened: "%ADMIN_URL_BASE%&open_dashboard=1"
 echo.
 endlocal
