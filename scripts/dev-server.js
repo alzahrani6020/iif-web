@@ -93,6 +93,29 @@ function proxySearx(req, res) {
 
 function serveStatic(req, res) {
   let urlPath = new URL(req.url, 'http://localhost').pathname;
+  /** دخول مباشر محلي (تطوير فقط): يضبط جلسة المالك ثم يفتح /admin */
+  if (urlPath === '/admin-direct') {
+    const ownerEmail = String(process.env.IIF_OWNER_EMAIL || 'talalkenani@gmail.com').trim().toLowerCase();
+    const adminUrl = 'http://127.0.0.1:' + PORT + '/admin';
+    const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>دخول الإدارة (محلي)</title></head>
+<body style="background:#05070c;color:#e9ddbf;font-family:system-ui,-apple-system,Segoe UI,Arial;padding:18px;">
+<p>يتم فتح لوحة الإدارة محلياً…</p>
+<script>
+(function(){
+  try {
+    localStorage.setItem('iif-user-email', ${JSON.stringify(ownerEmail)});
+    localStorage.setItem('iif-logged-in', '1');
+    localStorage.setItem('iif-is-admin', '1');
+    try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (e) {}
+  } catch (e) {}
+  location.replace(${JSON.stringify(adminUrl)});
+})();
+</script>
+<noscript>فعّل JavaScript ثم افتح: <a href="${adminUrl}">${adminUrl}</a></noscript>
+</body></html>`;
+    send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
+    return;
+  }
   /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
   if (urlPath === '/dashboard' || urlPath === '/cp') {
     /* بدون # في العنوان — يُفتح من الاستعلام + sessionStorage (تفادي سقوط الهاش من PowerShell/اختصارات) */
@@ -210,5 +233,6 @@ server.listen(PORT, () => {
   console.log('  بروكسي SearXNG: /api/searx/*  →  ' + SEARX_UPSTREAM.origin + '/*');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');
   console.log('  لوحة (اختصار): /dashboard أو /cp  →  واجهة الصندوق + open_dashboard=1');
+  console.log('  أدمن مباشر (محلي): /admin-direct  →  دخول بدون كلمة مرور (تطوير فقط)');
   console.log('');
 });
