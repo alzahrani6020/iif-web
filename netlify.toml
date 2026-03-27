@@ -25,6 +25,12 @@
   to = "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
   status = 302
 
+# مسار التطوير المحلي فقط — على الإنتاج يوجّه لبوابة الدخول الرسمية (بدون حقن جلسة)
+[[redirects]]
+  from = "/admin-direct"
+  to = "/fund-admin"
+  status = 302
+
 [[redirects]]
   from = "/admin"
   to = "/financial-consulting/iif-fund-demo/admin.html"

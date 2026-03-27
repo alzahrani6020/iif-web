@@ -146,6 +146,32 @@ function serveStatic(req, res) {
     send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
+  /** مطابقة netlify.toml — نفس المسارات على الإنتاج والتطوير */
+  if (urlPath === '/fund') {
+    res.writeHead(302, {
+      Location: '/financial-consulting/iif-fund-demo/index.html',
+      'Cache-Control': 'no-store',
+    });
+    res.end();
+    return;
+  }
+  if (urlPath === '/fund-admin') {
+    res.writeHead(302, {
+      Location:
+        '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1',
+      'Cache-Control': 'no-store',
+    });
+    res.end();
+    return;
+  }
+  if (urlPath === '/gov') {
+    res.writeHead(302, {
+      Location: '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
+      'Cache-Control': 'no-store',
+    });
+    res.end();
+    return;
+  }
   /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */
   if (urlPath !== '/' && urlPath.endsWith('/')) {
     urlPath = urlPath.slice(0, -1) + '/index.html';
@@ -251,6 +277,7 @@ server.listen(PORT, () => {
   console.log('  بروكسي SearXNG: /api/searx/*  →  ' + SEARX_UPSTREAM.origin + '/*');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');
   console.log('  لوحة (اختصار): /dashboard أو /cp  →  واجهة الصندوق + open_dashboard=1');
+  console.log('  مثل Netlify: /fund  /gov  /fund-admin  →  إعادة توجيه 302');
   console.log('  أدمن مباشر (محلي): /admin-direct  →  دخول بدون كلمة مرور (تطوير فقط)');
   console.log('');
 });

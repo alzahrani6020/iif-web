@@ -16,7 +16,7 @@
 | `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) — **قبل نشر تغييرات حرجة:** [QA-PRE-RELEASE.md](./financial-consulting/iif-fund-demo/QA-PRE-RELEASE.md) |
 | `financial-consulting/fund-site/` | واجهة أبسط |
 | `executive-brief.html`، `sovereign-standards.html` (جذر المستودع) | موجز للمستويات الرفيعة + معايير سيادية؛ اختصارات `/executive`، `/sovereign`، `/charter` |
-| `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `18080` |
+| `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `18080`؛ اختصارات **`/fund` `/gov` `/fund-admin`** (302 مثل `netlify.toml`)؛ **`/admin`** محلياً → `/admin-direct` |
 | `engines/searxng/` | **Tor + SearXNG** (Docker) — `npm start` → `/api/searx`؛ محركات `.onion` عبر حاوية `tor` |
 | [CANONICAL-URLS.md](./CANONICAL-URLS.md) | روابط **إنتاج** Vercel وNetlify المعتمدة (مرجع واحد) |
 | [قائمة-تحقق-قبل-الدمج.md](./قائمة-تحقق-قبل-الدمج.md) | تجنّب أخطاء وازدواجية؛ انسجام الجهاز والمنصات والمساعد؛ **قسم 7:** وقاية واستعادة عند خلل في الكود أو الجهاز أو المنصات |

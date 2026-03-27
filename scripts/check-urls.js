@@ -33,13 +33,24 @@ const PATHS = [
 const SOFT_PATHS = [{ path: '/api/searx/', note: 'بروكسي → SearXNG على 127.0.0.1:18080 (Docker من engines/searxng)' }];
 const CHECK_OPTIONAL = process.env.CHECK_OPTIONAL === '1';
 
+/** اختصارات مطابقة لـ netlify.toml — يجب أن تُرجع إعادة توجيه */
+const REDIRECT_SHORTCUTS = [
+  { path: '/fund', wantStatus: 302, locationIncludes: 'iif-fund-demo/index.html' },
+  { path: '/fund-admin', wantStatus: 302, locationIncludes: 'open_dashboard=1' },
+  { path: '/gov', wantStatus: 302, locationIncludes: 'SIMPLE-GOVERNMENT-PLATFORM.html' },
+];
+
 function get(path) {
   return new Promise((resolve, reject) => {
     const req = http.request(
       { hostname: HOST, port: PORT, path, method: 'GET', timeout: 10000 },
       (res) => {
         res.resume();
-        resolve({ path, status: res.statusCode });
+        resolve({
+          path,
+          status: res.statusCode,
+          location: res.headers.location || '',
+        });
       }
     );
     req.on('error', reject);
@@ -65,6 +76,22 @@ async function main() {
       }
     } catch (e) {
       console.log('  FAIL', p, '—', e.message);
+      failed = true;
+    }
+  }
+
+  for (const r of REDIRECT_SHORTCUTS) {
+    try {
+      const { status, location } = await get(r.path);
+      const loc = String(location || '');
+      if (status === r.wantStatus && loc.includes(r.locationIncludes)) {
+        console.log('  OK', status, r.path, '→', loc);
+      } else {
+        console.log('  BAD', r.path, 'status=', status, 'location=', loc);
+        failed = true;
+      }
+    } catch (e) {
+      console.log('  FAIL', r.path, '—', e.message);
       failed = true;
     }
   }
