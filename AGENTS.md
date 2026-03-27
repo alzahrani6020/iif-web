@@ -17,6 +17,7 @@
 | `financial-consulting/fund-site/` | واجهة أبسط |
 | `executive-brief.html`، `sovereign-standards.html` (جذر المستودع) | موجز للمستويات الرفيعة + معايير سيادية؛ اختصارات `/executive`، `/sovereign`، `/charter` |
 | `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `18080`؛ اختصارات **`/fund` `/gov` `/fund-admin`** (302 مثل `netlify.toml`)؛ **`/admin`** محلياً → `/admin-direct` |
+| `OPEN-LOCAL-DASHBOARD.bat` | **ويندوز — فتح لوحة التحكم محلياً** بدون تجارب روابط: يشغّل الخادم إن لزم ثم `http://127.0.0.1:3333/?local_dashboard=1` (يعمل **فقط** على الجهاز؛ لا يُستخدم على Netlify) |
 | `engines/searxng/` | **Tor + SearXNG** (Docker) — `npm start` → `/api/searx`؛ محركات `.onion` عبر حاوية `tor` |
 | [CANONICAL-URLS.md](./CANONICAL-URLS.md) | روابط **إنتاج** Vercel وNetlify المعتمدة (مرجع واحد) |
 | [قائمة-تحقق-قبل-الدمج.md](./قائمة-تحقق-قبل-الدمج.md) | تجنّب أخطاء وازدواجية؛ انسجام الجهاز والمنصات والمساعد؛ **قسم 7:** وقاية واستعادة عند خلل في الكود أو الجهاز أو المنصات |

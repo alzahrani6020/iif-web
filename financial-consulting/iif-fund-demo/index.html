@@ -63,6 +63,38 @@
       }
     } catch (e) { }
   </script>
+  <script>
+    /**
+     * حل محلي صريح — لا يعمل على Netlify/الإنترنت (hostname ليس 127.0.0.1).
+     * افتح: ...?local_dashboard=1 بعد npm start — أو استخدم OPEN-LOCAL-DASHBOARD.bat
+     * يضبط جلسة المالك ثم يستبدل الاستعلام بـ iif_admin_portal + open_dashboard حتى يمر باقي الصفحة كالمعتاد.
+     */
+    (function () {
+      try {
+        var h = location.hostname || '';
+        var onlyLocal = h === '127.0.0.1' || h === 'localhost' || h === '[::1]';
+        if (!onlyLocal || location.protocol === 'file:') return;
+        var sp = new URLSearchParams(location.search || '');
+        if (sp.get('local_dashboard') !== '1' && sp.get('iif_local_dashboard') !== '1') return;
+        var owner = 'talalkenani@gmail.com';
+        try {
+          localStorage.setItem('iif-logged-in', '1');
+          localStorage.setItem('iif-user-email', owner);
+          localStorage.setItem('iif-is-admin', '1');
+          sessionStorage.setItem('iif_admin_portal_mode', '1');
+          sessionStorage.setItem('iif_pending_open_dashboard', '1');
+        } catch (e0) { }
+        try {
+          var u = new URL(location.href);
+          u.searchParams.delete('local_dashboard');
+          u.searchParams.delete('iif_local_dashboard');
+          u.searchParams.set('iif_admin_portal', '1');
+          u.searchParams.set('open_dashboard', '1');
+          history.replaceState(null, '', u.pathname + u.search + (u.hash || ''));
+        } catch (e1) { }
+      } catch (e) { }
+    })();
+  </script>
   <title>International Investment Fund · FII · Paris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e18" />
