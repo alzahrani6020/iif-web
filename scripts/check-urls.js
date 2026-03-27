@@ -27,6 +27,7 @@ const PATHS = [
   '/legal/contact.html',
   '/assets/og-cover.svg',
   '/financial-consulting/iif-fund-demo/assets/emblem.jpg',
+  '/financial-consulting/iif-fund-demo/dashboard-entry.html',
 ];
 
 /** مسارات اختيارية: فشلها لا يوقف السكربت (مثلاً SearXNG غير مشغّل) */
@@ -38,6 +39,7 @@ const REDIRECT_SHORTCUTS = [
   { path: '/fund', wantStatus: 302, locationIncludes: 'iif-fund-demo/index.html' },
   { path: '/fund-admin', wantStatus: 302, locationIncludes: 'open_dashboard=1' },
   { path: '/gov', wantStatus: 302, locationIncludes: 'SIMPLE-GOVERNMENT-PLATFORM.html' },
+  { path: '/dashboard-entry', wantStatus: 302, locationIncludes: 'dashboard-entry.html' },
 ];
 
 function get(path) {

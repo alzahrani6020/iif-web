@@ -16,6 +16,11 @@
   CI = "true"
 
 [[redirects]]
+  from = "/dashboard-entry"
+  to = "/financial-consulting/iif-fund-demo/dashboard-entry.html"
+  status = 302
+
+[[redirects]]
   from = "/fund"
   to = "/financial-consulting/iif-fund-demo/index.html"
   status = 302
