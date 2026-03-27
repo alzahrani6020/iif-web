@@ -17465,14 +17465,21 @@ Generated: ${new Date().toLocaleString()}
           var un = (opts.name || localStorage.getItem('iif-user-name') || '').trim() || loginEmail;
           upsertSiteUser(loginEmail, un);
         }
-        /* بعد ترحيب تسجيل الدخول (يُغلق النافذة ~2.2s): افتح اللوحة لمن يملك صلاحية — بدون الاعتماد على ?open_dashboard= في الرابط */
+        /* بعد ترحيب تسجيل الدخول (~2.2s): افتح اللوحة لمن يملك صلاحية — تأخير 3s + إعادة محاولة واحدة إن لم تُفتح الطبقة */
         try {
-          setTimeout(function () {
+          function tryOpenDashAfterLogin() {
             try {
               if (typeof canAccessDashboard !== 'function' || !canAccessDashboard()) return;
               if (typeof openDashboardEnhanced === 'function') openDashboardEnhanced();
-            } catch (eOpenDashAfterLogin) { }
-          }, 2600);
+            } catch (e1) { }
+          }
+          setTimeout(tryOpenDashAfterLogin, 3000);
+          setTimeout(function () {
+            try {
+              var ov = document.getElementById('dashboard-overlay');
+              if (ov && !ov.classList.contains('is-open')) tryOpenDashAfterLogin();
+            } catch (e2) { }
+          }, 4800);
         } catch (eDashAuto) { }
       }
       function hasTrustedDevice() {
