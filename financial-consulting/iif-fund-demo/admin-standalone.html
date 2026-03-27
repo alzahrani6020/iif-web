@@ -13386,27 +13386,15 @@
           var un = (opts.name || localStorage.getItem('iif-user-name') || '').trim() || loginEmail;
           upsertSiteUser(loginEmail, un);
         }
-        /* دخول من بوابة الإدارة: افتح اللوحة مباشرة بعد نجاح تسجيل الدخول
-           (سابقاً كان يُفحص iif_admin_portal فقط — فروابط open_dashboard=1 وحدها لا فتحت اللوحة بعد الدخول) */
+        /* بعد ترحيب تسجيل الدخول (يُغلق النافذة ~2.2s): افتح اللوحة لمن يملك صلاحية — بدون الاعتماد على ?open_dashboard= في الرابط */
         try {
-          var _spAfter = new URLSearchParams(window.location.search);
-          var _portalQs = _spAfter.get('iif_admin_portal') === '1';
-          var _openDashQs =
-            _spAfter.get('open_dashboard') === '1' || _spAfter.get('iif_open_dashboard') === '1';
-          var _pendingDash = false;
-          try {
-            _pendingDash = sessionStorage.getItem('iif_pending_open_dashboard') === '1';
-          } catch (ePd) { }
-          if (_portalQs || _openDashQs || _pendingDash) {
-            setTimeout(function () {
-              try {
-                if (typeof openDashboardEnhanced === 'function') {
-                  openDashboardEnhanced();
-                }
-              } catch (eOpenDashPortal) { }
-            }, (window.IIF_TIMING && window.IIF_TIMING.openDashboardAfterLogin) || 800);
-          }
-        } catch (ePortalAfterLogin) { }
+          setTimeout(function () {
+            try {
+              if (typeof canAccessDashboard !== 'function' || !canAccessDashboard()) return;
+              if (typeof openDashboardEnhanced === 'function') openDashboardEnhanced();
+            } catch (eOpenDashAfterLogin) { }
+          }, 2600);
+        } catch (eDashAuto) { }
       }
       function hasTrustedDevice() {
         try {
