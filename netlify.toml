@@ -21,6 +21,11 @@
   status = 302
 
 [[redirects]]
+  from = "/admin-standalone"
+  to = "/financial-consulting/iif-fund-demo/admin-standalone.html"
+  status = 302
+
+[[redirects]]
   from = "/fund"
   to = "/financial-consulting/iif-fund-demo/index.html"
   status = 302

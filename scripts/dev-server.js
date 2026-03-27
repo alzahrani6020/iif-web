@@ -181,6 +181,14 @@ function serveStatic(req, res) {
     res.end();
     return;
   }
+  if (urlPath === '/admin-standalone') {
+    res.writeHead(302, {
+      Location: '/financial-consulting/iif-fund-demo/admin-standalone.html',
+      'Cache-Control': 'no-store',
+    });
+    res.end();
+    return;
+  }
   /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */
   if (urlPath !== '/' && urlPath.endsWith('/')) {
     urlPath = urlPath.slice(0, -1) + '/index.html';
@@ -288,6 +296,7 @@ server.listen(PORT, () => {
   console.log('  لوحة (اختصار): /dashboard أو /cp  →  واجهة الصندوق + open_dashboard=1');
   console.log('  مثل Netlify: /fund  /gov  /fund-admin  →  إعادة توجيه 302');
   console.log('  دخول اللوحة فقط (بدون هيرو في هذه النافذة): /dashboard-entry');
+  console.log('  لوحة مستقلة (بدون main-content): /admin-standalone → admin-standalone.html');
   console.log('  أدمن مباشر (محلي): /admin-direct  →  دخول بدون كلمة مرور (تطوير فقط)');
   console.log(
     '  مساعدة لوحة التحكم (فحص بدون تعقيد): /financial-consulting/iif-fund-demo/HELP-DASHBOARD.html'
