@@ -31,14 +31,13 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
-      - name: Install + verify
-        # يطابق محلياً: npm run verify (بناء + فحص صياغة السكربتات)
-        run: npm ci --no-audit --fund=false && npm run verify
+      - name: Install + verify:full (بناء + smoke مع خادم مؤقت)
+        run: npm ci --no-audit --fund=false && npm run verify:full
 
-      - name: Smoke HTML (لوحة الصندوق + مسارات حرجة)
-        run: |
-          node scripts/dev-server.js &
-          echo $! > /tmp/iif-dev-server.pid
-          sleep 3
-          npm run smoke:html
-          kill $(cat /tmp/iif-dev-server.pid) 2>/dev/null || true
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: E2E — لوحة التحكم في متصفح حقيقي
+        run: npm run test:e2e
+        env:
+          CI: true
