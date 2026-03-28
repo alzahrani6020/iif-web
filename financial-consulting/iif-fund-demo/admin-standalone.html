@@ -10412,7 +10412,7 @@
         adminEmbedOpen: 0,
         toastShort: 2500,
         toastLong: 5000,
-        openDashboardAfterLogin: 800,
+        openDashboardAfterLogin: 0,
         successDismiss: 4000,
         biometricOffer: 2500,
         uploadStatusDismiss: 2500
@@ -13386,7 +13386,7 @@
           var un = (opts.name || localStorage.getItem('iif-user-name') || '').trim() || loginEmail;
           upsertSiteUser(loginEmail, un);
         }
-        /* بعد ترحيب تسجيل الدخول (~2.2s): افتح اللوحة لمن يملك صلاحية — تأخير 3s + إعادة محاولة واحدة إن لم تُفتح الطبقة */
+        /* فتح اللوحة فوراً لمن يملك صلاحية — openDashboard يغلق نافذة الدخول؛ إعادة محاولات خفيفة إن تأخّرت الطبقة */
         try {
           function tryOpenDashAfterLogin() {
             try {
@@ -13394,13 +13394,22 @@
               if (typeof openDashboardEnhanced === 'function') openDashboardEnhanced();
             } catch (e1) { }
           }
-          setTimeout(tryOpenDashAfterLogin, 3000);
+          var dashDelay = (window.IIF_TIMING && window.IIF_TIMING.openDashboardAfterLogin != null)
+            ? window.IIF_TIMING.openDashboardAfterLogin
+            : 0;
+          setTimeout(tryOpenDashAfterLogin, dashDelay);
           setTimeout(function () {
             try {
               var ov = document.getElementById('dashboard-overlay');
               if (ov && !ov.classList.contains('is-open')) tryOpenDashAfterLogin();
             } catch (e2) { }
-          }, 4800);
+          }, Math.max(400, dashDelay + 400));
+          setTimeout(function () {
+            try {
+              var ov = document.getElementById('dashboard-overlay');
+              if (ov && !ov.classList.contains('is-open')) tryOpenDashAfterLogin();
+            } catch (e3) { }
+          }, Math.max(1800, dashDelay + 1400));
         } catch (eDashAuto) { }
       }
       function hasTrustedDevice() {
@@ -14782,40 +14791,45 @@
           document.documentElement.classList.add('iif-admin-embed');
           window.IIF_ADMIN_EMBED = true;
 
-          /** زر طوارئ داخل الصفحة لتفادي الحاجة للـ Console */
+          /** زر طوارئ — يُربَط بـ body بعد توفره (لا يُفشل بصمت إن كان body غير جاهز بعد) */
           (function ensureAdminQuickOpenButton() {
-            try {
-              if (document.getElementById('iif-admin-quick-open')) return;
-              var btn = document.createElement('button');
-              btn.id = 'iif-admin-quick-open';
-              btn.type = 'button';
-              btn.textContent = 'فتح لوحة التحكم الآن';
-              btn.setAttribute('aria-label', 'Open dashboard now');
-              btn.style.cssText =
-                'position:fixed;z-index:2147483647;bottom:16px;left:16px;max-width:calc(100vw - 32px);' +
-                'padding:10px 12px;border-radius:12px;border:1px solid rgba(201,162,39,.55);' +
-                'background:rgba(12,14,18,.82);color:#f5e7b6;font-family:system-ui,-apple-system,Segoe UI,Arial;' +
-                'font-size:13px;line-height:1.2;cursor:pointer;backdrop-filter:blur(6px)';
-              btn.addEventListener('click', function () {
-                try {
-                  if (typeof openDashboardEnhanced === 'function') {
-                    openDashboardEnhanced();
-                    return;
-                  }
-                } catch (e) { }
-                try {
-                  if (typeof openAuth === 'function') openAuth('login');
-                } catch (e2) { }
-              });
-              document.body.appendChild(btn);
-            } catch (eBtn) { }
+            function place() {
+              try {
+                if (document.getElementById('iif-admin-quick-open')) return;
+                if (!document.body) return;
+                var btn = document.createElement('button');
+                btn.id = 'iif-admin-quick-open';
+                btn.type = 'button';
+                btn.textContent = 'فتح لوحة التحكم الآن';
+                btn.setAttribute('aria-label', 'Open dashboard now');
+                btn.style.cssText =
+                  'position:fixed;z-index:2147483647;bottom:16px;left:16px;max-width:calc(100vw - 32px);' +
+                  'padding:10px 12px;border-radius:12px;border:1px solid rgba(201,162,39,.55);' +
+                  'background:rgba(12,14,18,.82);color:#f5e7b6;font-family:system-ui,-apple-system,Segoe UI,Arial;' +
+                  'font-size:13px;line-height:1.2;cursor:pointer;backdrop-filter:blur(6px)';
+                btn.addEventListener('click', function () {
+                  try {
+                    if (typeof openDashboardEnhanced === 'function') {
+                      openDashboardEnhanced();
+                      return;
+                    }
+                  } catch (e) { }
+                  try {
+                    if (typeof openAuth === 'function') openAuth('login');
+                  } catch (e2) { }
+                });
+                document.body.appendChild(btn);
+              } catch (eBtn) { }
+            }
+            if (document.body) place();
+            else document.addEventListener('DOMContentLoaded', place);
           })();
 
           /** إن كان open_dashboard=1: أعد المحاولة عدة مرات بعد الدخول/التهيئة */
           if (wantDashFromQs) {
             try {
               var tries = 0;
-              var maxTries = 30; // ~15 ثانية
+              var maxTries = 60; // ~12 ثانية بخطوات أقصر
               var t = setInterval(function () {
                 tries++;
                 try {
@@ -14825,7 +14839,7 @@
                   }
                 } catch (eTry) { }
                 if (tries >= maxTries) clearInterval(t);
-              }, 500);
+              }, 200);
             } catch (eInt) { }
           }
 

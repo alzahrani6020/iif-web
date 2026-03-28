@@ -27,7 +27,7 @@
 
 [[redirects]]
   from = "/fund"
-  to = "/financial-consulting/iif-fund-demo/index.html"
+  to = "/financial-consulting/iif-fund-demo/dashboard-entry.html"
   status = 302
 
 [[redirects]]

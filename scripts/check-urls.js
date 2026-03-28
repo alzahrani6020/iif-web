@@ -11,13 +11,13 @@ const HOST = process.env.CHECK_HOST || '127.0.0.1';
 const PORT = Number(process.env.PORT) || 3333;
 
 const PATHS = [
-  '/',
+  '/?iif_public_site=1',
   '/executive-brief.html',
   '/executive',
   '/sovereign-standards.html',
   '/sovereign',
   '/charter',
-  '/financial-consulting/iif-fund-demo/index.html',
+  '/financial-consulting/iif-fund-demo/index.html?iif_public_site=1',
   '/financial-consulting/fund-site/index.html',
   '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
   '/financial-consulting/government-search/iif-config.js',
@@ -37,7 +37,7 @@ const CHECK_OPTIONAL = process.env.CHECK_OPTIONAL === '1';
 
 /** اختصارات مطابقة لـ netlify.toml — يجب أن تُرجع إعادة توجيه */
 const REDIRECT_SHORTCUTS = [
-  { path: '/fund', wantStatus: 302, locationIncludes: 'iif-fund-demo/index.html' },
+  { path: '/fund', wantStatus: 302, locationIncludes: 'dashboard-entry.html' },
   { path: '/fund-admin', wantStatus: 302, locationIncludes: 'open_dashboard=1' },
   { path: '/gov', wantStatus: 302, locationIncludes: 'SIMPLE-GOVERNMENT-PLATFORM.html' },
   { path: '/dashboard-entry', wantStatus: 302, locationIncludes: 'dashboard-entry.html' },

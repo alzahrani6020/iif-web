@@ -91,8 +91,64 @@ function proxySearx(req, res) {
   req.pipe(preq);
 }
 
+/** طلبات من المتصفح المحلي فقط (لا يؤثر على نشر ثابت بدون هذا الخادم) */
+function isLocalDevHost(req) {
+  const h = String(req.headers.host || '').toLowerCase();
+  return (
+    h.startsWith('127.0.0.1:') ||
+    h.startsWith('localhost:') ||
+    h === '127.0.0.1' ||
+    h === 'localhost'
+  );
+}
+
+/** هل المسار هو «صفحة الصندوق العامة» (الهيرو)؟ */
+function isFundIndexPath(pathname) {
+  const p = (pathname || '').replace(/\/$/, '') || '/';
+  if (p === '/financial-consulting/iif-fund-demo' || p === '/financial-consulting/iif-fund-demo/index.html') {
+    return true;
+  }
+  if (p === '/' || p === '/index.html') {
+    const primary = path.join(ROOT, 'financial-consulting', 'iif-fund-demo', 'index.html');
+    return fs.existsSync(primary);
+  }
+  return false;
+}
+
+/** لا تعيد التوجيه إذا طُلب الموقع العام صراحةً أو وضع البوابة/اللوحة في الاستعلام */
+function skipFundToDashboardRedirect(searchParams) {
+  if (!searchParams) return false;
+  return (
+    searchParams.get('iif_public_site') === '1' ||
+    searchParams.get('iif_admin_portal') === '1' ||
+    searchParams.get('open_dashboard') === '1' ||
+    searchParams.get('iif_open_dashboard') === '1' ||
+    searchParams.get('local_dashboard') === '1' ||
+    searchParams.get('iif_local_dashboard') === '1'
+  );
+}
+
 function serveStatic(req, res) {
-  let urlPath = new URL(req.url, 'http://localhost').pathname;
+  const reqUrl = new URL(req.url, 'http://127.0.0.1');
+  let urlPath = reqUrl.pathname;
+  /**
+   * محلي فقط: فتح صفحة الصندوق الافتراضية (/) أو …/iif-fund-demo/index → دخول اللوحة بدون الهيرو.
+   * الموقع العام الكامل: أضف ?iif_public_site=1
+   * تعطيل: IIF_DASHBOARD_FIRST=0 npm start
+   */
+  if (
+    process.env.IIF_DASHBOARD_FIRST !== '0' &&
+    isLocalDevHost(req) &&
+    isFundIndexPath(urlPath) &&
+    !skipFundToDashboardRedirect(reqUrl.searchParams)
+  ) {
+    res.writeHead(302, {
+      Location: '/financial-consulting/iif-fund-demo/dashboard-entry.html',
+      'Cache-Control': 'no-store',
+    });
+    res.end();
+    return;
+  }
   /**
    * محلياً فقط: اجعل /admin يذهب مباشرة إلى /admin-direct
    * لتفادي: iframe + تكرار تسجيل الدخول + صفحات فارغة.
@@ -149,7 +205,7 @@ function serveStatic(req, res) {
   /** مطابقة netlify.toml — نفس المسارات على الإنتاج والتطوير */
   if (urlPath === '/fund') {
     res.writeHead(302, {
-      Location: '/financial-consulting/iif-fund-demo/index.html',
+      Location: '/financial-consulting/iif-fund-demo/dashboard-entry.html',
       'Cache-Control': 'no-store',
     });
     res.end();
@@ -287,7 +343,9 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  الواجهة: http://127.0.0.1:' + PORT + '/');
+  console.log('  الواجهة الافتراضية (محلي): / و/fund و…/iif-fund-demo/index → دخول اللوحة dashboard-entry (بدون هيرو)');
+  console.log('  الموقع العام (الهيرو): أضف ?iif_public_site=1 مثال: http://127.0.0.1:' + PORT + '/?iif_public_site=1');
+  console.log('  تعطيل إعادة التوجيه: IIF_DASHBOARD_FIRST=0 npm start');
   console.log('  موجز للمستويات الرفيعة: /executive-brief.html أو /executive');
   console.log('  معايير سيادية: /sovereign-standards.html أو /sovereign');
   console.log('  المنصة: …/government-search/SIMPLE-GOVERNMENT-PLATFORM.html');

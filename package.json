@@ -20,12 +20,15 @@
     "health": "npm run check-urls && npm run smoke:html",
     "verify:searx": "node scripts/verify-searx.js",
     "verify:stack": "npm run verify && npm run verify:searx",
-    "qa:iif-fund": "node scripts/smoke-html-check.mjs"
+    "qa:iif-fund": "node scripts/smoke-html-check.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "i18n-iso-countries": "^7.14.0",
     "world-countries": "^5.1.0"
   }
