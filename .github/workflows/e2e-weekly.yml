@@ -32,6 +32,9 @@ jobs:
       - name: E2E — لوحة التحكم (dev-server + Playwright)
         run: npm run e2e:dashboard
 
+      - name: E2E — واجهة عامة (جوال 390px + عربي + privacy)
+        run: npm run e2e:public
+
   index-stats:
     runs-on: ubuntu-latest
     steps:

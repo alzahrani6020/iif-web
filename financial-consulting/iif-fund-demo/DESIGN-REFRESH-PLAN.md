@@ -8,11 +8,12 @@
 
 | العنصر | الملاحظة |
 |--------|-----------|
-| `index.html` | ملف واحد كبير جداً؛ غالبية التنسيق داخل `<style>` في `head`/`body` وليس عبر ملفات `css/*.css` الخارجية. |
-| `css/design-system.css` | يحتوي متغيرات (`:root`) جاهزة (ألوان، مسافات، خطوط) — **يُفضّل جعله مصدر الحقيقة البصرية** وربطه من `index.html` ثم تقليل التكرار تدريجياً. |
-| `i18n.js` | مئات المفاتيح؛ أي نص جديد للواجهة يجب أن يمر عبر `iifT(...)` وليس نصاً ثابتاً في CSS فقط. |
-| لوحة التحكم | قواعد حرجة مضمّنة (`iif-dashboard-fullpage-critical-head` وغيرها) — **لا تُعاد كتابتها دفعة واحدة**؛ أي تغيير يكون إضافياً أو بعد نسخة احتياطية واختبار. |
-| الخط | Plus Jakarta Sans (Google Fonts) — يمكن الإبقاء عليه أو إضافة خط عربي مكمّل (مثلاً `Noto Sans Arabic`) مع `font-display: swap`. |
+| `index.html` | ما زال كبيراً؛ جزء من التنسيق انتقل إلى `design-system.css` / `public-shell.css` / `public-components.css`؛ الباقي مضمّن (ومنها أنماط اللوحة). |
+| `css/design-system.css` | **مصدر `:root` الموحّد** (ألوان IIF، مسافات، نصف أقطار، `--header-height`). |
+| `css/public-shell.css` | هيكل `main#main-content`، `footer`، مراسي التمرير، **`.skip-link`**، حلقات تركيز للواجهة العامة. |
+| `i18n.js` | مئات المفاتيح؛ أي نص جديد يمر عبر `iifT(...)` / `data-i18n`. |
+| لوحة التحكم | قواعد حرجة مضمّنة — راجع `DASHBOARD-I18N-MAP.md`. |
+| الخط | Plus Jakarta + **Noto Sans Arabic** (preload)؛ اختبار جوال/RTL: **`npm run e2e:public`**. |
 
 ---
 
@@ -98,10 +99,9 @@
 
 ## 5) معايير جاهزية كل دفعة (قبل الدمج)
 
-- [ ] لا أخطاء في وحدة التحكم متعلقة بمسارات `assets/`.
-- [ ] `node financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js --strict` ناجح إذا أُضيفت مفاتيح.
-- [ ] فتح الصفحة على GitHub Pages path وعلى `localhost:3333` (مع `base` الصحيح).
-- [ ] لقطة سريعة للوحة: فتح/إغلاق بدون انكسار التخطيط.
+- [x] **آلي:** `npm run verify` + `npm run smoke:with-server` + (عند تغيير i18n) `check-i18n-keys.js --strict` — في CI.
+- [x] **جوال + RTL (آلي اختياري):** `npm run e2e:public` (Playwright) — يُشغَّل أسبوعياً مع `e2e:dashboard`؛ `SKIP_E2E=1` للتخطي محلياً.
+- [ ] **يدوي قبل إصدار حرج:** لا أخطاء Console لمسارات `assets/`؛ فتح على **GitHub Pages** و`localhost:3333`؛ فتح/إغلاق اللوحة — انظر [QA-PRE-RELEASE.md](./QA-PRE-RELEASE.md).
 
 ---
 
@@ -113,3 +113,8 @@
 ---
 
 *مرجع لوحة: `DASHBOARD-I18N-MAP.md` — آخر تحديث: 2026-04-04.*
+
+### مستقبلي (اختياري — خارج نطاق «المتبقي» المنفَّذ)
+
+- استخراج تدريجي لمزيد من الأنماط من `index.html` إلى ملفات `css/` دون لمس أنماط اللوحة الحرجة.
+- توسيع استخدام `.iif-public-card` في أقسام الصفحة الرئيسية.

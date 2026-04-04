@@ -11,6 +11,27 @@
   --iif-focus-ring-offset: 3px;
 }
 
+/* تخطي إلى المحتوى — القاعدة؛ استثناءات اللوحة/خدمة في index.html */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: var(--space-4);
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--color-accent-gold);
+  color: #1b1b1b;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+  outline: 2px solid var(--color-accent-gold-soft);
+  outline-offset: 2px;
+}
+
 html {
   scroll-behavior: smooth;
   /* صفحات ثانوية بدون --header-height في :root */

@@ -36,6 +36,14 @@ npm run health
 
 (`check-urls` + `smoke:html`)
 
+**جوال وعربي (Playwright — مرة واحدة `npx playwright install chromium`):**
+
+```bash
+npm run e2e:public
+```
+
+يتحقق من عرض 390px، `#main-content` + الهيرو، تفعيل `lang=ar` وخط Noto، وتحميل `privacy.html`.
+
 ---
 
 ## 2) فحص يدوي سريع (دقيقتان)

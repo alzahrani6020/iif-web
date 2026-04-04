@@ -37,6 +37,8 @@ npm run health        # بعد `npm start`: check-urls + smoke:html (يشمل in
 npm run verify:searx  # هل SearXNG يستجيب على 18080؟ (بعد docker compose)
 npm run verify:stack  # verify + verify:searx
 npm run qa:iif-fund   # نفس smoke:html — اسم صريح لواجهة الصندوق
+npm run e2e:public    # Playwright: عرض جوال + lang=ar/Noto + privacy (يتطلب npx playwright install chromium)
+npm run e2e:dashboard # Playwright: فتح اللوحة من /admin-direct
 ```
 
 - **Node:** `>=22` (`.nvmrc` / `.node-version` — مطابق لـ CI وNetlify).
