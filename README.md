@@ -49,7 +49,7 @@
 | معايير الجودة بما يليق بالقيادات السيادية | [`sovereign-standards.html`](./sovereign-standards.html) و [`SOVEREIGN-STANDARDS.md`](./SOVEREIGN-STANDARDS.md) |
 | تشغيل المشروع وروابط التطوير | هذا الملف (README) — قسم **التشغيل السريع** |
 | قائمة قبل النشر (محتوى + تقنية) | [`قبل-النشر.md`](./قبل-النشر.md) |
-| **روابط الإنتاج المعتمدة** (Vercel / Netlify) | [`CANONICAL-URLS.md`](./CANONICAL-URLS.md) |
+| **روابط الإنتاج المعتمدة** (Vercel / Netlify / GitHub Pages) | [`CANONICAL-URLS.md`](./CANONICAL-URLS.md) |
 | **قبل الدمج** — أخطاء، ازدواجية، انسجام مع المنصات والمساعد | [`قائمة-تحقق-قبل-الدمج.md`](./قائمة-تحقق-قبل-الدمج.md) |
 | مسارات الملفات ≠ بحث Google | [`PATHS-NOT-GOOGLE.md`](./PATHS-NOT-GOOGLE.md) |
 | خطوات Netlify والاختصارات `/fund` و `/gov` | [`NETLIFY-CHECKLIST.md`](./NETLIFY-CHECKLIST.md) و [`netlify.toml`](./netlify.toml) |
@@ -77,8 +77,11 @@
 
 ```bash
 npm run verify   # بناء + فحص صياغة السكربتات (اختياري قبل الدفع)
+npm run verify:local   # verify + فحص صيانة الروابط في الملفات (بدون خادم؛ أو VERIFY-IIF-LOCAL.bat)
 npm start
 ```
+
+**MiniMax API (اختياري):** لضبط المفتاح من ويندوز بدون أوامر معقّدة، انقر **`MINIMAX-KEY-SETUP.bat`** ثم **`MINIMAX-TEST.bat`** (تفاصيل في [AGENTS.md](./AGENTS.md)).
 
 **قبل فتح الروابط في المتصفح** (في طرفية أخرى):
 
@@ -162,6 +165,14 @@ docker compose up -d
 
 **أمان (أسرار، مفاتيح):** [SECURITY.md](./SECURITY.md)
 
+### GitHub Pages (بديل عند توقف Netlify أو للمعاينة العامة)
+
+- سير العمل: [`.github/workflows/github-pages.yml`](./.github/workflows/github-pages.yml) — ينشر **`financial-consulting/iif-fund-demo/`** كموقع ثابت.
+- **تفعيل لمرة واحدة:** المستودع على GitHub → **Settings** → **Pages** → **Build and deployment** → المصدر: **GitHub Actions** (وليس Branch).
+- بعد نجاح التشغيل: الرابط يكون `https://<user>.github.io/<repo>/` (مثال للمستودع المرتبط: [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)).
+- يوجد ملف [`.nojekyll`](./financial-consulting/iif-fund-demo/.nojekyll) في مجلد الواجهة لتعطيل معالج Jekyll الافتراضي.
+- **دفع التغييرات:** `git push origin main` يشغّل النشر تلقائياً عند تعديل ملفات داخل `financial-consulting/iif-fund-demo/` أو سير العمل نفسه؛ أو من تبويب **Actions** → **Deploy GitHub Pages** → **Run workflow**.
+
 ---
 
 ## متغيرات اختيارية
@@ -169,6 +180,8 @@ docker compose up -d
 | المتغير | المعنى |
 |---------|--------|
 | `PORT` | منفذ خادم التطوير (افتراضي `3333`) |
+| `MINIMAX_API_KEY` | مفتاح **MiniMax Platform API** (اختياري) لتشغيل `npm run minimax:ask` — انسخ `.env.example` إلى `.env` |
+| `MINIMAX_MODEL` | نموذج النص (افتراضي `MiniMax-M2.7` في السكربت) |
 
 ```bash
 set PORT=4000

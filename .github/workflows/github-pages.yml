@@ -1,0 +1,51 @@
+# نشر واجهة الصندوق إلى GitHub Pages (مجلد financial-consulting/iif-fund-demo كجذر للموقع).
+#
+# تفعيل لمرة واحدة في المستودع:
+#   Settings → Pages → Build and deployment → Source: «GitHub Actions»
+#
+# بعد أول push ناجح: الموقع على
+#   https://<اسم-المستخدم>.github.io/<اسم-المستودع>/
+# (المسارات النسبية تُضبط تلقائياً عبر <base> في index.html)
+#
+name: Deploy GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'financial-consulting/iif-fund-demo/**'
+      - '.github/workflows/github-pages.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload static site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: financial-consulting/iif-fund-demo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
