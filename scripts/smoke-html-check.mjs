@@ -79,6 +79,16 @@ async function main() {
       mustInclude: ['open_dashboard=1', 'iif_admin_portal=1', 'iif-fund-demo/index.html'],
       label: 'اختصار /panel → واجهة الصندوق + فتح اللوحة',
     },
+    {
+      path: '/financial-consulting/iif-fund-demo/privacy.html',
+      mustInclude: ['Privacy policy', 'localStorage', 'index.html#contact'],
+      label: 'صفحة الخصوصية',
+    },
+    {
+      path: '/financial-consulting/iif-fund-demo/about-institution.html',
+      mustInclude: ['About the institution', 'Leadership', 'index.html#terms'],
+      label: 'صفحة عن الصندوق',
+    },
   ];
 
   let allOk = true;

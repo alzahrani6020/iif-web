@@ -24154,12 +24154,19 @@ Generated: ${new Date().toLocaleString()}
           } catch (eNet) {
             return { ok: false, results: [], error: 'network' };
           }
-          if (!r.ok) return { ok: false, results: [], error: 'HTTP ' + r.status };
+          if (!r.ok) {
+            var errCode = 'HTTP ' + r.status;
+            if (r.status === 429) errCode = 'rate_limited';
+            return { ok: false, results: [], error: errCode };
+          }
           var data;
           try {
             data = await r.json();
           } catch (eJ) {
             return { ok: false, results: [], error: 'invalid_json' };
+          }
+          if (data && data.error === 'rate_limited') {
+            return { ok: false, results: [], error: 'rate_limited' };
           }
           var results = (data && Array.isArray(data.results)) ? data.results.slice(0, 6).map(function (x) {
             return { title: x.title || '', url: x.url || '', engine: x.engine || '', content: (x.content || '').slice(0, 400) };
@@ -24211,6 +24218,13 @@ Generated: ${new Date().toLocaleString()}
           }
           var webQuery = [item.title, countryName, 'economic outlook', 'risk'].filter(Boolean).join(' ');
           var searx = await fetchSearxPack(webQuery);
+          try {
+            if (searx && searx.error === 'rate_limited') {
+              setStatus(iifT('dashPaSearxRateLimited', 'Search proxy rate limit — continuing without live web results. Retry in about one minute.'));
+            } else if (searx && searx.ok === false && searx.error && searx.error !== 'rate_limited') {
+              setStatus(iifT('dashPaSearxSkipped', 'Web search unavailable — analysis continues with World Bank data only.'));
+            }
+          } catch (eSt) { }
 
           var system = 'You are an institutional investment analyst. Output STRICT JSON only. No markdown. No extra text.';
           var user = JSON.stringify({
@@ -24229,7 +24243,8 @@ Generated: ${new Date().toLocaleString()}
               worldBankLatest: wb.indicators,
               worldBankSeries: wb.series
             },
-            webSources: searx.results
+            webSearchStatus: searx && searx.ok ? 'ok' : (searx && searx.error ? String(searx.error) : 'unknown'),
+            webSources: (searx && Array.isArray(searx.results)) ? searx.results : []
           }, null, 2) + '\n\n' +
             'Return JSON with keys: responsibleAuthority, workRegulations, financialCenter, debt, sovereignGuarantee, security, economicAnalysis, risks, confidence (0-1), sources (array of {title,url}).';
 

@@ -68,3 +68,15 @@ Vercel project URL:      (لوحة Vercel → Domains)
 ## Abuse note (open proxy)
 
 - The SearX proxy is a **GET forwarder**. Monitor Vercel logs; consider rate limits or auth if traffic grows.
+- **Per-IP rate limit** is enabled on the Vercel function (`IIF_PROXY_RL_*` — see above).
+
+## Ollama / تحليل المشروع (لوحة التحكم)
+
+- مسارات **`/api/ollama`** تعمل مع **`npm start`** والخادم المحلي فقط. على GitHub Pages **لا يوجد** Ollama افتراضياً — زر التحليل يحتاج جهازاً يشغّل Ollama ويمرّر البروكسي، أو خادماً خاصاً لاحقاً.
+- عند غياب البحث على الويب (429 أو خطأ شبكة)، يُكمَل سياق النموذج ببيانات البنك الدولي فقط ورسالة حالة في الواجهة.
+
+## Lighthouse (أداء — يدوي)
+
+```bash
+npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performance --chrome-flags="--headless=new --no-sandbox" --view
+```
