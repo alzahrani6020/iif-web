@@ -26,6 +26,7 @@ Vercel project URL:      (لوحة Vercel → Domains)
 
 - File: `api/searx/search.js` (deployed with this directory as the Vercel project root).
 - Optional env: **`SEARX_UPSTREAM`** = `https://your-favorite-searx.example` (default: `https://searx.tiekoetter.com`).
+- **تحديد معدل (ذاكرة لكل عقدة serverless):** `IIF_PROXY_RL_MAX` (افتراضي 45 طلباً)، `IIF_PROXY_RL_WINDOW_MS` (افتراضي 60000)، أو `IIF_PROXY_RL_OFF=1` لتعطيل الحد مؤقتاً.
 - Redeploy after adding env vars.
 - مثال محلي: انسخ `.env.example` إلى `.env` وعدّل القيم عند استخدام `vercel dev` (لا ترفع `.env`).
 
@@ -45,7 +46,11 @@ Vercel project URL:      (لوحة Vercel → Domains)
 1. Create a proxied DNS record to your GitHub Pages (or custom domain CNAME).
 2. Enable **Auto minify** (HTML/CSS/JS) if desired.
 3. Caching: “Standard” or a Page Rule to cache static assets longer than HTML.
-4. **Alternative proxy**: see `ops/cloudflare-searx-proxy.js` (template) if you prefer Workers instead of Vercel for `/api/searx/search`.
+4. **Alternative proxy (Cloudflare Worker)**:
+   - الكود: `ops/cloudflare-searx-proxy.js`
+   - الإعداد: `ops/wrangler.toml`
+   - من المجلد `ops`: `npx wrangler@3 deploy` ثم اربط **Route** (مثل `api.example.com/api/searx/*`).
+   - سر اختياري: `npx wrangler secret put SEARX_UPSTREAM`
 
 ## Monitoring
 
