@@ -3626,6 +3626,11 @@ window.IIF_I18N = (function() {
     uiSkipToMain: 'Aller au contenu principal',
     uiBackToTop: 'Retour en haut',
     navSearchEngine: 'Moteur de recherche',
+    navGoogleWebSearch: 'Recherche Google',
+    iifSearxExternalHint:
+      'Ouvre SearXNG (site externe). Les résultats viennent de moteurs tiers (pas de ce site). Pour les noms, essayez une expression exacte entre guillemets ou modifiez les moteurs dans les préférences SearXNG.',
+    iifGoogleSearchHint:
+      'Ouvre Google dans un nouvel onglet — souvent plus clair pour les personnes et les organisations.',
     navExecutiveBriefLink: 'Note de synthèse',
     sectorsHighlightHtml: '<strong>Focus mis en avant (illustratif) :</strong> Énergie &amp; eau / réseaux · Technologie &amp; IA — tous les secteurs ci-dessous restent dans notre périmètre.',
     missionLead: 'Nous défendons la diplomatie, la paix et la justice sociale en finançant des projets de développement et d\'investissement responsables, avec un respect strict des lois nationales et des normes internationales LBC/FT et de gouvernance.',
@@ -4870,6 +4875,16 @@ window.IIF_I18N = (function() {
     schemaOrgName: 'Fonds international d\'investissement',
     schemaOrgAltName: 'FII',
     schemaKnowsAboutCsv: 'Financement de projets|BOT|PPP public-privé|Études de faisabilité|Investissement institutionnel|Finance souveraine|Relations investisseurs|KYC|Lutte contre le blanchiment',
+    footerTerms: 'Conditions générales',
+    footerPrivacyPolicy: 'Politique de confidentialité',
+    footerAboutInstitution: 'À propos et direction',
+    footerCompliance: 'Conformité et licences',
+    footerPrivacyNote:
+      'Confidentialité et données : voir les conditions et les sections contact/KYC.',
+    footerPlatformFundNote:
+      'Les outils de plateforme et l\'hébergement ne sont pas équivalents aux services institutionnels du Fonds — voir les conditions.',
+    footerShortcutsTrust:
+      '<a href="#trust-entry">Confiance et parcours</a> · <a href="#governance-snapshot">Gouvernance</a> · <a href="#partners-trust">Partenaires</a>',
     footerCopy: '© Fonds International d\'Investissement · Toutes les nations'
   };
 
