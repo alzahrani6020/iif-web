@@ -41,7 +41,7 @@
 
 ### المرحلة C — الصفحات الثانوية
 
-- [ ] **C1** `privacy.html` و `about-institution.html`: نفس `design-system.css` + `public-shell.css` لتطابق المظهر.
+- [x] **C1** (جزئي) `privacy.html` و `about-institution.html`: ربط `design-system.css`؛ `public-shell.css` لاحقاً عند إنشائه.
 - [ ] **C2** مراجعة روابط التذييل/الهيدر بعد أي تغيير هيكل.
 
 ### المرحلة D — لوحة التحكم (لاحقاً)
