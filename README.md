@@ -12,6 +12,8 @@
 
 **للمبتدئين — رفع المشروع إلى GitHub ثم Netlify (بدون مصطلحات معقدة):** [دليل-المبتدئ-النشر.md](./دليل-المبتدئ-النشر.md)
 
+**قبل إصدار أو رابط رسمي:** [docs/PRE-RELEASE-CHECKLIST.md](./docs/PRE-RELEASE-CHECKLIST.md) · **حماية الفرع `main`:** [docs/BRANCH-PROTECTION.md](./docs/BRANCH-PROTECTION.md)
+
 **المستودع على GitHub:** [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)
 
 **للمساعد الذكاء الاصطناعي (Cursor / غيره):** اقرأ [AGENTS.md](./AGENTS.md) ومجلد `.cursor/rules/`.

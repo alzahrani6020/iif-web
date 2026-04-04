@@ -132,3 +132,9 @@
   for = "/financial-consulting/government-search/*"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# أصول الواجهة (صور، خطوط ثابتة) — كاش أطول من HTML؛ راجع عند تغيير أسماء الملفات يدوياً
+[[headers]]
+  for = "/financial-consulting/iif-fund-demo/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

@@ -23,6 +23,7 @@
     "verify:stack": "npm run verify && npm run verify:searx",
     "qa:iif-fund": "node scripts/smoke-html-check.mjs",
     "e2e:dashboard": "node scripts/e2e-dashboard-playwright.mjs",
+    "report:index-size": "node scripts/report-index-size.mjs",
     "maintenance:audit": "node scripts/maintenance-full-audit.mjs",
     "maintenance:audit:server": "node scripts/maintenance-full-audit.mjs --with-server",
     "maintenance:audit:external": "node scripts/maintenance-full-audit.mjs --external",
