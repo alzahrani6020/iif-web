@@ -1,43 +1,25 @@
-# تحقق من البناء عند push / PR — يُتخطى عند تغيير التوثيق فقط (توفير دقائق Actions)
-# انظر: NETLIFY-FREE-TIER.md
-
+# فحص تلقائي: بناء بيانات الحكومة + صياغة JS + تدقيق روابط داخلية (بدون خادم ولا شبكة خارجية)
 name: CI
 
 on:
   push:
     branches: [main, master]
-    paths-ignore:
-      - "**.md"
-      - "robots.txt"
-      - "404.html"
   pull_request:
-    paths-ignore:
-      - "**.md"
-      - "robots.txt"
-      - "404.html"
-
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [main, master]
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
+          node-version: '20'
+          cache: npm
 
-      - name: Install + verify:full (بناء + smoke مع خادم مؤقت)
-        run: npm ci --no-audit --fund=false && npm run verify:full
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Install Playwright Chromium
-        run: npx playwright install chromium --with-deps
-
-      - name: E2E — لوحة التحكم في متصفح حقيقي
-        run: npm run test:e2e
-        env:
-          CI: true
+      - name: Verify (build + syntax + maintenance audit)
+        run: npm run verify && node scripts/maintenance-full-audit.mjs

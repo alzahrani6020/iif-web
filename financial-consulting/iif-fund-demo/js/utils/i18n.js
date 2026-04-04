@@ -358,7 +358,7 @@ export class I18nManager {
     document.documentElement.setAttribute('dir', this.isRTL() ? 'rtl' : 'ltr');
     
     // Update language selectors
-    const selectors = ['language-selector', 'footer-language-selector'];
+    const selectors = ['language-selector', 'footer-language-selector', 'iif-lang-picker'];
     selectors.forEach(id => {
       const selector = document.getElementById(id);
       if (selector) {

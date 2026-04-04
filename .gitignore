@@ -1,9 +1,16 @@
 node_modules/
+# بيئات بايثون محلية (مثلاً translator)
+.venv*/
+venv/
+__pycache__/
 .DS_Store
 *.log
 .env
 .env.local
 .netlify/
+
+# مخرجات تجهيز GitHub Pages (يُولَّد محلياً وفي CI)
+gh-pages-dist/
 
 # كاش SearXNG محلياً (يُبقى المجلد فقط)
 engines/searxng/data/*
@@ -11,6 +18,7 @@ engines/searxng/data/*
 # نسخة مرجعية من الإعداد الافتراضي (لتوليد جدول المحركات)
 !engines/searxng/data/upstream-settings-default.yml
 
-# Playwright
-playwright-report/
+# محلي / أدوات — لا تُرفع
+.minimax/
 test-results/
+playwright-report/

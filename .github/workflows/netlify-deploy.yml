@@ -3,15 +3,14 @@
 #   NETLIFY_AUTH_TOKEN  ← Netlify → User settings → Applications → Personal access tokens
 #   NETLIFY_SITE_ID     ← Site settings → Site details → Site ID
 #
-# التشغيل: يدوياً من Actions → Deploy Netlify، أو تلقائياً مع كل push إلى main
+# التشغيل: يدوياً فقط من Actions → Deploy Netlify (عطّلنا push التلقائي لتوفير الدقائق وتجنب الحدود).
 # إذا لم تُعرّف الأسرار: يُعرض إشعار ويُتخطى النشر بدون فشل.
+# النشر الافتراضي للواجهات الثابتة: workflow «Deploy GitHub Pages».
 
 name: Deploy Netlify
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 concurrency:
   group: netlify-deploy-${{ github.ref }}

@@ -19,6 +19,9 @@ export class UIComponents {
       // Setup event listeners
       this.setupEventListeners();
 
+      // Local-only helpers
+      this.setupLocalOnlyLinks();
+
       // Initialize language
       this.updateLanguage();
 
@@ -40,13 +43,28 @@ export class UIComponents {
     }
   }
 
+  setupLocalOnlyLinks() {
+    try {
+      const host = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname) : '';
+      const isLocal = host === 'localhost' || host === '127.0.0.1';
+      const localOnly = document.querySelectorAll('[data-local-only="1"]');
+      localOnly.forEach((el) => {
+        el.style.display = isLocal ? 'inline-flex' : 'none';
+      });
+    } catch (e) {
+      // ignore
+    }
+  }
+
   async loadHeader() {
     try {
-      const response = await fetch('components/header.html');
+      const bust = 'v=' + Date.now();
+      const response = await fetch('components/header.html?' + bust, { cache: 'no-store' });
       const html = await response.text();
       const headerElement = document.getElementById('site-header');
       if (headerElement) {
         headerElement.innerHTML = html;
+        this.setupLocalOnlyLinks();
         console.log('✅ Header loaded successfully');
       }
     } catch (error) {
@@ -56,7 +74,8 @@ export class UIComponents {
 
   async loadNavigation() {
     try {
-      const response = await fetch('components/navigation.html');
+      const bust = 'v=' + Date.now();
+      const response = await fetch('components/navigation.html?' + bust, { cache: 'no-store' });
       const html = await response.text();
       const navElement = document.getElementById('site-nav');
       if (navElement) {
@@ -70,7 +89,8 @@ export class UIComponents {
 
   async loadHero() {
     try {
-      const response = await fetch('components/hero.html');
+      const bust = 'v=' + Date.now();
+      const response = await fetch('components/hero.html?' + bust, { cache: 'no-store' });
       const html = await response.text();
       const heroElement = document.getElementById('hero');
       if (heroElement) {
@@ -84,7 +104,8 @@ export class UIComponents {
 
   async loadFooter() {
     try {
-      const response = await fetch('components/footer.html');
+      const bust = 'v=' + Date.now();
+      const response = await fetch('components/footer.html?' + bust, { cache: 'no-store' });
       const html = await response.text();
       const footerElement = document.getElementById('site-footer');
       if (footerElement) {
@@ -154,7 +175,7 @@ export class UIComponents {
   setupEventListeners() {
     // Language selector
     document.addEventListener('change', (e) => {
-      if (e.target.id === 'language-selector' || e.target.id === 'footer-language-selector') {
+      if (e.target.id === 'language-selector' || e.target.id === 'footer-language-selector' || e.target.id === 'iif-lang-picker') {
         this.handleLanguageChange(e.target.value);
       }
     });
@@ -240,6 +261,29 @@ export class UIComponents {
           this.showErrorNotification(error.message || 'Search failed. Please try again.');
         });
     }
+  }
+
+  handleLanguageChange(language) {
+    const lang = (language || 'en').toString().trim().toLowerCase();
+
+    // Update language attribute
+    document.documentElement.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+
+    // Update direction
+    const isRTL = typeof this.i18n.isRTL === 'function' ? this.i18n.isRTL(lang) : (lang === 'ar');
+    document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+
+    // Save preference
+    try { localStorage.setItem('iif-language', lang); } catch (e) {}
+
+    // Emit event for App/app.js listener
+    document.dispatchEvent(new CustomEvent('languagechange', {
+      detail: { language: lang }
+    }));
+
+    // Update UI now
+    this.updateLanguage();
   }
 
   showSuccessNotification(message) {

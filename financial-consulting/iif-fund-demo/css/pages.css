@@ -12,6 +12,54 @@
   text-align: center;
 }
 
+/* Dashboard local system status (dev endpoints: /healthz & /diagnostics.json) */
+.dashboard__statusbar {
+  margin: 0 auto var(--space-6);
+  padding: 0.55rem 0.85rem;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.dashboard-statusbar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-statusbar__muted {
+  opacity: 0.9;
+}
+
+.dashboard-statusbar__sep {
+  opacity: 0.7;
+}
+
+.dashboard-statusbar__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.7);
+}
+
+.dashboard-statusbar__dot.is-ok {
+  background: rgba(16, 185, 129, 0.95);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.dashboard-statusbar__dot.is-fail {
+  background: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
 .dashboard__title {
   font-size: var(--font-size-3xl);
   font-weight: 700;

@@ -27,6 +27,9 @@ export class DashboardManager {
       
       // Render dashboard
       this.renderDashboard();
+
+      // Render local system status (dev endpoints) without blocking UI
+      this.renderSystemStatus();
       
       console.log('✅ Dashboard Manager initialized successfully!');
       
@@ -180,6 +183,51 @@ export class DashboardManager {
     
     // Render market ticker
     this.renderMarketTicker();
+  }
+
+  async renderSystemStatus() {
+    const el = document.getElementById('dashboard-statusbar');
+    if (!el) return;
+
+    try {
+      const res = await fetch('/healthz', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      const searxOk = Boolean(data?.searx?.ok);
+      const latency = data?.searx?.latencyMs;
+      const diagSize = data?.diagnostics?.size;
+
+      const dotClass = searxOk ? 'is-ok' : 'is-fail';
+      const dotLabel = searxOk ? 'OK' : 'FAIL';
+      const latencyText = typeof latency === 'number' ? `${latency}ms` : 'N/A';
+      const diagText = typeof diagSize === 'number' ? String(diagSize) : 'N/A';
+
+      el.innerHTML = `
+        <span class="dashboard-statusbar__item">
+          <span class="dashboard-statusbar__dot ${dotClass}" aria-hidden="true"></span>
+          <span class="lang-en">SearXNG:</span><span class="lang-ar">SearXNG:</span>
+          <strong>${dotLabel}</strong>
+          <span class="dashboard-statusbar__muted">(${latencyText})</span>
+        </span>
+        <span class="dashboard-statusbar__sep" aria-hidden="true">•</span>
+        <span class="dashboard-statusbar__item">
+          <span class="lang-en" title="Dev-server diagnostic events (proxy/rate-limit); 0 is normal until something is logged">Diag events:</span>
+          <span class="lang-ar" title="أحداث تشخيص خادم التطوير؛ 0 طبيعي إذا لم يُسجّل شيء">سجلات تشخيص:</span>
+          <strong>${diagText}</strong>
+        </span>
+      `;
+    } catch (e) {
+      // لا نوقف لوحة التحكم بسبب فشل استدعاء الصحة.
+      el.innerHTML = `
+        <span class="lang-en">System status: unavailable — local dev only (<code>/healthz</code>).
+          <a href="/healthz" target="_blank" rel="noopener">Open JSON</a> · <a href="/health.html">Health page</a>
+        </span>
+        <span class="lang-ar">حالة النظام غير متاحة — مع <code>npm start</code> فقط.
+          <a href="/healthz" target="_blank" rel="noopener">فتح JSON</a> · <a href="/health.html">صفحة الصحة</a>
+        </span>
+      `;
+    }
   }
 
   updateStats() {

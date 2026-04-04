@@ -24,6 +24,7 @@ docker compose down && docker compose up -d
 ```
 
 4. راجع أيضاً `limiter` و`base_url` وHTTPS في [وثائق SearXNG](https://docs.searxng.org/).
+5. لنشر VPS جاهز (Docker + Caddy): [deploy/README-VPS.md](./deploy/README-VPS.md).
 
 ---
 

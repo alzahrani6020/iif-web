@@ -11,7 +11,10 @@ if errorlevel 1 (
 )
 
 echo [1/3] محرك SearXNG + Tor ^(Docker^)...
-if exist "%ROOT%engines\searxng\docker-compose.yml" (
+call :iif_ensure_docker
+if errorlevel 1 (
+  echo تنبيه: Docker لم يستجب — شغّل Docker Desktop ثم أعد تشغيل هذا الملف.
+) else if exist "%ROOT%engines\searxng\docker-compose.yml" (
   pushd "%ROOT%engines\searxng"
   docker compose up -d
   if errorlevel 1 (
@@ -23,6 +26,28 @@ if exist "%ROOT%engines\searxng\docker-compose.yml" (
 ) else (
   echo لم يُعثر على engines\searxng\docker-compose.yml
 )
+goto iif_after_compose
+
+:iif_ensure_docker
+docker info >nul 2>nul
+if not errorlevel 1 exit /b 0
+echo Docker غير جاهز — تشغيل Docker Desktop...
+if exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" (
+  start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+) else if exist "%LocalAppData%\Docker\Docker Desktop.exe" (
+  start "" "%LocalAppData%\Docker\Docker Desktop.exe"
+)
+echo انتظر حتى يصبح Docker جاهزاً...
+set /a _t=0
+:iif_waitdd
+docker info >nul 2>nul
+if not errorlevel 1 exit /b 0
+set /a _t+=1
+if %_t% geq 24 exit /b 1
+timeout /t 5 /nobreak >nul
+goto iif_waitdd
+
+:iif_after_compose
 
 echo [2/3] خادم التطوير على المنفذ 3333...
 where pnpm >nul 2>nul

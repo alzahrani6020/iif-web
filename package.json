@@ -14,22 +14,29 @@
     "expand:gov-un195": "node financial-consulting/government-search/expand-government-data-to-un195.mjs",
     "fix:worldbank-urls": "node financial-consulting/government-search/fix-worldbank-country-urls.mjs",
     "build": "npm run build:gov-data",
-    "build:admin-standalone": "node scripts/build-admin-standalone.mjs",
+    "build:github-pages": "npm run build && node scripts/prepare-github-pages-site.mjs",
     "validate": "npm run build",
-    "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js && node --check scripts/smoke-with-server.mjs && node --check scripts/build-admin-standalone.mjs",
-    "health": "npm run check-urls && npm run smoke:html",
+    "verify": "npm run build && node --check scripts/dev-server.js && node --check scripts/check-urls.js && node --check scripts/smoke-with-server.mjs && node --check scripts/maintenance-full-audit.mjs && node --check scripts/lib/dotenv-load.mjs && node --check scripts/minimax-ask.mjs && node --check scripts/minimax-env-status.mjs",
+    "verify:local": "npm run verify && node scripts/maintenance-full-audit.mjs",
+    "health": "npm run maintenance:audit && npm run check-urls && npm run smoke:html",
     "verify:searx": "node scripts/verify-searx.js",
     "verify:stack": "npm run verify && npm run verify:searx",
     "qa:iif-fund": "node scripts/smoke-html-check.mjs",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "e2e:dashboard": "node scripts/e2e-dashboard-playwright.mjs",
+    "maintenance:audit": "node scripts/maintenance-full-audit.mjs",
+    "maintenance:audit:server": "node scripts/maintenance-full-audit.mjs --with-server",
+    "maintenance:audit:external": "node scripts/maintenance-full-audit.mjs --external",
+    "maintenance:full": "npm run verify && node scripts/maintenance-full-audit.mjs && node scripts/smoke-with-server.mjs",
+    "maintenance:full:live": "npm run verify && node scripts/maintenance-full-audit.mjs --with-server",
+    "minimax:ask": "node scripts/minimax-ask.mjs",
+    "minimax:status": "node scripts/minimax-env-status.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
     "i18n-iso-countries": "^7.14.0",
+    "playwright": "^1.50.0",
     "world-countries": "^5.1.0"
   }
 }

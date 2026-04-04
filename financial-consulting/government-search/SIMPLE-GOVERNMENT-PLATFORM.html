@@ -1230,13 +1230,24 @@
             const title = r.title || r.url || '';
             const url = r.url || '#';
             const content = r.content || '';
-            const engine = (r.engine || r.parsed_url || 'web').toString();
+            const engine = (r.engine || 'web').toString();
+            let host = '';
+            try {
+                host = (new URL(url)).hostname || '';
+            } catch (e) {
+                host = '';
+            }
             return `
                 <div class="result-card web-result-card">
                     <div class="engine-badge">${escapeHtml(engine)}</div>
                     <div class="result-info">
                         <h3><a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
                         <p style="font-size:0.95rem;color:#555;">${escapeHtml(content)}</p>
+                        <p style="margin-top:0.5rem;font-size:0.85rem;color:#64748b;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                          <span><strong>المصدر:</strong> ${escapeHtml(host || 'غير معروف')}</span>
+                          <span style="opacity:.85;">—</span>
+                          <a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" style="color:#2563eb;word-break:break-all;">${escapeHtml(url)}</a>
+                        </p>
                     </div>
                 </div>`;
         }

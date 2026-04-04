@@ -1,5 +1,42 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/fund",
+      "destination": "/financial-consulting/iif-fund-demo/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/gov",
+      "destination": "/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html",
+      "permanent": false
+    },
+    {
+      "source": "/admin",
+      "destination": "/financial-consulting/iif-fund-demo/admin.html",
+      "permanent": false
+    },
+    {
+      "source": "/panel",
+      "destination": "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1",
+      "permanent": false
+    },
+    {
+      "source": "/cp",
+      "destination": "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1",
+      "permanent": false
+    },
+    {
+      "source": "/fund-admin",
+      "destination": "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/index.html",

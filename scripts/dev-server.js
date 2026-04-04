@@ -6,6 +6,7 @@
 'use strict';
 
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
@@ -14,6 +15,10 @@ const PORT = Number(process.env.PORT) || 3333;
 const ROOT = path.join(__dirname, '..');
 /** upstream SearXNG (Docker) */
 const SEARX_UPSTREAM = new URL(process.env.SEARXNG_URL || 'http://127.0.0.1:18080');
+/** upstream Ollama (local) */
+const OLLAMA_UPSTREAM = new URL(process.env.OLLAMA_URL || 'http://127.0.0.1:11434');
+/** upstream Translator (local, NLLB-200) */
+const TRANSLATE_UPSTREAM = new URL(process.env.IIF_TRANSLATE_URL || 'http://127.0.0.1:7071');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -36,6 +41,107 @@ function send(res, status, body, headers = {}) {
   res.end(body);
 }
 
+function sendJson(res, status, obj, headers = {}) {
+  send(res, status, JSON.stringify(obj, null, 2), {
+    'Content-Type': 'application/json; charset=utf-8',
+    ...headers,
+  });
+}
+
+const DIAG_MAX = Number(process.env.IIF_DIAG_MAX || 200);
+const DIAG = [];
+function diagPush(event) {
+  try {
+    const item = { ts: new Date().toISOString(), ...event };
+    DIAG.unshift(item);
+    if (DIAG.length > DIAG_MAX) DIAG.length = DIAG_MAX;
+  } catch (e) { }
+}
+
+/** دخول أدمن بدون كلمة مرور — معطّل عند NODE_ENV=production إلا إذا IIF_ALLOW_ADMIN_DIRECT=1 */
+function allowDevAdminDirect() {
+  if (String(process.env.IIF_ALLOW_ADMIN_DIRECT || '').trim() === '1') return true;
+  return process.env.NODE_ENV !== 'production';
+}
+
+function getClientIp(req) {
+  const xf = String(req.headers['x-forwarded-for'] || '').trim();
+  if (xf) return xf.split(',')[0].trim();
+  const ra = (req.socket && req.socket.remoteAddress) ? String(req.socket.remoteAddress) : '';
+  return ra || 'unknown';
+}
+
+function createRateLimiter({ windowMs, max, label }) {
+  const hits = new Map();
+  let lastCleanup = Date.now();
+  function cleanup(now) {
+    if (now - lastCleanup < Math.min(windowMs, 30000)) return;
+    lastCleanup = now;
+    for (const [k, v] of hits.entries()) {
+      if (now - v.ts > windowMs) hits.delete(k);
+    }
+  }
+  function check(req, res, label) {
+    const now = Date.now();
+    cleanup(now);
+    const ip = getClientIp(req);
+    const key = `${label}:${ip}`;
+    const v = hits.get(key);
+    if (!v || now - v.ts > windowMs) {
+      hits.set(key, { ts: now, n: 1 });
+      return true;
+    }
+    v.n += 1;
+    if (v.n > max) {
+      diagPush({ type: 'rate_limit', label, ip, path: req.url, method: req.method, max, windowMs });
+      send(res, 429, 'تم تجاوز حد الطلبات. انتظر قليلاً ثم أعد المحاولة.', {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': String(Math.ceil(windowMs / 1000)),
+      });
+      return false;
+    }
+    return true;
+  }
+  function snapshot(label) {
+    const now = Date.now();
+    cleanup(now);
+    let keys = 0;
+    let total = 0;
+    for (const [k, v] of hits.entries()) {
+      if (!k.startsWith(label + ':')) continue;
+      keys += 1;
+      total += v.n;
+    }
+    return { windowMs, max, trackedKeys: keys, totalHits: total };
+  }
+  return { check, snapshot };
+}
+
+const RL_SEARX = createRateLimiter({
+  windowMs: Number(process.env.IIF_RL_WINDOW_MS || 60000),
+  max: Number(process.env.IIF_RL_SEARX_MAX || 120),
+  label: 'searx',
+});
+const RL_FETCH = createRateLimiter({
+  windowMs: Number(process.env.IIF_RL_WINDOW_MS || 60000),
+  max: Number(process.env.IIF_RL_FETCH_MAX || 60),
+  label: 'fetch',
+});
+const RL_TRANSLATE = createRateLimiter({
+  windowMs: Number(process.env.IIF_RL_WINDOW_MS || 60000),
+  max: Number(process.env.IIF_RL_TRANSLATE_MAX || 120),
+  label: 'translate',
+});
+
+function parseSearxSafeSearchMode() {
+  const raw = String(process.env.IIF_SEARX_SAFESEARCH || '').trim().toLowerCase();
+  if (!raw) return null;
+  if (raw === 'off' || raw === '0' || raw === 'false') return '0';
+  if (raw === 'moderate' || raw === '1' || raw === 'true') return '1';
+  if (raw === 'strict' || raw === '2') return '2';
+  return null;
+}
+
 function safeJoin(base, reqPath) {
   const decoded = decodeURIComponent(reqPath.split('?')[0]);
   const target = path.normalize(path.join(base, decoded));
@@ -46,7 +152,11 @@ function safeJoin(base, reqPath) {
 function proxySearx(req, res) {
   const u = new URL(req.url, 'http://127.0.0.1');
   const subPath = u.pathname.replace(/^\/api\/searx/, '') || '/';
-  const targetPath = subPath + u.search;
+  const forceSafe = parseSearxSafeSearchMode();
+  if (forceSafe !== null && !u.searchParams.has('safesearch')) {
+    u.searchParams.set('safesearch', forceSafe);
+  }
+  const targetPath = subPath + (u.searchParams.toString() ? ('?' + u.searchParams.toString()) : '');
   const port = Number(SEARX_UPSTREAM.port) || 18080;
   const headers = {};
   for (const k of Object.keys(req.headers)) {
@@ -73,17 +183,19 @@ function proxySearx(req, res) {
   preq.on('timeout', () => {
     preq.destroy();
     if (!res.headersSent) {
+      diagPush({ type: 'proxy_timeout', label: 'searx', path: req.url });
       send(res, 504, 'انتهت مهلة الاتصال بـ SearXNG', { 'Content-Type': 'text/plain; charset=utf-8' });
     }
   });
   preq.on('error', (e) => {
     if (!res.headersSent) {
+      diagPush({ type: 'proxy_error', label: 'searx', path: req.url, error: e.message });
       send(
         res,
         502,
         'SearXNG غير متاح: ' +
-          e.message +
-          '\n\nشغّل المحرك من: engines/searxng\n  docker compose up -d\n',
+        e.message +
+        '\n\nشغّل المحرك من: engines/searxng\n  docker compose up -d\n',
         { 'Content-Type': 'text/plain; charset=utf-8' }
       );
     }
@@ -91,62 +203,276 @@ function proxySearx(req, res) {
   req.pipe(preq);
 }
 
-/** طلبات من المتصفح المحلي فقط (لا يؤثر على نشر ثابت بدون هذا الخادم) */
-function isLocalDevHost(req) {
-  const h = String(req.headers.host || '').toLowerCase();
-  return (
-    h.startsWith('127.0.0.1:') ||
-    h.startsWith('localhost:') ||
-    h === '127.0.0.1' ||
-    h === 'localhost'
-  );
+function getFetchAllowlist() {
+  const defaults = [
+    'example.com',
+    'api.worldbank.org',
+    'data.worldbank.org',
+    'www.worldbank.org',
+    'restcountries.com',
+    'api.github.com',
+    'raw.githubusercontent.com',
+  ];
+  const extra = String(process.env.IIF_FETCH_ALLOWLIST || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return Array.from(new Set([...defaults, ...extra]));
 }
 
-/** هل المسار هو «صفحة الصندوق العامة» (الهيرو)؟ */
-function isFundIndexPath(pathname) {
-  const p = (pathname || '').replace(/\/$/, '') || '/';
-  if (p === '/financial-consulting/iif-fund-demo' || p === '/financial-consulting/iif-fund-demo/index.html') {
-    return true;
-  }
-  if (p === '/' || p === '/index.html') {
-    const primary = path.join(ROOT, 'financial-consulting', 'iif-fund-demo', 'index.html');
-    return fs.existsSync(primary);
+function isHostAllowed(hostname, allowlist) {
+  const h = String(hostname || '').trim().toLowerCase();
+  if (!h) return false;
+  for (const rule of allowlist) {
+    if (!rule) continue;
+    if (rule.startsWith('*.')) {
+      const suffix = rule.slice(2);
+      if (h === suffix || h.endsWith('.' + suffix)) return true;
+      continue;
+    }
+    if (rule.startsWith('.')) {
+      const suffix = rule.slice(1);
+      if (h === suffix || h.endsWith('.' + suffix)) return true;
+      continue;
+    }
+    if (h === rule) return true;
   }
   return false;
 }
 
-/** لا تعيد التوجيه إذا طُلب الموقع العام صراحةً أو وضع البوابة/اللوحة في الاستعلام */
-function skipFundToDashboardRedirect(searchParams) {
-  if (!searchParams) return false;
-  return (
-    searchParams.get('iif_public_site') === '1' ||
-    searchParams.get('iif_admin_portal') === '1' ||
-    searchParams.get('open_dashboard') === '1' ||
-    searchParams.get('iif_open_dashboard') === '1' ||
-    searchParams.get('local_dashboard') === '1' ||
-    searchParams.get('iif_local_dashboard') === '1'
+function proxyFetch(req, res) {
+  const u = new URL(req.url, 'http://127.0.0.1');
+  const raw = String(u.searchParams.get('url') || '').trim();
+  if (!raw) {
+    diagPush({ type: 'bad_request', label: 'fetch', path: req.url, error: 'Missing url' });
+    sendJson(res, 400, { ok: false, error: 'Missing url' }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+  let target;
+  try {
+    target = new URL(raw);
+  } catch (e) {
+    diagPush({ type: 'bad_request', label: 'fetch', path: req.url, error: 'Invalid url' });
+    sendJson(res, 400, { ok: false, error: 'Invalid url' }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+  if (target.protocol !== 'http:' && target.protocol !== 'https:') {
+    diagPush({ type: 'bad_request', label: 'fetch', path: req.url, error: 'Only http/https allowed' });
+    sendJson(res, 400, { ok: false, error: 'Only http/https allowed' }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+
+  const allowlist = getFetchAllowlist();
+  if (!isHostAllowed(target.hostname, allowlist)) {
+    diagPush({ type: 'blocked', label: 'fetch', host: target.hostname, url: raw });
+    sendJson(
+      res,
+      403,
+      { ok: false, error: 'Host not allowed', host: target.hostname, allowlist },
+      { 'Access-Control-Allow-Origin': '*' }
+    );
+    return;
+  }
+
+  const isHttps = target.protocol === 'https:';
+  const mod = isHttps ? https : http;
+  const port = Number(target.port) || (isHttps ? 443 : 80);
+
+  const headers = {
+    'User-Agent': 'iif-fund-demo-dev-server/1.0',
+    Accept: req.headers.accept || '*/*',
+  };
+
+  const preq = mod.request(
+    {
+      hostname: target.hostname,
+      port,
+      path: target.pathname + target.search,
+      method: 'GET',
+      headers,
+      timeout: Number(process.env.IIF_FETCH_TIMEOUT_MS || 20000),
+    },
+    (pres) => {
+      const ct = String(pres.headers['content-type'] || 'application/octet-stream');
+      const maxBytes = Number(process.env.IIF_FETCH_MAX_BYTES || 2_000_000);
+      let size = 0;
+      const chunks = [];
+      pres.on('data', (buf) => {
+        size += buf.length;
+        if (size > maxBytes) {
+          pres.destroy();
+          diagPush({ type: 'too_large', label: 'fetch', host: target.hostname, maxBytes });
+          sendJson(res, 413, { ok: false, error: 'Response too large', maxBytes }, { 'Access-Control-Allow-Origin': '*' });
+          return;
+        }
+        chunks.push(buf);
+      });
+      pres.on('end', () => {
+        if (res.headersSent) return;
+        const body = Buffer.concat(chunks);
+        res.writeHead(pres.statusCode || 200, {
+          'Content-Type': ct,
+          'Cache-Control': 'no-store',
+          'Access-Control-Allow-Origin': '*',
+          'X-IIF-Fetch-Host': target.hostname,
+        });
+        res.end(body);
+      });
+    }
   );
+
+  preq.on('timeout', () => {
+    preq.destroy();
+    if (!res.headersSent) {
+      diagPush({ type: 'proxy_timeout', label: 'fetch', host: target.hostname, url: raw });
+      sendJson(res, 504, { ok: false, error: 'Fetch timeout' }, { 'Access-Control-Allow-Origin': '*' });
+    }
+  });
+  preq.on('error', (e) => {
+    if (!res.headersSent) {
+      diagPush({ type: 'proxy_error', label: 'fetch', host: target.hostname, url: raw, error: e.message });
+      sendJson(res, 502, { ok: false, error: e.message }, { 'Access-Control-Allow-Origin': '*' });
+    }
+  });
+  preq.end();
+}
+
+function proxyOllama(req, res) {
+  const u = new URL(req.url, 'http://127.0.0.1');
+  const subPath = u.pathname.replace(/^\/api\/ollama/, '') || '/';
+  const targetPath = subPath + u.search;
+  const port = Number(OLLAMA_UPSTREAM.port) || 11434;
+  const headers = {};
+  for (const k of Object.keys(req.headers)) {
+    const lk = k.toLowerCase();
+    if (lk === 'host' || lk === 'connection') continue;
+    headers[k] = req.headers[k];
+  }
+  headers.host = `${OLLAMA_UPSTREAM.hostname}:${port}`;
+  const preq = http.request(
+    {
+      hostname: OLLAMA_UPSTREAM.hostname,
+      port,
+      path: targetPath,
+      method: req.method,
+      headers,
+      timeout: 120000,
+    },
+    (pres) => {
+      res.writeHead(pres.statusCode, pres.headers);
+      pres.pipe(res);
+    }
+  );
+  preq.on('timeout', () => {
+    preq.destroy();
+    if (!res.headersSent) {
+      send(res, 504, 'انتهت مهلة الاتصال بـ Ollama', { 'Content-Type': 'text/plain; charset=utf-8' });
+    }
+  });
+  preq.on('error', (e) => {
+    if (!res.headersSent) {
+      send(
+        res,
+        502,
+        'Ollama غير متاح: ' +
+        e.message +
+        '\n\nثبّت وشغّل Ollama محلياً ثم حمّل نموذجاً.\nمثال:\n  ollama pull llama3.1:8b\n',
+        { 'Content-Type': 'text/plain; charset=utf-8' }
+      );
+    }
+  });
+  req.pipe(preq);
+}
+
+function proxyTranslate(req, res) {
+  const u = new URL(req.url, 'http://127.0.0.1');
+  if (req.method !== 'POST') {
+    sendJson(res, 405, { ok: false, error: 'Method Not Allowed' }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+  const port = Number(TRANSLATE_UPSTREAM.port) || 7071;
+  const timeoutMs = Number(process.env.IIF_TRANSLATE_TIMEOUT_MS || 180000);
+  const headers = {
+    'Content-Type': req.headers['content-type'] || 'application/json',
+    Accept: req.headers.accept || 'application/json',
+    host: `${TRANSLATE_UPSTREAM.hostname}:${port}`,
+  };
+  const preq = http.request(
+    {
+      hostname: TRANSLATE_UPSTREAM.hostname,
+      port,
+      path: '/translate',
+      method: 'POST',
+      headers,
+      timeout: timeoutMs,
+    },
+    (pres) => {
+      res.writeHead(pres.statusCode, {
+        ...pres.headers,
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-store',
+      });
+      pres.pipe(res);
+    }
+  );
+  preq.setTimeout(timeoutMs);
+  preq.on('timeout', () => {
+    preq.destroy();
+    if (!res.headersSent) {
+      diagPush({ type: 'proxy_timeout', label: 'translate', path: req.url });
+      sendJson(res, 504, { ok: false, error: 'Translate timeout' }, { 'Access-Control-Allow-Origin': '*' });
+    }
+  });
+  preq.on('error', (e) => {
+    if (!res.headersSent) {
+      diagPush({ type: 'proxy_error', label: 'translate', path: req.url, error: e.message });
+      sendJson(
+        res,
+        502,
+        {
+          ok: false,
+          error: 'Translator not available: ' + e.message,
+          hint: 'Run START-IIF-TRANSLATOR.bat (local NLLB-200 service) then retry.',
+        },
+        { 'Access-Control-Allow-Origin': '*' }
+      );
+    }
+  });
+  req.pipe(preq);
+}
+
+function searxProbe() {
+  const start = Date.now();
+  return new Promise((resolve) => {
+    const port = Number(SEARX_UPSTREAM.port) || 18080;
+    const req = http.request(
+      {
+        hostname: SEARX_UPSTREAM.hostname,
+        port,
+        path: '/',
+        method: 'GET',
+        timeout: 2500,
+      },
+      (res) => {
+        res.resume();
+        resolve({ ok: res.statusCode === 200, status: res.statusCode, latencyMs: Date.now() - start });
+      }
+    );
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({ ok: false, status: 0, latencyMs: Date.now() - start, error: 'timeout' });
+    });
+    req.on('error', (e) => {
+      resolve({ ok: false, status: 0, latencyMs: Date.now() - start, error: e.message });
+    });
+    req.end();
+  });
 }
 
 function serveStatic(req, res) {
-  const reqUrl = new URL(req.url, 'http://127.0.0.1');
-  let urlPath = reqUrl.pathname;
-  /**
-   * محلي فقط: فتح صفحة الصندوق الافتراضية (/) أو …/iif-fund-demo/index → دخول اللوحة بدون الهيرو.
-   * الموقع العام الكامل: أضف ?iif_public_site=1
-   * تعطيل: IIF_DASHBOARD_FIRST=0 npm start
-   */
-  if (
-    process.env.IIF_DASHBOARD_FIRST !== '0' &&
-    isLocalDevHost(req) &&
-    isFundIndexPath(urlPath) &&
-    !skipFundToDashboardRedirect(reqUrl.searchParams)
-  ) {
-    res.writeHead(302, {
-      Location: '/financial-consulting/iif-fund-demo/dashboard-entry.html',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
+  let urlPath = new URL(req.url, 'http://localhost').pathname;
+  if (urlPath.startsWith('/api/ollama/')) {
+    proxyOllama(req, res);
     return;
   }
   /**
@@ -154,18 +480,24 @@ function serveStatic(req, res) {
    * لتفادي: iframe + تكرار تسجيل الدخول + صفحات فارغة.
    */
   if (urlPath === '/admin') {
+    if (!allowDevAdminDirect()) {
+      send(res, 404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
+      return;
+    }
     const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لوحة الإدارة</title>
 <script>location.replace('/admin-direct');</script></head><body><a href="/admin-direct">متابعة إلى لوحة الإدارة</a></body></html>`;
     send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
-  /** دخول مباشر محلي (تطوير فقط): يضبط جلسة المالك ثم يفتح /admin */
+  /** دخول مباشر محلي (تطوير فقط): يضبط جلسة المالك ثم يمرّر إلى /dashboard (نفس مسار لوحة التحكم المعتمد) */
   if (urlPath === '/admin-direct') {
+    if (!allowDevAdminDirect()) {
+      send(res, 404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
+      return;
+    }
     const ownerEmail = String(process.env.IIF_OWNER_EMAIL || 'talalkenani@gmail.com').trim().toLowerCase();
-    const adminUrl =
-      'http://127.0.0.1:' +
-      PORT +
-      '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1';
+    /** نفس سلوك [[redirects]] /dashboard في netlify.toml — رابط قصير مخصّص للوحة فقط */
+    const adminUrl = '/dashboard';
     const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>دخول الإدارة (محلي)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
@@ -191,8 +523,12 @@ function serveStatic(req, res) {
     send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
-  /** اختصار محلي: يحوّل إلى index مع #dashboard (يفتح الدخول أو اللوحة حسب الجلسة) */
-  if (urlPath === '/dashboard' || urlPath === '/cp') {
+  /**
+   * لوحة التحكم — رابط منفصل عن الرئيسية:
+   *   /dashboard | /cp | /panel → index.html?iif_admin_portal=1&open_dashboard=1
+   * الرئيسية: / أو /financial-consulting/iif-fund-demo/index.html بدون تلك المعاملات
+   */
+  if (urlPath === '/dashboard' || urlPath === '/cp' || urlPath === '/panel' || urlPath === '/fund-admin') {
     /* بدون # في العنوان — يُفتح من الاستعلام + sessionStorage (تفادي سقوط الهاش من PowerShell/اختصارات) */
     const dashPath =
       '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1';
@@ -202,55 +538,15 @@ function serveStatic(req, res) {
     send(res, 200, html, { 'Content-Type': 'text/html; charset=utf-8' });
     return;
   }
-  /** مطابقة netlify.toml — نفس المسارات على الإنتاج والتطوير */
-  if (urlPath === '/fund') {
-    res.writeHead(302, {
-      Location: '/financial-consulting/iif-fund-demo/dashboard-entry.html',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
-    return;
-  }
-  if (urlPath === '/fund-admin') {
-    res.writeHead(302, {
-      Location:
-        '/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
-    return;
-  }
-  if (urlPath === '/gov') {
-    res.writeHead(302, {
-      Location: '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
-    return;
-  }
-  /** صفحة دخول للوحة فقط (بدون عرض الصفحة الرئيسية في النافذة الأمامية) */
-  if (urlPath === '/dashboard-entry') {
-    res.writeHead(302, {
-      Location: '/financial-consulting/iif-fund-demo/dashboard-entry.html',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
-    return;
-  }
-  if (urlPath === '/admin-standalone') {
-    res.writeHead(302, {
-      Location: '/financial-consulting/iif-fund-demo/admin-standalone.html',
-      'Cache-Control': 'no-store',
-    });
-    res.end();
-    return;
-  }
   /** مجلدات: /legal/ → /legal/index.html (مثل Netlify) */
   if (urlPath !== '/' && urlPath.endsWith('/')) {
     urlPath = urlPath.slice(0, -1) + '/index.html';
   }
   /** اختصارات مثل netlify.toml — للتطوير المحلي */
   const shortPaths = {
+    '/fund': '/financial-consulting/iif-fund-demo/index.html',
+    '/gov': '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
+    '/admin': '/financial-consulting/iif-fund-demo/admin.html',
     '/privacy': '/legal/privacy.html',
     '/disclaimer': '/legal/disclaimer.html',
     '/contact': '/legal/contact.html',
@@ -263,6 +559,7 @@ function serveStatic(req, res) {
   if (shortPaths[urlPath]) {
     urlPath = shortPaths[urlPath];
   }
+  /** الصفحة الرئيسية للموقع (الزوار والأعضاء والمستخدمون): نفس الملف بدون معاملات لوحة — لوحة التحكم من /dashboard فقط */
   if (urlPath === '/' || urlPath === '/index.html') {
     const primary = path.join(ROOT, 'financial-consulting', 'iif-fund-demo', 'index.html');
     urlPath = fs.existsSync(primary)
@@ -323,7 +620,38 @@ const server = http.createServer((req, res) => {
       Allow: 'GET, HEAD, OPTIONS',
       'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
       'Access-Control-Allow-Headers': req.headers['access-control-request-headers'] || '*',
+      'Access-Control-Allow-Origin': '*',
     });
+    return;
+  }
+  if (urlPath === '/healthz') {
+    (async () => {
+      const searx = await searxProbe();
+      const safe = parseSearxSafeSearchMode();
+      sendJson(res, 200, {
+        ok: true,
+        now: new Date().toISOString(),
+        port: PORT,
+        searx: { ...searx, upstream: SEARX_UPSTREAM.origin, safeSearchForced: safe !== null ? safe : null },
+        rateLimit: {
+          searx: RL_SEARX.snapshot('searx'),
+          fetch: RL_FETCH.snapshot('fetch'),
+        },
+        fetchAllowlist: getFetchAllowlist(),
+        diagnostics: { max: DIAG_MAX, size: DIAG.length },
+      }, { 'Access-Control-Allow-Origin': '*' });
+    })().catch((e) => {
+      sendJson(res, 500, { ok: false, error: e.message }, { 'Access-Control-Allow-Origin': '*' });
+    });
+    return;
+  }
+  if (urlPath === '/diagnostics.json') {
+    sendJson(res, 200, { ok: true, now: new Date().toISOString(), items: DIAG }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+  if (urlPath === '/api/translate') {
+    if (!RL_TRANSLATE.check(req, res, 'translate')) return;
+    proxyTranslate(req, res);
     return;
   }
   if (urlPath.startsWith('/api/searx')) {
@@ -331,7 +659,17 @@ const server = http.createServer((req, res) => {
       send(res, 405, 'Method Not Allowed', { 'Content-Type': 'text/plain; charset=utf-8' });
       return;
     }
+    if (!RL_SEARX.check(req, res, 'searx')) return;
     proxySearx(req, res);
+    return;
+  }
+  if (urlPath === '/api/fetch') {
+    if (method !== 'GET' && method !== 'HEAD') {
+      sendJson(res, 405, { ok: false, error: 'Method Not Allowed' }, { 'Access-Control-Allow-Origin': '*' });
+      return;
+    }
+    if (!RL_FETCH.check(req, res, 'fetch')) return;
+    proxyFetch(req, res);
     return;
   }
   /**
@@ -343,21 +681,21 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  الواجهة الافتراضية (محلي): / و/fund و…/iif-fund-demo/index → دخول اللوحة dashboard-entry (بدون هيرو)');
-  console.log('  الموقع العام (الهيرو): أضف ?iif_public_site=1 مثال: http://127.0.0.1:' + PORT + '/?iif_public_site=1');
-  console.log('  تعطيل إعادة التوجيه: IIF_DASHBOARD_FIRST=0 npm start');
+  console.log('  الواجهة: http://127.0.0.1:' + PORT + '/');
   console.log('  موجز للمستويات الرفيعة: /executive-brief.html أو /executive');
   console.log('  معايير سيادية: /sovereign-standards.html أو /sovereign');
   console.log('  المنصة: …/government-search/SIMPLE-GOVERNMENT-PLATFORM.html');
   console.log('  بروكسي SearXNG: /api/searx/*  →  ' + SEARX_UPSTREAM.origin + '/*');
+  console.log('  صحة النظام (JSON): /healthz');
+  console.log('  تشخيص (JSON): /diagnostics.json');
+  console.log('  ترجمة (POST JSON): /api/translate  →  ' + TRANSLATE_UPSTREAM.origin + '/translate');
+  console.log('  Proxy fetch (Allowlist): /api/fetch?url=https://example.com/data.json');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');
-  console.log('  لوحة (اختصار): /dashboard أو /cp  →  واجهة الصندوق + open_dashboard=1');
-  console.log('  مثل Netlify: /fund  /gov  /fund-admin  →  إعادة توجيه 302');
-  console.log('  دخول اللوحة فقط (بدون هيرو في هذه النافذة): /dashboard-entry');
-  console.log('  لوحة مستقلة (بدون main-content): /admin-standalone → admin-standalone.html');
-  console.log('  أدمن مباشر (محلي): /admin-direct  →  دخول بدون كلمة مرور (تطوير فقط)');
-  console.log(
-    '  مساعدة لوحة التحكم (فحص بدون تعقيد): /financial-consulting/iif-fund-demo/HELP-DASHBOARD.html'
-  );
+  console.log('  لوحة (اختصار): /dashboard أو /cp أو /panel أو /fund-admin  →  واجهة الصندوق + open_dashboard=1');
+  if (allowDevAdminDirect()) {
+    console.log('  أدمن مباشر (محلي): /admin-direct  →  دخول بدون كلمة مرور (معطّل عند NODE_ENV=production ما لم يُضبط IIF_ALLOW_ADMIN_DIRECT=1)');
+  } else {
+    console.log('  أدمن مباشر: معطّل (NODE_ENV=production). للتفعيل: IIF_ALLOW_ADMIN_DIRECT=1');
+  }
   console.log('');
 });

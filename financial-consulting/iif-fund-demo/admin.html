@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr" data-lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>لوحة التحكم الإدارية</title>
+    <title data-i18n="metaSiteTitle">International Investment Fund · IIF · Paris</title>
     <meta name="robots" content="noindex,nofollow" />
+    <script src="i18n.js" defer></script>
     <style>
       html, body { height: 100%; margin: 0; background: #05070c; }
       .shell {
@@ -68,18 +69,19 @@
     <div class="shell">
       <div class="topbar">
         <div>
-          <div class="title">لوحة التحكم الإدارية</div>
-          <div class="hint">إذا لم تظهر اللوحة داخل الإطار، افتحها داخل نفس التبويب.</div>
+          <div class="title" data-i18n="adminShellTitle">Administration panel</div>
+          <div class="hint" data-i18n="adminShellHint">If the panel does not appear inside the frame, open it in the same tab.</div>
         </div>
         <div class="actions">
-          <button class="btn" id="open-same-tab" type="button">فتح داخل نفس التبويب</button>
-          <button class="btn secondary" id="reload-iframe" type="button">إعادة تحميل الإطار</button>
+          <button class="btn" id="open-same-tab" type="button" data-i18n="adminOpenSameTab">Open in same tab</button>
+          <button class="btn secondary" id="reload-iframe" type="button" data-i18n="adminReloadFrame">Reload frame</button>
         </div>
       </div>
       <iframe
         id="admin-frame"
         class="frame"
-        title="IIF Admin"
+        data-i18n-title="adminIframeTitle"
+        title="IIF administration"
         allow="clipboard-read; clipboard-write; camera"
         referrerpolicy="no-referrer"
         src="./index.html?iif_admin_portal=1&open_dashboard=1"
@@ -87,15 +89,35 @@
     </div>
     <div class="fallback" id="fallback">
       <div>
-        <p>إن لم تظهر لوحة الإدارة داخل الإطار، افتح الرابط مباشرة:</p>
-        <p><a href="./index.html?iif_admin_portal=1&open_dashboard=1">فتح لوحة الإدارة</a></p>
+        <p data-i18n="adminFallbackLead">If the administration panel does not appear in the frame, open the link directly:</p>
+        <p><a href="./index.html?iif_admin_portal=1&open_dashboard=1" data-i18n="adminFallbackLink">Open administration panel</a></p>
       </div>
     </div>
     <script>
-      // لا نغطي الـ iframe إلا إذا فشل تحميله (حتى لا "تتجمد" الأزرار داخل صفحة الدخول).
       const frame = document.getElementById('admin-frame');
       const fb = document.getElementById('fallback');
       let loaded = false;
+
+      function applyAdminShellLang() {
+        if (!window.IIF_I18N || typeof window.IIF_I18N.apply !== 'function') return;
+        var lang = '';
+        try { lang = (localStorage.getItem('iif-lang') || '').trim().toLowerCase(); } catch (e) { }
+        if (!lang || window.IIF_I18N.codes.indexOf(lang) < 0) lang = window.IIF_I18N.detect();
+        window.IIF_I18N.apply(lang);
+      }
+
+      window.addEventListener('message', function (ev) {
+        var d = ev && ev.data;
+        if (d && d.source === 'iif-site' && d.type === 'iif-lang-changed' && d.lang) {
+          applyAdminShellLang();
+        }
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyAdminShellLang);
+      } else {
+        applyAdminShellLang();
+      }
 
       if (frame) {
         frame.addEventListener('load', () => {

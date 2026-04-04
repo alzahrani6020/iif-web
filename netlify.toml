@@ -1,4 +1,4 @@
-# Netlify — نشر الموقع الثابت من جذر المستودع
+# Netlify — نشر الموقع الثابت من جذر المستودع (اختياري؛ عند تجاوز الحدود استخدم GitHub Pages).
 # في واجهة Netlify: اترك Build command و Publish فارغين إن أمكن (يُقرأ من هنا).
 # قائمة تحقق: NETLIFY-CHECKLIST.md
 # صفحة 404: ضع ملف 404.html في الجذر — Netlify يخدمه تلقائياً للمسارات غير الموجودة.
@@ -15,19 +15,37 @@
   NODE_ENV = "production"
   CI = "true"
 
-[[redirects]]
-  from = "/dashboard-entry"
-  to = "/financial-consulting/iif-fund-demo/dashboard-entry.html"
-  status = 302
+[functions]
+  directory = "netlify/functions"
 
 [[redirects]]
-  from = "/admin-standalone"
-  to = "/financial-consulting/iif-fund-demo/admin-standalone.html"
-  status = 302
+  from = "/healthz"
+  to = "/.netlify/functions/healthz"
+  status = 200
+
+[[redirects]]
+  from = "/api/fetch"
+  to = "/.netlify/functions/fetch"
+  status = 200
+
+[[redirects]]
+  from = "/api/translate"
+  to = "/.netlify/functions/translate"
+  status = 200
+
+[[redirects]]
+  from = "/api/searx/*"
+  to = "/.netlify/functions/searx/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/diagnostics.json"
+  to = "/.netlify/functions/diagnostics"
+  status = 200
 
 [[redirects]]
   from = "/fund"
-  to = "/financial-consulting/iif-fund-demo/dashboard-entry.html"
+  to = "/financial-consulting/iif-fund-demo/index.html"
   status = 302
 
 [[redirects]]
@@ -35,10 +53,19 @@
   to = "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
   status = 302
 
-# مسار التطوير المحلي فقط — على الإنتاج يوجّه لبوابة الدخول الرسمية (بدون حقن جلسة)
 [[redirects]]
-  from = "/admin-direct"
-  to = "/fund-admin"
+  from = "/panel"
+  to = "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
+  status = 302
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
+  status = 302
+
+[[redirects]]
+  from = "/cp"
+  to = "/financial-consulting/iif-fund-demo/index.html?iif_admin_portal=1&open_dashboard=1"
   status = 302
 
 [[redirects]]

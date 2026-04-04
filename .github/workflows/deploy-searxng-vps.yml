@@ -1,0 +1,79 @@
+# نشر مجلد engines/searxng إلى VPS عبر SSH + rsync ثم docker compose
+#
+# ليس لدى GitHub صلاحية على سيرفرك حتى تضيف الأسرار أنت.
+# أضف في Repository → Settings → Secrets and variables → Actions:
+#   SEARXNG_VPS_HOST           مثال: 203.0.113.10 أو نطاق
+#   SEARXNG_VPS_USER           مثال: ubuntu
+#   SEARXNG_VPS_SSH_PRIVATE_KEY  المفتاح الخاص كاملاً (-----BEGIN ... END-----)
+#   SEARXNG_PUBLIC_HOST        نفس SEARXNG_HOST في .env (بدون https، بدون مسار)
+#
+# اختياري:
+#   SEARXNG_VPS_REMOTE_DIR      افتراضي: searxng  (تحت ~ المستخدم)
+#   SEARXNG_VPS_SSH_PORT        افتراضي: 22
+
+name: Deploy SearXNG VPS
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: searxng-vps-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check VPS secrets
+        id: gate
+        env:
+          H: ${{ secrets.SEARXNG_VPS_HOST }}
+          U: ${{ secrets.SEARXNG_VPS_USER }}
+          K: ${{ secrets.SEARXNG_VPS_SSH_PRIVATE_KEY }}
+          D: ${{ secrets.SEARXNG_PUBLIC_HOST }}
+        run: |
+          if [ -n "$H" ] && [ -n "$U" ] && [ -n "$K" ] && [ -n "$D" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Secrets missing (SEARXNG_VPS_HOST, SEARXNG_VPS_USER, SEARXNG_VPS_SSH_PRIVATE_KEY, SEARXNG_PUBLIC_HOST). Skipping."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ok == 'true'
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        if: steps.gate.outputs.ok == 'true'
+        with:
+          ssh-private-key: ${{ secrets.SEARXNG_VPS_SSH_PRIVATE_KEY }}
+
+      - name: Rsync + compose up
+        if: steps.gate.outputs.ok == 'true'
+        env:
+          HOST: ${{ secrets.SEARXNG_VPS_HOST }}
+          USER: ${{ secrets.SEARXNG_VPS_USER }}
+          REMOTE_DIR: ${{ secrets.SEARXNG_VPS_REMOTE_DIR }}
+          PORT: ${{ secrets.SEARXNG_VPS_SSH_PORT }}
+          PUBLIC_HOST: ${{ secrets.SEARXNG_PUBLIC_HOST }}
+        run: |
+          set -euo pipefail
+          RDIR="${REMOTE_DIR:-searxng}"
+          P="${PORT:-22}"
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "$P" -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          RSYNC_SSH="ssh -p $P -o StrictHostKeyChecking=accept-new"
+          rsync -avz --delete \
+            -e "$RSYNC_SSH" \
+            --exclude '.git' \
+            --exclude 'data/' \
+            ./engines/searxng/ "${USER}@${HOST}:~/${RDIR}/"
+          ssh -p "$P" -o StrictHostKeyChecking=accept-new "${USER}@${HOST}" \
+            "export RDIR='${RDIR}'; export PUBLIC_HOST='${PUBLIC_HOST}'; bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+          mkdir -p "$HOME/$RDIR/data"
+          cd "$HOME/$RDIR/deploy"
+          printf 'SEARXNG_HOST=%s\n' "$PUBLIC_HOST" > .env
+          docker compose pull
+          docker compose up -d
+          docker compose ps
+          REMOTE_SCRIPT

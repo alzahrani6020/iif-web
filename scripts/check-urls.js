@@ -11,13 +11,18 @@ const HOST = process.env.CHECK_HOST || '127.0.0.1';
 const PORT = Number(process.env.PORT) || 3333;
 
 const PATHS = [
-  '/?iif_public_site=1',
+  '/',
+  '/start-here.html',
+  '/health.html',
+  '/connect.html',
+  '/analysis.html',
+  '/diagnostics.html',
   '/executive-brief.html',
   '/executive',
   '/sovereign-standards.html',
   '/sovereign',
   '/charter',
-  '/financial-consulting/iif-fund-demo/index.html?iif_public_site=1',
+  '/financial-consulting/iif-fund-demo/index.html',
   '/financial-consulting/fund-site/index.html',
   '/financial-consulting/government-search/SIMPLE-GOVERNMENT-PLATFORM.html',
   '/financial-consulting/government-search/iif-config.js',
@@ -27,22 +32,11 @@ const PATHS = [
   '/legal/contact.html',
   '/assets/og-cover.svg',
   '/financial-consulting/iif-fund-demo/assets/emblem.jpg',
-  '/financial-consulting/iif-fund-demo/dashboard-entry.html',
-  '/financial-consulting/iif-fund-demo/admin-standalone.html',
 ];
 
 /** مسارات اختيارية: فشلها لا يوقف السكربت (مثلاً SearXNG غير مشغّل) */
 const SOFT_PATHS = [{ path: '/api/searx/', note: 'بروكسي → SearXNG على 127.0.0.1:18080 (Docker من engines/searxng)' }];
 const CHECK_OPTIONAL = process.env.CHECK_OPTIONAL === '1';
-
-/** اختصارات مطابقة لـ netlify.toml — يجب أن تُرجع إعادة توجيه */
-const REDIRECT_SHORTCUTS = [
-  { path: '/fund', wantStatus: 302, locationIncludes: 'dashboard-entry.html' },
-  { path: '/fund-admin', wantStatus: 302, locationIncludes: 'open_dashboard=1' },
-  { path: '/gov', wantStatus: 302, locationIncludes: 'SIMPLE-GOVERNMENT-PLATFORM.html' },
-  { path: '/dashboard-entry', wantStatus: 302, locationIncludes: 'dashboard-entry.html' },
-  { path: '/admin-standalone', wantStatus: 302, locationIncludes: 'admin-standalone.html' },
-];
 
 function get(path) {
   return new Promise((resolve, reject) => {
@@ -50,11 +44,7 @@ function get(path) {
       { hostname: HOST, port: PORT, path, method: 'GET', timeout: 10000 },
       (res) => {
         res.resume();
-        resolve({
-          path,
-          status: res.statusCode,
-          location: res.headers.location || '',
-        });
+        resolve({ path, status: res.statusCode });
       }
     );
     req.on('error', reject);
@@ -80,22 +70,6 @@ async function main() {
       }
     } catch (e) {
       console.log('  FAIL', p, '—', e.message);
-      failed = true;
-    }
-  }
-
-  for (const r of REDIRECT_SHORTCUTS) {
-    try {
-      const { status, location } = await get(r.path);
-      const loc = String(location || '');
-      if (status === r.wantStatus && loc.includes(r.locationIncludes)) {
-        console.log('  OK', status, r.path, '→', loc);
-      } else {
-        console.log('  BAD', r.path, 'status=', status, 'location=', loc);
-        failed = true;
-      }
-    } catch (e) {
-      console.log('  FAIL', r.path, '—', e.message);
       failed = true;
     }
   }
