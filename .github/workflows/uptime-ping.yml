@@ -1,5 +1,6 @@
-# فحص دوري بسيط لتوفر المواقع (HTTP 200) — بدون UptimeRobot.
-# عند الفشل: راجع تبويب Actions وفعّل إشعارات البريد لـ «Workflow runs» من إعدادات GitHub.
+# فحص دوري لتوفر الموقع (HTTP 200) — بدون خدمة خارجية.
+# GitHub Pages: إلزامي. Netlify: إعلامي فقط (قد يعيد 503 إن وُقف الموقع أو تجاوزت الحدود).
+# عند فشل خطوة Pages: راجع النشر؛ فعّل إشعارات Actions من إعدادات GitHub.
 name: Uptime ping
 
 on:
@@ -12,20 +13,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  http-check:
+  github-pages:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: GitHub Pages
-            url: https://alzahrani6020.github.io/iif-web/
-          - name: Netlify fund
-            url: https://fluffy-meerkat-eff966.netlify.app/fund
     steps:
-      - name: ${{ matrix.name }}
+      - name: GitHub Pages
         run: |
           set -e
-          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 45 "${{ matrix.url }}")
-          echo "$code <- ${{ matrix.url }}"
+          url="https://alzahrani6020.github.io/iif-web/"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 45 "$url")
+          echo "$code <- $url"
+          test "$code" = "200"
+
+  netlify-optional:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Netlify (مرجعي — قد يكون معطلاً)
+        run: |
+          url="https://fluffy-meerkat-eff966.netlify.app/fund"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 45 "$url")
+          echo "$code <- $url (503/502 متوقع إن وُقف Netlify)"
           test "$code" = "200"
