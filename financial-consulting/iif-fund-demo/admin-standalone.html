@@ -7406,7 +7406,11 @@
           var spb = document.getElementById('service-page-back-bar');
           if (spb) spb.style.removeProperty('display');
           var hw = document.getElementById('https-warning');
-          if (hw) hw.style.removeProperty('display');
+          if (hw) {
+            var sec = typeof window.IIF_connectionIsSecure === 'function' ? window.IIF_connectionIsSecure() : (typeof location !== 'undefined' && location.protocol === 'https:');
+            if (sec) hw.style.setProperty('display', 'none', 'important');
+            else { hw.style.removeProperty('display'); hw.style.display = 'block'; }
+          }
         } catch (e3) { }
       }
       window.IIF_hidePublicSiteChrome = iifHidePublicSiteChrome;
@@ -11213,13 +11217,23 @@
         }
       }, true);
 
-      /* تحذير HTTPS — إظهار عند فتح الموقع دون HTTPS (ما عدا localhost) */
+      /* تحذير HTTPS — إظهار عند فتح الموقع دون HTTPS (ما عدا localhost وGitHub Pages) */
       (function initHttpsWarning() {
         var w = document.getElementById('https-warning');
         var dismiss = document.getElementById('https-warning-dismiss');
-        var isSecure = (typeof location !== 'undefined' && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'));
+        function iifConnectionIsSecure() {
+          if (typeof location === 'undefined') return false;
+          var h = (location.hostname || '').toLowerCase();
+          if (location.protocol === 'https:') return true;
+          if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]') return true;
+          if (h.endsWith('.github.io')) return true;
+          return false;
+        }
+        var isSecure = iifConnectionIsSecure();
         if (!isSecure && w) { w.style.display = 'block'; }
+        if (isSecure && w) { w.style.setProperty('display', 'none', 'important'); }
         if (dismiss) dismiss.addEventListener('click', function () { if (w) w.style.display = 'none'; });
+        window.IIF_connectionIsSecure = iifConnectionIsSecure;
       })();
 
       /* العودة للأعلى — يظهر بعد التمرير، يخفى عند صفحة الخدمة الموسّعة */
