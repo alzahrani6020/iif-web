@@ -124,8 +124,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link rel="dns-prefetch" href="https://translate.google.com" />
+  <link rel="preconnect" href="https://translate.google.com" crossorigin />
+  <link rel="dns-prefetch" href="https://iif-fund-dr-talal.vercel.app" />
+  <link rel="preconnect" href="https://iif-fund-dr-talal.vercel.app" crossorigin />
+  <link rel="dns-prefetch" href="https://searx.tiekoetter.com" />
+  <!-- خط Google: تحميل غير معطّل للعرض (أقرب لتجربة localhost السريعة على الإنترنت) -->
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
+  </noscript>
   <style id="iif-seo-accessibility">
     .iif-skip-link {
       position: absolute;
@@ -24110,8 +24121,14 @@ Generated: ${new Date().toLocaleString()}
         async function fetchSearxPack(query) {
           var q = (query || '').trim();
           if (!q) return { ok: true, results: [] };
+          /* يعمل مع npm start + بروكسي /api/searx فقط؛ على GitHub Pages لا خادم خلفي فيُرجع فشلاً سريعاً دون انتظار طويل */
           var url = window.location.origin + '/api/searx/search?' + new URLSearchParams({ q: q, format: 'json', language: 'en', categories: 'general' }).toString();
-          var r = await fetch(url, { method: 'GET' });
+          var r;
+          try {
+            r = await fetch(url, { method: 'GET', cache: 'no-store' });
+          } catch (eNet) {
+            return { ok: false, results: [], error: 'network' };
+          }
           if (!r.ok) return { ok: false, results: [], error: 'HTTP ' + r.status };
           var data = await r.json();
           var results = (data && Array.isArray(data.results)) ? data.results.slice(0, 6).map(function (x) {
@@ -25973,7 +25990,8 @@ Generated: ${new Date().toLocaleString()}
       } catch (eGt) { }
     };
   </script>
-  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" nonce="iif2026"></script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" nonce="iif2026"
+    defer></script>
   <style nonce="iif2026">
     .iif-gtranslate-host { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
     body { top: 0 !important; position: static !important; }
