@@ -47,6 +47,8 @@ npx vercel deploy --prod --yes
 الملف: `.github/workflows/vercel-deploy.yml`  
 يحتاج أسرار: `VERCEL_TOKEN`، `VERCEL_ORG_ID`، `VERCEL_PROJECT_ID` (يمكن إنشاء التوكن من [Vercel → Account → Tokens](https://vercel.com/account/tokens)).
 
+**التشغيل:** يدوياً فقط — من **Actions** → **Deploy Vercel (optional)** → **Run workflow** (لا يُشغَّل تلقائياً عند كل `push` لتوفير دقائق Actions وتجنب تشغيلات غير لازمة).
+
 ### ازدواجية نشر محتملة
 
-إن كان المشروع **مربوطاً بـ Git** في Vercel مع **Automatic deployments**، وفي نفس الوقت مفعّل workflow **Deploy Vercel (optional)** مع أسرار `VERCEL_*`، فقد يُنفَّذ **نشران** إلى نفس المشروع عند كل `push` إلى `main`. لتقليل الازدواجية: عطّل أحدهما — إما تعطيل الـ workflow من **Actions** (أو إزالة/تعليق الأسرار)، أو الاعتماد على نشر Vercel من Git فقط وتعطيل تشغيل الـ workflow على `push` إن رغبت (يتطلب تعديل الملف أو الإعدادات).
+إن كان المشروع **مربوطاً بـ Git** في Vercel مع **Automatic deployments**، فكل **`push`** إلى `main` قد ينشر من Vercel أصلاً. استخدم workflow Actions **فقط** عندما تريد نشراً من GitHub دون الاعتماد على تكامل Vercel، أو عطّل أحد المصدرين لتفادي نشر مزدوج.

@@ -1,6 +1,6 @@
 # IIF Fund Demo — المنصة الحكومية + الصندوق
 
-> **محرك البحث (SearXNG)** في `engines/searxng/` — يشغّل **Tor + SearXNG** عبر Docker؛ على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك. **GitHub Pages:** سير العمل **Deploy GitHub Pages** ينشر مجلد **`financial-consulting/iif-fund-demo/`** كجذر الموقع على `github.io`؛ **لا** توجد دوال `/api/*` هناك — لبروكسي SearXNG على الإنترنت راجع `engines/searxng/deploy/`.
+> **محرك البحث (SearXNG)** في `engines/searxng/` — يشغّل **Tor + SearXNG** عبر Docker؛ على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك.
 
 ## الرؤية / Vision
 
@@ -172,6 +172,12 @@ docker compose up -d
 - بعد نجاح التشغيل: الرابط يكون `https://<user>.github.io/<repo>/` (مثال للمستودع المرتبط: [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)).
 - يوجد ملف [`.nojekyll`](./financial-consulting/iif-fund-demo/.nojekyll) في مجلد الواجهة لتعطيل معالج Jekyll الافتراضي.
 - **دفع التغييرات:** `git push origin main` يشغّل النشر تلقائياً عند تعديل ملفات داخل `financial-consulting/iif-fund-demo/` أو سير العمل نفسه؛ أو من تبويب **Actions** → **Deploy GitHub Pages** → **Run workflow**.
+- **ما لا يعمل على Pages وحدها (موقع ثابت):** مسارات مثل **`/healthz`** و**`/diagnostics.json`** و**`/api/*`** يوفّرها **`npm start`** (تطوير) أو **دوال Netlify** عند النشر هناك — وليست ملفاتاً ثابتة في كل البيئات.
+
+### Vercel وNetlify من Actions
+
+- **Deploy Netlify** و**Deploy Vercel (optional):** تشغيل **يدوي** من تبويب **Actions** → **Run workflow** بعد إضافة الأسرار في **Settings → Secrets and variables → Actions** (انظر تعليقات ملفات الـ workflow و[VERCEL-DEPLOY.md](./VERCEL-DEPLOY.md)).
+- النشر التلقائي عند **push** يمكن ضبطه من **لوحة Netlify / Vercel** عند ربط المستودع بـ Git هناك.
 
 ---
 

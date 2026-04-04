@@ -1,18 +1,19 @@
-# نشر اختياري إلى Vercel من GitHub Actions (عندما تُضاف الأسرار).
-# أضف في GitHub → Settings → Secrets and variables → Actions:
+# نشر اختياري إلى Vercel من GitHub Actions (يدوياً فقط — لا push تلقائي).
+# يوفّر دقائق Actions ويتجنّب تشغيلات خضراء/حمراء غير مرغوبة على كل commit.
+#
+# أضف في GitHub → Settings → Secrets and variables → Actions → Secrets:
 #   VERCEL_TOKEN          ← Vercel → Account Settings → Tokens
 #   VERCEL_ORG_ID         ← Project → Settings → General
 #   VERCEL_PROJECT_ID     ← Project → Settings → General
 #
-# ثم: Actions → Deploy Vercel (optional) → Run workflow
-# أو يدوياً من مجلد الواجهة: npx vercel deploy --prod --token …
+# التشغيل: Actions → Deploy Vercel (optional) → Run workflow
+# النشر التلقائي من Vercel عند الربط بـ Git: من لوحة Vercel (انظر VERCEL-DEPLOY.md).
+# يدوياً من مجلد الواجهة: npx vercel deploy --prod --token …
 
 name: Deploy Vercel (optional)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 concurrency:
   group: vercel-deploy-${{ github.ref }}
