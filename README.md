@@ -168,7 +168,7 @@ docker compose up -d
 ### GitHub Pages (بديل عند توقف Netlify أو للمعاينة العامة)
 
 - سير العمل: [`.github/workflows/github-pages.yml`](./.github/workflows/github-pages.yml) — ينشر **`financial-consulting/iif-fund-demo/`** كموقع ثابت.
-- **تفعيل لمرة واحدة:** المستودع على GitHub → **Settings** → **Pages** → **Build and deployment** → المصدر: **GitHub Actions** (وليس Branch).
+- **تفعيل لمرة واحدة:** المستودع على GitHub → **Settings** → **Pages** → **Build and deployment** → المصدر: **GitHub Actions** (وليس Branch). إذا ظهرت صفحة 404 «لا يوجد موقع» رغم وجود الـ workflow، غالباً لم يُنشَأ موقع Pages بعد: من الطرفية مع [GitHub CLI](https://cli.github.com) بعد `gh auth login` نفّذ `gh api -X POST repos/alzahrani6020/iif-web/pages -f build_type=workflow` أو شغّل `.\scripts\enable-github-pages.ps1` من جذر المشروع.
 - بعد نجاح التشغيل: الرابط يكون `https://<user>.github.io/<repo>/` (مثال للمستودع المرتبط: [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)).
 - يوجد ملف [`.nojekyll`](./financial-consulting/iif-fund-demo/.nojekyll) في مجلد الواجهة لتعطيل معالج Jekyll الافتراضي.
 - **دفع التغييرات:** `git push origin main` يشغّل النشر تلقائياً عند تعديل ملفات داخل `financial-consulting/iif-fund-demo/` أو سير العمل نفسه؛ أو من تبويب **Actions** → **Deploy GitHub Pages** → **Run workflow**.
