@@ -37,7 +37,7 @@
 |--------|----------------|
 | **Vercel** (فريق `dr-talal`، مشروع `iif-fund`) | `https://iif-fund-dr-talal.vercel.app/index.html` — اللوحة: `…/index.html#dashboard` |
 | **Netlify** (موقع مربوط بالريبو، `fluffy-meerkat-eff966`) | `https://fluffy-meerkat-eff966.netlify.app/fund` (يحوّل إلى واجهة الصندوق) — أو مع هاش: `…/index.html#dashboard` حسب المسار المنشور |
-| **GitHub Pages** (سير عمل `Deploy GitHub Pages`) | `https://alzahrani6020.github.io/iif-web/` — نفس واجهة الصندوق من جذر الموقع المنشور؛ اللوحة: `…/index.html#dashboard` أو معاملات الاستعلام كما في الأعلى |
+| **GitHub Pages** (سير عمل `Deploy GitHub Pages`) | `https://alzahrani6020.github.io/iif-web/` — واجهة الصندوق عند جذر الموقع المنشور (المصدر في الـ workflow: `financial-consulting/iif-fund-demo/`)؛ اللوحة: `…/index.html#dashboard` أو معاملات الاستعلام كما في الأعلى. **لا** توجد دوال `/api/*` على Pages (خلاف Netlify). |
 
 ## ملاحظات
 

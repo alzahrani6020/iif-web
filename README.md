@@ -1,6 +1,6 @@
 # IIF Fund Demo — المنصة الحكومية + الصندوق
 
-> **محرك البحث (SearXNG)** في `engines/searxng/` — يشغّل **Tor + SearXNG** عبر Docker؛ على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك.
+> **محرك البحث (SearXNG)** في `engines/searxng/` — يشغّل **Tor + SearXNG** عبر Docker؛ على **جهاز التطوير** (`npm start`) يُربَط بالمنصة عبر **`/api/searx`**. على **Netlify** يبقى **بحث الجهات محلياً** ما لم يُضف لاحقاً خادم/بروكسي للمحرك. **GitHub Pages:** سير العمل **Deploy GitHub Pages** ينشر مجلد **`financial-consulting/iif-fund-demo/`** كجذر الموقع على `github.io`؛ **لا** توجد دوال `/api/*` هناك — لبروكسي SearXNG على الإنترنت راجع `engines/searxng/deploy/`.
 
 ## الرؤية / Vision
 
