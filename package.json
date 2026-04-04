@@ -33,7 +33,7 @@
     "minimax:status": "node scripts/minimax-env-status.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "devDependencies": {
     "i18n-iso-countries": "^7.14.0",

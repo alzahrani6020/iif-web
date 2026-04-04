@@ -11,7 +11,7 @@
   ignore = "git log -1 --pretty=%B | grep -qF '[skip netlify]'"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
   NODE_ENV = "production"
   CI = "true"
 

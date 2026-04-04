@@ -39,7 +39,7 @@ npm run verify:stack  # verify + verify:searx
 npm run qa:iif-fund   # نفس smoke:html — اسم صريح لواجهة الصندوق
 ```
 
-- **Node:** `>=20` (`.nvmrc`).
+- **Node:** `>=22` (`.nvmrc` / `.node-version` — مطابق لـ CI وNetlify).
 
 ### تكامل MiniMax (سطر أوامر — API السحابي)
 
