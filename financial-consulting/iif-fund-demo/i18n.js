@@ -3740,6 +3740,7 @@ window.IIF_I18N = (function() {
     btnCapture: 'Capturer',
     dashTitle: 'Fonds international d\'investissement — Tableau de bord',
     dashSearchEngine: 'Moteur de recherche',
+    dashGoogleWebSearch: 'Recherche Google',
     dashCloseDashboard: 'Fermer le tableau de bord',
     dashHeroTitle: 'Tableau de bord — Investir avec le Fonds',
     dashHeroBadge: 'Entièrement automatisé — listes actualisées à l\'ouverture',
