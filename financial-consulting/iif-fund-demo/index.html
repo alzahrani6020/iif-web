@@ -135,13 +135,19 @@
   <link rel="preload" as="style"
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'" />
   <noscript>
     <link rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" />
   </noscript>
   <!-- design-system.css أولاً؛ كتلة :root المضمّنة لاحقاً تطغى على أي متغير متعارض (انظر DESIGN-REFRESH-PLAN.md) -->
   <link rel="stylesheet" href="css/design-system.css" />
   <link rel="stylesheet" href="css/public-shell.css" />
+  <link rel="stylesheet" href="css/public-components.css" />
   <style id="iif-seo-accessibility">
     .iif-skip-link {
       position: absolute;
@@ -351,6 +357,12 @@
       opacity: 0.06;
       pointer-events: none;
       z-index: 0;
+    }
+
+    /* B2: عربي — يُحمّل Noto Sans Arabic من <head> */
+    html[data-lang="ar"] body,
+    html[lang="ar"] body {
+      font-family: "Noto Sans Arabic", var(--font-sans);
     }
 
     p {

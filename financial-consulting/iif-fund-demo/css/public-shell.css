@@ -6,6 +6,9 @@
 
 :root {
   --iif-public-content-max: 1200px;
+  /* B1: حلقة تركيز واضحة على خلفية داكنة */
+  --iif-focus-ring: var(--color-accent-gold, #c9a227);
+  --iif-focus-ring-offset: 3px;
 }
 
 html {
@@ -38,4 +41,22 @@ footer {
   font-weight: 500;
   color: var(--color-text-muted);
   background: linear-gradient(180deg, var(--color-bg) 0%, #020408 100%);
+}
+
+/* B1: تركيز لوحة المفاتيح — الواجهة العامة والتذييل فقط */
+main#main-content a:focus-visible,
+footer a:focus-visible {
+  outline: 2px solid var(--iif-focus-ring);
+  outline-offset: var(--iif-focus-ring-offset);
+}
+
+main#main-content .btn:focus-visible {
+  outline: 2px solid var(--color-accent-gold-soft, #e8d48a);
+  outline-offset: 2px;
+}
+
+/* صفحات ثانوية بدون #main-content (خصوصية / عن الصندوق) */
+body:not(:has(#main-content)) a:focus-visible {
+  outline: 2px solid var(--iif-focus-ring);
+  outline-offset: var(--iif-focus-ring-offset);
 }

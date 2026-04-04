@@ -1,0 +1,16 @@
+/**
+ * مكوّنات بصرية مشتركة للواجهة العامة والصفحات الثانوية.
+ * لا تُستخدم داخل #dashboard-overlay إلا بعد مراجعة منفصلة.
+ */
+
+.iif-public-card {
+  border: 1px solid rgba(201, 162, 39, 0.25);
+  border-radius: var(--radius-md, 12px);
+  padding: var(--space-4, 1rem) var(--space-5, 1.1rem);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.iif-public-card--subtle {
+  border-color: var(--color-border-subtle, rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.02);
+}
