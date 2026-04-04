@@ -48,7 +48,7 @@
 |--------|----------------|
 | **Vercel** (فريق `dr-talal`، مشروع `iif-fund`) | `https://iif-fund-dr-talal.vercel.app/index.html` — اللوحة: `…/index.html#dashboard` |
 | **Netlify** (موقع مربوط بالريبو، `fluffy-meerkat-eff966`) | `https://fluffy-meerkat-eff966.netlify.app/fund` (يحوّل إلى واجهة الصندوق) — أو مع هاش: `…/index.html#dashboard` حسب المسار المنشور |
-| **GitHub Pages** (سير عمل `Deploy GitHub Pages`) | `https://alzahrani6020.github.io/iif-web/` — واجهة الصندوق عند جذر الموقع المنشور (المصدر في الـ workflow: `financial-consulting/iif-fund-demo/`)؛ اللوحة: `…/index.html#dashboard` أو معاملات الاستعلام كما في الأعلى. **لا** توجد دوال `/api/*` على Pages (خلاف Netlify). **لا** يوجد **`/healthz`** JSON ثابت هناك (يُخدم محلياً أو عبر Netlify/Vercel حسب الإعداد). |
+| **GitHub Pages** (سير عمل `Deploy GitHub Pages`) | `https://alzahrani6020.github.io/iif-web/` — واجهة الصندوق عند جذر الموقع المنشور (المصدر في الـ workflow: `financial-consulting/iif-fund-demo/`)؛ اللوحة: `…/index.html#dashboard` أو معاملات الاستعلام كما في الأعلى. **لا** توجد دوال `/api/*` على Pages (خلاف Netlify). **لا** يوجد **`/healthz`** JSON ثابت هناك (يُخدم محلياً أو عبر Netlify/Vercel حسب الإعداد). **localStorage** خاص بكل نطاق — صورة الملف على `localhost` لا تظهر تلقائياً على `github.io`؛ أعد رفع الصورة على النطاق الذي تستخدمه أو استخدم نفس الموقع دائماً. رابط **SearXNG** في الهيدر على Pages يوجّه إلى واجهة عامة (ميتا `iif-searx-public-url` في `index.html`) وليس خادمك المحلي. |
 
 ## ملاحظات
 

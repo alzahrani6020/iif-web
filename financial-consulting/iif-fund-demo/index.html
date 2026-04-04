@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <!-- جذر المسارات النسبية (assets/، الشعار): اختياري عبر meta iif-app-base؛ وإلا يُحسب من المسار + استثناء npm start (المنفذ 3333) -->
   <meta name="iif-app-base" content="" />
+  <!-- على GitHub Pages: رابط واجهة SearXNG عامة (فارغ = إخفاء الرابط خارج localhost). غيّر الرابط إن رغبت. -->
+  <meta name="iif-searx-public-url" content="https://searx.tiekoetter.com/" />
   <base id="iif-document-base" href="/" />
   <script>
     (function () {
@@ -15008,10 +15010,24 @@ Generated: ${new Date().toLocaleString()}
         }
         if (typeof updateDashboardNav === 'function') updateDashboardNav();
         try {
-          var host = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname) : '';
+          var host = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname).toLowerCase() : '';
           var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+          var isGhPages = host.endsWith('.github.io');
+          var searxMeta = document.querySelector && document.querySelector('meta[name="iif-searx-public-url"]');
+          var searxPublic = (searxMeta && searxMeta.getAttribute('content') || '').trim();
           document.querySelectorAll('[data-local-only="1"]').forEach(function (el) {
-            el.style.display = isLocal ? 'inline-block' : 'none';
+            if (isLocal) {
+              el.style.display = 'inline-flex';
+              return;
+            }
+            if (isGhPages && searxPublic && /^https?:\/\//i.test(searxPublic)) {
+              el.style.display = 'inline-flex';
+              el.setAttribute('href', searxPublic);
+              el.setAttribute('target', '_blank');
+              el.setAttribute('rel', 'noopener noreferrer');
+              return;
+            }
+            el.style.display = 'none';
           });
         } catch (eLocalOnly) { }
       }
@@ -16019,6 +16035,17 @@ Generated: ${new Date().toLocaleString()}
       function getCertPhoto() {
         var keys = getAllCertImageKeys(CERT_PHOTO_KEY);
         for (var i = 0; i < keys.length; i++) { var v = localStorage.getItem(keys[i]) || ''; if (v) return v; }
+        try {
+          var em = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+          if (em) {
+            var raw = localStorage.getItem('iif-user-profile');
+            if (raw) {
+              var o = JSON.parse(raw);
+              var av = o[em] && o[em].avatarDataUrl;
+              if (typeof av === 'string' && av.trim().indexOf('data:image') === 0) return av.trim();
+            }
+          }
+        } catch (eAv) { }
         return '';
       }
       function getCertLogo() {
@@ -16044,6 +16071,18 @@ Generated: ${new Date().toLocaleString()}
         var keys = getAllCertImageKeys(CERT_PHOTO_KEY);
         try {
           for (var i = 0; i < keys.length; i++) localStorage.setItem(keys[i], dataUrl || '');
+          try {
+            var em2 = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+            if (em2) {
+              var rawP = localStorage.getItem('iif-user-profile');
+              var o2 = {};
+              try { o2 = rawP ? JSON.parse(rawP) : {}; } catch (eJ) { o2 = {}; }
+              if (!o2[em2]) o2[em2] = {};
+              if (dataUrl && String(dataUrl).indexOf('data:image') === 0) o2[em2].avatarDataUrl = dataUrl;
+              else delete o2[em2].avatarDataUrl;
+              localStorage.setItem('iif-user-profile', JSON.stringify(o2));
+            }
+          } catch (eMirror) { }
           if (typeof renderAboutTeam === 'function') renderAboutTeam();
           if (typeof renderPublicMembersList === 'function') renderPublicMembersList();
         } catch (e) {
@@ -25213,6 +25252,7 @@ Generated: ${new Date().toLocaleString()}
 
           var profile = getUserProfile();
           var fullName = iifPairFieldVal('user-full-name', 'dash-profile-full-name');
+          var prevSnap = profile[email] || {};
 
           profile[email] = {
             fullName: fullName,
@@ -25229,6 +25269,9 @@ Generated: ${new Date().toLocaleString()}
             allowPublic: iifPairChecked('allow-public', 'dash-profile-allow-public', false),
             updatedAt: new Date().toISOString()
           };
+          if (prevSnap.avatarDataUrl && String(prevSnap.avatarDataUrl).indexOf('data:image') === 0) {
+            profile[email].avatarDataUrl = prevSnap.avatarDataUrl;
+          }
 
           if (saveUserProfile(profile)) {
             try {
