@@ -8003,6 +8003,7 @@
             target="_blank"
             rel="noopener noreferrer"
             data-local-only="1"
+            data-i18n-title="iifSearxExternalHint"
             class="site-header__auth-btn site-header__auth-btn--login"
             style="display:none; text-decoration:none; background: rgba(29, 155, 240, 0.12); border-color: rgba(29, 155, 240, 0.55); font-size: 0.82rem;"
             title="SearXNG"
@@ -8954,6 +8955,7 @@
               target="_blank"
               rel="noopener noreferrer"
               data-local-only="1"
+              data-i18n-title="iifSearxExternalHint"
               id="dashboard-searx-link"
               class="site-header__auth-btn site-header__auth-btn--login"
               style="display:none; text-decoration:none; background: rgba(29, 155, 240, 0.12); border-color: rgba(29, 155, 240, 0.55); font-size: 0.82rem;"
@@ -16603,7 +16605,9 @@ Generated: ${new Date().toLocaleString()}
             var file = input.files && input.files[0];
             if (!file) return;
             var kindForConfirm = previewId === 'cert-photo-preview' ? 'photo' : previewId === 'cert-logo-preview' ? 'logo' : previewId === 'cert-flag-preview' ? 'flag' : '';
-            if (kindForConfirm && hasCertImageKind(kindForConfirm) && !confirm(confirmReplaceMsg())) {
+            /* لوحة الملف الشخصي: onChangeProfilePhotoClick يؤكد الاستبدال قبل فتح المنتقي */
+            var skipReplaceConfirm = key === 'dash-profile-photo-file';
+            if (kindForConfirm && hasCertImageKind(kindForConfirm) && !skipReplaceConfirm && !confirm(confirmReplaceMsg())) {
               input.value = '';
               return;
             }
@@ -16688,6 +16692,7 @@ Generated: ${new Date().toLocaleString()}
           });
         }
         handleFile('cert-photo-input', setCertPhoto, 'cert-photo-preview', successPhoto);
+        handleFile('dash-profile-photo-file', setCertPhoto, 'cert-photo-preview', successPhoto);
         handleFile('cert-logo-input', setCertLogo, 'cert-logo-preview', successLogo);
         handleFile('cert-flag-input', setCertFlag, 'cert-flag-preview', successFlag);
         handleFile('cert-photo-capture', setCertPhoto, 'cert-photo-preview', successPhoto);

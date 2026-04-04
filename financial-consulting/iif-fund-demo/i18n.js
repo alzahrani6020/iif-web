@@ -445,6 +445,8 @@ window.IIF_I18N = (function() {
     uiSkipToMain: 'Skip to main content',
     uiBackToTop: 'Back to top',
     navSearchEngine: 'Search engine',
+    iifSearxExternalHint:
+      'Opens external SearXNG. Results are from third-party engines (not this site). For people’s names, try an exact phrase in quotes or pick different engines in SearXNG preferences.',
     navExecutiveBriefLink: 'Executive Brief',
     sectorsHighlightHtml: '<strong>Highlighted focus (illustrative):</strong> Energy &amp; Water / networks · Technology &amp; AI — all sectors below remain part of our scope.',
     missionLead: 'We uphold diplomacy, peace, and social justice by financing responsible development and investment projects with strict compliance to national laws and international AML/CFT and governance standards.',
@@ -2102,6 +2104,8 @@ window.IIF_I18N = (function() {
     uiSkipToMain: 'انتقال إلى المحتوى الرئيسي',
     uiBackToTop: 'العودة للأعلى',
     navSearchEngine: 'محرك البحث',
+    iifSearxExternalHint:
+      'يفتح SearXNG خارجياً. النتائج من محركات طرف ثالث (مثل Bing) وليست من موقع الصندوق. للأسماء جرّب العبارة بين علامتي اقتباس "…" أو غيّر المحركات من تفضيلات SearXNG.',
     navExecutiveBriefLink: 'موجز للمستويات الرفيعة',
     sectorsHighlightHtml: '<strong>تركيز معروض (توضيحي):</strong> الطاقة والمياه / الشبكات · التكنولوجيا والذكاء الاصطناعي — بقية القطاعات أدناه ضمن النطاق.',
     missionLead: 'نحن نعزز الدبلوماسية والسلام والعدالة الاجتماعية من خلال تمويل مشاريع التنمية والاستثمار المسؤولة مع الالتزام الصارم بالقوانين الوطنية ومعايير مكافحة غسل الأموال وتمويل الإرهاب والحوكمة الدولية.',
