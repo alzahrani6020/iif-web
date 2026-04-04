@@ -34,6 +34,8 @@ async function main() {
       path: '/financial-consulting/iif-fund-demo/index.html',
       mustInclude: [
         '<base id="iif-document-base"',
+        'css/design-system.css',
+        'css/public-shell.css',
         'assets/emblem.jpg',
         'id="dashboard-overlay"',
         'iif-dashboard-fullpage-critical-head',
@@ -81,12 +83,12 @@ async function main() {
     },
     {
       path: '/financial-consulting/iif-fund-demo/privacy.html',
-      mustInclude: ['Privacy policy', 'localStorage', 'index.html#contact'],
+      mustInclude: ['Privacy policy', 'localStorage', 'index.html#contact', 'css/public-shell.css'],
       label: 'صفحة الخصوصية',
     },
     {
       path: '/financial-consulting/iif-fund-demo/about-institution.html',
-      mustInclude: ['About the institution', 'Leadership', 'index.html#terms'],
+      mustInclude: ['About the institution', 'Leadership', 'index.html#terms', 'css/public-shell.css'],
       label: 'صفحة عن الصندوق',
     },
   ];

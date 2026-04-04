@@ -141,6 +141,7 @@
   </noscript>
   <!-- design-system.css أولاً؛ كتلة :root المضمّنة لاحقاً تطغى على أي متغير متعارض (انظر DESIGN-REFRESH-PLAN.md) -->
   <link rel="stylesheet" href="css/design-system.css" />
+  <link rel="stylesheet" href="css/public-shell.css" />
   <style id="iif-seo-accessibility">
     .iif-skip-link {
       position: absolute;
@@ -304,22 +305,6 @@
       --service-back-bar-height: 4rem;
     }
 
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: var(--header-height);
-    }
-
-    [id],
-    .section,
-    section[id],
-    main [id] {
-      scroll-margin-top: var(--header-height);
-    }
-
-    main#main-content {
-      padding-top: 0.5rem;
-    }
-
     .skip-link {
       position: absolute;
       top: -3rem;
@@ -385,15 +370,10 @@
       color: var(--color-text-main);
     }
 
-    /* لا تستخدم selector عاماً لـ main — يوجد <main class="dashboard-main"> داخل اللوحة فيُطبَّق max-width:1200px على اللوحة فيبدو كنافذة عائمة */
-    main#main-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--space-12) var(--space-4) var(--space-16);
-      position: relative;
-      z-index: 1;
-    }
-
+    /*
+     * هيكل الصفحة العامة (main#main-content، footer، scroll-margin للمراسي): css/public-shell.css
+     * لا تضف selector عاماً لـ main — داخل اللوحة يوجد <main class="dashboard-main"> وعرضه من أنماط اللوحة.
+     */
     /* أزرار بارزة — هيئة أزرار فعلية */
     .btn {
       display: inline-flex;
@@ -3692,15 +3672,7 @@
       }
     }
 
-    footer {
-      border-top: 1px solid var(--color-border-subtle);
-      padding: var(--space-10) var(--space-4);
-      text-align: center;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-text-muted);
-      background: linear-gradient(180deg, var(--color-bg) 0%, #020408 100%);
-    }
+    /* footer: انظر css/public-shell.css */
 
     .lang-ar {
       display: none !important;

@@ -1,0 +1,41 @@
+/**
+ * Public page shell — layout only (header/main/footer rhythm).
+ * Loaded after design-system.css; uses :root tokens from index.html inline :root.
+ * Do not add dashboard-overlay / .dashboard-* rules here.
+ */
+
+:root {
+  --iif-public-content-max: 1200px;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* صفحات ثانوية بدون --header-height في :root */
+  scroll-padding-top: var(--header-height, 9rem);
+}
+
+[id],
+.section,
+section[id],
+main [id] {
+  scroll-margin-top: var(--header-height, 9rem);
+}
+
+/* Public home only — dashboard uses main.dashboard-main inside #dashboard-overlay */
+main#main-content {
+  max-width: var(--iif-public-content-max);
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-4) var(--space-16);
+  position: relative;
+  z-index: 1;
+}
+
+footer {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: var(--space-10) var(--space-4);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: linear-gradient(180deg, var(--color-bg) 0%, #020408 100%);
+}

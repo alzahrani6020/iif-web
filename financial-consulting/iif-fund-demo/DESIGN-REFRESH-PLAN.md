@@ -29,9 +29,41 @@
 ### المرحلة A — أساس (1–2 جلسات عمل)
 
 - [x] **A1** ربط `css/design-system.css` من `index.html` مبكراً في `<head>` (بعد خطوط Google، قبل `iif-seo-accessibility`)؛ `:root` المضمّن لاحقاً يطغى على التعارض.
-- [ ] **A2** توثيق **قائمة مقاطع** للصفحة العامة (هيرو، شريط ثقة، أقسام الخدمات، تذييل، CTA) بأسماء `id`/`class` الحالية — بدون إعادة تسمية واسعة في الجولة الأولى.
-- [ ] **A3** إنشاء **`css/public-shell.css`** (أو اسم مشابه) لاحتواء **الهيكل العام فقط**: `header`/`main`/`footer`، حدود أقسام، حد أقصى للعرض، تباعد عمودي موحّد — **بدون** لمس منطق اللوحة.
-- [ ] **A4** قائمة تحقق جوال: عرض 375px و 768px، تباين ألوان (WCAG تقريبي للنصوص الأساسية).
+- [x] **A2** خريطة المقاطع العامة في `index.html` (مرجع — دون إعادة تسمية):
+
+| منطقة | محدد رئيسي | ملاحظة |
+|--------|------------|--------|
+| شريط علوي لزوم | `#service-page-back-bar` | يظهر عند سياق صفحة خدمة |
+| تحذير HTTPS | `#https-warning` | تنبيه |
+| **هيدر الموقع** | `header.site-header` | ساعة `#site-clock-wrap`، قائمة حكومة `#gov-menu`، مصادقة `#header-auth-btns`، بحث `#iif-search`، تيكرات `#ticker-track` / `#ticker-asian-*` / `#ticker-arab-*` |
+| **المحتوى العام** | `main#main-content` | يبدأ بعد إغلاق `#dashboard-overlay` في DOM |
+| **هيرو** | `section.hero` | `.hero__eyebrow`, `.hero__mission`, `.hero__actions`, `.hero__stats`, `.hero__visual` |
+| ثقة ومسارات | `#trust-entry.section` | عنوان `#trust-entry-title` |
+| أصحاب المصلحة | `#stakeholders` | |
+| معايير الاختيار | `#selection-criteria` | |
+| حوكمة | `#governance-snapshot` | |
+| شركاء | `#partners-trust` | |
+| لماذا الصندوق | `#why-fund` | |
+| مجلس أعمال | `#business-council` | |
+| قيادة | `#leadership` | |
+| تاريخ | `#history` | |
+| فريق / من نحن | `#about-team`, `#about` | |
+| اقتراحات | `#suggest` | |
+| استشارات | `#financial-consultation`, `#urgent-consultation-online` | |
+| خدمات | `#services.section--services` | |
+| قطاعات | `#sectors` | |
+| أمثلة مشاريع | `#project-examples` | |
+| رسالة / حكمة | `#mission`, `#hizkama` | |
+| أنشطة | `#activities` | |
+| امتثال | `#compliance` | |
+| كيفية / مجلس / عضوية | `#how`, `#council`, `#membership` | |
+| **اتصال (CTA)** | `#contact` | |
+| **شروط** | `#terms.terms-section` | |
+| **تذييل** | `footer` | روابط إلى `#terms`, `privacy.html`, `about-institution.html`, `#compliance` |
+| زر عائم | `#iif-fab-contact` | |
+
+- [x] **A3** ملف **`css/public-shell.css`**: `html` + scroll-margin للمراسي، `main#main-content` (عرض أقصى وتباعد)، `footer` — مربوط من `index.html` و`privacy.html` و`about-institution.html` بعد `design-system.css`. القواعد أُزيلت من المضمّن في `index.html` مع إشارة في التعليقات.
+- [ ] **A4** قائمة تحقق جوال (يدوي): عند كل دفعة تصميم — عرض **375px** و**768px**؛ تباين نص أساسي/خلفية؛ تمرير إلى `#contact`/`#terms` تحت الهيدر اللاصق؛ RTL للعربية.
 
 ### المرحلة B — الهوية والطباعة (2–3 جلسات)
 
@@ -41,7 +73,7 @@
 
 ### المرحلة C — الصفحات الثانوية
 
-- [x] **C1** (جزئي) `privacy.html` و `about-institution.html`: ربط `design-system.css`؛ `public-shell.css` لاحقاً عند إنشائه.
+- [x] **C1** `privacy.html` و `about-institution.html`: `design-system.css` + `public-shell.css`.
 - [ ] **C2** مراجعة روابط التذييل/الهيدر بعد أي تغيير هيكل.
 
 ### المرحلة D — لوحة التحكم (لاحقاً)
@@ -80,9 +112,9 @@
 - **6أ)** تحميل `design-system.css` **قبل** أول `<style>` يعرّف `:root` في `index.html` بحيث تبقى القيم المضمّنة هي الغالبة حتى نُوحّد الملفات لاحقاً؛ أو  
 - **6ب)** نسخ قيم `:root` من `index.html` إلى `design-system.css` ثم إزالة التكرار تدريجياً من HTML.
 
-1. إضافة `<link rel="stylesheet" href="css/design-system.css" />` في `index.html` في موضع صحيح (بعد اختيار 6أ أو 6ب).
-2. إنشاء `css/public-shell.css` فارغ تقريباً ثم نقل **قواعد الحاوية العامة** من أكبر كتلة style يمكن عزلها بأمان (بدون لمس قواعد اللوحة الحرجة).
-3. تحديث هذا الملف بعلامة اختيار عند إتمام A1–A3.
+1. ~~إضافة `css/design-system.css`~~ (مُنجَز).
+2. ~~`css/public-shell.css` + ربط الصفحات~~ (مُنجَز).
+3. **6ب** (اختياري): مواءمة `design-system.css` مع `:root` في `index.html` وتقليل التكرار.
 
 ---
 
