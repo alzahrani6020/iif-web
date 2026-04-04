@@ -1,39 +1,39 @@
-/* Design System - CSS Variables and Base Styles */
+/* Design System — مصدر رموز :root الموحّد مع index.html (دفعة 6ب) */
 
 :root {
-  /* Colors */
-  --color-primary: #c9a227;
-  --color-primary-soft: #d6af4f;
-  --color-secondary: #1e3a5f;
-  --color-accent: #c9a227;
+  /* ألوان IIF (نفس القيم السابقة في index المضمّن) */
+  --color-primary: #0a0e18;
+  --color-primary-soft: #111827;
   --color-accent-gold: #c9a227;
-  --color-accent-gold-soft: #d6af4f;
-  --color-accent-gold-glow: rgba(201, 162, 39, 0.3);
+  --color-accent-gold-soft: #e8d48a;
+  --color-accent-gold-glow: rgba(201, 162, 39, 0.22);
   --color-accent-emerald: #1c8a57;
   --color-accent-emerald-soft: #2ea874;
-  
-  /* Background Colors */
-  --color-bg: #03060c;
+  --color-accent-slate: #0f172a;
+  --color-accent-blue: #1e3a5f;
+  --color-accent-blue-soft: rgba(30, 58, 95, 0.35);
+  --color-accent-white: #f8fafc;
+  --color-accent-silver: rgba(255, 255, 255, 0.1);
+  --color-accent: var(--color-accent-gold);
+  --color-secondary: var(--color-accent-blue);
+
+  --color-bg: #050810;
   --color-bg-secondary: #081b33;
-  --color-surface: rgba(255, 255, 255, 0.03);
-  --color-surface-elevated: rgba(255, 255, 255, 0.06);
-  --color-glass: rgba(255, 255, 255, 0.08);
-  
-  /* Text Colors */
-  --color-text-main: #ffffff;
-  --color-text-muted: #a0a0a0;
-  --color-text-inverse: #03060c;
-  
-  /* Border Colors */
+  --color-surface: #0c111b;
+  --color-surface-elevated: #131a28;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-  
-  /* Typography */
-  --font-family-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-family-secondary: Georgia, 'Times New Roman', serif;
-  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  
-  /* Font Sizes */
+  --color-glass: rgba(255, 255, 255, 0.04);
+
+  --color-text-main: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #03060c;
+
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-primary: var(--font-sans);
+  --font-family-secondary: Georgia, "Times New Roman", serif;
+  --font-family-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -43,8 +43,7 @@
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
   --font-size-5xl: 3rem;
-  
-  /* Spacing */
+
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -57,27 +56,28 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
-  
-  /* Border Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
-  
-  /* Shadows */
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
-  
-  /* Transitions */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-card-hover: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
-  
-  /* Z-index */
+
+  --header-height: 9rem;
+  --service-back-bar-height: 4rem;
+
   --z-dropdown: 1000;
   --z-sticky: 1020;
   --z-fixed: 1030;
@@ -112,7 +112,6 @@ body {
   min-height: 100vh;
 }
 
-/* RTL Support */
 [dir="rtl"] {
   direction: rtl;
 }
@@ -121,19 +120,17 @@ body {
   direction: ltr;
 }
 
-/* Focus Styles */
+/* --color-primary داكن؛ الحلقة المرئية بالذهبي */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-accent-gold);
   outline-offset: 2px;
 }
 
-/* Selection */
 ::selection {
-  background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  background-color: var(--color-accent-gold-soft);
+  color: #0d0d0d;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -149,7 +146,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: var(--color-accent-slate);
 }
 
 /* Utility Classes */

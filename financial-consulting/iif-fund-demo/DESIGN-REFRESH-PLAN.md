@@ -76,11 +76,11 @@
 - [x] **C1** `privacy.html` و `about-institution.html`: `design-system.css` + `public-shell.css`.
 - [x] **C2** مراجعة روابط التذييل/الهيدر — لم يتغيّر مسار الهيكل في هذه الدفعة؛ الروابط الحالية (`#terms`, `privacy.html`, `about-institution.html`, `#compliance`, `#trust-entry`, …) لا تزال صالحة.
 
-### المرحلة D — لوحة التحكم (لاحقاً)
+### المرحلة D — لوحة التحكم
 
-- [ ] **D1** خريطة: أي أقسام تستخدم `data-i18n` / `iifT` فقط — لا نقل نصوص إلى CSS.
-- [ ] **D2** تطبيق المتغيرات على مناطق آمنة (خلفيات، حدود البطاقات) دون تغيير `z-index` أو `position` للطبقات الحرجة إلا بعد اختبار يدوي.
-- [x] **D3** (عملية) تُشغَّل بعد كل دفعة: `npm run verify` + `smoke-with-server`؛ عند تغيير i18n: `check-i18n-keys.js --strict`. لم تُمس اللوحة في دفعة B.
+- [x] **D1** وثيقة **`DASHBOARD-I18N-MAP.md`**: هيكل `#dashboard-overlay`، جدول TOC ↔ المراسي، قواعد `dash*` / `data-i18n` / نصوص JS.
+- [x] **D2** اللوحة تستخدم أصلاً `var(--space-*)`, `var(--radius-*)`, `var(--color-*)` من **`design-system.css`** بعد مواءمة **6ب**؛ لا تغييرات إضافية على `position`/`z-index` في هذه الدفعة.
+- [x] **D3** (عملية) تُشغَّل بعد كل دفعة: `npm run verify` + `smoke-with-server`؛ عند تغيير i18n: `check-i18n-keys.js --strict`.
 
 ---
 
@@ -105,17 +105,11 @@
 
 ---
 
-## 6) أول مهمة تنفيذية (تبدأ مباشرة بعد الموافقة)
+## 6) توحيد الرموز (6أ + 6ب)
 
-**تنبيه:** `css/design-system.css` الحالي **لا يطابق** كتلة `:root` داخل `index.html` (مثلاً `--color-primary` مختلف). خياران آمنان:
-
-- **6أ)** تحميل `design-system.css` **قبل** أول `<style>` يعرّف `:root` في `index.html` بحيث تبقى القيم المضمّنة هي الغالبة حتى نُوحّد الملفات لاحقاً؛ أو  
-- **6ب)** نسخ قيم `:root` من `index.html` إلى `design-system.css` ثم إزالة التكرار تدريجياً من HTML.
-
-1. ~~إضافة `css/design-system.css`~~ (مُنجَز).
-2. ~~`css/public-shell.css` + ربط الصفحات~~ (مُنجَز).
-3. **6ب** (اختياري): مواءمة `design-system.css` مع `:root` في `index.html` وتقليل التكرار.
+- [x] **6أ** تحميل `design-system.css` قبل الأنماط المضمّنة.
+- [x] **6ب** قيم `:root` الموحّدة في **`css/design-system.css`** (ألوان IIF، مسافات، نصف أقطار، `--header-height`، `--service-back-bar-height`)؛ حُذفت الكتل المكررة من `index.html` مع تعليق إحالة. تعديلات `:focus-visible` و`::selection` وشريط التمرير لتناسب `--color-primary` الداكن.
 
 ---
 
-*آخر تحديث: 2026-04-04 — قابلة للتعديل حسب أولوياتك.*
+*مرجع لوحة: `DASHBOARD-I18N-MAP.md` — آخر تحديث: 2026-04-04.*

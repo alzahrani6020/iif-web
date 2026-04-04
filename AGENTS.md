@@ -13,7 +13,7 @@
 | المسار | المحتوى |
 |--------|---------|
 | `financial-consulting/government-search/` | المنصة الحكومية، `government-data.json` → يُولَّد `government-data.js` |
-| `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) — **قبل نشر تغييرات حرجة:** [QA-PRE-RELEASE.md](./financial-consulting/iif-fund-demo/QA-PRE-RELEASE.md) |
+| `financial-consulting/iif-fund-demo/` | واجهة الصندوق الأصلية (ملفات كثيرة) — **قبل نشر تغييرات حرجة:** [QA-PRE-RELEASE.md](./financial-consulting/iif-fund-demo/QA-PRE-RELEASE.md)؛ لوحة التحكم + i18n: [DASHBOARD-I18N-MAP.md](./financial-consulting/iif-fund-demo/DASHBOARD-I18N-MAP.md)؛ تجديد التصميم: [DESIGN-REFRESH-PLAN.md](./financial-consulting/iif-fund-demo/DESIGN-REFRESH-PLAN.md) |
 | `financial-consulting/fund-site/` | واجهة أبسط |
 | `executive-brief.html`، `sovereign-standards.html` (جذر المستودع) | موجز للمستويات الرفيعة + معايير سيادية؛ اختصارات `/executive`، `/sovereign`، `/charter` |
 | `scripts/dev-server.js` | خادم التطوير (`3333`) + بروكسي `/api/searx` → SearXNG على `18080` |
