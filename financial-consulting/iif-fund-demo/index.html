@@ -7,6 +7,8 @@
   <meta name="iif-app-base" content="" />
   <!-- على GitHub Pages: رابط واجهة SearXNG عامة (فارغ = إخفاء الرابط خارج localhost). غيّر الرابط إن رغبت. -->
   <meta name="iif-searx-public-url" content="https://searx.tiekoetter.com/" />
+  <!-- قاعدة بروكسي SearXNG (Vercel / Worker) لتحليل الويب من GitHub Pages — يجب أن يوفّر /api/searx/search -->
+  <meta name="iif-searx-proxy-base" content="https://iif-fund-dr-talal.vercel.app" />
   <base id="iif-document-base" href="/" />
   <script>
     (function () {
@@ -14290,6 +14292,10 @@ Generated: ${new Date().toLocaleString()}
       style="font-size:0.88rem;margin-top:0.75rem;color:var(--color-text-muted);max-width:42rem;margin-inline:auto;">
       <a href="#terms" data-i18n="footerTerms" data-iif-track="footer-terms">Terms</a>
       <span aria-hidden="true"> · </span>
+      <a href="privacy.html" data-i18n="footerPrivacyPolicy" data-iif-track="footer-privacy-page">Privacy policy</a>
+      <span aria-hidden="true"> · </span>
+      <a href="about-institution.html" data-i18n="footerAboutInstitution" data-iif-track="footer-about-institution">About &amp; leadership</a>
+      <span aria-hidden="true"> · </span>
       <a href="#compliance" data-i18n="footerCompliance" data-iif-track="footer-compliance">Compliance &amp;
         licenses</a>
       <span aria-hidden="true"> · </span>
@@ -24118,19 +24124,41 @@ Generated: ${new Date().toLocaleString()}
           return { ok: true, indicators: out, series: series };
         }
 
+        function iifResolveSearxPackUrl(paramsStr) {
+          var h = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname).toLowerCase() : '';
+          var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+          if (isLocal) {
+            return (typeof location !== 'undefined' ? location.origin : '') + '/api/searx/search?' + paramsStr;
+          }
+          try {
+            var m = typeof document !== 'undefined' && document.querySelector && document.querySelector('meta[name="iif-searx-proxy-base"]');
+            var base = m && m.getAttribute('content');
+            base = base ? String(base).trim().replace(/\/$/, '') : '';
+            if (base && /^https?:\/\//i.test(base)) {
+              return base + '/api/searx/search?' + paramsStr;
+            }
+          } catch (eM) { }
+          return (typeof location !== 'undefined' ? location.origin : '') + '/api/searx/search?' + paramsStr;
+        }
+
         async function fetchSearxPack(query) {
           var q = (query || '').trim();
           if (!q) return { ok: true, results: [] };
-          /* يعمل مع npm start + بروكسي /api/searx فقط؛ على GitHub Pages لا خادم خلفي فيُرجع فشلاً سريعاً دون انتظار طويل */
-          var url = window.location.origin + '/api/searx/search?' + new URLSearchParams({ q: q, format: 'json', language: 'en', categories: 'general' }).toString();
+          var paramsStr = new URLSearchParams({ q: q, format: 'json', language: 'en', categories: 'general' }).toString();
+          var url = iifResolveSearxPackUrl(paramsStr);
           var r;
           try {
-            r = await fetch(url, { method: 'GET', cache: 'no-store' });
+            r = await fetch(url, { method: 'GET', cache: 'no-store', mode: 'cors' });
           } catch (eNet) {
             return { ok: false, results: [], error: 'network' };
           }
           if (!r.ok) return { ok: false, results: [], error: 'HTTP ' + r.status };
-          var data = await r.json();
+          var data;
+          try {
+            data = await r.json();
+          } catch (eJ) {
+            return { ok: false, results: [], error: 'invalid_json' };
+          }
           var results = (data && Array.isArray(data.results)) ? data.results.slice(0, 6).map(function (x) {
             return { title: x.title || '', url: x.url || '', engine: x.engine || '', content: (x.content || '').slice(0, 400) };
           }) : [];

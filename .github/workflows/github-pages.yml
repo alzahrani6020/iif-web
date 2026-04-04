@@ -34,10 +34,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare Pages site (exclude Vercel-only api/ serverless sources)
+        run: |
+          set -e
+          rm -rf _ghp_site
+          mkdir -p _ghp_site
+          rsync -a --delete \
+            --exclude 'api/' \
+            --exclude 'node_modules/' \
+            "financial-consulting/iif-fund-demo/" "_ghp_site/"
+
       - name: Upload static site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: financial-consulting/iif-fund-demo
+          path: _ghp_site
 
   deploy:
     needs: build

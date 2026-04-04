@@ -24,6 +24,29 @@ jobs:
           echo "$code <- $url"
           test "$code" = "200"
 
+      - name: GitHub Pages — privacy.html
+        run: |
+          set -e
+          url="https://alzahrani6020.github.io/iif-web/privacy.html"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 45 "$url")
+          echo "$code <- $url"
+          test "$code" = "200"
+
+  vercel-searx-proxy-optional:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vercel SearX proxy (JSON smoke — إعلامي)
+        run: |
+          url="https://iif-fund-dr-talal.vercel.app/api/searx/search?q=iif&format=json&language=en&categories=general"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 35 "$url" || echo "000")
+          echo "$code <- $url"
+          if [ "$code" = "200" ] || [ "$code" = "429" ]; then
+            echo "Proxy OK"
+            exit 0
+          fi
+          echo "::notice::البروكسي غير جاهز أو يعيد $code — انشر مجلد الواجهة إلى Vercel وأضف SEARX_UPSTREAM إن لزم"
+          exit 0
+
   netlify-optional:
     runs-on: ubuntu-latest
     continue-on-error: true
