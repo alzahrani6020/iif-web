@@ -8010,6 +8010,18 @@
           >
             <span data-i18n="navSearchEngine">Search engine</span>
           </a>
+          <a
+            href="https://www.google.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-iif-google-search="1"
+            data-i18n-title="iifGoogleSearchHint"
+            class="site-header__auth-btn site-header__auth-btn--login"
+            style="display:none; text-decoration:none; background: rgba(66, 133, 244, 0.1); border-color: rgba(66, 133, 244, 0.5); font-size: 0.82rem;"
+            title="Google"
+          >
+            <span data-i18n="navGoogleWebSearch">Google search</span>
+          </a>
           <!-- موجز للمستويات الرفيعة — وثيقة مؤسسية للاطلاع الرسمي -->
           <div class="site-header__auth-btns"
             style="margin-bottom: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
@@ -15030,6 +15042,9 @@ Generated: ${new Date().toLocaleString()}
               return;
             }
             el.style.display = 'none';
+          });
+          document.querySelectorAll('[data-iif-google-search="1"]').forEach(function (gEl) {
+            gEl.style.display = isLocal || isGhPages ? 'inline-flex' : 'none';
           });
         } catch (eLocalOnly) { }
       }

@@ -45,11 +45,27 @@ export class UIComponents {
 
   setupLocalOnlyLinks() {
     try {
-      const host = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname) : '';
-      const isLocal = host === 'localhost' || host === '127.0.0.1';
-      const localOnly = document.querySelectorAll('[data-local-only="1"]');
-      localOnly.forEach((el) => {
-        el.style.display = isLocal ? 'inline-flex' : 'none';
+      const host = String((typeof location !== 'undefined' && location.hostname) || '').toLowerCase();
+      const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+      const isGhPages = host.endsWith('.github.io');
+      const searxMeta = document.querySelector('meta[name="iif-searx-public-url"]');
+      const searxPublic = (searxMeta && searxMeta.getAttribute('content') || '').trim();
+      document.querySelectorAll('[data-local-only="1"]').forEach((el) => {
+        if (isLocal) {
+          el.style.display = 'inline-flex';
+          return;
+        }
+        if (isGhPages && searxPublic && /^https?:\/\//i.test(searxPublic)) {
+          el.style.display = 'inline-flex';
+          el.setAttribute('href', searxPublic);
+          el.setAttribute('target', '_blank');
+          el.setAttribute('rel', 'noopener noreferrer');
+          return;
+        }
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('[data-iif-google-search="1"]').forEach((el) => {
+        el.style.display = isLocal || isGhPages ? 'inline-flex' : 'none';
       });
     } catch (e) {
       // ignore
