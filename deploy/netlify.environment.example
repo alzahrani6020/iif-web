@@ -1,0 +1,9 @@
+# انسخ القيم إلى Netlify: Site settings → Environment variables → Add variable
+# لا ترفع هذا الملف بأسرار حقيقية إلى مستودع عام.
+
+SEARXNG_URL=https://search.example.com
+IIF_SEARX_TIMEOUT_MS=15000
+
+# اختياري — مترجم
+# IIF_TRANSLATE_URL=https://translator.example.com
+# IIF_TRANSLATE_TIMEOUT_MS=180000

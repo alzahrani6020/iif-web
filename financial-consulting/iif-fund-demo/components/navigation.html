@@ -21,8 +21,14 @@
 
     <!-- Search Bar -->
     <div class="header-search" id="iif-search-wrap-outer">
-      <input type="search" id="iif-search" autocomplete="off" data-i18n="searchPlaceholder" placeholder="Search site…"
-        aria-label="Search">
+      <form class="header-search__form" role="search" autocomplete="off" onsubmit="return false;"
+        aria-label="Site search">
+        <input type="text" id="iif-search" name="q" role="searchbox" inputmode="search" enterkeyhint="search"
+          autocomplete="one-time-code" autocapitalize="none" spellcheck="false" data-form-type="other"
+          data-lpignore="true" data-1p-ignore="true" data-bwignore readonly
+          data-iif-search-readonly-until-focus="1" data-i18n="searchPlaceholder" placeholder="Search site…"
+          aria-label="Search" aria-autocomplete="none">
+      </form>
       <div id="iif-search-wrap" class="search-results"></div>
     </div>
 

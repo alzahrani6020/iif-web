@@ -84,6 +84,7 @@ window.IIF_I18N = (function() {
     navTranslation: 'Translation',
     navLicenses: 'Licenses',
     navContact: 'Contact',
+    navMore: 'More',
     navLogin: 'Login / Register',
     heroEyebrow: 'International Investment Fund · Paris · FII',
     heroTitle: 'A royal vision for global investment & prosperity',
@@ -452,6 +453,8 @@ window.IIF_I18N = (function() {
     iifSearxExternalHint:
       'Opens external SearXNG. Results are from third-party engines (not this site). For people’s names, try an exact phrase in quotes or pick different engines in SearXNG preferences.',
     navGoogleWebSearch: 'Google search',
+    navHideSectionLinks: 'Hide section links',
+    navShowSectionLinks: 'Show section links',
     dashGoogleWebSearch: 'Google search',
     iifGoogleSearchHint: 'Opens Google in a new tab — often clearer results for people and organization names.',
     navExecutiveBriefLink: 'Executive Brief',
@@ -578,6 +581,8 @@ window.IIF_I18N = (function() {
     dashDiagEventsTitle: 'Dev-server diagnostic events (proxy/rate-limit); 0 is normal until something is logged',
     dashSystemStatusUnavailableHtml: 'System status: unavailable — local dev only (<code>/healthz</code>). <a href="/healthz" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Open JSON</a> · <a href="/health.html" style="color:inherit;text-decoration:underline;">Health page</a>',
     dashTocStructureLabel: 'Structure — jump to section',
+    dashTocShowSectionLinks: 'Show section links',
+    dashTocHideSectionLinks: 'Hide section links',
     dashTocZoneOps: 'Operations & content',
     dashTocMyContent: 'My content',
     dashTocMyProfile: 'My profile',
@@ -610,7 +615,8 @@ window.IIF_I18N = (function() {
     dashProfileLockedHint: 'Enable editing to change your details, then tap Save.',
     dashProfileChangePhoto: 'Change Photo',
     dashProfileFullName: 'Full Name',
-    dashProfileEmailHint: 'Email is your account identifier.',
+    dashProfileEmailHint:
+      'Tap «Edit information», change your email here if needed, then «Save». If you use a password, you may be asked to confirm when the address changes. You can also use «Change email» for a guided prompt.',
     dashProfileChangeEmail: 'Change email',
     dashProfilePhone: 'Phone',
     dashProfileCompanyOrg: 'Company/Organization',
@@ -972,6 +978,12 @@ window.IIF_I18N = (function() {
     tickerEgyptTodayEconomy: 'Egypt Today Economy',
     tickerAlIttihadBusiness: 'Al Ittihad Business',
     tickerNoItemsNow: 'No items at the moment.',
+    navNewsSources: 'News sources',
+    tickerMotionPause: 'Pause tickers',
+    tickerMotionResume: 'Resume tickers',
+    tickerFilterAsia: 'Asia focus',
+    tickerFilterArab: 'Arab region',
+    tickerCountryAll: 'All',
     cgFormSectionBasic: 'Company Basic Information',
     cgLabelCompanyName: 'Company Name',
     cgLabelRegistrationNumber: 'Registration Number',
@@ -1806,6 +1818,7 @@ window.IIF_I18N = (function() {
     navTranslation: 'الترجمة',
     navLicenses: 'التراخيص',
     navContact: 'اتصل بنا',
+    navMore: 'المزيد',
     navLogin: 'تسجيل الدخول / إنشاء حساب',
     heroEyebrow: 'صندوق الاستثمار الدولي · باريس · FII',
     heroTitle: 'رؤية ملكية للاستثمار العالمي والازدهار',
@@ -2174,6 +2187,8 @@ window.IIF_I18N = (function() {
     iifSearxExternalHint:
       'يفتح SearXNG خارجياً. النتائج من محركات طرف ثالث (مثل Bing) وليست من موقع الصندوق. للأسماء جرّب العبارة بين علامتي اقتباس "…" أو غيّر المحركات من تفضيلات SearXNG.',
     navGoogleWebSearch: 'بحث Google',
+    navHideSectionLinks: 'إخفاء روابط الأقسام',
+    navShowSectionLinks: 'إظهار روابط الأقسام',
     dashGoogleWebSearch: 'بحث Google',
     iifGoogleSearchHint: 'يفتح Google في نافذة جديدة — غالباً أوضح للأسماء والمؤسسات.',
     navExecutiveBriefLink: 'موجز للمستويات الرفيعة',
@@ -2300,6 +2315,8 @@ window.IIF_I18N = (function() {
     dashDiagEventsTitle: 'أحداث تشخيص خادم التطوير؛ 0 طبيعي إذا لم يُسجّل شيء',
     dashSystemStatusUnavailableHtml: 'حالة النظام غير متاحة — يظهر مع <code>npm start</code> فقط. <a href="/healthz" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">فتح JSON</a> · <a href="/health.html" style="color:inherit;text-decoration:underline;">صفحة الصحة</a>',
     dashTocStructureLabel: 'الهيكلة — انتقال سريع',
+    dashTocShowSectionLinks: 'إظهار روابط الأقسام',
+    dashTocHideSectionLinks: 'إخفاء روابط الأقسام',
     dashTocZoneOps: 'العمليات والمحتوى',
     dashTocMyContent: 'محتواي',
     dashTocMyProfile: 'ملفي الشخصي',
@@ -2332,7 +2349,8 @@ window.IIF_I18N = (function() {
     dashProfileLockedHint: 'فعّل التعديل لتغيير البيانات، ثم اضغط حفظ.',
     dashProfileChangePhoto: 'تغيير الصورة',
     dashProfileFullName: 'الاسم الكامل',
-    dashProfileEmailHint: 'الإيميل هو معرّف حسابك.',
+    dashProfileEmailHint:
+      'اضغط «تعديل المعلومات»، عدّل البريد في هذا الحقل إن رغبت، ثم «حفظ». إن وُجدت كلمة مرور قد يُطلب تأكيدها عند تغيير العنوان. يمكنك أيضاً استخدام «تغيير البريد» لمسار مُوجَّه.',
     dashProfileChangeEmail: 'تغيير الإيميل',
     dashProfilePhone: 'رقم الهاتف',
     dashProfileCompanyOrg: 'الشركة/المنظمة',
@@ -2694,6 +2712,12 @@ window.IIF_I18N = (function() {
     tickerEgyptTodayEconomy: 'مصر اليوم الاقتصاد',
     tickerAlIttihadBusiness: 'الاتحاد الأعمال',
     tickerNoItemsNow: 'لا توجد عناصر حالياً.',
+    navNewsSources: 'مصادر الأخبار',
+    tickerMotionPause: 'إيقاف المؤشرات',
+    tickerMotionResume: 'تشغيل المؤشرات',
+    tickerFilterAsia: 'تركيز آسيا',
+    tickerFilterArab: 'منطقة عربية',
+    tickerCountryAll: 'الكل',
     cgFormSectionBasic: 'المعلومات الأساسية للشركة',
     cgLabelCompanyName: 'اسم الشركة',
     cgLabelRegistrationNumber: 'رقم التسجيل',
@@ -3528,6 +3552,7 @@ window.IIF_I18N = (function() {
     navTranslation: 'Traduction',
     navLicenses: 'Licences',
     navContact: 'Contact',
+    navMore: 'Plus',
     navLogin: 'Connexion / Inscription',
     heroEyebrow: 'FII · Paris',
     heroTitle: 'Une vision royale pour l\'investissement et la prospérité mondiaux',
@@ -3745,6 +3770,8 @@ window.IIF_I18N = (function() {
     uiBackToTop: 'Retour en haut',
     navSearchEngine: 'Moteur de recherche',
     navGoogleWebSearch: 'Recherche Google',
+    navHideSectionLinks: 'Masquer les liens des rubriques',
+    navShowSectionLinks: 'Afficher les liens des rubriques',
     iifSearxExternalHint:
       'Ouvre SearXNG (site externe). Les résultats viennent de moteurs tiers (pas de ce site). Pour les noms, essayez une expression exacte entre guillemets ou modifiez les moteurs dans les préférences SearXNG.',
     iifGoogleSearchHint:
@@ -3874,6 +3901,8 @@ window.IIF_I18N = (function() {
     dashDiagEventsTitle: 'Événements de diagnostic du serveur de dev (proxy/limitation) ; 0 est normal tant qu\'aucun journal.',
     dashSystemStatusUnavailableHtml: 'État du système : indisponible — environnement local uniquement (<code>/healthz</code>). <a href="/healthz" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Ouvrir le JSON</a> · <a href="/health.html" style="color:inherit;text-decoration:underline;">Page santé</a>',
     dashTocStructureLabel: 'Structure — aller à la section',
+    dashTocShowSectionLinks: 'Afficher les liens',
+    dashTocHideSectionLinks: 'Masquer les liens',
     dashTocZoneOps: 'Opérations et contenu',
     dashTocMyContent: 'Mon contenu',
     dashTocMyProfile: 'Mon profil',
@@ -3906,7 +3935,8 @@ window.IIF_I18N = (function() {
     dashProfileLockedHint: 'Activez l\'édition pour modifier vos données, puis enregistrez.',
     dashProfileChangePhoto: 'Changer la photo',
     dashProfileFullName: 'Nom complet',
-    dashProfileEmailHint: 'L\'e-mail est l\'identifiant de votre compte.',
+    dashProfileEmailHint:
+      'Ouvrez « Modifier les informations », changez l’e-mail si besoin, puis « Enregistrer ». Un mot de passe peut être demandé. « Changer l’e-mail » reste disponible.',
     dashProfileChangeEmail: 'Changer l\'e-mail',
     dashProfilePhone: 'Téléphone',
     dashProfileCompanyOrg: 'Entreprise / organisation',
@@ -4285,6 +4315,12 @@ window.IIF_I18N = (function() {
     videoCallShareLink: 'Ouvrir dans un nouvel onglet / Partager le lien',
     tickerAsianMarketsLabel: 'Marchés asiatiques',
     tickerArabMarketsLabel: 'Marchés arabes',
+    navNewsSources: 'Sources d’actualités',
+    tickerMotionPause: 'Pause des tickers',
+    tickerMotionResume: 'Reprendre les tickers',
+    tickerFilterAsia: 'Focus Asie',
+    tickerFilterArab: 'Région arabe',
+    tickerCountryAll: 'Tous',
     cgFormSectionBasic: 'Informations de base sur l\'entreprise',
     cgLabelCompanyName: 'Raison sociale',
     cgLabelRegistrationNumber: 'Numéro d\'immatriculation',
@@ -6375,6 +6411,12 @@ window.IIF_I18N = (function() {
     tickerEgyptTodayEconomy: '今日埃及经济',
     tickerAlIttihadBusiness: '伊蒂哈德商业',
     tickerNoItemsNow: '暂无内容。',
+    navNewsSources: '新闻来源',
+    tickerMotionPause: '暂停滚动条',
+    tickerMotionResume: '恢复滚动条',
+    tickerFilterAsia: '亚洲地区',
+    tickerFilterArab: '阿拉伯地区',
+    tickerCountryAll: '全部',
     metaSiteTitle: '国际投资基金 · IIF · 巴黎',
     metaDescription: '国际投资基金（FII）巴黎 — 机构性项目融资、主权与政府资本、BOT 协调、可行性研究、调解与治理。欧盟透明度注册；在法国与美国持牌。面向投资者、政府与合作伙伴的合规全球融资。',
     metaKeywords: '国际投资基金, FII, IIF, 巴黎, 机构投资者, 项目融资, 主权融资, 政府BOT, PPP, 可行性研究, 全球融资, 调解, 治理, 欧盟透明度注册, 法国牌照, 美国牌照, 反洗钱, 投资者',
@@ -6626,6 +6668,8 @@ window.IIF_I18N = (function() {
     dashDiagEventsTitle: '开发服务器诊断事件（代理/限速）；无日志时 0 为正常',
     dashSystemStatusUnavailableHtml: '系统状态：不可用 — 仅本地开发（<code>/healthz</code>）。<a href="/healthz" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">打开 JSON</a> · <a href="/health.html" style="color:inherit;text-decoration:underline;">健康页</a>',
     dashTocStructureLabel: '结构 — 跳转至版块',
+    dashTocShowSectionLinks: '显示版块链接',
+    dashTocHideSectionLinks: '隐藏版块链接',
     dashTocZoneOps: '运营与内容',
     dashTocMyContent: '我的内容',
     dashTocMyProfile: '我的资料',
@@ -6658,7 +6702,7 @@ window.IIF_I18N = (function() {
     dashProfileLockedHint: '启用编辑后可修改资料，然后点击保存。',
     dashProfileChangePhoto: '更换照片',
     dashProfileFullName: '全名',
-    dashProfileEmailHint: '邮箱即您的账户标识。',
+    dashProfileEmailHint: '点「编辑资料」后可在此修改邮箱并「保存」；若设有密码，更改时可能需验证。仍可使用「更改邮箱」引导。',
     dashProfileChangeEmail: '更改邮箱',
     dashProfilePhone: '电话',
     dashProfileCompanyOrg: '公司/组织',
@@ -10578,6 +10622,22 @@ window.IIF_I18N = (function() {
     var input = document.getElementById('iif-search');
     var wrap = document.getElementById('iif-search-wrap');
     if (!input || !wrap) return;
+    var searchForm = input.form;
+    if (searchForm) {
+      searchForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+      });
+    }
+    if (input.getAttribute('data-iif-search-readonly-until-focus') === '1') {
+      var unlockRo = function () {
+        try {
+          input.removeAttribute('readonly');
+          input.removeAttribute('data-iif-search-readonly-until-focus');
+        } catch (eRo) { }
+      };
+      input.addEventListener('focus', unlockRo, { once: true });
+      input.addEventListener('pointerdown', unlockRo, { once: true });
+    }
     input.addEventListener('keyup', function() {
       var q = (input.value || '').trim().toLowerCase();
       if (q.length < 2) {
@@ -10600,7 +10660,11 @@ window.IIF_I18N = (function() {
           a.textContent = label;
           a.addEventListener('click', function(e) {
             e.preventDefault();
-            sec.scrollIntoView({ behavior: 'smooth' });
+            if (typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+              window.IIF_scrollIntoViewClearHeader(sec, { behavior: 'smooth' });
+            } else {
+              sec.scrollIntoView({ behavior: 'smooth' });
+            }
             wrap.classList.remove('has-results');
             input.value = '';
           });

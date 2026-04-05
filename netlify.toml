@@ -118,6 +118,11 @@
   to = "/sovereign-standards.html"
   status = 302
 
+[[redirects]]
+  from = "/news-sources"
+  to = "/financial-consulting/iif-fund-demo/news-sources.html"
+  status = 302
+
 [[headers]]
   for = "/*"
   [headers.values]

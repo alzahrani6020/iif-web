@@ -134,7 +134,22 @@ smoke.on('close', (code) => {
     stdio: 'inherit',
     env: { ...process.env, PORT: String(PORT), CHECK_HOST: HOST },
   });
-  checkUrls.on('close', (c2) => shutdown(c2 ?? 0));
+  checkUrls.on('close', (c2) => {
+    if (c2 !== 0) {
+      shutdown(c2 ?? 1);
+      return;
+    }
+    const newsSmoke = spawn(process.execPath, [path.join(ROOT, 'scripts', 'smoke-news-api.mjs')], {
+      cwd: ROOT,
+      stdio: 'inherit',
+      env: { ...process.env, PORT: String(PORT), CHECK_HOST: HOST },
+    });
+    newsSmoke.on('close', (c3) => shutdown(c3 ?? 0));
+    newsSmoke.on('error', (err) => {
+      console.error(err);
+      shutdown(1);
+    });
+  });
   checkUrls.on('error', (err) => {
     console.error(err);
     shutdown(1);

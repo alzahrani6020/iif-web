@@ -36,6 +36,26 @@ docker compose up -d
 
 Then put a reverse proxy (Nginx/Caddy) in front and serve it via HTTPS.
 
+**Examples in this repo:**
+
+- Caddy: [`deploy/caddy/Caddyfile.example`](./caddy/Caddyfile.example)
+- Nginx: [`deploy/nginx-searx.conf.example`](./nginx-searx.conf.example)
+- Netlify env names (copy into UI): [`deploy/netlify.environment.example`](./netlify.environment.example)
+
+After Netlify is configured, verify from your PC (PowerShell):
+
+```bash
+$env:PROXY_BASE="https://YOUR_SITE.netlify.app"; npm run verify:proxy
+```
+
+To probe SearXNG directly (local Docker or your HTTPS URL):
+
+```bash
+npm run verify:searx
+# or
+$env:SEARXNG_URL="https://search.example.com"; npm run verify:searx
+```
+
 ## VPS: Translator (Docker)
 
 See: `deploy/translator/`

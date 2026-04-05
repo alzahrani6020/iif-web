@@ -1,9 +1,31 @@
-const CORS = {
+const CORS_BASE = {
   'Content-Type': 'application/json; charset=utf-8',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Cache-Control': 'public, max-age=300, stale-while-revalidate=600'
+  'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+  'Access-Control-Expose-Headers': 'X-IIF-News-Item-Count, X-IIF-News-Empty'
 };
+
+function jsonNewsResponse(body, itemCount) {
+  const n = Number(itemCount) || 0;
+  const headers = {
+    ...CORS_BASE,
+    'X-IIF-News-Item-Count': String(n)
+  };
+  if (n === 0) headers['X-IIF-News-Empty'] = '1';
+  return new Response(body, { status: 200, headers });
+}
+
+const ARABIC_SCRIPT = /[\u0600-\u06FF\u0750-\u077F]/;
+
+/** إسقاط عناوين ترفيه/رياضة واضحة من شريطي asian / arabic */
+function filterMarketTickerNoise(list, cat) {
+  const c = String(cat || '').toLowerCase();
+  if (c !== 'asian' && c !== 'arabic') return list;
+  const noise =
+    /\b(sports?|football|soccer|basketball|cricket|rugby|tennis|golf|celebrity|oscars?|grammy|tiktok|dating|horoscope|premier league|world cup|formula\s*1|\bf1\b|wwe|ufc|playoff|super bowl|concert tour|album drop)\b/i;
+  return list.filter((it) => !noise.test(String(it.title || '')));
+}
 
 function getFeeds(targetLang, targetCat, targetCountry) {
   const FEEDS_EN = [
@@ -14,34 +36,35 @@ function getFeeds(targetLang, targetCat, targetCountry) {
     { url: 'https://www.cnbc.com/id/10001147/device/rss/rss.html', name: 'CNBC World' }
   ];
   const FEEDS_AR = [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'Al Eqtisadiah' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.com/xml/rss/all.xml', name: 'Al Jazeera (EN)' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ];
   const FEEDS_CN = [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP Economy' },
-    { url: 'https://www.caixinglobal.com/rss.xml', name: 'Caixin Global' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
+    { url: 'https://www.caixin.com/rss/all.xml', name: 'Caixin Global' }
   ];
   const FEEDS_ASIAN = [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
-    { url: 'https://www.caixinglobal.com/rss.xml', name: 'Caixin Global' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
+    { url: 'https://www.caixin.com/rss/all.xml', name: 'Caixin Global' },
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
     { url: 'https://feeds.reuters.com/reuters/INbusinessNews', name: 'Reuters' },
     { url: 'https://www.cnbc.com/id/10001147/device/rss/rss.html', name: 'CNBC' }
   ];
   /* أسواق فقط — مصادر اقتصادية/مالية دون أخبار عامة (موقع اقتصادي) */
+  /* رويترز أغلق كثيراً من خلاصات RSS العامة — نعتمد BBC آسيا + مصادر إقليمية تعمل */
   const FEEDS_ASIAN_MARKETS = [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP Economy' },
-    { url: 'https://www.caixinglobal.com/rss.xml', name: 'Caixin Global' },
-    { url: 'https://feeds.reuters.com/reuters/businessNews', name: 'Reuters Business' },
-    { url: 'https://feeds.reuters.com/reuters/INbusinessNews', name: 'Reuters Asia' },
+    { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
+    { url: 'https://www.caixin.com/rss/all.xml', name: 'Caixin Global' },
+    { url: 'https://www.japantimes.co.jp/feed/topstories/', name: 'Japan Times' },
     { url: 'https://www.cnbc.com/id/10001147/device/rss/rss.html', name: 'CNBC' }
   ];
   /* أسواق عربية فقط — مصادر اقتصادية/مالية (مربوطة بالأسواق كالآسيوية) */
   const FEEDS_AR_MARKETS = [
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' },
-    { url: 'https://www.arabnews.com/rss', name: 'Arab News' },
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' }
+    { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' },
+    { url: 'https://feeds.bbci.co.uk/news/world/middle_east/rss.xml', name: 'BBC Middle East' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' }
   ];
   if (targetCat === 'arabic') {
     if (targetCountry) {
@@ -52,8 +75,18 @@ function getFeeds(targetLang, targetCat, targetCountry) {
   }
   if (targetCat === 'asian') {
     const countryFeeds = FEEDS_BY_ASIAN_COUNTRY[targetCountry];
-    if (countryFeeds && countryFeeds.length) return [...countryFeeds, ...FEEDS_ASIAN_MARKETS];
-    return FEEDS_ASIAN_MARKETS;
+    const core =
+      countryFeeds && countryFeeds.length ? [...countryFeeds, ...FEEDS_ASIAN_MARKETS] : [...FEEDS_ASIAN_MARKETS];
+    /* واجهة عربية: نخلط مصادر عربية (عناوين عربية فعلية) مع مصادر آسيوية الإنجليزية */
+    if (targetLang === 'ar') {
+      const FEEDS_ASIAN_AR_SUPPLEMENT = [
+        { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' },
+        { url: 'https://www.aljazeera.net/rss', name: 'الجزيرة نت' },
+        { url: 'https://feeds.bbci.co.uk/news/world/middle_east/rss.xml', name: 'BBC Middle East' }
+      ];
+      return [...FEEDS_ASIAN_AR_SUPPLEMENT, ...core];
+    }
+    return core;
   }
   if (targetCat === 'chinese') return FEEDS_CN;
   if (targetCat === 'global') return FEEDS_EN;
@@ -67,86 +100,86 @@ function getFeeds(targetLang, targetCat, targetCountry) {
 
 const FEEDS_BY_COUNTRY = {
   SA: [
-    { url: 'https://www.arabnews.com/rss', name: 'Arab News' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' }
+    { url: 'https://feeds.bbci.co.uk/news/world/middle_east/rss.xml', name: 'BBC Middle East' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' }
   ],
   AE: [
-    { url: 'https://www.thenationalnews.com/rss', name: 'The National' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' }
+    { url: 'https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml', name: 'CNA' },
+    { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   EG: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   QA: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' }
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' }
   ],
   KW: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' }
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
+    { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   BH: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' }
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
+    { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   OM: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
-    { url: 'https://www.aleqt.com/rss.xml', name: 'الاقتصادية' }
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
+    { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   JO: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   MA: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   LB: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   IQ: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   TN: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   DZ: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   SD: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   YE: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   PS: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   SY: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   LY: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ],
   MR: [
-    { url: 'https://www.aljazeera.net/aljazeera/rss', name: 'Al Jazeera' },
+    { url: 'https://www.aljazeera.net/rss', name: 'Al Jazeera' },
     { url: 'https://www.bbc.com/arabic/index.xml', name: 'BBC Arabic' }
   ]
 };
 
 const FEEDS_BY_ASIAN_COUNTRY = {
   CN: [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
-    { url: 'https://www.caixinglobal.com/rss.xml', name: 'Caixin Global' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
+    { url: 'https://www.caixin.com/rss/all.xml', name: 'Caixin Global' }
   ],
   JP: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
@@ -165,7 +198,7 @@ const FEEDS_BY_ASIAN_COUNTRY = {
     { url: 'https://feeds.reuters.com/reuters/worldNews', name: 'Reuters' }
   ],
   MY: [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' }
   ],
   TH: [
@@ -174,19 +207,19 @@ const FEEDS_BY_ASIAN_COUNTRY = {
   ],
   VN: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' }
   ],
   PK: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
     { url: 'https://feeds.reuters.com/reuters/worldNews', name: 'Reuters' }
   ],
   SG: [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
     { url: 'https://feeds.reuters.com/reuters/worldNews', name: 'Reuters' }
   ],
   PH: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' }
   ],
   BD: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
@@ -198,53 +231,146 @@ const FEEDS_BY_ASIAN_COUNTRY = {
   ],
   MM: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' }
   ],
   KH: [
     { url: 'https://feeds.bbci.co.uk/news/world/asia/rss.xml', name: 'BBC Asia' },
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' }
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' }
   ],
   TW: [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
     { url: 'https://feeds.reuters.com/reuters/worldNews', name: 'Reuters' }
   ],
   HK: [
-    { url: 'https://www.scmp.com/rss/91/feed', name: 'SCMP' },
+    { url: 'https://www.straitstimes.com/news/rss.xml', name: 'Straits Times' },
     { url: 'https://feeds.reuters.com/reuters/worldNews', name: 'Reuters' }
   ]
 };
 
 function parseRssItems(xml) {
   const items = [];
-  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-  let match;
-  while ((match = itemRegex.exec(xml)) !== null) {
-    const block = match[1];
-    const titleMatch = block.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || block.match(/<title>(.*?)<\/title>/);
-    const linkMatch = block.match(/<link>(.*?)<\/link>/);
-    const title = titleMatch ? titleMatch[1].replace(/&amp;/g, '&').replace(/&#39;/g, "'").trim() : '';
-    const link = linkMatch ? linkMatch[1].trim() : '';
-    if (title && link) items.push({ title, link });
+  const seen = new Set();
+
+  function decodeXml(s) {
+    return String(s || '')
+      .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
   }
+
+  function unescUrl(s) {
+    return String(s || '').trim().replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+  }
+
+  function extractLink(block) {
+    const href = block.match(/<link[^>]+href=["']([^"']+)["'][^>]*\/?>/i);
+    if (href && href[1]) return unescUrl(href[1]);
+    const inner = block.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
+    if (inner && inner[1].trim()) return unescUrl(decodeXml(inner[1]));
+    const guid = block.match(/<guid[^>]*>([\s\S]*?)<\/guid>/i);
+    if (guid) {
+      const g = decodeXml(guid[1]);
+      if (/^https?:\/\//i.test(g)) return g;
+    }
+    const id = block.match(/<id>([\s\S]*?)<\/id>/i);
+    if (id) {
+      const u = decodeXml(id[1]);
+      if (/^https?:\/\//i.test(u)) return u;
+    }
+    return '';
+  }
+
+  function extractTitle(block) {
+    const m =
+      block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) ||
+      block.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    return m ? decodeXml(m[1]) : '';
+  }
+
+  function parseBlock(block) {
+    const title = extractTitle(block);
+    const link = extractLink(block);
+    if (!title || !link || !/^https?:\/\//i.test(link)) return;
+    if (seen.has(link)) return;
+    seen.add(link);
+    items.push({ title, link });
+  }
+
+  let m;
+  const itemRe = /<item>([\s\S]*?)<\/item>/gi;
+  while ((m = itemRe.exec(xml)) !== null) parseBlock(m[1]);
+  const entryRe = /<entry>([\s\S]*?)<\/entry>/gi;
+  while ((m = entryRe.exec(xml)) !== null) parseBlock(m[1]);
+
   return items;
 }
 
-async function translateTitles(list, lang) {
-  if (lang !== 'ar') return list;
-  const translate = async (t) => {
-    const q = encodeURIComponent(String(t).slice(0, 500));
-    const resp = await fetch(`https://api.mymemory.translated.net/get?q=${q}&langpair=${encodeURIComponent('auto|' + lang)}`);
-    if (!resp.ok) return t;
-    const j = await resp.json();
-    const out = (j && j.response && j.response.translatedText) || (j && j.responseData && j.responseData.translatedText) || '';
-    return out || t;
-  };
-  const slice = list.slice(0, 12);
-  return Promise.all(slice.map(async (it) => ({
-    title: await translate(it.title),
-    link: it.link,
-    source: it.source
-  })));
+/**
+ * ترجمة عناوين إنجليزية → عربية عبر خدمة NLLB المحلية (نفس عقد /translate في search.html).
+ * عيّن IIF_TICKER_TRANSLATE_URL كاملاً، مثلاً http://127.0.0.1:7071 — على Vercel غير مفعّل افتراضياً.
+ */
+async function translateEnglishTitlesForArabicUi(list) {
+  const base = String(process.env.IIF_TICKER_TRANSLATE_URL || '').trim().replace(/\/$/, '');
+  if (!base) return list;
+  const maxN = Math.min(12, Math.max(1, Number(process.env.IIF_TICKER_TRANSLATE_MAX || 8)));
+  const needIdx = [];
+  for (let i = 0; i < list.length && needIdx.length < maxN; i++) {
+    const t = String(list[i].title || '').trim();
+    if (t && !ARABIC_SCRIPT.test(t)) needIdx.push(i);
+  }
+  if (!needIdx.length) return list;
+  const texts = needIdx.map((i) => String(list[i].title).slice(0, 450));
+  const timeoutMs = Number(process.env.IIF_TICKER_TRANSLATE_TIMEOUT_MS || 45000);
+  try {
+    const ac = new AbortController();
+    const to = setTimeout(() => ac.abort(), timeoutMs);
+    const r = await fetch(`${base}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: texts, target_lang: 'ar', source_lang: 'en' }),
+      signal: ac.signal
+    });
+    clearTimeout(to);
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) return list;
+    const out = Array.isArray(j.result) ? j.result : [];
+    const next = list.map((it) => ({ ...it }));
+    needIdx.forEach((idx, k) => {
+      const tr = String(out[k] || '').trim();
+      if (tr && tr.length > 1) next[idx] = { ...next[idx], arTranslation: tr };
+    });
+    return next;
+  } catch {
+    return list;
+  }
+}
+
+/** تمييز بسيط: عناوين عربية vs إنجليزية لعرض مناسب في lang-en / lang-ar */
+function annotateBilingualTitles(list) {
+  return list.map((it) => {
+    const t = String(it.title || '').trim();
+    const arTr = String(it.arTranslation || '').trim();
+    const base = { link: it.link, source: it.source };
+    if (arTr) return { ...base, title: t, titleEn: t, titleAr: arTr };
+    if (!t) return { ...base, title: t, titleEn: '', titleAr: '' };
+    if (ARABIC_SCRIPT.test(t)) return { ...base, title: t, titleEn: '', titleAr: t };
+    return { ...base, title: t, titleEn: t, titleAr: '' };
+  });
+}
+
+const NEWS_CACHE_TTL_MS = Number(process.env.IIF_NEWS_CACHE_MS || 120000);
+const newsResponseCache = new Map();
+
+function newsCacheKey(targetLang, targetCat, targetCountry, rawLang) {
+  const tr = String(process.env.IIF_TICKER_TRANSLATE_URL || '').trim() ? '1' : '0';
+  const lk = String(rawLang || targetLang || 'en').toLowerCase();
+  return `${lk}|${targetLang}|${targetCat}|${targetCountry || ''}|${tr}`;
 }
 
 export async function GET(request) {
@@ -252,9 +378,18 @@ export async function GET(request) {
   const urlLang = url.searchParams.get('lang') || url.searchParams.get('l') || '';
   const urlCat = url.searchParams.get('cat') || url.searchParams.get('category') || '';
   const urlCountry = (url.searchParams.get('country') || '').toUpperCase().trim();
-  const targetLang = (String(urlLang || '').toLowerCase() === 'ar') ? 'ar' : 'en';
+  const rawLang = String(urlLang || '').trim().toLowerCase();
+  /* خلاصات RSS: عربي vs غير عربي؛ lang=fr|de|… يُعامل كإنجليزي لاختيار المصادر */
+  const targetLang = rawLang === 'ar' ? 'ar' : 'en';
   const targetCat = (String(urlCat || '').toLowerCase()) || 'all';
   const targetCountry = urlCountry && /^[A-Z]{2}$/.test(urlCountry) ? urlCountry : '';
+
+  const ck = newsCacheKey(targetLang, targetCat, targetCountry, rawLang);
+  const now = Date.now();
+  const hit = newsResponseCache.get(ck);
+  if (hit && NEWS_CACHE_TTL_MS > 0 && now - hit.at < NEWS_CACHE_TTL_MS) {
+    return jsonNewsResponse(hit.body, hit.count);
+  }
 
   try {
     const all = [];
@@ -270,9 +405,15 @@ export async function GET(request) {
     }
     const uniqueByLink = [...new Map(all.map((i) => [i.link, i])).values()];
     let list = uniqueByLink.slice(0, 15);
-    list = await translateTitles(list, targetLang);
-    return new Response(JSON.stringify({ items: list }), { status: 200, headers: CORS });
+    list = filterMarketTickerNoise(list, targetCat);
+    if (targetLang === 'ar') list = await translateEnglishTitlesForArabicUi(list);
+    list = annotateBilingualTitles(list);
+    const body = JSON.stringify({ items: list });
+    if (NEWS_CACHE_TTL_MS > 0) {
+      newsResponseCache.set(ck, { at: now, body, count: list.length });
+    }
+    return jsonNewsResponse(body, list.length);
   } catch (e) {
-    return new Response(JSON.stringify({ items: [] }), { status: 200, headers: CORS });
+    return jsonNewsResponse(JSON.stringify({ items: [] }), 0);
   }
 }

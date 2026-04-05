@@ -12,6 +12,13 @@
 
 After changing hosts, update **`iif-searx-proxy-base`** to match your live proxy (e.g. `https://your-project.vercel.app`).
 
+### موجز الأخبار `api/news.js`
+
+- يُنشر مع جذر مشروع Vercel نفسه (`financial-consulting/iif-fund-demo/api/news.js`). بعد أي تعديل على الخلاصات أو الترجمة، **أعد النشر** حتى يطابق `iif-funcs-base` النسخة الحالية.
+- محلياً على `127.0.0.1:3333` الواجهة تستدعي `/api/news` من `scripts/dev-server.js` (لا تعتمد على نشر قديم).
+- متغيرات اختيارية (Vercel / `.env`): `IIF_NEWS_CACHE_MS`, `IIF_TICKER_TRANSLATE_URL`, `IIF_TICKER_TRANSLATE_MAX` — راجع `.env.example`.
+- فحص الخلاصات: من جذر المستودع `npm run check:news-feeds`.
+
 ### نسخة احتياطية سريعة (للصق في مستند داخلي)
 
 ```

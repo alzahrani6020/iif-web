@@ -132,6 +132,21 @@ async function main() {
     const hero = await page.locator('section.hero').count();
     if (hero < 1) throw new Error('section.hero غير موجود');
 
+    console.log('E2E public: /api/news (lang=ar, cat=asian)');
+    const newsRes = await page.request.get(`${BASE}/api/news?lang=ar&cat=asian`);
+    if (!newsRes.ok()) throw new Error('api/news فشل HTTP ' + newsRes.status());
+    const newsJson = await newsRes.json();
+    if (!newsJson || !Array.isArray(newsJson.items)) throw new Error('api/news بدون items[]');
+    const nHeaders = newsRes.headers();
+    const cnt = nHeaders['x-iif-news-item-count'] || nHeaders['X-IIF-News-Item-Count'];
+    if (cnt != null && String(newsJson.items.length) !== String(cnt)) {
+      throw new Error('X-IIF-News-Item-Count لا يطابق طول items');
+    }
+    const newsFr = await page.request.get(`${BASE}/api/news?lang=fr&cat=asian`);
+    if (!newsFr.ok()) throw new Error('api/news lang=fr فشل');
+    const jFr = await newsFr.json();
+    if (!jFr || !Array.isArray(jFr.items)) throw new Error('api/news fr بدون items');
+
     await page.evaluate(() => {
       document.documentElement.setAttribute('data-lang', 'ar');
       document.documentElement.setAttribute('lang', 'ar');

@@ -9,10 +9,19 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const { URL } = require('url');
+const { URL, pathToFileURL } = require('url');
 
 const PORT = Number(process.env.PORT) || 3333;
 const ROOT = path.join(__dirname, '..');
+/** موجز الأخبار (RSS) — نفس منطق financial-consulting/iif-fund-demo/api/news.js */
+const IIF_NEWS_API_JS = path.join(ROOT, 'financial-consulting', 'iif-fund-demo', 'api', 'news.js');
+let iifNewsApiModulePromise = null;
+function getIifNewsApiModule() {
+  if (!iifNewsApiModulePromise) {
+    iifNewsApiModulePromise = import(pathToFileURL(IIF_NEWS_API_JS).href);
+  }
+  return iifNewsApiModulePromise;
+}
 /** upstream SearXNG (Docker) */
 const SEARX_UPSTREAM = new URL(process.env.SEARXNG_URL || 'http://127.0.0.1:18080');
 /** upstream Ollama (local) */
@@ -131,6 +140,11 @@ const RL_TRANSLATE = createRateLimiter({
   windowMs: Number(process.env.IIF_RL_WINDOW_MS || 60000),
   max: Number(process.env.IIF_RL_TRANSLATE_MAX || 120),
   label: 'translate',
+});
+const RL_NEWS = createRateLimiter({
+  windowMs: Number(process.env.IIF_RL_WINDOW_MS || 60000),
+  max: Number(process.env.IIF_RL_NEWS_MAX || 90),
+  label: 'news',
 });
 
 function parseSearxSafeSearchMode() {
@@ -555,6 +569,7 @@ function serveStatic(req, res) {
     '/brief': '/executive-brief.html',
     '/sovereign': '/sovereign-standards.html',
     '/charter': '/sovereign-standards.html',
+    '/news-sources': '/financial-consulting/iif-fund-demo/news-sources.html',
   };
   if (shortPaths[urlPath]) {
     urlPath = shortPaths[urlPath];
@@ -636,6 +651,7 @@ const server = http.createServer((req, res) => {
         rateLimit: {
           searx: RL_SEARX.snapshot('searx'),
           fetch: RL_FETCH.snapshot('fetch'),
+          news: RL_NEWS.snapshot('news'),
         },
         fetchAllowlist: getFetchAllowlist(),
         diagnostics: { max: DIAG_MAX, size: DIAG.length },
@@ -647,6 +663,45 @@ const server = http.createServer((req, res) => {
   }
   if (urlPath === '/diagnostics.json') {
     sendJson(res, 200, { ok: true, now: new Date().toISOString(), items: DIAG }, { 'Access-Control-Allow-Origin': '*' });
+    return;
+  }
+  if (urlPath === '/api/news') {
+    if (method !== 'GET' && method !== 'HEAD') {
+      send(res, 405, 'Method Not Allowed', { 'Content-Type': 'text/plain; charset=utf-8' });
+      return;
+    }
+    if (!RL_NEWS.check(req, res, 'news')) return;
+    (async () => {
+      try {
+        const { GET } = await getIifNewsApiModule();
+        const abs = `http://127.0.0.1${req.url || '/api/news'}`;
+        const webRes = await GET(new Request(abs, { method: 'GET' }));
+        const headers = {};
+        webRes.headers.forEach((v, k) => {
+          headers[k] = v;
+        });
+        if (method === 'HEAD') {
+          res.writeHead(webRes.status, headers);
+          res.end();
+          return;
+        }
+        const buf = Buffer.from(await webRes.arrayBuffer());
+        res.writeHead(webRes.status, headers);
+        res.end(buf);
+      } catch (e) {
+        diagPush({ type: 'api_news_error', path: req.url, error: e.message });
+        sendJson(
+          res,
+          200,
+          { items: [] },
+          {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+          }
+        );
+      }
+    })();
     return;
   }
   if (urlPath === '/api/translate') {
@@ -690,6 +745,7 @@ server.listen(PORT, () => {
   console.log('  تشخيص (JSON): /diagnostics.json');
   console.log('  ترجمة (POST JSON): /api/translate  →  ' + TRANSLATE_UPSTREAM.origin + '/translate');
   console.log('  Proxy fetch (Allowlist): /api/fetch?url=https://example.com/data.json');
+  console.log('  موجز الأخبار (RSS): /api/news?lang=en|ar&cat=asian|arabic|…  (حد معدل: IIF_RL_NEWS_MAX)');
   console.log('  المحرك: cd engines/searxng && docker compose up -d');
   console.log('  لوحة (اختصار): /dashboard أو /cp أو /panel أو /fund-admin  →  واجهة الصندوق + open_dashboard=1');
   if (allowDevAdminDirect()) {

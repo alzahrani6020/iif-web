@@ -507,16 +507,72 @@
     .site-header__inner {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0.4rem var(--space-4);
+      padding: 0.55rem var(--space-4) 0.5rem;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-6);
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: var(--space-4);
+      flex-wrap: nowrap;
+    }
+
+    .site-header__inner > .site-nav {
+      align-self: stretch;
+      max-width: 100%;
     }
 
     .site-header__tickers {
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ticker-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem 0.85rem;
+      padding: 0.35rem 0.5rem 0.45rem 6rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: rgba(10, 14, 24, 0.92);
+      font-size: 0.78rem;
+    }
+
+    [dir="rtl"] .ticker-toolbar {
+      padding: 0.35rem 6rem 0.45rem 0.5rem;
+    }
+
+    .ticker-toolbar label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--color-text-muted, #94a3b8);
+    }
+
+    .ticker-toolbar select {
+      max-width: 10rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(12, 16, 26, 0.95);
+      color: var(--color-text-main);
+      font-size: 0.76rem;
+    }
+
+    .ticker-toolbar .btn--ticker-pause {
+      margin-inline-end: auto;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.76rem;
+    }
+
+    [dir="rtl"] .ticker-toolbar .btn--ticker-pause {
+      margin-inline-end: 0;
+      margin-inline-start: auto;
+    }
+
+    .site-header__tickers--paused .ticker-track {
+      animation-play-state: paused !important;
     }
 
     .site-logo {
@@ -579,19 +635,207 @@
     }
 
     .site-header__brand {
+      display: block;
+      width: 100%;
+    }
+
+    /* شريط علوي واحد: الشعار + الساعة + الاختصارات + الحساب */
+    .iif-header-primary-bar {
       display: flex;
-      align-items: center;
-      gap: var(--space-4);
+      flex-direction: row;
       flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5rem 0.75rem;
+      border-radius: 14px;
+      border: 1px solid rgba(201, 162, 39, 0.16);
+      background:
+        linear-gradient(168deg, rgba(255, 255, 255, 0.045) 0%, transparent 38%),
+        linear-gradient(180deg, rgba(22, 26, 34, 0.92) 0%, rgba(10, 12, 18, 0.96) 100%);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 4px 18px rgba(0, 0, 0, 0.12);
+      -webkit-backdrop-filter: blur(12px) saturate(1.08);
+      backdrop-filter: blur(12px) saturate(1.08);
+    }
+
+    @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+      .iif-header-primary-bar {
+        background: linear-gradient(180deg, rgba(22, 26, 34, 0.98) 0%, rgba(10, 12, 18, 0.99) 100%);
+      }
+    }
+
+    .iif-header-primary-bar .site-logo {
+      flex: 0 1 auto;
+      min-width: 0;
+      margin-inline-end: 0.15rem;
     }
 
     .site-header__clock-lang {
       display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      flex: 1 1 220px;
+      min-width: min(100%, 12rem);
+      max-width: none;
+      flex-shrink: 1;
+    }
+
+    .iif-header-brand-stack {
+      display: flex;
       flex-direction: row;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       align-items: center;
-      gap: var(--space-4);
-      flex-shrink: 0;
+      gap: 0.45rem 0.55rem;
+      width: 100%;
+    }
+
+    .iif-header-brand-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem 0.55rem;
+      flex: 0 1 auto;
+    }
+
+    .iif-header-brand-top .site-clock--in-brand {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    .iif-header-brand-top .iif-section-links-toggle {
+      flex: 0 1 auto;
+      min-width: min(100%, 9.5rem);
+      max-width: 100%;
+      width: auto;
+      margin: 0;
+      align-self: center;
+    }
+
+    .iif-header-toolbar-panel {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem 0.5rem;
+      padding: 0;
+      border-radius: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      flex: 1 1 180px;
+      min-width: min(100%, 10rem);
+    }
+
+    .iif-header-toolbar-panel::before {
+      display: none;
+    }
+
+    .iif-header-toolbar-panel .site-header__auth-btns {
+      margin: 0 !important;
+    }
+
+    .iif-header-toolbar-panel .site-header__auth-btn {
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.28rem 0.82rem;
+      border-width: 1px;
+      letter-spacing: 0.02em;
+      box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .iif-header-toolbar-panel .site-header__auth-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .iif-header-toolbar-panel .site-header__auth-btn:active {
+      transform: translateY(0);
+    }
+
+    .iif-header-brand-account {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.45rem 0.6rem;
+      padding: 0;
+      border-radius: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      flex: 0 1 auto;
+      margin-inline-start: auto;
+    }
+
+    .iif-header-brand-stack:has(#iif-header-toolbar-links[hidden]) .iif-header-brand-account {
+      border: none;
+    }
+
+    .iif-header-brand-account .site-header__auth-btns--top {
+      margin: 0;
+      margin-inline-end: var(--space-2);
+      padding-inline-end: var(--space-2);
+      border-inline-end: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .iif-header-brand-account .lang-picker-wrap {
+      margin: 0;
+      padding: 0.22rem 0.48rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 11px;
+    }
+
+    .iif-header-brand-account .lang-picker-label {
+      color: rgba(226, 232, 240, 0.88);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .iif-header-brand-account .lang-picker-wrap select {
+      padding: 0.32rem 1.65rem 0.32rem 0.55rem;
+      border-radius: 9px;
+      border: 1px solid rgba(201, 162, 39, 0.28);
+      background-color: rgba(14, 16, 24, 0.92);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e2e8f0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      color: #e8eaf0;
+      font-size: 0.78rem;
+    }
+
+    [dir="rtl"] .iif-header-brand-account .lang-picker-wrap select {
+      background-position: left 0.5rem center;
+    }
+
+    .iif-header-brand-account .lang-picker-wrap select:hover,
+    .iif-header-brand-account .lang-picker-wrap select:focus {
+      border-color: rgba(212, 174, 42, 0.55);
+    }
+
+    .iif-header-brand-account .header-user-card {
+      margin: 0;
+      border-color: rgba(201, 162, 39, 0.2);
+      background: rgba(201, 162, 39, 0.05);
+      box-shadow: none;
+      filter: none;
+    }
+
+    .iif-header-brand-account .header-user-card:hover {
+      box-shadow: 0 2px 12px rgba(201, 162, 39, 0.12);
+      border-color: rgba(201, 162, 39, 0.32);
     }
 
     .site-header__brand .site-clock--in-brand {
@@ -601,8 +845,95 @@
       border-inline-start: 1px solid rgba(201, 162, 39, 0.25);
     }
 
+    .site-header__brand .iif-header-brand-top .site-clock--in-brand {
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      padding: 0.28rem 0.65rem;
+      padding-inline-start: 0.65rem;
+      min-width: 0;
+      align-items: flex-start;
+      text-align: start;
+      border-inline-start: none;
+      border-inline-end: none;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.22);
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+
+    .iif-header-primary-bar .site-clock__time {
+      font-size: 1.05rem;
+    }
+
+    .iif-header-primary-bar .site-clock__tz,
+    .iif-header-primary-bar .site-clock__date {
+      font-size: 0.68rem;
+    }
+
     .site-header__clock-lang .lang-picker-wrap {
       margin: 0;
+    }
+
+    .iif-section-links-toggle {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.76rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+      color: #faf6ee;
+      cursor: pointer;
+      border: 1px solid rgba(201, 162, 39, 0.45);
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg, rgba(201, 162, 39, 0.2) 0%, transparent 42%),
+        linear-gradient(180deg, rgba(44, 48, 60, 0.98) 0%, rgba(14, 16, 24, 1) 100%);
+      box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(0, 0, 0, 0.25) inset,
+        0 1px 0 rgba(255, 255, 255, 0.09) inset;
+      transition:
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background 0.22s ease,
+        transform 0.2s ease,
+        color 0.2s ease;
+    }
+
+    .iif-section-links-toggle:hover {
+      border-color: rgba(236, 220, 160, 0.55);
+      color: #fff;
+      box-shadow:
+        0 6px 28px rgba(201, 162, 39, 0.12),
+        0 4px 18px rgba(0, 0, 0, 0.32),
+        0 1px 0 rgba(255, 255, 255, 0.11) inset;
+      transform: translateY(-1px);
+    }
+
+    .iif-section-links-toggle:active {
+      transform: translateY(0);
+    }
+
+    .iif-section-links-toggle:focus-visible {
+      outline: 2px solid rgba(236, 220, 160, 0.75);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .iif-section-links-toggle,
+      .iif-header-toolbar-panel .site-header__auth-btn {
+        transition: none;
+      }
+
+      .iif-section-links-toggle:hover,
+      .iif-header-toolbar-panel .site-header__auth-btn:hover {
+        transform: none;
+      }
     }
 
     .site-header__auth-btns {
@@ -611,12 +942,6 @@
       gap: var(--space-2);
       align-items: center;
       flex-shrink: 0;
-    }
-
-    .site-header__auth-btns--top {
-      margin-inline-end: var(--space-2);
-      padding-inline-end: var(--space-2);
-      border-inline-end: 1px solid var(--color-border-subtle);
     }
 
     .site-header__auth-btns.is-hidden {
@@ -825,10 +1150,13 @@
     .site-nav {
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.4rem 0.45rem;
+      row-gap: 0.45rem;
       font-size: 0.8rem;
       flex-wrap: wrap;
       overflow: visible;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .site-nav a {
@@ -864,6 +1192,12 @@
 
     /* خدماتنا — قائمة منسدلة حتى يتوسّع الهيدر */
     .site-nav__services-wrap {
+      position: relative;
+      display: inline-block;
+      overflow: visible;
+    }
+
+    .site-nav__more-wrap {
       position: relative;
       display: inline-block;
       overflow: visible;
@@ -1103,6 +1437,32 @@
         box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12), 0 0 20px rgba(201, 162, 39, 0.45), 0 0 40px rgba(232, 212, 138, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         border-color: rgba(232, 212, 138, 0.6);
         color: #f0e6c8;
+      }
+    }
+
+    .site-nav__dropdown a.nav-link--rep-glow {
+      margin-inline: var(--space-3);
+      width: auto;
+      box-sizing: border-box;
+      border-radius: var(--radius-sm);
+      animation: rep-glow-pulse-dropdown 2.8s ease-in-out infinite;
+    }
+
+    .site-nav__dropdown a.nav-link--rep-glow:hover {
+      animation-duration: 2s;
+    }
+
+    @keyframes rep-glow-pulse-dropdown {
+
+      0%,
+      100% {
+        box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.32), 0 0 8px rgba(201, 162, 39, 0.12);
+        color: var(--color-accent-gold-soft);
+      }
+
+      50% {
+        box-shadow: inset 0 0 0 1px rgba(212, 174, 42, 0.45), 0 0 14px rgba(201, 162, 39, 0.2);
+        color: #f2ebd4;
       }
     }
 
@@ -4334,13 +4694,9 @@
     .ticker-track {
       display: flex;
       width: max-content;
-      animation: ticker-scroll-rtl 120s linear infinite;
-      animation-iteration-count: infinite;
+      animation: ticker-marquee 120s linear infinite;
       will-change: transform;
-    }
-
-    [dir="ltr"] .ticker-track {
-      animation-name: ticker-scroll-ltr;
+      backface-visibility: hidden;
     }
 
     .ticker-track:hover {
@@ -4394,38 +4750,40 @@
       margin-left: 0;
     }
 
-    /* حركة مستمرة: عند الانتهاء تُكرر من جديد (حلقة لا نهائية) */
-    @keyframes ticker-scroll-rtl {
-      0% {
-        transform: translateX(0);
-      }
-
-      100% {
-        transform: translateX(-50%);
-      }
+    [data-lang="ar"] .site-header__tickers .ticker-item .lang-ar {
+      display: inline !important;
     }
 
-    @keyframes ticker-scroll-ltr {
+    /* حلقة لا نهائية: مساران بنفس المحتوى؛ -50% = عرض نسخة واحدة */
+    @keyframes ticker-marquee {
       0% {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
       }
 
       100% {
-        transform: translateX(50%);
+        transform: translate3d(-50%, 0, 0);
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
+      .site-header__tickers .ticker-wrap,
+      .ticker-wrap {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+
       .ticker-track {
         animation: none !important;
+        transform: none !important;
       }
 
       .ticker-track__copy {
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 0.25rem 0.75rem;
-        max-width: 100%;
-        width: 100%;
+        max-width: none;
+        width: max-content;
       }
 
       .site-logo:hover .site-logo__emblem {
@@ -7132,12 +7490,68 @@
     @media (max-width: 900px) {
       .site-header__inner {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+      }
+
+      .iif-header-primary-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.55rem;
+      }
+
+      .iif-header-primary-bar .site-logo {
+        margin-inline-end: 0;
+      }
+
+      .site-header__clock-lang {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        flex-basis: 100%;
+        flex: 1 1 100%;
+      }
+
+      .iif-header-brand-stack {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .iif-header-brand-account {
+        margin-inline-start: 0;
+        justify-content: flex-start;
+      }
+
+      .iif-header-brand-top .site-clock--in-brand {
+        flex: 1 1 auto;
+      }
+
+      .iif-header-brand-top .iif-section-links-toggle {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
+        max-width: none;
+      }
+
+      .iif-header-toolbar-panel {
+        flex: 1 1 100%;
+        min-width: 0;
       }
 
       .site-nav {
+        flex-basis: 100%;
+        width: 100%;
         flex-wrap: wrap;
         gap: 0.35rem;
+        border-block-start: 1px solid rgba(201, 162, 39, 0.14);
+        padding-block-start: 0.55rem;
+        margin-block-start: 0.35rem;
+      }
+
+      .site-header__clock-lang .site-header__auth-btn {
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
       }
 
       .site-nav .header-search {
@@ -7699,6 +8113,7 @@
   <header class="site-header">
     <div class="site-header__inner">
       <div class="site-header__brand">
+        <div class="iif-header-primary-bar">
         <a href="#" class="site-logo">
           <span class="site-logo__emblem site-logo__emblem--crest" aria-hidden="true">
             <picture>
@@ -7714,15 +8129,24 @@
           </span>
         </a>
         <div class="site-header__clock-lang">
+          <div class="iif-header-brand-stack">
+          <div class="iif-header-brand-top">
           <div class="site-clock site-clock--in-brand" aria-live="polite" id="site-clock-wrap"
             aria-label="Your local time — your device timezone">
             <span class="site-clock__time" id="site-clock-time">—</span>
             <span class="site-clock__tz" id="site-clock-tz"></span>
             <span class="site-clock__date" id="site-clock-date"></span>
           </div>
+          <button type="button" id="iif-toggle-section-links" class="iif-section-links-toggle" aria-expanded="true"
+            aria-controls="iif-header-toolbar-links iif-header-main-nav">
+            <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Hide section links</span>
+            <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Show section links</span>
+          </button>
+          </div>
+          <div id="iif-header-toolbar-links" class="iif-header-collapsible-target iif-header-toolbar-panel">
           <!-- موجز للمستويات الرفيعة — وثيقة مؤسسية للاطلاع الرسمي -->
           <div class="site-header__auth-btns"
-            style="margin-bottom: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
             <a href="/executive-brief.html" class="site-header__auth-btn site-header__auth-btn--login"
               style="text-decoration: none; display: inline-block; background: rgba(248, 250, 252, 0.06); border-color: rgba(201, 162, 39, 0.45); font-size: 0.82rem;"
               title="Executive Brief — موجز للمستويات الرفيعة">
@@ -7738,7 +8162,7 @@
           </div>
           <!-- Government Search: بوابة الدول + الاستعلام الجغرافي (روابط عميقة) -->
           <div class="site-header__auth-btns"
-            style="margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
             <div style="position: relative; display: inline-block;">
               <button
                 type="button"
@@ -7787,7 +8211,9 @@
               </div>
             </div>
           </div>
+          </div>
 
+          <div class="iif-header-brand-account">
           <div class="site-header__auth-btns site-header__auth-btns--top" id="header-auth-btns" aria-label="Account">
             <button type="button" class="site-header__auth-btn site-header__auth-btn--login" id="auth-header-login">
               <span class="lang-en">Sign in</span>
@@ -7902,9 +8328,12 @@
               <span class="header-user-card__meta" id="header-user-meta"></span>
             </div>
           </div>
+          </div>
+          </div>
+        </div>
         </div>
       </div>
-      <nav class="site-nav">
+      <nav class="site-nav iif-header-collapsible-target" id="iif-header-main-nav">
         <div class="site-nav__about-wrap" id="about-dropdown-wrap" style="position: relative; display: inline-block;">
           <button type="button" class="site-nav__about-trigger" id="about-dropdown-trigger" aria-expanded="false"
             aria-haspopup="true" aria-controls="about-dropdown"
@@ -7972,14 +8401,26 @@
           </div>
         </div>
         <a href="#contact" class="btn btn--primary" data-i18n="navContact">Contact</a>
-        <a href="#terms"><span class="lang-en">Terms</span><span class="lang-ar">الشروط والأحكام</span></a>
-        <a href="#page-representative" class="nav-to-section nav-link--rep-glow"
-          data-scroll-to="page-representative"><span class="lang-en">Become representative</span><span
-            class="lang-ar">كن ممثلاً لنا</span></a>
-        <a href="#compliance" data-i18n="footerCompliance">Compliance &amp; licenses</a>
-        <a href="#customer-experience"><span class="lang-en">Experience</span><span class="lang-ar">تجربة
-            العملاء</span></a>
-        <a href="#careers"><span class="lang-en">Careers</span><span class="lang-ar">التوظيف</span></a>
+        <div class="site-nav__more-wrap" id="more-dropdown-wrap">
+          <button type="button" class="site-nav__services-trigger" id="more-dropdown-trigger" aria-expanded="false"
+            aria-haspopup="true" aria-controls="more-dropdown">
+            <span class="lang-en">More</span><span class="lang-ar">المزيد</span>
+          </button>
+          <div class="site-nav__dropdown" id="more-dropdown" role="menu" aria-hidden="true">
+            <a href="#terms" role="menuitem"><span class="lang-en">Terms</span><span class="lang-ar">الشروط والأحكام</span></a>
+            <a href="privacy.html" role="menuitem"><span class="lang-en">Privacy</span><span class="lang-ar">الخصوصية</span></a>
+            <a href="about-institution.html" role="menuitem"><span class="lang-en">About the Fund</span><span
+                class="lang-ar">عن الصندوق</span></a>
+            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
+            <a href="#page-representative" class="nav-to-section nav-link--rep-glow" role="menuitem"
+              data-scroll-to="page-representative"><span class="lang-en">Become representative</span><span
+                class="lang-ar">كن ممثلاً لنا</span></a>
+            <a href="#compliance" role="menuitem" data-i18n="footerCompliance">Compliance &amp; licenses</a>
+            <a href="#customer-experience" role="menuitem"><span class="lang-en">Experience</span><span
+                class="lang-ar">تجربة العملاء</span></a>
+            <a href="#careers" role="menuitem"><span class="lang-en">Careers</span><span class="lang-ar">التوظيف</span></a>
+          </div>
+        </div>
         <button type="button" class="btn btn--ghost" id="calc-open" aria-label="Calculator" style="display:none;"><span
             class="lang-en">Calculator</span><span class="lang-ar">حاسبة</span></button>
         <a href="#" class="btn btn--ghost nav-dashboard-link" id="nav-dashboard" aria-label="Dashboard"
@@ -8027,6 +8468,45 @@
       </nav>
     </div>
     <div class="site-header__tickers">
+      <div class="ticker-toolbar" role="toolbar" aria-label="Ticker options">
+        <button type="button" class="btn btn--ghost btn-sm btn--ticker-pause" id="iif-ticker-motion-toggle" aria-pressed="false" data-i18n="tickerMotionPause">Pause tickers</button>
+        <label><span data-i18n="tickerFilterAsia">Asia focus</span>
+          <select id="iif-ticker-country-asian" title="Asian markets region" aria-label="Asian markets region">
+            <option value="" data-i18n="tickerCountryAll">All</option>
+            <option value="CN">CN</option>
+            <option value="JP">JP</option>
+            <option value="IN">IN</option>
+            <option value="KR">KR</option>
+            <option value="SG">SG</option>
+            <option value="TH">TH</option>
+            <option value="VN">VN</option>
+            <option value="MY">MY</option>
+            <option value="ID">ID</option>
+            <option value="PH">PH</option>
+            <option value="PK">PK</option>
+            <option value="BD">BD</option>
+            <option value="LK">LK</option>
+            <option value="HK">HK</option>
+            <option value="TW">TW</option>
+          </select>
+        </label>
+        <label><span data-i18n="tickerFilterArab">Arab region</span>
+          <select id="iif-ticker-country-arab" title="Arab markets region" aria-label="Arab markets region">
+            <option value="" data-i18n="tickerCountryAll">All</option>
+            <option value="SA">SA</option>
+            <option value="AE">AE</option>
+            <option value="EG">EG</option>
+            <option value="QA">QA</option>
+            <option value="KW">KW</option>
+            <option value="BH">BH</option>
+            <option value="OM">OM</option>
+            <option value="JO">JO</option>
+            <option value="MA">MA</option>
+            <option value="LB">LB</option>
+            <option value="IQ">IQ</option>
+          </select>
+        </label>
+      </div>
       <!-- News & markets ticker -->
       <div class="ticker-wrap">
         <span class="ticker-label lang-en">Global Markets</span>
@@ -10826,6 +11306,7 @@
     defer></script>
   <script src="js/site-header-inner-newtab.js"></script>
   <script src="js/iif-same-page-hash-nav.js"></script>
+  <script src="js/iif-header-links-toggle.js"></script>
   <script src="js/iif-first-load-shell.js"></script>
   <script nonce="iif2026">
     (function () {
@@ -11395,6 +11876,17 @@
        * لا تغيّر ترتيب السكربتات أو تعتمد على تنفيذ السكربت المضمّن قبل i18n.js. */
       var LANG_STORAGE_KEY = (window.IIF_CONFIG && window.IIF_CONFIG.langStorageKey) || 'iif-lang';
       var DEFAULT_LANG = (window.IIF_CONFIG && window.IIF_CONFIG.defaultLang) || 'en';
+      function iifRestartTickerMarquees() {
+        var ids = ['ticker-track', 'ticker-asian-track', 'ticker-arab-track'];
+        for (var i = 0; i < ids.length; i++) {
+          var el = document.getElementById(ids[i]);
+          if (!el) continue;
+          el.style.animation = 'none';
+          void el.offsetWidth;
+          el.style.removeProperty('animation');
+        }
+      }
+      window.IIF_restartTickerMarquees = iifRestartTickerMarquees;
       function applyLangToDocument(lang) {
         var l = (typeof lang === 'string' ? lang : '').trim().toLowerCase() || DEFAULT_LANG;
         var root = document.documentElement;
@@ -11427,12 +11919,19 @@
           lang = (typeof lang === 'string' ? lang : '').trim().toLowerCase() || DEFAULT_LANG;
           IIF_I18N.apply(lang);
           applyLangToDocument(lang);
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
+              if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
+            });
+          });
           if (picker) {
             picker.value = lang;
             picker.addEventListener('change', function () {
               var v = (this.value || '').trim().toLowerCase() || DEFAULT_LANG;
               IIF_I18N.apply(v);
               applyLangToDocument(v);
+              if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
               if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
               if (typeof updateDashboardNav === 'function') updateDashboardNav();
               if (typeof updateRegPhoneCodeLabels === 'function') updateRegPhoneCodeLabels();
@@ -11440,9 +11939,11 @@
               if (typeof window.IIF_backToTopSync === 'function') window.IIF_backToTopSync();
               var ad = document.getElementById('about-dropdown');
               var sd = document.getElementById('services-dropdown');
+              var md = document.getElementById('more-dropdown');
               if (typeof window.IIF_clampNavDropdown === 'function') {
                 if (ad && ad.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(ad);
                 if (sd && sd.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(sd);
+                if (md && md.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(md);
               }
             });
           }
@@ -11453,11 +11954,18 @@
           var langToUse = (saved || DEFAULT_LANG).toLowerCase();
           if (!picker || !picker.querySelector('option[value="' + langToUse + '"]')) langToUse = DEFAULT_LANG;
           applyLangToDocument(langToUse);
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
+              if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
+            });
+          });
           if (picker) {
             picker.value = langToUse;
             picker.addEventListener('change', function () {
               var v = (this.value || '').trim().toLowerCase() || DEFAULT_LANG;
               applyLangToDocument(v);
+              if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
               if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
               if (typeof updateDashboardNav === 'function') updateDashboardNav();
               if (typeof updateRegPhoneCodeLabels === 'function') updateRegPhoneCodeLabels();
@@ -11465,9 +11973,11 @@
               if (typeof window.IIF_backToTopSync === 'function') window.IIF_backToTopSync();
               var ad2 = document.getElementById('about-dropdown');
               var sd2 = document.getElementById('services-dropdown');
+              var md2 = document.getElementById('more-dropdown');
               if (typeof window.IIF_clampNavDropdown === 'function') {
                 if (ad2 && ad2.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(ad2);
                 if (sd2 && sd2.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(sd2);
+                if (md2 && md2.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(md2);
               }
             });
           }
@@ -11498,8 +12008,10 @@
         window.addEventListener('resize', function () {
           var a = document.getElementById('about-dropdown');
           var s = document.getElementById('services-dropdown');
+          var m = document.getElementById('more-dropdown');
           if (a && a.getAttribute('aria-hidden') === 'false') clamp(a);
           if (s && s.getAttribute('aria-hidden') === 'false') clamp(s);
+          if (m && m.getAttribute('aria-hidden') === 'false') clamp(m);
         });
       })();
 
@@ -11975,6 +12487,46 @@
             var link = e.target && e.target.closest('a');
             if (link) {
               setTimeout(closeAboutDropdown, (window.IIF_TIMING && window.IIF_TIMING.dropdownClose) || 340);
+            }
+          });
+        }
+      })();
+
+      (function initMoreDropdown() {
+        var wrap = document.getElementById('more-dropdown-wrap');
+        var trigger = document.getElementById('more-dropdown-trigger');
+        var dropdown = document.getElementById('more-dropdown');
+        function closeMoreDropdown() {
+          if (wrap) wrap.classList.remove('is-open');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+          if (dropdown) {
+            dropdown.setAttribute('aria-hidden', 'true');
+            dropdown.style.setProperty('--iif-dd-x', '0px');
+          }
+        }
+        function openMoreDropdown() {
+          if (wrap) wrap.classList.add('is-open');
+          if (trigger) trigger.setAttribute('aria-expanded', 'true');
+          if (dropdown) {
+            dropdown.setAttribute('aria-hidden', 'false');
+            if (typeof window.IIF_clampNavDropdown === 'function') window.IIF_clampNavDropdown(dropdown);
+          }
+        }
+        function toggleMoreDropdown() {
+          if (wrap && wrap.classList.contains('is-open')) closeMoreDropdown();
+          else openMoreDropdown();
+        }
+        if (trigger && wrap) {
+          trigger.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); toggleMoreDropdown(); });
+        }
+        document.addEventListener('click', function (e) {
+          if (!wrap || !wrap.contains(e.target)) closeMoreDropdown();
+        });
+        if (dropdown) {
+          dropdown.addEventListener('click', function (e) {
+            var link = e.target && e.target.closest('a');
+            if (link) {
+              setTimeout(closeMoreDropdown, (window.IIF_TIMING && window.IIF_TIMING.dropdownClose) || 340);
             }
           });
         }
@@ -21551,17 +22103,94 @@
 
       /* شريطا الأسواق الآسيوية والعربية — مربوطة بالأسواق فقط (مصادر اقتصادية)، حركة مستمرة تُكرر من جديد */
       (function loadTickersAsianArab() {
+        var LS_ASIAN = 'iif-ticker-country-asian';
+        var LS_ARAB = 'iif-ticker-country-arab';
+        var LS_PAUSED = 'iif-ticker-paused';
         var copyAsian = document.getElementById('ticker-asian-copy');
         var copyAsian2 = document.getElementById('ticker-asian-copy2');
         var copyArab = document.getElementById('ticker-arab-copy');
         var copyArab2 = document.getElementById('ticker-arab-copy2');
-        if (!copyAsian || !copyArab) return;
+        if (!copyAsian || !copyAsian2) copyAsian = copyAsian2 = null;
+        if (!copyArab || !copyArab2) copyArab = copyArab2 = null;
+        if (!copyAsian && !copyArab) return;
+        function restoreTickerCountries() {
+          try {
+            var ea = document.getElementById('iif-ticker-country-asian');
+            var va = localStorage.getItem(LS_ASIAN) || '';
+            if (ea && va && ea.querySelector('option[value="' + va + '"]')) ea.value = va;
+            var er = document.getElementById('iif-ticker-country-arab');
+            var vr = localStorage.getItem(LS_ARAB) || '';
+            if (er && vr && er.querySelector('option[value="' + vr + '"]')) er.value = vr;
+          } catch (eR) { }
+        }
+        restoreTickerCountries();
+        function getCountryForCat(cat) {
+          try {
+            if (cat === 'asian') {
+              var el = document.getElementById('iif-ticker-country-asian');
+              var v = el && el.value ? String(el.value).toUpperCase().trim() : '';
+              return /^[A-Z]{2}$/.test(v) ? v : '';
+            }
+            if (cat === 'arabic') {
+              var el2 = document.getElementById('iif-ticker-country-arab');
+              var v2 = el2 && el2.value ? String(el2.value).toUpperCase().trim() : '';
+              return /^[A-Z]{2}$/.test(v2) ? v2 : '';
+            }
+          } catch (eC) { }
+          return '';
+        }
+        (function initTickerToolbarPause() {
+          var wrap = document.querySelector('.site-header__tickers');
+          var btn = document.getElementById('iif-ticker-motion-toggle');
+          if (!wrap || !btn) return;
+          function updatePauseLabel(paused) {
+            var key = paused ? 'tickerMotionResume' : 'tickerMotionPause';
+            try {
+              if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+                var tx = window.IIF_I18N.text(key);
+                if (tx) { btn.textContent = tx; return; }
+              }
+            } catch (eL) { }
+            btn.textContent = paused ? 'Resume' : 'Pause';
+          }
+          function setPaused(on) {
+            wrap.classList.toggle('site-header__tickers--paused', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            try { localStorage.setItem(LS_PAUSED, on ? '1' : '0'); } catch (eP) { }
+            updatePauseLabel(on);
+          }
+          try {
+            if (localStorage.getItem(LS_PAUSED) === '1') setPaused(true);
+            else updatePauseLabel(false);
+          } catch (eI) { updatePauseLabel(false); }
+          btn.addEventListener('click', function () {
+            setPaused(!wrap.classList.contains('site-header__tickers--paused'));
+          });
+          window.addEventListener('iif-lang-change', function () {
+            updatePauseLabel(wrap.classList.contains('site-header__tickers--paused'));
+          });
+        })();
+        var selAsian = document.getElementById('iif-ticker-country-asian');
+        if (selAsian) selAsian.addEventListener('change', function () {
+          try { localStorage.setItem(LS_ASIAN, this.value || ''); } catch (e) { }
+          if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
+        });
+        var selArab = document.getElementById('iif-ticker-country-arab');
+        if (selArab) selArab.addEventListener('change', function () {
+          try { localStorage.setItem(LS_ARAB, this.value || ''); } catch (e) { }
+          if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
+        });
         function escapeHtml(s) { return String(s).replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
-        function translateText(t, lang) {
-          if (!t || (lang !== 'ar' && lang !== 'en')) return Promise.resolve(t);
-          var pair = lang === 'ar' ? 'auto|ar' : 'auto|en';
-          var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(String(t).slice(0, 500)) + '&langpair=' + encodeURIComponent(pair);
-          return fetch(url).then(function (r) { return r.json(); }).then(function (j) { var out = (j && j.response && j.response.translatedText) || (j && j.responseData && j.responseData.translatedText) || ''; return out || t; }).catch(function () { return t; });
+        function tickerDisplayTitles(item) {
+          var fb = item.title || '';
+          var te = item.titleEn;
+          var ta = item.titleAr;
+          var hasEn = te != null && String(te).trim().length > 0;
+          var hasAr = ta != null && String(ta).trim().length > 0;
+          return {
+            titleEn: hasEn ? String(te).trim() : (hasAr ? String(ta).trim() : fb),
+            titleAr: hasAr ? String(ta).trim() : (hasEn ? String(te).trim() : fb)
+          };
         }
         function renderTickerBilingual(items, copy1, copy2) {
           var html = '';
@@ -21572,50 +22201,51 @@
           } else {
             items.forEach(function (item) {
               var link = (item.link || '#').replace(/"/g, '&quot;');
-              var titleEn = escapeHtml(item.titleEn || item.title || '');
-              var titleAr = escapeHtml(item.titleAr || item.title || '');
+              var dt = tickerDisplayTitles(item);
+              var titleEn = escapeHtml(dt.titleEn);
+              var titleAr = escapeHtml(dt.titleAr);
               var src = (item.source) ? ' <span>' + escapeHtml(item.source) + '</span>' : '';
               html += '<a href="' + link + '" target="_blank" rel="noopener noreferrer" class="ticker-item"><span class="lang-en">' + titleEn + '</span><span class="lang-ar">' + titleAr + '</span>' + src + '</a>';
             });
           }
           if (copy1) copy1.innerHTML = html || '';
           if (copy2) copy2.innerHTML = html || '';
+          if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
         }
         function loadCat(cat, copy1, copy2) {
+          if (!copy1 || !copy2) return;
           var base = (typeof window !== 'undefined' && window.IIF_FUNCS_BASE && window.IIF_FUNCS_BASE.trim()) ? window.IIF_FUNCS_BASE.trim() : '';
           if (!base && document.querySelector) { var meta = document.querySelector('meta[name="iif-funcs-base"]'); base = (meta && meta.getAttribute('content')) ? meta.getAttribute('content').trim() : ''; }
           base = typeof ensureHttpsUrl === 'function' ? ensureHttpsUrl(base) : base;
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          var apiLang = isAr ? 'ar' : 'en';
-          var qs = '?lang=' + apiLang + '&cat=' + encodeURIComponent(cat);
+          try {
+            if (typeof location !== 'undefined' && location.hostname === '127.0.0.1' && String(location.port || '') === '3333') base = '';
+          } catch (eLoc) { }
+          var docLangTicker = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase().trim() || 'en';
+          var qs = '?lang=' + encodeURIComponent(docLangTicker) + '&cat=' + encodeURIComponent(cat);
+          var cc = getCountryForCat(cat);
+          if (cc) qs += '&country=' + encodeURIComponent(cc);
           var api = (base ? base : '') + (typeof IIF_FUNCS_PREFIX !== 'undefined' ? IIF_FUNCS_PREFIX : '/api') + '/news' + qs;
           fetch(api).then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('')); }).then(function (data) {
             var items = (data && data.items && data.items.length) ? data.items : [];
             var slice = items.slice(0, 20);
-            if (!slice.length) { renderTickerBilingual([], copy1, copy2); return; }
-            var targetLang = isAr ? 'en' : 'ar';
-            Promise.all(slice.map(function (it) {
-              return translateText(it.title, targetLang).then(function (tt) {
-                if (isAr) return { titleEn: tt || it.title, titleAr: it.title, link: it.link, source: it.source };
-                return { titleEn: it.title, titleAr: tt || it.title, link: it.link, source: it.source };
-              });
-            })).then(function (bilingual) {
-              renderTickerBilingual(bilingual, copy1, copy2);
-            }).catch(function () {
-              var fallback = slice.map(function (it) {
-                if (isAr) return { titleEn: it.title, titleAr: it.title, link: it.link, source: it.source };
-                return { titleEn: it.title, titleAr: it.title, link: it.link, source: it.source };
-              });
-              renderTickerBilingual(fallback, copy1, copy2);
+            if (!slice.length) return;
+            var bilingual = slice.map(function (it) {
+              return { title: it.title, titleEn: it.titleEn, titleAr: it.titleAr, link: it.link, source: it.source };
             });
-          }).catch(function () { renderTickerBilingual([], copy1, copy2); });
+            renderTickerBilingual(bilingual, copy1, copy2);
+          }).catch(function () { });
         }
         function reload() {
-          loadCat('asian', copyAsian, copyAsian2);
-          loadCat('arabic', copyArab, copyArab2);
+          if (copyAsian && copyAsian2) loadCat('asian', copyAsian, copyAsian2);
+          if (copyArab && copyArab2) loadCat('arabic', copyArab, copyArab2);
         }
         reload();
         window.IIF_reloadTickers = reload;
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
+          });
+        });
       })();
     })();
 
