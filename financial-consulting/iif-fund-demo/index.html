@@ -7,6 +7,8 @@
   <meta name="iif-app-base" content="" />
   <!-- قاعدة API لتحليل الميزانية (CSV/Excel). فارغ = على localhost:3333 يُفترض الخادم على 3000. أو عيّن URL كاملاً. -->
   <meta name="iif-budget-api-base" content="" />
+  <!-- نموذج اتصل بنا: رابط POST (Formspree / Getform / Webhook). فارغ = حفظ محلي فقط في المتصفح. -->
+  <meta name="iif-contact-form-endpoint" content="" />
   <!-- على GitHub Pages: رابط واجهة SearXNG عامة (فارغ = إخفاء الرابط خارج localhost). غيّر الرابط إن رغبت. -->
   <meta name="iif-searx-public-url" content="https://searx.tiekoetter.com/" />
   <!-- قاعدة بروكسي SearXNG (Vercel / Worker) لتحليل الويب من GitHub Pages — يجب أن يوفّر /api/searx/search -->
@@ -14651,6 +14653,11 @@ Generated: ${new Date().toLocaleString()}
          */
         bookingUrl: null,
         /**
+         * نموذج اتصل بنا: عنوان https يستقبل POST (FormData). يتجاوز meta iif-contact-form-endpoint إن عُيّن هنا.
+         * مثال Formspree: https://formspree.io/f/xxxxxxxx
+         */
+        contactFormEndpoint: null,
+        /**
          * دردشة مباشرة (Tawk وغيره): رابط سكربت خارجي يُحمّل بشكل غير متزامن.
          * مثال Tawk: الصق سكربت المزوّد في الصفحة أو ضع رابط ملف .js هنا إن كان متاحاً كـ URL.
          * اتركه null حتى يتوفر فريق للرد — يبقى زر التواصل السريع يوجّه لـ #contact.
@@ -25619,20 +25626,38 @@ Generated: ${new Date().toLocaleString()}
       function getSubmissions() { try { var r = localStorage.getItem(SUBMISSIONS_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
       function saveSubmissions(arr) { try { localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(arr)); } catch (e) { } }
       function getSubmissionLocation(cb) {
+        if (!cb) return;
         var out = { ipCountry: '', ipCity: '', lat: '', lng: '', at: new Date().toISOString() };
-        if (typeof navigator !== 'undefined' && navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function (pos) { out.lat = String(pos.coords.latitude); out.lng = String(pos.coords.longitude); if (cb) cb(out); },
-            function () { if (cb) cb(out); },
-            { timeout: 8000, maximumAge: 60000 }
-          );
-        } else { if (cb) cb(out); }
+        var geoDone = false;
+        var ipDone = false;
+        function finish() {
+          if (!geoDone || !ipDone) return;
+          cb(out);
+        }
         try {
           fetch('https://ipapi.co/json/').then(function (r) { return r.json(); }).then(function (d) {
-            out.ipCountry = (d && d.country_name) ? d.country_name : ''; out.ipCity = (d && d.city) ? d.city : '';
-            if (!out.lat && !out.lng && d && d.latitude) { out.lat = String(d.latitude); out.lng = String(d.longitude); }
-          }).catch(function () { }).finally(function () { if (cb && !out.lat) cb(out); });
-        } catch (e) { if (cb) cb(out); }
+            if (d) {
+              out.ipCountry = (d.country_name) ? d.country_name : '';
+              out.ipCity = (d.city) ? d.city : '';
+              if (!out.lat && !out.lng && d.latitude) { out.lat = String(d.latitude); out.lng = String(d.longitude); }
+            }
+          }).catch(function () { }).finally(function () { ipDone = true; finish(); });
+        } catch (e) { ipDone = true; finish(); }
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (pos) {
+              out.lat = String(pos.coords.latitude);
+              out.lng = String(pos.coords.longitude);
+              geoDone = true;
+              finish();
+            },
+            function () { geoDone = true; finish(); },
+            { timeout: 8000, maximumAge: 600000 }
+          );
+        } else {
+          geoDone = true;
+          finish();
+        }
       }
       function iifNonBindingDisclaimer() {
         return typeof iifMessage === 'function' ? iifMessage('legalNonBindingDisclaimer') : 'Expression of interest only — no approval, financing, or binding offer. See Terms.';
@@ -26137,12 +26162,79 @@ Generated: ${new Date().toLocaleString()}
       var formContact = document.getElementById('form-contact');
       if (formContact) formContact.addEventListener('submit', function (e) {
         e.preventDefault();
-        var nameEl = document.getElementById('name'); var emailEl = document.getElementById('email');
-        var name = (nameEl && nameEl.value) || ''; var email = (emailEl && emailEl.value) || '';
+        var fd0 = new FormData(formContact);
+        var data = {};
+        try {
+          fd0.forEach(function (v, k) { data[k] = typeof v === 'string' ? v.trim() : v; });
+        } catch (errFd) { }
+        var email = String(data.email || '').trim().toLowerCase();
+        if (!isValidEmail(email)) {
+          alert(typeof iifMessage === 'function' ? iifMessage('jsInvalidEmailShort') : 'Invalid email.');
+          return;
+        }
+        var submitBtn = formContact.querySelector('button[type="submit"]');
+        function setContactBusy(busy) {
+          if (submitBtn) {
+            submitBtn.disabled = !!busy;
+            submitBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
+          }
+        }
+        function getContactEndpoint() {
+          try {
+            var m = document.querySelector('meta[name="iif-contact-form-endpoint"]');
+            var c = m && m.getAttribute('content');
+            if (c && String(c).trim()) return String(c).trim();
+          } catch (eM) { }
+          try {
+            if (window.IIF_CONFIG && window.IIF_CONFIG.contactFormEndpoint) {
+              var u = String(window.IIF_CONFIG.contactFormEndpoint).trim();
+              if (u) return u;
+            }
+          } catch (eC) { }
+          return '';
+        }
+        setContactBusy(true);
         getSubmissionLocation(function (loc) {
-          addSubmission('contact', { name: name, email: email }, loc || {});
-          alert(iifSubmissionAcknowledgmentMsg());
-          formContact.reset();
+          addSubmission('contact', data, loc || {});
+          var endpoint = getContactEndpoint();
+          function contactDoneOk() {
+            alert(iifSubmissionAcknowledgmentMsg());
+            formContact.reset();
+            setContactBusy(false);
+          }
+          function contactDoneErr() {
+            alert(typeof iifMessage === 'function' ? iifMessage('contactSendFailed') : 'Could not reach the mail service. Your message was saved in this browser.');
+            setContactBusy(false);
+          }
+          if (!endpoint || !/^https?:\/\//i.test(endpoint)) {
+            contactDoneOk();
+            return;
+          }
+          var sendFd = new FormData();
+          try {
+            Object.keys(data).forEach(function (k) {
+              var val = data[k];
+              sendFd.append(k, val == null ? '' : String(val));
+            });
+            sendFd.append('_subject', 'IIF contact form');
+            sendFd.append('iif_form', 'contact');
+            if (loc) {
+              if (loc.ipCountry) sendFd.append('iif_loc_ip_country', loc.ipCountry);
+              if (loc.ipCity) sendFd.append('iif_loc_ip_city', loc.ipCity);
+              if (loc.lat) sendFd.append('iif_loc_lat', loc.lat);
+              if (loc.lng) sendFd.append('iif_loc_lng', loc.lng);
+              if (loc.at) sendFd.append('iif_loc_at', loc.at);
+            }
+          } catch (eFd) { }
+          fetch(endpoint, { method: 'POST', body: sendFd, headers: { Accept: 'application/json' }, mode: 'cors' })
+            .then(function (r) {
+              if (r.ok) {
+                contactDoneOk();
+                return;
+              }
+              return r.text().then(function (t) { throw new Error(t || String(r.status)); });
+            })
+            .catch(function () { contactDoneErr(); });
         });
       });
       if (formMembership) formMembership.addEventListener('submit', function (e) {
@@ -26371,17 +26463,17 @@ Generated: ${new Date().toLocaleString()}
       }
       if (formUrgentOnline) formUrgentOnline.addEventListener('submit', function (e) {
         e.preventDefault();
-        var loc = {};
-        getSubmissionLocation(function (l) { loc = l; });
         var name = (document.getElementById('urgent-name') && document.getElementById('urgent-name').value) || '';
         var email = (document.getElementById('urgent-email') && document.getElementById('urgent-email').value) || '';
         var channel = (document.getElementById('urgent-channel') && document.getElementById('urgent-channel').value) || '';
-        addSubmission('urgent', { name: name, email: email, channel: channel }, loc);
-        if (urgentOnlineSuccess) {
-          urgentOnlineSuccess.textContent = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessMsg') : 'Request received. The Fund will contact you to arrange the secure online session.';
-          urgentOnlineSuccess.hidden = false;
-          formUrgentOnline.reset();
-        }
+        getSubmissionLocation(function (loc) {
+          addSubmission('urgent', { name: name, email: email, channel: channel }, loc || {});
+          if (urgentOnlineSuccess) {
+            urgentOnlineSuccess.textContent = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessMsg') : 'Request received. The Fund will contact you to arrange the secure online session.';
+            urgentOnlineSuccess.hidden = false;
+            formUrgentOnline.reset();
+          }
+        });
       });
 
       var formCareers = document.getElementById('form-careers');
