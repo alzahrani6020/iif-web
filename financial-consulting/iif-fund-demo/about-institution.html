@@ -7,6 +7,7 @@
   <meta name="robots" content="index,follow" />
   <title>About the Fund &amp; leadership · International Investment Fund</title>
   <meta name="description" content="International Investment Fund (FII) — public summary of mandate, governance links, and leadership placeholders for official disclosures." />
+  <link rel="icon" href="assets/emblem.webp" type="image/webp" />
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
   <link rel="stylesheet" href="css/fonts-hosted.css" />
   <link rel="stylesheet" href="css/design-system.css" />
@@ -24,6 +25,7 @@
     .ar { direction: rtl; font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; border-inline-start: 3px solid rgba(201, 162, 39, 0.55); padding-inline-start: 1rem; margin-top: 1.75rem; color: #cbd5e1; }
     .muted { color: #94a3b8; font-size: 0.9rem; }
     .logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .logo picture { display: contents; }
     .logo img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; }
     .card { margin-top: 1rem; }
     .placeholder { font-style: italic; color: #94a3b8; }
@@ -33,7 +35,10 @@
   <div id="iif-first-load-shell" class="iif-first-load-shell" role="progressbar" aria-label="Loading" aria-busy="true"></div>
   <p class="back"><a href="index.html">← Home</a> · <a href="privacy.html">Privacy</a> · <a href="index.html#governance-snapshot">Governance</a> · <a href="index.html#compliance">Compliance</a> · <a href="index.html#terms">Terms</a></p>
   <div class="logo">
-    <img src="assets/emblem.jpg" width="48" height="48" alt="IIF emblem" loading="lazy" decoding="async" />
+    <picture>
+      <source type="image/webp" srcset="assets/emblem.webp" />
+      <img src="assets/emblem.jpg" width="48" height="48" alt="IIF emblem" loading="lazy" decoding="async" />
+    </picture>
     <div>
       <strong style="color:#f5e9b8;">International Investment Fund</strong>
       <div class="muted" style="font-size:0.85rem;">FII · Paris — public web presence</div>

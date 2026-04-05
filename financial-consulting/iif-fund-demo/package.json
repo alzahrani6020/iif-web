@@ -12,7 +12,8 @@
     "lh": "node scripts/lighthouse-iif.js",
     "fonts:vendor": "node scripts/vendor-fontsource-woff2.js",
     "postinstall": "node scripts/vendor-fontsource-woff2.js",
-    "csp:sync": "node scripts/sync-csp.js"
+    "csp:sync": "node scripts/sync-csp.js",
+    "assets:optimize": "node scripts/optimize-assets.js"
   },
   "keywords": [
     "government",
@@ -36,7 +37,8 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "sharp": "^0.34.5"
   },
   "engines": {
     "node": ">=22"

@@ -14,3 +14,16 @@
   border-color: var(--color-border-subtle, rgba(255, 255, 255, 0.08));
   background: rgba(255, 255, 255, 0.02);
 }
+
+/* <picture> لا يكسر تخطيط الفليكس/الأبعاد عند لف شعار emblem */
+.site-logo__emblem picture,
+.hero-emblem picture,
+.video-call-modal__brand picture,
+#certificate-card > picture,
+.letterhead-sheet__head-left picture {
+  display: contents;
+}
+
+.logo picture {
+  display: contents;
+}

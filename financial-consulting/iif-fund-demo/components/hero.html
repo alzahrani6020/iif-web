@@ -19,7 +19,10 @@
   </div>
 
   <div class="hero__visual">
-    <img src="../assets/emblem.jpg" alt="IIF Emblem" class="hero-emblem" id="hero-emblem">
+    <picture>
+      <source type="image/webp" srcset="../assets/emblem.webp" />
+      <img src="../assets/emblem.jpg" alt="IIF Emblem" class="hero-emblem" id="hero-emblem" decoding="async" />
+    </picture>
     <div class="hero__background">
       <!-- Animated background elements -->
       <div class="hero__particle hero__particle--1"></div>

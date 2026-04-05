@@ -93,7 +93,7 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 
 ملاحظة: `reports/lh-*.html` في `.gitignore` (يُبقى `reports/.gitkeep`).
 
-**في المصدر (مرجع سريع):** preload لـ `assets/emblem.jpg` مع `fetchpriority="high"` على شعار الهيدر؛ أيقونات التيكر بـ `loading="lazy"` وأبعاد صريحة؛ `prefers-reduced-motion` يعطّل حركة التيكر والتمرير اللانهائي؛ `text-rendering: optimizeLegibility` على `body` في `design-system.css`.
+**في المصدر (مرجع سريع):** preload لـ `assets/emblem.webp` مع `<picture>` (WebP + JPEG احتياطي) للشعار؛ خلفيات CSS تستخدم `image-set()`؛ أيقونات التيكر بـ `loading="lazy"`؛ `prefers-reduced-motion` للتيكر والتمرير؛ `text-rendering: optimizeLegibility` على `body`. بعد استبدال ملف الشعار الأصلي شغّل **`npm run assets:optimize`** (Sharp) لإعادة توليد `emblem.jpg` و`emblem.webp`.
 
 ## خطوط محلية
 

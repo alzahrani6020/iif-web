@@ -125,9 +125,10 @@
     }
   }
   </script>
+  <link rel="icon" href="assets/emblem.webp" type="image/webp" />
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
   <link rel="apple-touch-icon" href="assets/emblem.jpg" />
-  <link rel="preload" as="image" href="assets/emblem.jpg" type="image/jpeg" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/emblem.webp" type="image/webp" fetchpriority="high" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
   <link rel="dns-prefetch" href="https://translate.google.com" />
@@ -279,6 +280,7 @@
       position: fixed;
       inset: 0;
       background: url('assets/emblem.jpg') center center no-repeat;
+      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center center no-repeat;
       background-size: min(70vw, 520px) auto;
       opacity: 0.06;
       pointer-events: none;
@@ -469,6 +471,14 @@
       width: 100%;
       display: block;
       object-fit: contain;
+    }
+
+    .site-logo__emblem picture,
+    .hero-emblem picture,
+    .video-call-modal__brand picture,
+    #certificate-card > picture,
+    .letterhead-sheet__head-left picture {
+      display: contents;
     }
 
     .site-logo__text {
@@ -1654,6 +1664,7 @@
       width: 20px;
       height: 20px;
       background: url('assets/emblem.jpg') center/contain no-repeat;
+      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center/contain no-repeat;
       opacity: 0.9;
       flex-shrink: 0;
     }
@@ -1825,6 +1836,7 @@
       width: 28px;
       height: 28px;
       background: url('assets/emblem.jpg') center/contain no-repeat;
+      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center/contain no-repeat;
       opacity: 0.9;
       flex-shrink: 0;
     }
@@ -6276,6 +6288,7 @@
       width: 180px;
       height: 180px;
       background: url('assets/emblem.jpg') center center no-repeat;
+      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center center no-repeat;
       background-size: contain;
       opacity: 0.07;
       pointer-events: none;
@@ -8374,9 +8387,12 @@
       <div class="site-header__brand">
         <a href="#" class="site-logo">
           <span class="site-logo__emblem site-logo__emblem--crest" aria-hidden="true">
-            <img src="assets/emblem.jpg"
-              alt="صندوق الاستثمار الدولي — International Investment Fund — شعار الصندوق الرسمي" class="site-logo__img"
-              width="56" height="56" loading="eager" fetchpriority="high" decoding="async" />
+            <picture>
+              <source type="image/webp" srcset="assets/emblem.webp" />
+              <img src="assets/emblem.jpg"
+                alt="صندوق الاستثمار الدولي — International Investment Fund — شعار الصندوق الرسمي" class="site-logo__img"
+                width="56" height="56" loading="eager" fetchpriority="high" decoding="async" />
+            </picture>
           </span>
           <span class="site-logo__text">
             <span class="site-logo__title" data-i18n="logoTitle">International Investment Fund</span>
@@ -8978,7 +8994,10 @@
     <div class="video-call-modal">
       <div class="video-call-modal__head">
         <span class="video-call-modal__brand" aria-hidden="true">
-          <img src="assets/emblem.jpg" alt="" class="video-call-modal__logo" width="36" height="36" />
+          <picture>
+            <source type="image/webp" srcset="assets/emblem.webp" />
+            <img src="assets/emblem.jpg" alt="" class="video-call-modal__logo" width="36" height="36" decoding="async" />
+          </picture>
         </span>
         <div class="video-call-modal__titles">
           <h2 class="video-call-modal__title" data-i18n="videoCallTitle">International Investment Fund — Video &amp; audio call</h2>
@@ -9264,8 +9283,11 @@
   <!-- بطاقة عضوية رقمية داخل المنصة — كيو آر للتحقق وعرض ثم الانتقال لصفحة العضو -->
   <div class="certificate-overlay" id="certificate-overlay" aria-hidden="true">
     <div class="certificate-card" id="certificate-card">
-      <img src="assets/emblem.jpg" alt="" class="cert-emblem" id="certificate-emblem"
-        onerror="this.style.display='none'" />
+      <picture>
+        <source type="image/webp" srcset="assets/emblem.webp" />
+        <img src="assets/emblem.jpg" alt="" class="cert-emblem" id="certificate-emblem"
+          decoding="async" onerror="this.style.display='none'" />
+      </picture>
       <h2 class="cert-title" id="certificate-title" data-i18n="certTitle">Digital membership card</h2>
       <p class="cert-subtitle" id="certificate-subtitle" data-i18n="certSubtitle">International Investment Fund — FII</p>
       <div class="cert-member-images" id="certificate-member-images"
@@ -9870,7 +9892,10 @@
           <div class="letterhead-sheet">
             <div class="letterhead-sheet__head">
               <div class="letterhead-sheet__head-left">
-                <img src="assets/emblem.jpg" alt="صندوق الاستثمار الدولي" class="letterhead-logo" />
+                <picture>
+                  <source type="image/webp" srcset="assets/emblem.webp" />
+                  <img src="assets/emblem.jpg" alt="صندوق الاستثمار الدولي" class="letterhead-logo" decoding="async" />
+                </picture>
               </div>
               <div class="letterhead-sheet__head-right">
               </div>
@@ -11126,7 +11151,10 @@
       </div>
       <div class="hero__visual" aria-hidden="true">
         <span class="hero-emblem hero-emblem--crest">
-          <img src="assets/emblem.jpg" alt="" class="hero-emblem__img" width="280" height="336" />
+          <picture>
+            <source type="image/webp" srcset="assets/emblem.webp" />
+            <img src="assets/emblem.jpg" alt="" class="hero-emblem__img" width="280" height="336" decoding="async" />
+          </picture>
         </span>
       </div>
     </section>
