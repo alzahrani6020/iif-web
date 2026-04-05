@@ -5,8 +5,14 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const multer = require('multer');
+const { parseBudgetFile } = require('./lib/budget-import-parse');
 
 const app = express();
+const budgetUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 8 * 1024 * 1024 }
+});
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -317,6 +323,19 @@ app.get('/api/countries/search', (req, res) => {
     });
 });
 
+/** Budget import: CSV/Excel validation + approved/actual/forecast rollups (SME / multi-country templates). */
+app.post('/api/budget/parse', budgetUpload.single('file'), (req, res) => {
+    if (!req.file || !req.file.buffer) {
+        return res.status(400).json({ ok: false, errors: ['No file uploaded'], warnings: [] });
+    }
+    try {
+        const out = parseBudgetFile(req.file.buffer, req.file.originalname || 'budget');
+        res.status(out.ok ? 200 : 400).json(out);
+    } catch (e) {
+        res.status(500).json({ ok: false, errors: [String(e.message || e)], warnings: [] });
+    }
+});
+
 // Get all countries (for dropdown)
 app.get('/api/countries', (req, res) => {
     const lang = req.query.lang || 'ar';
@@ -361,6 +380,7 @@ app.listen(PORT, () => {
     console.log('  GET /api/countries/search?q=country&lang=ar - Search country');
     console.log('  GET /api/countries?lang=ar - Get all countries');
     console.log('  POST /api/countries - Add country (admin only)');
+    console.log('  POST /api/budget/parse - Parse & validate budget CSV/Excel (multipart field: file)');
 });
 
 // Error handling

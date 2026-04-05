@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <!-- جذر المسارات النسبية (assets/، الشعار): اختياري عبر meta iif-app-base؛ وإلا يُحسب من المسار + استثناء npm start (المنفذ 3333) -->
   <meta name="iif-app-base" content="" />
+  <!-- قاعدة API لتحليل الميزانية (CSV/Excel). فارغ = على localhost:3333 يُفترض الخادم على 3000. أو عيّن URL كاملاً. -->
+  <meta name="iif-budget-api-base" content="" />
   <!-- على GitHub Pages: رابط واجهة SearXNG عامة (فارغ = إخفاء الرابط خارج localhost). غيّر الرابط إن رغبت. -->
   <meta name="iif-searx-public-url" content="https://searx.tiekoetter.com/" />
   <!-- قاعدة بروكسي SearXNG (Vercel / Worker) لتحليل الويب من GitHub Pages — يجب أن يوفّر /api/searx/search -->
@@ -4129,6 +4131,330 @@
     .analysis-result-table .result-total {
       font-weight: 700;
       color: var(--color-accent-gold-soft);
+    }
+
+    .budget-bar-chart {
+      margin-top: var(--space-4);
+      max-width: 28rem;
+    }
+
+    .budget-bar-chart__row {
+      display: grid;
+      grid-template-columns: minmax(5rem, 7rem) 1fr minmax(4.5rem, auto);
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+      font-size: 0.875rem;
+    }
+
+    .budget-bar-chart__label {
+      color: var(--color-text-muted);
+    }
+
+    .budget-bar-chart__track {
+      height: 0.65rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .budget-bar-chart__fill {
+      height: 100%;
+      border-radius: 4px;
+      min-width: 2px;
+      transition: width 0.25s ease;
+    }
+
+    .budget-bar-chart__fill--rev {
+      background: linear-gradient(90deg, #1c8a57, #2ea36f);
+    }
+
+    .budget-bar-chart__fill--exp {
+      background: linear-gradient(90deg, #b85c38, #d47850);
+    }
+
+    .budget-bar-chart__val {
+      text-align: end;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .budget-template-row {
+      margin-top: var(--space-3);
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .budget-template-row a {
+      color: var(--color-accent-gold-soft);
+      font-weight: 600;
+    }
+
+    .budget-context-panel {
+      margin-top: var(--space-6);
+      padding: var(--space-5);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md, 8px);
+      background: rgba(0, 0, 0, 0.12);
+    }
+
+    .budget-context-panel[hidden] {
+      display: none !important;
+    }
+
+    .budget-context-panel h3 {
+      margin: 0 0 var(--space-4);
+      font-size: 1.05rem;
+    }
+
+    .budget-context-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+      gap: var(--space-4);
+    }
+
+    .budget-context-grid .form-group {
+      margin: 0;
+    }
+
+    .budget-context-grid label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .budget-context-grid input,
+    .budget-context-grid select,
+    .budget-context-grid textarea {
+      width: 100%;
+      padding: 0.45rem 0.5rem;
+      font-size: 0.875rem;
+      border-radius: 4px;
+      border: 1px solid var(--color-border-subtle);
+      background: var(--color-surface, #1a2332);
+      color: inherit;
+    }
+
+    .budget-context-grid textarea {
+      min-height: 3.5rem;
+      resize: vertical;
+    }
+
+    .budget-analysis-report .budget-deep-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: var(--space-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .budget-analysis-report .budget-deep-table th,
+    .budget-analysis-report .budget-deep-table td {
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--color-border-subtle);
+      text-align: start;
+    }
+
+    .budget-analysis-report .budget-deep-table td:last-child {
+      text-align: end;
+    }
+
+    .budget-analysis-report .budget-flag-list {
+      margin: 0;
+      padding-inline-start: 1.25rem;
+    }
+
+    .budget-analysis-report .budget-flag-list li {
+      margin-bottom: 0.35rem;
+    }
+
+    .budget-analysis-report .budget-flag--warn {
+      color: #e8a54b;
+    }
+
+    .budget-analysis-report .budget-flag--crit {
+      color: #e07070;
+    }
+
+    .budget-toolbar {
+      margin-top: var(--space-5);
+      padding: var(--space-4);
+      border-radius: var(--radius-md, 8px);
+      border: 1px solid var(--color-border-subtle);
+      background: rgba(0, 0, 0, 0.14);
+    }
+
+    .budget-toolbar[hidden] {
+      display: none !important;
+    }
+
+    .budget-toolbar__row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: var(--space-4);
+    }
+
+    .budget-toolbar__scenario {
+      flex: 1 1 14rem;
+    }
+
+    .budget-toolbar__scenario label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .budget-toolbar__scenario input[type="range"] {
+      width: 100%;
+    }
+
+    .budget-toolbar__scenario .budget-scenario-val {
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-accent-gold-soft);
+    }
+
+    .budget-toolbar__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .budget-validation-list {
+      margin: var(--space-2) 0 0;
+      padding-inline-start: 1.25rem;
+      font-size: 0.85rem;
+      color: #e8a54b;
+    }
+
+    .budget-scenario-banner {
+      padding: var(--space-3);
+      margin-bottom: var(--space-4);
+      border-radius: 6px;
+      background: rgba(200, 162, 39, 0.12);
+      border: 1px solid rgba(200, 162, 39, 0.35);
+      font-size: 0.9rem;
+    }
+
+    .budget-chartjs-section {
+      margin-top: var(--space-2);
+    }
+
+    .budget-chartjs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: var(--space-5);
+      margin-top: var(--space-3);
+    }
+
+    .budget-chartjs-wrap {
+      position: relative;
+      min-height: 220px;
+      max-width: 100%;
+    }
+
+    .budget-chartjs-wrap canvas {
+      max-width: 100%;
+      height: auto !important;
+    }
+
+    .budget-chartjs-wrap--full {
+      grid-column: 1 / -1;
+      min-height: 260px;
+    }
+
+    .budget-disclaimer-inline {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin: var(--space-3) 0 0;
+      line-height: 1.45;
+    }
+
+    .budget-draft-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+      border-radius: 8px;
+      border: 1px solid rgba(200, 162, 39, 0.45);
+      background: rgba(200, 162, 39, 0.1);
+    }
+
+    .budget-draft-banner[hidden] {
+      display: none !important;
+    }
+
+    .budget-draft-banner__text {
+      margin: 0;
+      flex: 1 1 14rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .budget-draft-banner__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .budget-legal-box {
+      padding: var(--space-3);
+      border-radius: 6px;
+      border: 1px solid var(--color-border-subtle);
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .budget-data-source {
+      font-size: 0.88rem;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #budget-analysis,
+      #budget-analysis * {
+        visibility: visible;
+      }
+
+      #budget-analysis {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      #budget-analysis .budget-toolbar,
+      #budget-analysis .budget-upload-zone,
+      #budget-analysis .budget-template-row,
+      #budget-analysis .budget-report-lang,
+      #budget-analysis .budget-context-panel,
+      #budget-analysis .budget-draft-banner,
+      #budget-analysis .no-permission {
+        display: none !important;
+      }
+
+      #budget-results-wrap,
+      #budget-results {
+        display: block !important;
+      }
+
+      #budget-results .budget-analysis-report,
+      #budget-results .budget-analysis-report * {
+        color: #111 !important;
+      }
+
+      #budget-results .analysis-result-table th {
+        background: #eee !important;
+      }
     }
 
     .project-description-wrap {
@@ -13298,6 +13624,13 @@ Generated: ${new Date().toLocaleString()}
       <p data-i18n="budgetSectionIntro" style="margin-bottom: var(--space-4);">Upload your budget file (Excel, PDF, CSV, Word, or
         text). The site will read it and analyze it from all aspects. Report in your language with an option to switch
         to another language.</p>
+      <div id="budget-draft-banner" class="budget-draft-banner" hidden>
+        <p id="budget-draft-banner-text" class="budget-draft-banner__text"></p>
+        <div class="budget-draft-banner__actions">
+          <button type="button" class="btn btn--secondary btn-sm" id="budget-draft-restore-btn" data-i18n="budgetDraftRestore">Restore draft</button>
+          <button type="button" class="btn btn--ghost btn-sm" id="budget-draft-clear-btn" data-i18n="budgetDraftClear">Clear saved draft</button>
+        </div>
+      </div>
       <div class="budget-analysis-box">
         <div class="budget-upload-zone" id="budget-upload-zone">
           <p data-i18n="budgetUploadPrompt" style="margin-bottom: var(--space-2);">Drag your budget file here or click to choose — any
@@ -13306,13 +13639,69 @@ Generated: ${new Date().toLocaleString()}
             accept=".xls,.xlsx,.csv,.pdf,.txt,.doc,.docx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
           <p id="budget-file-name" style="font-size:0.9rem; color:var(--color-text-muted); margin-top:var(--space-2);">
           </p>
+          <ul id="budget-validation-list" class="budget-validation-list" hidden></ul>
         </div>
+        <p class="budget-template-row">
+          <a href="budget-template.csv" download="budget-template.csv" data-i18n="budgetTemplateLink">Download budget template (CSV)</a>
+          — <a href="budget-template-hints.txt" download="budget-template-hints.txt" data-i18n="budgetTemplateHintsLink">Template hints (TXT)</a>
+          — <span data-i18n="budgetTemplateHint">Use type revenue or expense in the type column.</span>
+        </p>
         <div class="budget-report-lang" style="margin-top: var(--space-4);">
           <label for="budget-report-lang" data-i18n="budgetReportLangLabel">Report language</label>
           <select id="budget-report-lang">
             <option value="ar">العربية</option>
             <option value="en">English</option>
           </select>
+        </div>
+        <div id="budget-toolbar" class="budget-toolbar" hidden>
+          <div class="budget-toolbar__row">
+            <div class="budget-toolbar__scenario">
+              <label for="budget-scenario-rev"><span data-i18n="budgetScenarioRev">Revenue scenario</span> (<span id="budget-scenario-rev-val" class="budget-scenario-val">0</span>%)</label>
+              <input type="range" id="budget-scenario-rev" min="-50" max="30" value="0" step="1" />
+            </div>
+            <div class="budget-toolbar__scenario">
+              <label for="budget-scenario-exp"><span data-i18n="budgetScenarioExp">Expense scenario</span> (<span id="budget-scenario-exp-val" class="budget-scenario-val">0</span>%)</label>
+              <input type="range" id="budget-scenario-exp" min="-30" max="50" value="0" step="1" />
+            </div>
+            <div class="budget-toolbar__actions">
+              <button type="button" class="btn btn--secondary" id="budget-print-btn" data-i18n="budgetExportPrint">Print / PDF</button>
+              <button type="button" class="btn btn--secondary" id="budget-csv-btn" data-i18n="budgetExportCsv">Download CSV</button>
+              <button type="button" class="btn btn--secondary" id="budget-copy-md-btn" data-i18n="budgetCopyMarkdown">Copy report (Markdown)</button>
+            </div>
+          </div>
+          <p class="budget-disclaimer-inline" data-i18n="budgetDisclaimerShort">Figures are indicative; scenarios scale all revenue or expense lines uniformly. Not financial advice.</p>
+          <p class="budget-draft-privacy" style="font-size:0.78rem;color:var(--color-text-muted);margin:var(--space-2) 0 0;line-height:1.45;" data-i18n="budgetDraftPrivacyNote">Drafts are stored in this browser only.</p>
+        </div>
+        <div id="budget-context-panel" class="budget-context-panel" hidden>
+          <h3 data-i18n="budgetContextTitle">Additional context (deepens the analysis)</h3>
+          <p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 var(--space-4);" data-i18n="budgetContextIntro">Optional fields unlock year-on-year comparison, balance sheet ratios, liquidity, inventory, and loan tables in the report.</p>
+          <div class="budget-context-grid">
+            <div class="form-group"><label for="budget-ctx-company" data-i18n="budgetCtxCompany">Entity name</label><input type="text" id="budget-ctx-company" autocomplete="organization" maxlength="120" /></div>
+            <div class="form-group"><label for="budget-ctx-office" data-i18n="budgetCtxOffice">Issuing office (optional)</label><input type="text" id="budget-ctx-office" maxlength="120" /></div>
+            <div class="form-group"><label for="budget-ctx-from" data-i18n="budgetCtxPeriodFrom">Period from</label><input type="text" id="budget-ctx-from" placeholder="YYYY-MM-DD" maxlength="24" /></div>
+            <div class="form-group"><label for="budget-ctx-to" data-i18n="budgetCtxPeriodTo">Period to</label><input type="text" id="budget-ctx-to" placeholder="YYYY-MM-DD" maxlength="24" /></div>
+            <div class="form-group"><label for="budget-ctx-prev-rev" data-i18n="budgetCtxPrevRev">Prior period revenue (total)</label><input type="text" id="budget-ctx-prev-rev" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-prev-exp" data-i18n="budgetCtxPrevExp">Prior period expenses (total)</label><input type="text" id="budget-ctx-prev-exp" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-assets" data-i18n="budgetCtxTotalAssets">Total assets</label><input type="text" id="budget-ctx-assets" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-prev-assets" data-i18n="budgetCtxPrevAssets">Prior total assets</label><input type="text" id="budget-ctx-prev-assets" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-liab" data-i18n="budgetCtxTotalLiab">Total liabilities</label><input type="text" id="budget-ctx-liab" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-equity" data-i18n="budgetCtxEquity">Equity</label><input type="text" id="budget-ctx-equity" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-cur-assets" data-i18n="budgetCtxCurAssets">Current assets</label><input type="text" id="budget-ctx-cur-assets" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-cur-liab" data-i18n="budgetCtxCurLiab">Current liabilities</label><input type="text" id="budget-ctx-cur-liab" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-consolidated" data-i18n="budgetCtxConsolidated">Consolidated budget?</label><select id="budget-ctx-consolidated"><option value="no" data-i18n="budgetCtxNo">No</option><option value="yes" data-i18n="budgetCtxYes">Yes</option></select></div>
+            <div class="form-group"><label for="budget-ctx-entities" data-i18n="budgetCtxNumEntities">Number of entities</label><input type="text" id="budget-ctx-entities" inputmode="numeric" /></div>
+            <div class="form-group"><label for="budget-ctx-cogs" data-i18n="budgetCtxCogs">Cost of goods sold</label><input type="text" id="budget-ctx-cogs" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-inventory" data-i18n="budgetCtxAvgInv">Average inventory</label><input type="text" id="budget-ctx-inventory" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-payables" data-i18n="budgetCtxPayables">Supplier payables</label><input type="text" id="budget-ctx-payables" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-ppe" data-i18n="budgetCtxNewPpe">New PPE additions</label><input type="text" id="budget-ctx-ppe" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-depr-rate" data-i18n="budgetCtxDeprRate">Depreciation rate %</label><input type="text" id="budget-ctx-depr-rate" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-depr-exp" data-i18n="budgetCtxDeprExp">Depreciation expense</label><input type="text" id="budget-ctx-depr-exp" inputmode="decimal" /></div>
+            <div class="form-group" style="grid-column:1/-1;"><label for="budget-ctx-banks" data-i18n="budgetCtxBanks">Bank loans (one per line: name, amount)</label><textarea id="budget-ctx-banks" placeholder="Bank A, 100000"></textarea></div>
+            <div class="form-group"><label for="budget-ctx-activity" data-i18n="budgetCtxActivity">Business activity</label><input type="text" id="budget-ctx-activity" maxlength="80" /></div>
+            <div class="form-group"><label for="budget-ctx-country" data-i18n="budgetCtxCountry">Country / market</label><input type="text" id="budget-ctx-country" maxlength="80" /></div>
+            <div class="form-group"><label for="budget-ctx-target-rev" data-i18n="budgetCtxTargetRev">Target / approved revenue (optional)</label><input type="text" id="budget-ctx-target-rev" inputmode="decimal" /></div>
+            <div class="form-group"><label for="budget-ctx-target-exp" data-i18n="budgetCtxTargetExp">Target / approved expenses (optional)</label><input type="text" id="budget-ctx-target-exp" inputmode="decimal" /></div>
+          </div>
         </div>
         <div id="budget-results-wrap" class="protected-results budget-results-inline"
           style="margin-top: var(--space-6);" data-protected="budget">
@@ -20765,11 +21154,752 @@ Generated: ${new Date().toLocaleString()}
         }
         return out;
       }
-      function readBudgetFile(file, cb) {
+      function parseBudgetCsvLine(line) {
+        var out = [];
+        var cur = '';
+        var inQ = false;
+        for (var i = 0; i < line.length; i++) {
+          var ch = line[i];
+          if (ch === '"') {
+            inQ = !inQ;
+            continue;
+          }
+          if (!inQ && ch === ',') {
+            out.push(cur.trim());
+            cur = '';
+            continue;
+          }
+          cur += ch;
+        }
+        out.push(cur.trim());
+        return out;
+      }
+      function applyBudgetScenario(revenues, expenses, lineItems, opts) {
+        opts = opts || {};
+        var revMult = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expMult = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        if (revMult < 0) revMult = 0;
+        if (expMult < 0) expMult = 0;
+        return {
+          revenues: (revenues || []).map(function (x) { return x * revMult; }),
+          expenses: (expenses || []).map(function (x) { return x * expMult; }),
+          lineItems: (lineItems || []).map(function (row) {
+            var m = row.type === 'revenue' ? revMult : expMult;
+            var o = { category: row.category, type: row.type, amount: (row.amount || 0) * m };
+            if (row.period) o.period = row.period;
+            if (row.scenario) o.scenario = row.scenario;
+            if (row.currency) o.currency = row.currency;
+            return o;
+          })
+        };
+      }
+      function budgetValidationMessages(data, fileName) {
+        var msgs = [];
+        if (!data || (!data.revenues.length && !data.expenses.length)) return msgs;
+        var ext = (fileName || '').split('.').pop().toLowerCase();
+        if (/^(pdf|doc|docx)$/i.test(ext)) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnHeuristic') : '');
+        function hasNeg(arr) { return (arr || []).some(function (n) { return n < 0; }); }
+        if (hasNeg(data.revenues) || hasNeg(data.expenses)) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnNegative') : '');
+        if (!data.lineItems || !data.lineItems.length) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnNoCategories') : '');
+        if (data.parseSource === 'server' && data.serverWarnings && data.serverWarnings.length) {
+          data.serverWarnings.forEach(function (w) { msgs.push(String(w)); });
+        }
+        if (data.serverFallbackErrors && data.serverFallbackErrors.length) {
+          var fb = typeof iifMessage === 'function' ? iifMessage('budgetServerFallback') : '';
+          msgs.push(fb + ' ' + data.serverFallbackErrors.join('; '));
+        }
+        if (data.serverFallbackWarnings && data.serverFallbackWarnings.length) {
+          data.serverFallbackWarnings.forEach(function (w) { msgs.push(String(w)); });
+        }
+        if (data.parseSource === 'server' && typeof iifMessage === 'function' && !(data.serverFallbackErrors && data.serverFallbackErrors.length)) {
+          msgs.push(iifMessage('budgetServerParseOk'));
+        }
+        return msgs.filter(Boolean);
+      }
+      function renderBudgetValidationList(msgs) {
+        var ul = document.getElementById('budget-validation-list');
+        if (!ul) return;
+        if (!msgs || !msgs.length) {
+          ul.innerHTML = '';
+          ul.hidden = true;
+          return;
+        }
+        ul.innerHTML = msgs.map(function (m) { return '<li>' + escapeHtml(m) + '</li>'; }).join('');
+        ul.hidden = false;
+      }
+      var BUDGET_DRAFT_KEY = 'iif-budget-draft-v1';
+      var BUDGET_AUDIT_KEY = 'iif-budget-audit-log';
+      var BUDGET_AUDIT_MAX = 25;
+      var BUDGET_CTX_FIELD_IDS = [
+        'budget-ctx-company', 'budget-ctx-office', 'budget-ctx-from', 'budget-ctx-to',
+        'budget-ctx-prev-rev', 'budget-ctx-prev-exp', 'budget-ctx-assets', 'budget-ctx-prev-assets',
+        'budget-ctx-liab', 'budget-ctx-equity', 'budget-ctx-cur-assets', 'budget-ctx-cur-liab',
+        'budget-ctx-consolidated', 'budget-ctx-entities', 'budget-ctx-cogs', 'budget-ctx-inventory',
+        'budget-ctx-payables', 'budget-ctx-ppe', 'budget-ctx-depr-rate', 'budget-ctx-depr-exp',
+        'budget-ctx-banks', 'budget-ctx-activity', 'budget-ctx-country',
+        'budget-ctx-target-rev', 'budget-ctx-target-exp'
+      ];
+      function gatherBudgetContextFromDom() {
+        var ctx = {};
+        BUDGET_CTX_FIELD_IDS.forEach(function (id) {
+          var el = document.getElementById(id);
+          ctx[id] = el ? String(el.value || '') : '';
+        });
+        return ctx;
+      }
+      function applyBudgetContextToDom(ctx) {
+        if (!ctx) return;
+        BUDGET_CTX_FIELD_IDS.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && ctx[id] != null) el.value = ctx[id];
+        });
+      }
+      function appendBudgetAuditLog(meta) {
+        try {
+          var raw = localStorage.getItem(BUDGET_AUDIT_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(arr)) arr = [];
+          arr.unshift({
+            at: meta.at || new Date().toISOString(),
+            fileName: meta.fileName || '',
+            revCount: meta.revCount | 0,
+            expCount: meta.expCount | 0,
+            lineCount: meta.lineCount | 0
+          });
+          while (arr.length > BUDGET_AUDIT_MAX) arr.pop();
+          localStorage.setItem(BUDGET_AUDIT_KEY, JSON.stringify(arr));
+        } catch (e) { }
+      }
+      function getBudgetAuditLog() {
+        try {
+          var raw = localStorage.getItem(BUDGET_AUDIT_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+      function saveBudgetDraft() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        try {
+          var draft = {
+            version: 1,
+            at: new Date().toISOString(),
+            fileName: (window.__lastBudgetUploadMeta && window.__lastBudgetUploadMeta.fileName) || '',
+            revenues: pack.revenues,
+            expenses: pack.expenses,
+            lineItems: pack.lineItems || [],
+            rollup: pack.rollup,
+            byPeriod: pack.byPeriod,
+            currencies: pack.currencies || [],
+            primaryScenario: pack.primaryScenario || 'actual',
+            parseSource: pack.parseSource || 'client',
+            context: gatherBudgetContextFromDom(),
+            scenarioRev: (document.getElementById('budget-scenario-rev') || {}).value || '0',
+            scenarioExp: (document.getElementById('budget-scenario-exp') || {}).value || '0',
+            reportLang: (document.getElementById('budget-report-lang') || {}).value || 'ar'
+          };
+          localStorage.setItem(BUDGET_DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) { }
+      }
+      function scheduleBudgetDraftSave() {
+        clearTimeout(window.__budgetDraftTimer);
+        window.__budgetDraftTimer = setTimeout(saveBudgetDraft, 700);
+      }
+      function clearBudgetDraftFromStorage() {
+        try { localStorage.removeItem(BUDGET_DRAFT_KEY); } catch (e) { }
+        var ban = document.getElementById('budget-draft-banner');
+        if (ban) ban.hidden = true;
+      }
+      function restoreBudgetDraftFromStorage() {
+        try {
+          var raw = localStorage.getItem(BUDGET_DRAFT_KEY);
+          if (!raw) return;
+          var d = JSON.parse(raw);
+          if (!d || !d.revenues || (!d.revenues.length && !d.expenses.length)) return;
+          window.__lastBudgetAnalysis = {
+            revenues: d.revenues,
+            expenses: d.expenses,
+            lineItems: d.lineItems || [],
+            rollup: d.rollup,
+            byPeriod: d.byPeriod,
+            currencies: d.currencies || [],
+            primaryScenario: d.primaryScenario || 'actual',
+            parseSource: d.parseSource || 'client'
+          };
+          window.__lastBudgetUploadMeta = {
+            fileName: d.fileName || 'draft',
+            at: d.at || '',
+            revCount: d.revenues.length,
+            expCount: d.expenses.length,
+            lineCount: (d.lineItems || []).length,
+            restored: true
+          };
+          applyBudgetContextToDom(d.context);
+          if (d.reportLang) {
+            var sel = document.getElementById('budget-report-lang');
+            if (sel && (d.reportLang === 'ar' || d.reportLang === 'en')) sel.value = d.reportLang;
+          }
+          if (d.scenarioRev != null) {
+            var sr = document.getElementById('budget-scenario-rev');
+            if (sr) sr.value = d.scenarioRev;
+          }
+          if (d.scenarioExp != null) {
+            var se = document.getElementById('budget-scenario-exp');
+            if (se) se.value = d.scenarioExp;
+          }
+          updateBudgetScenarioLabels();
+          var bp = document.getElementById('budget-context-panel');
+          if (bp) bp.hidden = false;
+          var tb = document.getElementById('budget-toolbar');
+          if (tb) tb.hidden = false;
+          var ban = document.getElementById('budget-draft-banner');
+          if (ban) ban.hidden = true;
+          refreshBudgetReport();
+        } catch (e) { }
+      }
+      function initBudgetDraftBanner() {
+        var ban = document.getElementById('budget-draft-banner');
+        var txt = document.getElementById('budget-draft-banner-text');
+        if (!ban) return;
+        try {
+          var cur = window.__lastBudgetAnalysis;
+          if (cur && (cur.revenues.length || cur.expenses.length)) {
+            ban.hidden = true;
+            return;
+          }
+          var raw = localStorage.getItem(BUDGET_DRAFT_KEY);
+          if (!raw) { ban.hidden = true; return; }
+          var d = JSON.parse(raw);
+          if (!d || !d.revenues || (!d.revenues.length && !d.expenses.length)) { ban.hidden = true; return; }
+          ban.hidden = false;
+          if (txt) {
+            var msg = typeof iifMessage === 'function' ? iifMessage('budgetDraftBanner') : '';
+            var fn = d.fileName ? ' — ' + d.fileName : '';
+            var at = d.at ? ' (' + d.at.slice(0, 19) + ')' : '';
+            txt.textContent = msg + fn + at;
+          }
+        } catch (e) { ban.hidden = true; }
+      }
+      function buildBudgetMarkdownExport(lang) {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return '';
+        var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        opts.rollup = pack.rollup;
+        opts.byPeriod = pack.byPeriod;
+        opts.currencies = pack.currencies || [];
+        opts.primaryScenario = pack.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(pack.lineItems || [], opts.primaryScenario);
+        var scaled = applyBudgetScenario(pack.revenues, pack.expenses, itemsForScale, opts);
+        var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        var rollupReport = opts.rollup ? scaleBudgetRollup(opts.rollup, revM, expM) : null;
+        var byPeriodReport = null;
+        if (opts.byPeriod) {
+          byPeriodReport = {};
+          Object.keys(opts.byPeriod).forEach(function (k) {
+            byPeriodReport[k] = scaleBudgetRollup(opts.byPeriod[k], revM, expM);
+          });
+        }
+        var tr = scaled.revenues.reduce(function (a, b) { return a + b; }, 0);
+        var te = scaled.expenses.reduce(function (a, b) { return a + b; }, 0);
+        var bal = tr - te;
+        var lines = ['# ' + (L.title || 'Budget'), ''];
+        lines.push('## ' + (L.totals || 'Totals'));
+        lines.push('| | ' + (L.deepColAmount || 'Amount') + ' |');
+        lines.push('| --- | ---: |');
+        lines.push('| ' + (L.revenue || '') + ' | ' + tr.toFixed(2) + ' |');
+        lines.push('| ' + (L.expenses || '') + ' | ' + te.toFixed(2) + ' |');
+        lines.push('| ' + (L.balance || '') + ' | ' + bal.toFixed(2) + ' |');
+        lines.push('');
+        if (opts.currencies && opts.currencies.length > 1) {
+          lines.push('> ' + (L.budgetMultiCurrencyNote || '') + '');
+          lines.push('');
+        } else if (opts.currencies && opts.currencies.length === 1) {
+          lines.push('*' + (L.budgetSingleCurrencyLabel || '') + ': ' + opts.currencies[0] + '*');
+          lines.push('');
+        }
+        var tRev = parseFloat(opts.targetRevenue) || 0;
+        var tExp = parseFloat(opts.targetExpenses) || 0;
+        if (tRev > 0 || tExp > 0) {
+          lines.push('## ' + (L.budgetTargetsSection || 'Targets'));
+          if (tRev > 0) lines.push('- ' + (L.budgetTargetRevLabel || '') + ': ' + tRev.toFixed(2) + ' → Δ ' + (tRev ? ((tr - tRev) / tRev * 100).toFixed(1) : '0') + '%');
+          if (tExp > 0) lines.push('- ' + (L.budgetTargetExpLabel || '') + ': ' + tExp.toFixed(2) + ' → Δ ' + (tExp ? ((te - tExp) / tExp * 100).toFixed(1) : '0') + '%');
+          lines.push('');
+        }
+        if ((parseFloat(opts.scenarioRevPct) || 0) !== 0 || (parseFloat(opts.scenarioExpPct) || 0) !== 0) {
+          lines.push('*' + (L.scenarioBanner || '').replace(/\{r\}/g, String(opts.scenarioRevPct || 0)).replace(/\{e\}/g, String(opts.scenarioExpPct || 0)) + '*');
+          lines.push('');
+        }
+        var rollup = rollupReport;
+        if (rollup && rollup.revenue && rollup.expense) {
+          var scenUsed = ['approved', 'actual', 'forecast'].filter(function (k) {
+            return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+          });
+          if (scenUsed.length >= 2) {
+            lines.push('## ' + (L.budgetScenarioRollupTitle || ''));
+            lines.push('| | ' + (L.budgetScenarioApproved || '') + ' | ' + (L.budgetScenarioActual || '') + ' | ' + (L.budgetScenarioForecast || '') + ' |');
+            lines.push('| --- | ---: | ---: | ---: |');
+            lines.push('| ' + (L.revenue || '') + ' | ' + (rollup.revenue.approved || 0).toFixed(2) + ' | ' + (rollup.revenue.actual || 0).toFixed(2) + ' | ' + (rollup.revenue.forecast || 0).toFixed(2) + ' |');
+            lines.push('| ' + (L.expenses || '') + ' | ' + (rollup.expense.approved || 0).toFixed(2) + ' | ' + (rollup.expense.actual || 0).toFixed(2) + ' | ' + (rollup.expense.forecast || 0).toFixed(2) + ' |');
+            lines.push('');
+            if (L.budgetScenarioRollupNote) {
+              lines.push('*' + L.budgetScenarioRollupNote + '*');
+              lines.push('');
+            }
+          }
+        }
+        var bp = byPeriodReport || {};
+        var pKeys = Object.keys(bp).filter(function (k) { return k !== '_all'; }).sort();
+        if (pKeys.length) {
+          var sa = L.budgetScenarioApproved || 'approved';
+          var sn = L.budgetScenarioActual || 'actual';
+          var sf = L.budgetScenarioForecast || 'forecast';
+          var revHdr = (L.revenue || '') + ' (' + sa + ' / ' + sn + ' / ' + sf + ')';
+          var expHdr = (L.expenses || '') + ' (' + sa + ' / ' + sn + ' / ' + sf + ')';
+          lines.push('## ' + (L.budgetPeriodBreakdownTitle || ''));
+          lines.push('| ' + (L.budgetColPeriod || '') + ' | ' + revHdr + ' | ' + expHdr + ' |');
+          lines.push('| --- | --- | --- |');
+          pKeys.forEach(function (pk) {
+            var slice = bp[pk] || { revenue: {}, expense: {} };
+            var rv = ((slice.revenue && slice.revenue.approved) || 0).toFixed(2) + ' / ' + ((slice.revenue && slice.revenue.actual) || 0).toFixed(2) + ' / ' + ((slice.revenue && slice.revenue.forecast) || 0).toFixed(2);
+            var ex = ((slice.expense && slice.expense.approved) || 0).toFixed(2) + ' / ' + ((slice.expense && slice.expense.actual) || 0).toFixed(2) + ' / ' + ((slice.expense && slice.expense.forecast) || 0).toFixed(2);
+            lines.push('| ' + String(pk).replace(/\|/g, '/') + ' | ' + rv + ' | ' + ex + ' |');
+          });
+          lines.push('');
+        }
+        if (scaled.lineItems && scaled.lineItems.length) {
+          var hasPeriod = scaled.lineItems.some(function (r) { return r.period; });
+          var hasScen = scaled.lineItems.some(function (r) { return r.scenario; });
+          var hasCur = scaled.lineItems.some(function (r) { return r.currency; });
+          lines.push('## ' + (L.deepCategoryRev || '') + ' / ' + (L.deepCategoryExp || ''));
+          var hdr = ['| ' + (L.deepColItem || 'Item'), 'type', (L.deepColAmount || '')];
+          var sep = ['| ---', '---', '---:'];
+          if (hasPeriod) { hdr.push(L.budgetColPeriod || 'period'); sep.push('---'); }
+          if (hasScen) { hdr.push('scenario'); sep.push('---'); }
+          if (hasCur) { hdr.push('currency'); sep.push('---'); }
+          lines.push(hdr.join(' | ') + ' |');
+          lines.push(sep.join(' | ') + ' |');
+          scaled.lineItems.forEach(function (row) {
+            var cells = [
+              String(row.category || '').replace(/\|/g, '/'),
+              row.type,
+              row.amount != null ? row.amount.toFixed(2) : ''
+            ];
+            if (hasPeriod) cells.push(String(row.period || '').replace(/\|/g, '/'));
+            if (hasScen) cells.push(String(row.scenario || '').replace(/\|/g, '/'));
+            if (hasCur) cells.push(String(row.currency || '').replace(/\|/g, '/'));
+            lines.push('| ' + cells.join(' | ') + ' |');
+          });
+          lines.push('');
+        }
+        lines.push('---');
+        lines.push((L.budgetDisclaimerLegal || '') + ' ' + (L.budgetDisclaimerContact || '') + ': #contact');
+        return lines.join('\n');
+      }
+      function copyBudgetMarkdownToClipboard() {
+        var lang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
+        if (lang !== 'ar' && lang !== 'en') lang = 'ar';
+        var md = buildBudgetMarkdownExport(lang);
+        if (!md) return;
+        function ok() { if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetCopyOk') : ''); }
+        function fail() { if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetCopyFail') : ''); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(md).then(ok).catch(fail);
+        } else fail();
+      }
+      function ensureChartJs(next) {
+        if (typeof Chart !== 'undefined') { next(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+        s.crossOrigin = 'anonymous';
+        s.onload = function () { next(); };
+        s.onerror = function () { next(); };
+        document.head.appendChild(s);
+      }
+      function destroyBudgetCharts() {
+        if (window.__budgetChartInstances && window.__budgetChartInstances.length) {
+          window.__budgetChartInstances.forEach(function (c) { try { c.destroy(); } catch (e) {} });
+        }
+        window.__budgetChartInstances = [];
+      }
+      function budgetChartTopNLabelsData(rows, total, maxN, otherLabel) {
+        if (!rows || !rows.length || total <= 0) return { labels: [], data: [] };
+        var top = rows.slice(0, maxN);
+        var sumTop = 0;
+        top.forEach(function (x) { sumTop += x.amount; });
+        var other = Math.max(0, total - sumTop);
+        var labels = top.map(function (x) {
+          var n = String(x.name || '—');
+          return n.length > 26 ? n.slice(0, 23) + '…' : n;
+        });
+        var data = top.map(function (x) { return x.amount; });
+        if (other > total * 0.001 && rows.length > maxN) {
+          labels.push(otherLabel || 'Other');
+          data.push(other);
+        }
+        return { labels: labels, data: data };
+      }
+      function budgetLineItemsPrimarySlice(lineItems, primaryScenario) {
+        if (!lineItems || !lineItems.length) return [];
+        var hasScen = lineItems.some(function (r) { return r && r.scenario; });
+        if (!hasScen || !primaryScenario) return lineItems;
+        return lineItems.filter(function (r) { return (r.scenario || 'actual') === primaryScenario; });
+      }
+      function budgetScenarioKeysActive(rollup) {
+        if (!rollup || !rollup.revenue || !rollup.expense) return [];
+        return ['approved', 'actual', 'forecast'].filter(function (k) {
+          return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+        });
+      }
+      function scaleBudgetRollup(rollup, revMult, expMult) {
+        if (!rollup || !rollup.revenue || !rollup.expense) return null;
+        revMult = revMult != null ? revMult : 1;
+        expMult = expMult != null ? expMult : 1;
+        var out = { revenue: {}, expense: {} };
+        ['approved', 'actual', 'forecast'].forEach(function (k) {
+          out.revenue[k] = (rollup.revenue[k] || 0) * revMult;
+          out.expense[k] = (rollup.expense[k] || 0) * expMult;
+        });
+        return out;
+      }
+      function renderBudgetCharts(revenues, expenses, lineItems, lang, chartOpts) {
+        chartOpts = chartOpts || {};
+        destroyBudgetCharts();
+        var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
+        if (typeof Chart === 'undefined') return;
+        var prim = chartOpts.primaryScenario || 'actual';
+        var sliceItems = budgetLineItemsPrimarySlice(lineItems, prim);
+        var totalRev = revenues.reduce(function (a, b) { return a + b; }, 0);
+        var totalExp = expenses.reduce(function (a, b) { return a + b; }, 0);
+        var revByCat = aggregateBudgetLineItemsByCategory(sliceItems, 'revenue');
+        var expByCat = aggregateBudgetLineItemsByCategory(sliceItems, 'expense');
+        var green = '#2ea36f';
+        var coral = '#d47850';
+        var muted = ['#5a6b82', '#8b7355', '#4a7c8c', '#7c6b9e', '#6b8c7a', '#9e7b6b', '#6b7c9e'];
+        var elBar = document.getElementById('budget-chart-rev-exp');
+        if (elBar && (totalRev > 0 || totalExp > 0)) {
+          var c1 = new Chart(elBar, {
+            type: 'bar',
+            data: {
+              labels: [L.revenue, L.expenses],
+              datasets: [{
+                label: L.totals || '',
+                data: [totalRev, totalExp],
+                backgroundColor: [green, coral],
+                borderColor: [green, coral],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { display: false },
+                title: { display: true, text: L.chartRevExpBar || '', color: '#e8ecf4' }
+              },
+              scales: {
+                x: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c1);
+        }
+        var otherL = L.chartOther || 'Other';
+        var elExp = document.getElementById('budget-chart-exp-pie');
+        if (elExp && totalExp > 0 && expByCat.length) {
+          var ed = budgetChartTopNLabelsData(expByCat, totalExp, 7, otherL);
+          var c2 = new Chart(elExp, {
+            type: 'doughnut',
+            data: {
+              labels: ed.labels,
+              datasets: [{
+                data: ed.data,
+                backgroundColor: ed.data.map(function (_, i) { return muted[i % muted.length]; }),
+                borderColor: '#1a2332',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                title: { display: true, text: L.chartExpBreakdown || '', color: '#e8ecf4' },
+                legend: { position: 'bottom', labels: { color: '#c4cddf', boxWidth: 12 } }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c2);
+        }
+        var elRev = document.getElementById('budget-chart-rev-pie');
+        if (elRev && totalRev > 0 && revByCat.length) {
+          var rd = budgetChartTopNLabelsData(revByCat, totalRev, 7, otherL);
+          var revPalette = ['#2ea36f', '#c9a227', '#4a9e7a', '#8cb894', '#3d8a62', '#6abf8f', '#2d6b4f'];
+          var c3 = new Chart(elRev, {
+            type: 'doughnut',
+            data: {
+              labels: rd.labels,
+              datasets: [{
+                data: rd.data,
+                backgroundColor: rd.data.map(function (_, i) { return revPalette[i % revPalette.length]; }),
+                borderColor: '#1a2332',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                title: { display: true, text: L.chartRevBreakdown || '', color: '#e8ecf4' },
+                legend: { position: 'bottom', labels: { color: '#c4cddf', boxWidth: 12 } }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c3);
+        }
+        var rollup = chartOpts.rollup;
+        var active = rollup ? budgetScenarioKeysActive(rollup) : [];
+        var elScen = document.getElementById('budget-chart-scenarios');
+        if (elScen && rollup && active.length >= 2) {
+          var scenLabels = {
+            approved: L.budgetScenarioApproved || 'Approved',
+            actual: L.budgetScenarioActual || 'Actual',
+            forecast: L.budgetScenarioForecast || 'Forecast'
+          };
+          var labels = active.map(function (k) { return scenLabels[k] || k; });
+          var c4 = new Chart(elScen, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: L.revenue || '',
+                  data: active.map(function (k) { return rollup.revenue[k] || 0; }),
+                  backgroundColor: green,
+                  borderColor: green,
+                  borderWidth: 1
+                },
+                {
+                  label: L.expenses || '',
+                  data: active.map(function (k) { return rollup.expense[k] || 0; }),
+                  backgroundColor: coral,
+                  borderColor: coral,
+                  borderWidth: 1
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { labels: { color: '#c4cddf' } },
+                title: { display: true, text: L.chartScenarioCompare || '', color: '#e8ecf4' }
+              },
+              scales: {
+                x: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c4);
+        }
+      }
+      function getBudgetApiBase() {
+        try {
+          if (typeof window.IIF_BUDGET_API_BASE === 'string' && window.IIF_BUDGET_API_BASE.trim()) {
+            return String(window.IIF_BUDGET_API_BASE).trim().replace(/\/$/, '');
+          }
+          var meta = document.querySelector('meta[name="iif-budget-api-base"]');
+          var c = meta && meta.getAttribute('content');
+          if (c != null && String(c).trim() !== '') {
+            return String(c).trim().replace(/\/$/, '');
+          }
+          var host = location.hostname || '';
+          var port = String(location.port || '');
+          var isLocal = host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
+          if (isLocal && port === '3333') return 'http://127.0.0.1:3000';
+          return '';
+        } catch (e) { return ''; }
+      }
+      function tryBudgetServerParse(file, cb) {
+        var base = getBudgetApiBase();
+        if (!base) {
+          cb(null, null);
+          return;
+        }
+        var fd = new FormData();
+        fd.append('file', file);
+        fetch(base + '/api/budget/parse', { method: 'POST', body: fd })
+          .then(function (res) {
+            return res.json().then(function (j) {
+              return { status: res.status, j: j };
+            });
+          })
+          .then(function (x) {
+            var j = x.j || {};
+            var hasData = (j.revenues && j.revenues.length) || (j.expenses && j.expenses.length) || (j.lineItems && j.lineItems.length);
+            if (x.status === 200 && j.ok && hasData) {
+              cb({
+                revenues: j.revenues || [],
+                expenses: j.expenses || [],
+                lineItems: j.lineItems || [],
+                rollup: j.rollup,
+                byPeriod: j.byPeriod,
+                currencies: j.currencies || [],
+                primaryScenario: j.primaryScenario || 'actual',
+                serverWarnings: j.warnings || [],
+                serverErrors: [],
+                parseSource: 'server'
+              }, null);
+              return;
+            }
+            cb(null, j);
+          })
+          .catch(function () {
+            cb(null, null);
+          });
+      }
+      function normalizeBudgetScenarioCell(raw) {
+        var s = String(raw == null ? '' : raw).toLowerCase().trim();
+        if (!s) return 'actual';
+        if (/^approved|budget|معتمد|ميزانية\s*معتمدة/.test(s)) return 'approved';
+        if (/^forecast|projected|متوقع|تقدير/.test(s)) return 'forecast';
+        if (/^actual|فعلي|تحقق/.test(s)) return 'actual';
+        return 'actual';
+      }
+      function mergeBudgetLegacyFromLineItems(lineItems) {
+        var scenSet = {};
+        (lineItems || []).forEach(function (r) {
+          scenSet[(r && r.scenario) || 'actual'] = true;
+        });
+        var keys = Object.keys(scenSet);
+        var pick = 'actual';
+        if (keys.length === 1) {
+          pick = keys[0];
+        } else if (keys.length > 1 && !scenSet.actual) {
+          if (scenSet.approved) pick = 'approved';
+          else if (scenSet.forecast) pick = 'forecast';
+        }
+        var rev = [];
+        var exp = [];
+        (lineItems || []).forEach(function (row) {
+          if (keys.length > 1 && ((row.scenario || 'actual') !== pick)) return;
+          if (row.type === 'revenue') rev.push(row.amount);
+          else if (row.type === 'expense') exp.push(row.amount);
+        });
+        return { revenues: rev, expenses: exp, primaryScenario: pick };
+      }
+      function buildRollupFromLineItems(lineItems) {
+        var rollup = {
+          revenue: { approved: 0, actual: 0, forecast: 0 },
+          expense: { approved: 0, actual: 0, forecast: 0 }
+        };
+        (lineItems || []).forEach(function (row) {
+          var scen = row.scenario || 'actual';
+          var side = row.type === 'revenue' ? 'revenue' : 'expense';
+          rollup[side][scen] = (rollup[side][scen] || 0) + (row.amount || 0);
+        });
+        return rollup;
+      }
+      function buildByPeriodFromLineItems(lineItems) {
+        var byPeriod = {};
+        (lineItems || []).forEach(function (row) {
+          var pKey = row.period || '_all';
+          if (!byPeriod[pKey]) {
+            byPeriod[pKey] = {
+              revenue: { approved: 0, actual: 0, forecast: 0 },
+              expense: { approved: 0, actual: 0, forecast: 0 }
+            };
+          }
+          var scen = row.scenario || 'actual';
+          var side = row.type === 'revenue' ? 'revenue' : 'expense';
+          byPeriod[pKey][side][scen] = (byPeriod[pKey][side][scen] || 0) + (row.amount || 0);
+        });
+        return byPeriod;
+      }
+      function tryParseStructuredBudgetMatrix(matrix) {
+        if (!matrix || matrix.length < 2) return null;
+        var headerCells = matrix[0].map(function (c) {
+          return String(c == null ? '' : c).replace(/^\ufeff/g, '').toLowerCase().trim();
+        });
+        var typeIdx = -1;
+        var amtIdx = -1;
+        var catIdx = -1;
+        var periodIdx = -1;
+        var scenIdx = -1;
+        var curIdx = -1;
+        for (var j = 0; j < headerCells.length; j++) {
+          var h = headerCells[j];
+          if (h === 'type' || h === 'نوع' || h === 'kind') typeIdx = j;
+          if (h === 'amount' || h === 'مبلغ' || h === 'value') amtIdx = j;
+          if (h === 'category' || h === 'item' || h === 'account' || h === 'بند' || h === 'description' || h === 'name') catIdx = j;
+          if (h === 'period' || h === 'فترة' || h === 'month' || h === 'quarter' || h === 'year') periodIdx = j;
+          if (h === 'scenario' || h === 'سيناريو' || h === 'version' || h === 'نوع_الميزانية') scenIdx = j;
+          if (h === 'currency' || h === 'عملة' || h === 'ccy') curIdx = j;
+        }
+        if (typeIdx < 0 || amtIdx < 0) return null;
+        var lineItems = [];
+        for (var r = 1; r < matrix.length; r++) {
+          var row = matrix[r];
+          if (!row || !row.length) continue;
+          var t = String(row[typeIdx] != null ? row[typeIdx] : '').toLowerCase();
+          var raw = row[amtIdx];
+          var amt = typeof raw === 'number' && !isNaN(raw) ? raw : parseFloat(String(raw).replace(/[^\d.-]/g, ''));
+          if (isNaN(amt)) continue;
+          var cat = catIdx >= 0 ? String(row[catIdx] != null ? row[catIdx] : '').trim() : '';
+          var period = periodIdx >= 0 ? String(row[periodIdx] != null ? row[periodIdx] : '').trim() : '';
+          var scenario = scenIdx >= 0 ? normalizeBudgetScenarioCell(row[scenIdx]) : 'actual';
+          var currency = curIdx >= 0 ? String(row[curIdx] != null ? row[curIdx] : '').trim().toUpperCase().slice(0, 8) : '';
+          var rowType = null;
+          if (/revenue|rev\b|إيراد|ايراد|income/.test(t)) rowType = 'revenue';
+          else if (/expense|exp\b|مصروف|^cost/.test(t)) rowType = 'expense';
+          if (!rowType) continue;
+          var item = { category: cat || '—', type: rowType, amount: amt, scenario: scenario };
+          if (period) item.period = period;
+          if (currency) item.currency = currency;
+          lineItems.push(item);
+        }
+        if (lineItems.length === 0) return null;
+        var legacy = mergeBudgetLegacyFromLineItems(lineItems);
+        var currencies = [];
+        var curSet = {};
+        lineItems.forEach(function (li) {
+          if (li.currency && !curSet[li.currency]) {
+            curSet[li.currency] = true;
+            currencies.push(li.currency);
+          }
+        });
+        return {
+          revenues: legacy.revenues,
+          expenses: legacy.expenses,
+          lineItems: lineItems,
+          primaryScenario: legacy.primaryScenario,
+          rollup: buildRollupFromLineItems(lineItems),
+          byPeriod: buildByPeriodFromLineItems(lineItems),
+          currencies: currencies,
+          parseSource: 'client'
+        };
+      }
+      function readBudgetFileClient(file, cb) {
         if (!file) { cb(null, null); return; }
         var name = (file.name || '').toLowerCase();
         var rev = [], exp = [];
-        function done() { cb(rev.length || exp.length ? { revenues: rev, expenses: exp } : null, null); }
+        var lineItems = [];
+        var rollup, byPeriod, currencies, primaryScenario, parseSource;
+        function packResult() {
+          if (!(rev.length || exp.length)) return null;
+          var o = { revenues: rev, expenses: exp, lineItems: lineItems };
+          if (rollup) o.rollup = rollup;
+          if (byPeriod) o.byPeriod = byPeriod;
+          if (currencies && currencies.length) o.currencies = currencies;
+          if (primaryScenario) o.primaryScenario = primaryScenario;
+          if (parseSource) o.parseSource = parseSource;
+          return o;
+        }
+        function done() {
+          cb(packResult(), null);
+        }
         function ensureXLSX(next) {
           if (typeof XLSX !== 'undefined') { next(); return; }
           var s = document.createElement('script');
@@ -20791,18 +21921,43 @@ Generated: ${new Date().toLocaleString()}
           var r = new FileReader();
           r.onload = function () {
             var text = (r.result || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            var lines = text.split('\n');
-            if (lines.length >= 2 && lines[0].indexOf(',') !== -1) {
-              var col0 = [], col1 = [];
-              for (var i = 1; i < lines.length; i++) {
-                var cells = lines[i].split(',');
-                var a = parseFloat(String(cells[0]).replace(/[^\d.-]/g, ''));
-                var b = parseFloat(String(cells[1] || '').replace(/[^\d.-]/g, ''));
-                if (!isNaN(a)) col0.push(a);
-                if (!isNaN(b)) col1.push(b);
+            var rawLines = text.split('\n');
+            var nonEmpty = [];
+            for (var li = 0; li < rawLines.length; li++) {
+              if (rawLines[li].trim()) nonEmpty.push(rawLines[li]);
+            }
+            var structured = null;
+            if (nonEmpty.length >= 2) {
+              var matrix = [];
+              for (var mi = 0; mi < nonEmpty.length; mi++) {
+                matrix.push(parseBudgetCsvLine(nonEmpty[mi]));
               }
-              if (col0.length || col1.length) { rev = col0; exp = col1; }
-            } else trySplitAll(extractNumbersFromText(text));
+              structured = tryParseStructuredBudgetMatrix(matrix);
+            }
+            if (structured) {
+              rev = structured.revenues;
+              exp = structured.expenses;
+              lineItems = structured.lineItems || [];
+              rollup = structured.rollup;
+              byPeriod = structured.byPeriod;
+              currencies = structured.currencies;
+              primaryScenario = structured.primaryScenario;
+              parseSource = structured.parseSource;
+            } else {
+              var lines = rawLines;
+              if (lines.length >= 2 && lines[0].indexOf(',') !== -1) {
+                var col0 = [], col1 = [];
+                for (var i = 1; i < lines.length; i++) {
+                  if (!lines[i].trim()) continue;
+                  var cells = parseBudgetCsvLine(lines[i]);
+                  var a = parseFloat(String(cells[0]).replace(/[^\d.-]/g, ''));
+                  var b = parseFloat(String(cells[1] || '').replace(/[^\d.-]/g, ''));
+                  if (!isNaN(a)) col0.push(a);
+                  if (!isNaN(b)) col1.push(b);
+                }
+                if (col0.length || col1.length) { rev = col0; exp = col1; }
+              } else trySplitAll(extractNumbersFromText(text));
+            }
             done();
           };
           r.readAsText(file, 'UTF-8');
@@ -20819,19 +21974,31 @@ Generated: ${new Date().toLocaleString()}
                 if (!first) { done(); return; }
                 var sheet = wb.Sheets[first];
                 var json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                var all = [];
-                var colA = [], colB = [];
-                for (var r = 0; r < json.length; r++) {
-                  var row = json[r];
-                  if (!Array.isArray(row)) continue;
-                  for (var c = 0; c < row.length; c++) {
-                    var v = row[c];
-                    var num = typeof v === 'number' && !isNaN(v) ? v : parseFloat(String(v).replace(/[^\d.-]/g, ''));
-                    if (!isNaN(num)) { all.push(num); if (c === 0) colA.push(num); else if (c === 1) colB.push(num); }
+                var structuredX = tryParseStructuredBudgetMatrix(json);
+                if (structuredX) {
+                  rev = structuredX.revenues;
+                  exp = structuredX.expenses;
+                  lineItems = structuredX.lineItems || [];
+                  rollup = structuredX.rollup;
+                  byPeriod = structuredX.byPeriod;
+                  currencies = structuredX.currencies;
+                  primaryScenario = structuredX.primaryScenario;
+                  parseSource = structuredX.parseSource;
+                } else {
+                  var all = [];
+                  var colA = [], colB = [];
+                  for (var r = 0; r < json.length; r++) {
+                    var row = json[r];
+                    if (!Array.isArray(row)) continue;
+                    for (var c = 0; c < row.length; c++) {
+                      var v = row[c];
+                      var num = typeof v === 'number' && !isNaN(v) ? v : parseFloat(String(v).replace(/[^\d.-]/g, ''));
+                      if (!isNaN(num)) { all.push(num); if (c === 0) colA.push(num); else if (c === 1) colB.push(num); }
+                    }
                   }
+                  if (colA.length && colB.length) { rev = colA; exp = colB; }
+                  else trySplitAll(all);
                 }
-                if (colA.length && colB.length) { rev = colA; exp = colB; }
-                else trySplitAll(all);
               } catch (err) { }
               done();
             };
@@ -20854,6 +22021,162 @@ Generated: ${new Date().toLocaleString()}
         fr3.onload = function () { trySplitAll(extractNumbersFromText(fr3.result || '')); done(); };
         fr3.readAsText(file, 'UTF-8');
       }
+      function readBudgetFile(file, cb) {
+        if (!file) { cb(null, null); return; }
+        tryBudgetServerParse(file, function (serverData, errPayload) {
+          if (serverData) {
+            cb(serverData, null);
+            return;
+          }
+          readBudgetFileClient(file, function (clientData) {
+            if (clientData && errPayload && errPayload.errors && errPayload.errors.length) {
+              clientData.serverFallbackErrors = errPayload.errors.slice();
+            }
+            if (clientData && errPayload && errPayload.warnings && errPayload.warnings.length) {
+              clientData.serverFallbackWarnings = errPayload.warnings.slice();
+            }
+            cb(clientData, null);
+          });
+        });
+      }
+
+      function collectBudgetOptsFromForm(lineItems) {
+        function val(id) {
+          var el = document.getElementById(id);
+          if (!el || !String(el.value || '').trim()) return '';
+          return String(el.value).trim();
+        }
+        function num(id) {
+          var el = document.getElementById(id);
+          if (!el || !String(el.value || '').trim()) return 0;
+          var x = parseFloat(String(el.value).replace(/[^\d.-]/g, ''));
+          return isNaN(x) ? 0 : x;
+        }
+        var cons = document.getElementById('budget-ctx-consolidated');
+        return {
+          lineItems: lineItems || [],
+          companyName: val('budget-ctx-company'),
+          officeIssued: val('budget-ctx-office'),
+          dateFrom: val('budget-ctx-from'),
+          dateTo: val('budget-ctx-to'),
+          prevYearRevenue: num('budget-ctx-prev-rev'),
+          prevYearExpenses: num('budget-ctx-prev-exp'),
+          totalAssets: num('budget-ctx-assets'),
+          prevYearAssets: num('budget-ctx-prev-assets'),
+          totalLiabilities: num('budget-ctx-liab'),
+          equity: num('budget-ctx-equity'),
+          currentAssets: num('budget-ctx-cur-assets'),
+          currentLiabilities: num('budget-ctx-cur-liab'),
+          consolidated: (cons && cons.value) || 'no',
+          numEntities: val('budget-ctx-entities'),
+          cogs: num('budget-ctx-cogs'),
+          avgInventory: num('budget-ctx-inventory'),
+          supplierPayables: num('budget-ctx-payables'),
+          newPPE: num('budget-ctx-ppe'),
+          depreciationRate: num('budget-ctx-depr-rate'),
+          depreciationExpense: num('budget-ctx-depr-exp'),
+          bankLoans: (document.getElementById('budget-ctx-banks') && document.getElementById('budget-ctx-banks').value) || '',
+          businessActivity: val('budget-ctx-activity'),
+          country: val('budget-ctx-country'),
+          scenarioRevPct: (function () {
+            var el = document.getElementById('budget-scenario-rev');
+            return el ? parseFloat(el.value) || 0 : 0;
+          })(),
+          scenarioExpPct: (function () {
+            var el = document.getElementById('budget-scenario-exp');
+            return el ? parseFloat(el.value) || 0 : 0;
+          })(),
+          targetRevenue: num('budget-ctx-target-rev'),
+          targetExpenses: num('budget-ctx-target-exp'),
+          uploadMeta: window.__lastBudgetUploadMeta || null
+        };
+      }
+      function updateBudgetScenarioLabels() {
+        var sr = document.getElementById('budget-scenario-rev');
+        var se = document.getElementById('budget-scenario-exp');
+        var vr = document.getElementById('budget-scenario-rev-val');
+        var ve = document.getElementById('budget-scenario-exp-val');
+        if (vr && sr) vr.textContent = String(sr.value);
+        if (ve && se) ve.textContent = String(se.value);
+      }
+      function downloadBudgetCsv() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        var prim = pack.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(pack.lineItems || [], prim);
+        var scaled = applyBudgetScenario(pack.revenues, pack.expenses, itemsForScale, opts);
+        function escCell(s) {
+          s = String(s == null ? '' : s);
+          if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }
+        var lines = [];
+        if (scaled.lineItems && scaled.lineItems.length) {
+          var hasPeriod = scaled.lineItems.some(function (r) { return r && r.period; });
+          var hasScen = scaled.lineItems.some(function (r) { return r && r.scenario; });
+          var hasCur = scaled.lineItems.some(function (r) { return r && r.currency; });
+          var cols = ['category', 'type', 'amount'];
+          if (hasPeriod) cols.push('period');
+          if (hasScen) cols.push('scenario');
+          if (hasCur) cols.push('currency');
+          lines.push(cols.join(','));
+          scaled.lineItems.forEach(function (row) {
+            var cells = [escCell(row.category), escCell(row.type), String((row.amount != null ? row.amount : 0).toFixed(4))];
+            if (hasPeriod) cells.push(escCell(row.period || ''));
+            if (hasScen) cells.push(escCell(row.scenario || ''));
+            if (hasCur) cells.push(escCell(row.currency || ''));
+            lines.push(cells.join(','));
+          });
+        } else {
+          lines.push('kind,index,amount');
+          scaled.revenues.forEach(function (a, i) { lines.push(['revenue', String(i + 1), String(a)].join(',')); });
+          scaled.expenses.forEach(function (a, i) { lines.push(['expense', String(i + 1), String(a)].join(',')); });
+        }
+        var blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'budget-analysis.csv';
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      }
+      function refreshBudgetReport() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        var reportLang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
+        if (reportLang !== 'ar' && reportLang !== 'en') reportLang = 'ar';
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        opts.rollup = pack.rollup;
+        opts.byPeriod = pack.byPeriod;
+        opts.currencies = pack.currencies || [];
+        opts.primaryScenario = pack.primaryScenario || 'actual';
+        var noPerm = document.getElementById('budget-no-permission');
+        var res = document.getElementById('budget-results');
+        destroyBudgetCharts();
+        if (res && typeof buildBudgetReport === 'function') {
+          res.innerHTML = buildBudgetReport(pack.revenues, pack.expenses, reportLang, opts);
+          if (typeof canViewBudget === 'function' && canViewBudget()) {
+            if (noPerm) noPerm.style.display = 'none';
+            res.style.display = 'block';
+            var scaled = applyBudgetScenario(pack.revenues, pack.expenses, pack.lineItems || [], opts);
+            var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+            var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+            var rollupDisp = pack.rollup ? scaleBudgetRollup(pack.rollup, revM, expM) : null;
+            ensureChartJs(function () {
+              if (typeof Chart === 'undefined') return;
+              renderBudgetCharts(scaled.revenues, scaled.expenses, scaled.lineItems, reportLang, {
+                primaryScenario: opts.primaryScenario,
+                rollup: rollupDisp
+              });
+            });
+            scheduleBudgetDraftSave();
+          } else {
+            if (noPerm) noPerm.style.display = 'block';
+            res.style.display = 'none';
+            scheduleBudgetDraftSave();
+          }
+        }
+      }
 
       var budgetZone = document.getElementById('budget-upload-zone');
       var budgetFileInput = document.getElementById('budget-file-input');
@@ -20873,33 +22196,107 @@ Generated: ${new Date().toLocaleString()}
           if (budgetZone) budgetZone.classList.toggle('has-file', !!f);
           if (!f) {
             if (budgetFileName) budgetFileName.textContent = '';
+            window.__lastBudgetAnalysis = null;
+            window.__lastBudgetUploadMeta = null;
+            var bp = document.getElementById('budget-context-panel');
+            if (bp) bp.hidden = true;
+            var tb = document.getElementById('budget-toolbar');
+            if (tb) tb.hidden = true;
+            renderBudgetValidationList([]);
+            destroyBudgetCharts();
+            initBudgetDraftBanner();
             return;
           }
           if (budgetFileName) budgetFileName.textContent = iifMessage('dashBudgetProcessing');
           readBudgetFile(f, function (data, err) {
             if (data && (data.revenues.length || data.expenses.length)) {
               if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + iifMessage('dashBudgetAnalyzed');
-              var reportLang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
-              if (reportLang !== 'ar' && reportLang !== 'en') reportLang = 'ar';
-              var opts = {};
-              var noPerm = document.getElementById('budget-no-permission');
-              var res = document.getElementById('budget-results');
-              if (res && typeof buildBudgetReport === 'function') {
-                res.innerHTML = buildBudgetReport(data.revenues, data.expenses, reportLang, opts);
-                res.style.display = 'block';
-                if (typeof canViewBudget === 'function' && canViewBudget()) {
-                  if (noPerm) noPerm.style.display = 'none';
-                  res.style.display = 'block';
-                } else {
-                  if (noPerm) noPerm.style.display = 'block';
-                  res.style.display = 'none';
-                }
-              }
+              window.__lastBudgetAnalysis = {
+                revenues: data.revenues,
+                expenses: data.expenses,
+                lineItems: data.lineItems || [],
+                rollup: data.rollup,
+                byPeriod: data.byPeriod,
+                currencies: data.currencies || [],
+                primaryScenario: data.primaryScenario || 'actual',
+                parseSource: data.parseSource || 'client',
+                serverWarnings: data.serverWarnings,
+                serverErrors: data.serverErrors
+              };
+              window.__lastBudgetUploadMeta = {
+                fileName: f.name,
+                at: new Date().toISOString(),
+                revCount: data.revenues.length,
+                expCount: data.expenses.length,
+                lineCount: (data.lineItems || []).length,
+                restored: false
+              };
+              appendBudgetAuditLog(window.__lastBudgetUploadMeta);
+              var bp = document.getElementById('budget-context-panel');
+              if (bp) bp.hidden = false;
+              var tb = document.getElementById('budget-toolbar');
+              if (tb) tb.hidden = false;
+              var srev = document.getElementById('budget-scenario-rev');
+              var sexp = document.getElementById('budget-scenario-exp');
+              if (srev) srev.value = 0;
+              if (sexp) sexp.value = 0;
+              updateBudgetScenarioLabels();
+              renderBudgetValidationList(budgetValidationMessages(data, f.name));
+              refreshBudgetReport();
+              initBudgetDraftBanner();
             } else {
+              window.__lastBudgetAnalysis = null;
+              window.__lastBudgetUploadMeta = null;
+              var bp2 = document.getElementById('budget-context-panel');
+              if (bp2) bp2.hidden = true;
+              var tb2 = document.getElementById('budget-toolbar');
+              if (tb2) tb2.hidden = true;
+              renderBudgetValidationList([]);
+              initBudgetDraftBanner();
               if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + iifMessage('dashBudgetNoNumbers');
             }
           });
         });
+        var budgetLangSel = document.getElementById('budget-report-lang');
+        if (budgetLangSel) budgetLangSel.addEventListener('change', refreshBudgetReport);
+        var ctxPanel = document.getElementById('budget-context-panel');
+        if (ctxPanel) {
+          ctxPanel.addEventListener('change', refreshBudgetReport);
+          ctxPanel.addEventListener('input', function () {
+            clearTimeout(ctxPanel._budgetDeb);
+            ctxPanel._budgetDeb = setTimeout(refreshBudgetReport, 280);
+          });
+        }
+        var tbEl = document.getElementById('budget-toolbar');
+        if (tbEl) {
+          tbEl.addEventListener('change', function (e) {
+            if (e.target && (e.target.id === 'budget-scenario-rev' || e.target.id === 'budget-scenario-exp')) {
+              updateBudgetScenarioLabels();
+              refreshBudgetReport();
+            }
+          });
+          tbEl.addEventListener('input', function (e) {
+            if (e.target && (e.target.id === 'budget-scenario-rev' || e.target.id === 'budget-scenario-exp')) {
+              updateBudgetScenarioLabels();
+              clearTimeout(tbEl._scenDeb);
+              tbEl._scenDeb = setTimeout(refreshBudgetReport, 120);
+            }
+          });
+        }
+        var printBtn = document.getElementById('budget-print-btn');
+        if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
+        var csvBtn = document.getElementById('budget-csv-btn');
+        if (csvBtn) csvBtn.addEventListener('click', downloadBudgetCsv);
+        var mdBtn = document.getElementById('budget-copy-md-btn');
+        if (mdBtn) mdBtn.addEventListener('click', copyBudgetMarkdownToClipboard);
+        var dr = document.getElementById('budget-draft-restore-btn');
+        if (dr) dr.addEventListener('click', restoreBudgetDraftFromStorage);
+        var dc = document.getElementById('budget-draft-clear-btn');
+        if (dc) dc.addEventListener('click', function () {
+          clearBudgetDraftFromStorage();
+          if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetDraftCleared') : '');
+        });
+        initBudgetDraftBanner();
       }
 
       var BUDGET_REPORT_STRINGS = {
@@ -21158,6 +22555,155 @@ Generated: ${new Date().toLocaleString()}
       BUDGET_REPORT_STRINGS.en.risksByCountry = 'By each country\'s regulations';
       BUDGET_REPORT_STRINGS.en.risksContextHint = 'Enter business activity type and country above to better align the analysis with sector and regulations.';
       BUDGET_REPORT_STRINGS.en.risksNote = 'The analysis considers market risks, state policy and regulatory risks, and competitor risks according to the type of business activity and each country\'s regulations. Specialist analysis by sector and country is recommended.';
+      BUDGET_REPORT_STRINGS.en.chartComparison = 'Totals comparison';
+      BUDGET_REPORT_STRINGS.ar.chartComparison = 'مقارنة المجاميع';
+      BUDGET_REPORT_STRINGS.en.deepAnalysisTitle = 'Deep budget diagnostics';
+      BUDGET_REPORT_STRINGS.ar.deepAnalysisTitle = 'تشخيص مالي معمّق للميزانية';
+      BUDGET_REPORT_STRINGS.en.deepCategoryRev = 'Revenue by line / category';
+      BUDGET_REPORT_STRINGS.ar.deepCategoryRev = 'الإيرادات حسب البند / الفئة';
+      BUDGET_REPORT_STRINGS.en.deepCategoryExp = 'Expenses by line / category';
+      BUDGET_REPORT_STRINGS.ar.deepCategoryExp = 'المصروفات حسب البند / الفئة';
+      BUDGET_REPORT_STRINGS.en.deepColItem = 'Item';
+      BUDGET_REPORT_STRINGS.ar.deepColItem = 'البند';
+      BUDGET_REPORT_STRINGS.en.deepColAmount = 'Amount';
+      BUDGET_REPORT_STRINGS.ar.deepColAmount = 'المبلغ';
+      BUDGET_REPORT_STRINGS.en.deepColShare = '% of subtotal';
+      BUDGET_REPORT_STRINGS.ar.deepColShare = '% من المجموع';
+      BUDGET_REPORT_STRINGS.en.deepConcentration = 'Concentration & dependency';
+      BUDGET_REPORT_STRINGS.ar.deepConcentration = 'التركيز والاعتمادية';
+      BUDGET_REPORT_STRINGS.en.deepTopRevShare = 'Largest revenue line as % of total revenue';
+      BUDGET_REPORT_STRINGS.ar.deepTopRevShare = 'أكبر بند إيراد كنسبة من إجمالي الإيرادات';
+      BUDGET_REPORT_STRINGS.en.deepTopExpShare = 'Largest expense line as % of total expenses';
+      BUDGET_REPORT_STRINGS.ar.deepTopExpShare = 'أكبر بند مصروف كنسبة من إجمالي المصروفات';
+      BUDGET_REPORT_STRINGS.en.deepHHI = 'Expense concentration index (HHI, 0–1)';
+      BUDGET_REPORT_STRINGS.ar.deepHHI = 'مؤشر تركيز المصروفات (HHI، بين 0 و1)';
+      BUDGET_REPORT_STRINGS.en.deepHHIHigh = 'High concentration — review dependency on few cost drivers.';
+      BUDGET_REPORT_STRINGS.ar.deepHHIHigh = 'تركيز مرتفع — راجع الاعتماد على عدد قليل من بنود التكلفة.';
+      BUDGET_REPORT_STRINGS.en.deepHHIModerate = 'Moderate concentration.';
+      BUDGET_REPORT_STRINGS.ar.deepHHIModerate = 'تركيز متوسط.';
+      BUDGET_REPORT_STRINGS.en.deepSensitivity = 'Simple stress test (revenue shock)';
+      BUDGET_REPORT_STRINGS.ar.deepSensitivity = 'اختبار إجهاد بسيط (صدمة في الإيرادات)';
+      BUDGET_REPORT_STRINGS.en.deepSens10 = 'If revenue falls by 10%, operating balance (revenue − expenses) ≈';
+      BUDGET_REPORT_STRINGS.ar.deepSens10 = 'عند هبوط الإيرادات 10%، الرصيد التشغيلي (إيرادات − مصروفات) تقريباً';
+      BUDGET_REPORT_STRINGS.en.deepSens20 = 'If revenue falls by 20%:';
+      BUDGET_REPORT_STRINGS.ar.deepSens20 = 'عند هبوط الإيرادات 20%:';
+      BUDGET_REPORT_STRINGS.en.deepFlagsTitle = 'Automated flags (rules-based)';
+      BUDGET_REPORT_STRINGS.ar.deepFlagsTitle = 'تنبيهات آلية (قواعد منطقية)';
+      BUDGET_REPORT_STRINGS.en.deepRecTitle = 'Indicative recommendations (not a substitute for professional advice)';
+      BUDGET_REPORT_STRINGS.ar.deepRecTitle = 'توصيات إرشادية (لا تحل محل مراجعة مهنية)';
+      BUDGET_REPORT_STRINGS.en.flagExpExceedsRev = 'Expenses exceed revenues — structural deficit.';
+      BUDGET_REPORT_STRINGS.ar.flagExpExceedsRev = 'المصروفات تتجاوز الإيرادات — عجز هيكلي.';
+      BUDGET_REPORT_STRINGS.en.flagExpNearRev = 'Expense-to-revenue ratio is very high (>90%).';
+      BUDGET_REPORT_STRINGS.ar.flagExpNearRev = 'نسبة المصروفات إلى الإيرادات مرتفعة جداً (>90%).';
+      BUDGET_REPORT_STRINGS.en.flagThinMargin = 'Surplus exists but margin on revenue is thin.';
+      BUDGET_REPORT_STRINGS.ar.flagThinMargin = 'يوجد فائض لكن الهامش على الإيرادات ضيق.';
+      BUDGET_REPORT_STRINGS.en.flagRevConcentrated = 'Revenue is highly concentrated on few lines.';
+      BUDGET_REPORT_STRINGS.ar.flagRevConcentrated = 'الإيرادات مركّزة على عدد قليل من البنود.';
+      BUDGET_REPORT_STRINGS.en.flagExpConcentrated = 'Costs are highly concentrated — single-line shock risk.';
+      BUDGET_REPORT_STRINGS.ar.flagExpConcentrated = 'التكاليف مركّزة — مخاطر صدمة على بند واحد.';
+      BUDGET_REPORT_STRINGS.en.recReduceExp = 'Review largest expense categories and discretionary spend.';
+      BUDGET_REPORT_STRINGS.ar.recReduceExp = 'راجع أكبر فئات المصروف والإنفاق التقديري.';
+      BUDGET_REPORT_STRINGS.en.recDiversifyRev = 'Consider revenue diversification and contract mix.';
+      BUDGET_REPORT_STRINGS.ar.recDiversifyRev = 'فكّر في تنويع الإيرادات ومزيج العقود.';
+      BUDGET_REPORT_STRINGS.en.recForecast = 'Maintain a rolling forecast tying revenue scenarios to obligations.';
+      BUDGET_REPORT_STRINGS.ar.recForecast = 'اعتمِد توقعاً مستمراً يربط سيناريوهات الإيرادات بالالتزامات.';
+      BUDGET_REPORT_STRINGS.en.recExpert = 'Validate conclusions with qualified finance and legal advisors.';
+      BUDGET_REPORT_STRINGS.ar.recExpert = 'ثبّت النتائج مع مستشارين ماليين وقانونيين مؤهلين.';
+      BUDGET_REPORT_STRINGS.en.noDeepFlags = 'No major rule-based flags for the current figures.';
+      BUDGET_REPORT_STRINGS.ar.noDeepFlags = 'لا تنبيهات قواعدية بارزة وفق الأرقام الحالية.';
+      BUDGET_REPORT_STRINGS.en.scenarioBanner = 'Interactive scenario active: revenue {r}%, expenses {e}% (uniform adjustment to all lines of each type).';
+      BUDGET_REPORT_STRINGS.ar.scenarioBanner = 'سيناريو تفاعلي: تعديل الإيرادات {r}% والمصروفات {e}% (تطبيق موحّد على كل البنود من كل نوع).';
+      BUDGET_REPORT_STRINGS.en.chartVisualTitle = 'Charts';
+      BUDGET_REPORT_STRINGS.ar.chartVisualTitle = 'الرسوم البيانية';
+      BUDGET_REPORT_STRINGS.en.chartVisualIntro = 'Bar: totals. Doughnuts: category mix. Wide bar (when present): approved / actual / forecast from file columns.';
+      BUDGET_REPORT_STRINGS.ar.chartVisualIntro = 'عمودي: المجاميع. دائري: الحصص حسب الفئة. الشريط العريض (إن وُجد): معتمد / فعلي / متوقع من أعمدة الملف.';
+      BUDGET_REPORT_STRINGS.en.chartRevExpBar = 'Revenue vs expenses (totals)';
+      BUDGET_REPORT_STRINGS.ar.chartRevExpBar = 'الإيرادات مقابل المصروفات (المجاميع)';
+      BUDGET_REPORT_STRINGS.en.chartExpBreakdown = 'Expense mix by category';
+      BUDGET_REPORT_STRINGS.ar.chartExpBreakdown = 'مزيج المصروفات حسب الفئة';
+      BUDGET_REPORT_STRINGS.en.chartRevBreakdown = 'Revenue mix by category';
+      BUDGET_REPORT_STRINGS.ar.chartRevBreakdown = 'مزيج الإيرادات حسب الفئة';
+      BUDGET_REPORT_STRINGS.en.chartOther = 'Other';
+      BUDGET_REPORT_STRINGS.ar.chartOther = 'أخرى';
+      BUDGET_REPORT_STRINGS.en.chartScenarioCompare = 'Approved vs actual vs forecast (from file)';
+      BUDGET_REPORT_STRINGS.ar.chartScenarioCompare = 'معتمد مقابل فعلي مقابل متوقع (من الملف)';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioRollupTitle = 'Budget versions in file (totals by scenario)';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioRollupTitle = 'إصدارات الميزانية في الملف (مجاميع حسب السيناريو)';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioRollupNote = 'Main totals and category charts use the primary slice (actual when present, else approved, else forecast). This table shows all scenario columns from your file.';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioRollupNote = 'المجاميع الرئيسية والرسوم حسب الفئة تعتمد على الجزء الأساسي (الفعلي إن وُجد، وإلا المعتمد، وإلا المتوقع). الجدول يعرض كل أعمدة السيناريو من الملف.';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioApproved = 'Approved / budget';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioApproved = 'معتمد / ميزانية';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioActual = 'Actual';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioActual = 'فعلي';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioForecast = 'Forecast';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioForecast = 'متوقع';
+      BUDGET_REPORT_STRINGS.en.budgetPeriodBreakdownTitle = 'Totals by period (when a period column is present)';
+      BUDGET_REPORT_STRINGS.ar.budgetPeriodBreakdownTitle = 'مجاميع حسب الفترة (عند وجود عمود period)';
+      BUDGET_REPORT_STRINGS.en.budgetColPeriod = 'Period';
+      BUDGET_REPORT_STRINGS.ar.budgetColPeriod = 'الفترة';
+      BUDGET_REPORT_STRINGS.en.budgetMultiCurrencyNote = 'Multiple currencies in file — reconcile FX before comparing totals.';
+      BUDGET_REPORT_STRINGS.ar.budgetMultiCurrencyNote = 'أكثر من عملة في الملف — وفّق أسعار الصرف قبل مقارنة المجاميع.';
+      BUDGET_REPORT_STRINGS.en.budgetSingleCurrencyLabel = 'Currency (from file)';
+      BUDGET_REPORT_STRINGS.ar.budgetSingleCurrencyLabel = 'العملة (من الملف)';
+      BUDGET_REPORT_STRINGS.en.deepNoLines = 'For line-level tables and concentration metrics, use the CSV template (columns category, type, amount; optional period, scenario, currency).';
+      BUDGET_REPORT_STRINGS.ar.deepNoLines = 'لجداول البنود ومقاييس التركيز، استخدم قالب CSV (category، type، amount؛ واختياري period، scenario، currency).';
+      BUDGET_REPORT_STRINGS.en.budgetDisclaimerLegal = 'This analysis is automated and indicative only. It is not an audit, investment advice, tax opinion, or substitute for qualified professionals. You remain responsible for decisions based on these figures.';
+      BUDGET_REPORT_STRINGS.ar.budgetDisclaimerLegal = 'هذا التحليل آلية وإرشادي فقط. وليس تدقيقاً ولا استشارة استثمارية ولا رأياً ضريبياً ولا بديلاً عن مختصين مؤهلين. تبقى مسؤولية القرارات على أساس هذه الأرقام على عاتقك.';
+      BUDGET_REPORT_STRINGS.en.budgetDisclaimerContact = 'Contact';
+      BUDGET_REPORT_STRINGS.ar.budgetDisclaimerContact = 'اتصل بنا';
+      BUDGET_REPORT_STRINGS.en.budgetSourceTitle = 'Data sources';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceTitle = 'مصادر البيانات';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFile = 'Uploaded file';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFile = 'الملف المرفوع';
+      BUDGET_REPORT_STRINGS.en.budgetSourceTime = 'Parsed at (timestamp)';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceTime = 'وقت القراءة';
+      BUDGET_REPORT_STRINGS.en.budgetSourceCounts = 'Counts — revenue lines: {r}, expense lines: {e}, structured rows: {l}.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceCounts = 'الأعداد — بنود إيراد: {r}، بنود مصروف: {e}، صفوف منظمة: {l}.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceRestored = 'Restored from a saved browser draft (not a new file upload).';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceRestored = 'مستعاد من مسودة محفوظة في المتصفح (وليس رفع ملف جديد).';
+      BUDGET_REPORT_STRINGS.en.budgetSourceUnknown = 'No file metadata available.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceUnknown = 'لا تتوفر بيانات وصفية للملف.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFormNote = 'Numbers and text in sections below may also use the optional context form on this page (manual entry), mixed with file-based lines.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFormNote = 'قد تُستخدم حقول النموذج الاختياري في الصفحة (إدخال يدوي) مع بنود الملف في الأقسام التالية.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFileOnly = 'Figures from the uploaded file drive the core totals unless you add optional context fields.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFileOnly = 'المجاميع الأساسية من الملف المرفوع ما لم تُضِف حقول السياق الاختيارية.';
+      BUDGET_REPORT_STRINGS.en.budgetTargetsSection = 'Targets / approved budget vs actual';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetsSection = 'الأهداف / الميزانية المعتمدة مقابل الفعلي';
+      BUDGET_REPORT_STRINGS.en.budgetTargetRevLabel = 'Target revenue';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetRevLabel = 'إيراد مستهدف';
+      BUDGET_REPORT_STRINGS.en.budgetTargetExpLabel = 'Target expenses';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetExpLabel = 'مصروف مستهدف';
+      BUDGET_REPORT_STRINGS.en.budgetVarianceCol = 'Variance %';
+      BUDGET_REPORT_STRINGS.ar.budgetVarianceCol = 'انحراف %';
+      BUDGET_REPORT_STRINGS.en.budgetAuditTitle = 'Recent budget uploads (this browser)';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditTitle = 'آخر عمليات رفع الميزانية (هذا المتصفح)';
+      BUDGET_REPORT_STRINGS.en.budgetAuditNote = 'Local log for admins only; not a server-side audit trail. Clear browser data to erase.';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditNote = 'سجل محلي للمسؤولين فقط؛ وليس سجلاً على الخادم. مسح بيانات المتصفح يحذفه.';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColTime = 'Time';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColTime = 'الوقت';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColFile = 'File name';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColFile = 'اسم الملف';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColRows = 'Rows (r/e/L)';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColRows = 'صفوف (إيراد/مصروف/منظم)';
+
+      function aggregateBudgetLineItemsByCategory(lineItems, itemType) {
+        var map = {};
+        (lineItems || []).forEach(function (row) {
+          if (!row || row.type !== itemType) return;
+          var k = (row.category || '—').trim() || '—';
+          map[k] = (map[k] || 0) + (row.amount || 0);
+        });
+        return Object.keys(map).map(function (k) { return { name: k, amount: map[k] }; }).sort(function (a, b) { return b.amount - a.amount; });
+      }
+      function budgetExpenseHHI(expByCat, totalExp) {
+        if (!totalExp || !expByCat || !expByCat.length) return 0;
+        var h = 0;
+        expByCat.forEach(function (row) {
+          var s = row.amount / totalExp;
+          h += s * s;
+        });
+        return h;
+      }
 
       function parseBankLoans(text) {
         var lines = (text || '').split(/[\n\r]+/);
@@ -21175,6 +22721,22 @@ Generated: ${new Date().toLocaleString()}
 
       function buildBudgetReport(revenues, expenses, lang, opts) {
         opts = opts || {};
+        var prim = opts.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(opts.lineItems || [], prim);
+        var scaled0 = applyBudgetScenario(revenues, expenses, itemsForScale, opts);
+        revenues = scaled0.revenues;
+        expenses = scaled0.expenses;
+        var lineItems = scaled0.lineItems;
+        var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        var rollupReport = opts.rollup ? scaleBudgetRollup(opts.rollup, revM, expM) : null;
+        var byPeriodReport = null;
+        if (opts.byPeriod) {
+          byPeriodReport = {};
+          Object.keys(opts.byPeriod).forEach(function (k) {
+            byPeriodReport[k] = scaleBudgetRollup(opts.byPeriod[k], revM, expM);
+          });
+        }
         var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
         var totalRev = revenues.reduce(function (a, b) { return a + b; }, 0);
         var totalExp = expenses.reduce(function (a, b) { return a + b; }, 0);
@@ -21211,9 +22773,38 @@ Generated: ${new Date().toLocaleString()}
         var cogs = parseFloat(opts.cogs) || 0;
         var supplierPayables = parseFloat(opts.supplierPayables) || 0;
         var bankLoansList = typeof parseBankLoans === 'function' ? parseBankLoans(opts.bankLoans || '') : [];
+        var targetRevenue = parseFloat(opts.targetRevenue) || 0;
+        var targetExpenses = parseFloat(opts.targetExpenses) || 0;
+        var hasFormSupplement = !!(companyName || officeIssued || dateFrom || dateTo || prevRev || prevExp || totalAssets || prevAssets || totalLiab || equity || currentAssets || currentLiab || (opts.numEntities && String(opts.numEntities).trim()) || isConsolidated || cogs || avgInventory || supplierPayables || newPPE || depRate || depExpense || (opts.bankLoans && String(opts.bankLoans).trim()) || opts.businessActivity || opts.country || targetRevenue || targetExpenses);
 
         var html = '<div class="budget-analysis-report" dir="' + dir + '">';
+        var scenR = parseFloat(opts.scenarioRevPct) || 0;
+        var scenE = parseFloat(opts.scenarioExpPct) || 0;
+        if (scenR !== 0 || scenE !== 0) {
+          var sb = (L.scenarioBanner || '').replace(/\{r\}/g, String(scenR)).replace(/\{e\}/g, String(scenE));
+          html += '<div class="budget-scenario-banner">' + sb + '</div>';
+        }
         html += '<h4>' + L.title + '</h4>';
+        html += '<div class="budget-legal-box report-section"><p style="font-size:0.82rem;line-height:1.55;margin:0;">' + (L.budgetDisclaimerLegal || '') + ' <a href="#contact">' + (L.budgetDisclaimerContact || '') + '</a></p></div>';
+        html += '<div class="report-section budget-data-source"><h5>' + (L.budgetSourceTitle || '') + '</h5>';
+        var um = opts.uploadMeta;
+        if (um) {
+          html += '<p>' + (L.budgetSourceFile || '') + ': <strong>' + escapeHtml(um.fileName || '—') + '</strong></p>';
+          if (um.at) html += '<p>' + (L.budgetSourceTime || '') + ': ' + escapeHtml(um.at) + '</p>';
+          html += '<p>' + (L.budgetSourceCounts || '').replace(/\{r\}/g, String(um.revCount != null ? um.revCount : revenues.length)).replace(/\{e\}/g, String(um.expCount != null ? um.expCount : expenses.length)).replace(/\{l\}/g, String(um.lineCount != null ? um.lineCount : lineItems.length)) + '</p>';
+          if (um.restored) html += '<p style="color:#e8a54b;">' + (L.budgetSourceRestored || '') + '</p>';
+        } else {
+          html += '<p>' + (L.budgetSourceUnknown || '') + '</p>';
+        }
+        if (hasFormSupplement) html += '<p>' + (L.budgetSourceFormNote || '') + '</p>';
+        else html += '<p>' + (L.budgetSourceFileOnly || '') + '</p>';
+        if (opts.currencies && opts.currencies.length > 1) {
+          html += '<p style="color:#e8a54b;font-size:0.88rem;">' + (L.budgetMultiCurrencyNote || '') + '</p>';
+        }
+        if (opts.currencies && opts.currencies.length === 1) {
+          html += '<p style="font-size:0.88rem;color:var(--color-text-muted);">' + (L.budgetSingleCurrencyLabel || '') + ': <strong>' + escapeHtml(opts.currencies[0]) + '</strong></p>';
+        }
+        html += '</div>';
         if (companyName || officeIssued || dateFrom || dateTo) {
           html += '<div class="report-section report-header"><h5>' + L.companyName + '</h5><p><strong>' + (companyName || '—') + '</strong></p>';
           if (officeIssued) { html += '<h5>' + L.officeIssued + '</h5><p>' + officeIssued + '</p>'; }
@@ -21232,6 +22823,131 @@ Generated: ${new Date().toLocaleString()}
         html += '<tr><td>' + L.revenue + '</td><td class="result-total">' + totalRev.toFixed(2) + '</td></tr>';
         html += '<tr><td>' + L.expenses + '</td><td class="result-total">' + totalExp.toFixed(2) + '</td></tr>';
         html += '<tr><td><strong>' + L.balance + ' (' + balanceLabel + ')</strong></td><td class="result-total">' + balance.toFixed(2) + '</td></tr></table></div>';
+        if (targetRevenue > 0 || targetExpenses > 0) {
+          html += '<div class="report-section"><h5>' + (L.budgetTargetsSection || '') + '</h5><table class="analysis-result-table"><tr><th></th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.budgetVarianceCol || '') + '</th></tr>';
+          if (targetRevenue > 0) {
+            var vRev = targetRevenue ? ((totalRev - targetRevenue) / targetRevenue * 100) : 0;
+            html += '<tr><td>' + (L.budgetTargetRevLabel || '') + '</td><td class="result-total">' + targetRevenue.toFixed(2) + '</td><td class="result-total">' + vRev.toFixed(1) + '%</td></tr>';
+          }
+          if (targetExpenses > 0) {
+            var vExp = targetExpenses ? ((totalExp - targetExpenses) / targetExpenses * 100) : 0;
+            html += '<tr><td>' + (L.budgetTargetExpLabel || '') + '</td><td class="result-total">' + targetExpenses.toFixed(2) + '</td><td class="result-total">' + vExp.toFixed(1) + '%</td></tr>';
+          }
+          html += '</table></div>';
+        }
+        var rollup = rollupReport;
+        if (rollup && rollup.revenue && rollup.expense) {
+          var scenUsed = ['approved', 'actual', 'forecast'].filter(function (k) {
+            return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+          });
+          if (scenUsed.length >= 2) {
+            html += '<div class="report-section"><h5>' + (L.budgetScenarioRollupTitle || '') + '</h5>';
+            html += '<table class="analysis-result-table"><tr><th></th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th></tr>';
+            html += '<tr><td>' + L.revenue + '</td><td>' + (rollup.revenue.approved || 0).toFixed(2) + '</td><td>' + (rollup.revenue.actual || 0).toFixed(2) + '</td><td>' + (rollup.revenue.forecast || 0).toFixed(2) + '</td></tr>';
+            html += '<tr><td>' + L.expenses + '</td><td>' + (rollup.expense.approved || 0).toFixed(2) + '</td><td>' + (rollup.expense.actual || 0).toFixed(2) + '</td><td>' + (rollup.expense.forecast || 0).toFixed(2) + '</td></tr>';
+            html += '</table>';
+            html += '<p style="font-size:0.82rem;color:var(--color-text-muted);margin:0.5rem 0 0;">' + (L.budgetScenarioRollupNote || '') + '</p>';
+            html += '</div>';
+          }
+        }
+        var bp = byPeriodReport || {};
+        var pKeys = Object.keys(bp).filter(function (k) { return k !== '_all'; }).sort();
+        if (pKeys.length) {
+          html += '<div class="report-section"><h5>' + (L.budgetPeriodBreakdownTitle || '') + '</h5>';
+          html += '<table class="analysis-result-table"><tr><th>' + (L.budgetColPeriod || '') + '</th><th colspan="3">' + L.revenue + '</th><th colspan="3">' + L.expenses + '</th></tr>';
+          html += '<tr><th></th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th></tr>';
+          pKeys.forEach(function (pk) {
+            var slice = bp[pk] || { revenue: {}, expense: {} };
+            html += '<tr><td>' + escapeHtml(pk) + '</td>';
+            html += '<td>' + ((slice.revenue && slice.revenue.approved) || 0).toFixed(2) + '</td><td>' + ((slice.revenue && slice.revenue.actual) || 0).toFixed(2) + '</td><td>' + ((slice.revenue && slice.revenue.forecast) || 0).toFixed(2) + '</td>';
+            html += '<td>' + ((slice.expense && slice.expense.approved) || 0).toFixed(2) + '</td><td>' + ((slice.expense && slice.expense.actual) || 0).toFixed(2) + '</td><td>' + ((slice.expense && slice.expense.forecast) || 0).toFixed(2) + '</td>';
+            html += '</tr>';
+          });
+          html += '</table></div>';
+        }
+        var maxBar = Math.max(totalRev, totalExp, 1);
+        var wRev = (totalRev / maxBar * 100);
+        var wExp = (totalExp / maxBar * 100);
+        html += '<div class="report-section"><h5>' + (L.chartComparison || 'Comparison') + '</h5>';
+        html += '<div class="budget-bar-chart" role="img" aria-label="' + (L.chartComparison || '') + '">';
+        html += '<div class="budget-bar-chart__row"><span class="budget-bar-chart__label">' + L.revenue + '</span><div class="budget-bar-chart__track"><div class="budget-bar-chart__fill budget-bar-chart__fill--rev" style="width:' + wRev + '%"></div></div><span class="budget-bar-chart__val">' + totalRev.toFixed(2) + '</span></div>';
+        html += '<div class="budget-bar-chart__row"><span class="budget-bar-chart__label">' + L.expenses + '</span><div class="budget-bar-chart__track"><div class="budget-bar-chart__fill budget-bar-chart__fill--exp" style="width:' + wExp + '%"></div></div><span class="budget-bar-chart__val">' + totalExp.toFixed(2) + '</span></div>';
+        html += '</div></div>';
+        html += '<div class="report-section budget-chartjs-section"><h5>' + (L.chartVisualTitle || '') + '</h5><p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 var(--space-2);">' + (L.chartVisualIntro || '') + '</p>';
+        html += '<div class="budget-chartjs-grid">';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-rev-exp" aria-hidden="false"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-exp-pie"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-rev-pie"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap budget-chartjs-wrap--full"><canvas id="budget-chart-scenarios"></canvas></div>';
+        html += '</div></div>';
+        var revByCat = aggregateBudgetLineItemsByCategory(lineItems, 'revenue');
+        var expByCat = aggregateBudgetLineItemsByCategory(lineItems, 'expense');
+        html += '<div class="report-section"><h5>' + (L.deepAnalysisTitle || '') + '</h5>';
+        if (!lineItems.length) {
+          html += '<p style="font-size:0.9rem;color:var(--color-text-muted);">' + (L.deepNoLines || '') + '</p>';
+        }
+        if (revByCat.length) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepCategoryRev || '') + '</h5><table class="budget-deep-table"><tr><th>' + (L.deepColItem || '') + '</th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.deepColShare || '') + '</th></tr>';
+          revByCat.forEach(function (row) {
+            var pct = totalRev ? row.amount / totalRev * 100 : 0;
+            html += '<tr><td>' + escapeHtml(row.name) + '</td><td>' + row.amount.toFixed(2) + '</td><td>' + pct.toFixed(1) + '%</td></tr>';
+          });
+          html += '</table>';
+        }
+        if (expByCat.length) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepCategoryExp || '') + '</h5><table class="budget-deep-table"><tr><th>' + (L.deepColItem || '') + '</th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.deepColShare || '') + '</th></tr>';
+          expByCat.forEach(function (row) {
+            var pct = totalExp ? row.amount / totalExp * 100 : 0;
+            html += '<tr><td>' + escapeHtml(row.name) + '</td><td>' + row.amount.toFixed(2) + '</td><td>' + pct.toFixed(1) + '%</td></tr>';
+          });
+          html += '</table>';
+        }
+        if (revByCat.length || expByCat.length || totalRev > 0 || totalExp > 0) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepConcentration || '') + '</h5>';
+          if (totalRev > 0 && revByCat.length) {
+            var topRevPct = revByCat[0].amount / totalRev * 100;
+            html += '<p>' + (L.deepTopRevShare || '') + ': ' + topRevPct.toFixed(1) + '% (' + escapeHtml(revByCat[0].name) + ')</p>';
+          }
+          if (totalExp > 0 && expByCat.length) {
+            var topExpPct = expByCat[0].amount / totalExp * 100;
+            html += '<p>' + (L.deepTopExpShare || '') + ': ' + topExpPct.toFixed(1) + '% (' + escapeHtml(expByCat[0].name) + ')</p>';
+          }
+          if (totalExp > 0 && expByCat.length > 1) {
+            var hhi = budgetExpenseHHI(expByCat, totalExp);
+            html += '<p>' + (L.deepHHI || '') + ': ' + hhi.toFixed(3) + '</p>';
+            if (hhi >= 0.28) html += '<p>' + (L.deepHHIHigh || '') + '</p>';
+            else if (hhi >= 0.18) html += '<p>' + (L.deepHHIModerate || '') + '</p>';
+          }
+        }
+        if (totalRev > 0) {
+          var bal10 = totalRev * 0.9 - totalExp;
+          var bal20 = totalRev * 0.8 - totalExp;
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepSensitivity || '') + '</h5>';
+          html += '<p>' + (L.deepSens10 || '') + ' <strong>' + bal10.toFixed(2) + '</strong></p>';
+          html += '<p>' + (L.deepSens20 || '') + ' <strong>' + bal20.toFixed(2) + '</strong></p>';
+        }
+        var flags = [];
+        if (totalExp > totalRev && totalRev >= 0) flags.push({ cls: 'budget-flag--crit', t: L.flagExpExceedsRev });
+        if (totalRev > 0 && expToRev > 90 && balance >= 0) flags.push({ cls: 'budget-flag--warn', t: L.flagExpNearRev });
+        if (balance > 0 && savingsRate < 5 && totalRev > 0) flags.push({ cls: 'budget-flag--warn', t: L.flagThinMargin });
+        if (totalRev > 0 && revByCat.length && revByCat[0].amount / totalRev > 0.5) flags.push({ cls: 'budget-flag--warn', t: L.flagRevConcentrated });
+        if (totalExp > 0 && expByCat.length && expByCat[0].amount / totalExp > 0.4) flags.push({ cls: 'budget-flag--warn', t: L.flagExpConcentrated });
+        html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepFlagsTitle || '') + '</h5>';
+        if (flags.length) {
+          html += '<ul class="budget-flag-list">';
+          flags.forEach(function (f) { html += '<li class="' + f.cls + '">' + f.t + '</li>'; });
+          html += '</ul>';
+        } else {
+          html += '<p>' + (L.noDeepFlags || '') + '</p>';
+        }
+        var recs = [];
+        if (totalExp > totalRev || expToRev > 90) recs.push(L.recReduceExp);
+        if (totalRev > 0 && revByCat.length && revByCat[0].amount / totalRev > 0.45) recs.push(L.recDiversifyRev);
+        if (totalExp > totalRev || expToRev > 85) recs.push(L.recForecast);
+        recs.push(L.recExpert);
+        html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepRecTitle || '') + '</h5><ul class="budget-flag-list">';
+        recs.forEach(function (t) { html += '<li>' + t + '</li>'; });
+        html += '</ul></div>';
         if (prevRev > 0 || prevExp > 0) {
           var revPct = prevRev ? ((totalRev - prevRev) / prevRev * 100) : 0;
           var expPct = prevExp ? ((totalExp - prevExp) / prevExp * 100) : 0;
@@ -21339,6 +23055,17 @@ Generated: ${new Date().toLocaleString()}
         html += '<div class="report-section"><h5>' + L.counts + '</h5><p>' + L.revItems + ': ' + revenues.length + '</p><p>' + L.expItems + ': ' + expenses.length + '</p></div>';
         html += '<div class="report-section"><h5>' + L.averages + '</h5><p>' + L.avgRev + ': ' + avgRev.toFixed(2) + '</p><p>' + L.avgExp + ': ' + avgExp.toFixed(2) + '</p></div>';
         html += '<div class="report-section"><h5>' + L.extremes + '</h5><p>' + L.maxRev + ': ' + maxRev.toFixed(2) + '</p><p>' + L.maxExp + ': ' + maxExp.toFixed(2) + '</p></div>';
+        if (typeof isAdmin === 'function' && isAdmin()) {
+          var alog = typeof getBudgetAuditLog === 'function' ? getBudgetAuditLog() : [];
+          if (alog.length) {
+            html += '<div class="report-section budget-audit-section"><h5>' + (L.budgetAuditTitle || '') + '</h5><p style="font-size:0.8rem;color:var(--color-text-muted);">' + (L.budgetAuditNote || '') + '</p>';
+            html += '<table class="budget-deep-table"><tr><th>' + (L.budgetAuditColTime || '') + '</th><th>' + (L.budgetAuditColFile || '') + '</th><th>' + (L.budgetAuditColRows || '') + '</th></tr>';
+            alog.forEach(function (row) {
+              html += '<tr><td>' + escapeHtml(row.at || '') + '</td><td>' + escapeHtml(row.fileName || '') + '</td><td>r:' + (row.revCount | 0) + ' e:' + (row.expCount | 0) + ' L:' + (row.lineCount | 0) + '</td></tr>';
+            });
+            html += '</table></div>';
+          }
+        }
         html += '</div>';
         return html;
       }
