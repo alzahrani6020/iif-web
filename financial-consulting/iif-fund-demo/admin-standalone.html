@@ -19,6 +19,7 @@
   </script>
 
   <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.sheetjs.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https:; frame-src https://translate.google.com https://www.google.com https://www.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:; object-src 'none'; upgrade-insecure-requests; worker-src 'self'" />
   <!-- جذر المسارات النسبية (assets/، الشعار): اختياري عبر meta iif-app-base؛ وإلا يُحسب من المسار + استثناء npm start (المنفذ 3333) -->
   <meta name="iif-app-base" content="" />
   <meta name="iif-contact-form-endpoint" content="" />
@@ -121,12 +122,9 @@
   <meta name="iif-funcs-base" content="https://iif-fund-dr-talal.vercel.app" />
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
   <link rel="apple-touch-icon" href="assets/emblem.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link rel="stylesheet" href="css/fonts-hosted.css" />
   <!-- تحقق-النشر: iif-dashboard-fullpage-v3 — إن لم يظهر هذا التعليق في Ctrl+U على Vercel فالنشر قديم -->
   <style id="iif-dashboard-fullpage-critical-head">
     /* لوحة التحكم: ملء الشاشة — نسخة مبكّرة في <head> (تُكمّلها iif-dashboard-fullpage-lock في آخر body) */
@@ -238,20 +236,20 @@
 
     /* أوزن الصفحات: الهيدر لا يغطي المحتوى — قيمة كافية حتى مع تكرار الهيدر على سطرين */
     :root {
-      --header-height: 9rem;
+      --header-height: clamp(11.5rem, 30vh, 24rem);
       --service-back-bar-height: 4rem;
     }
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: var(--header-height);
+      scroll-padding-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
     }
 
     [id],
     .section,
     section[id],
     main [id] {
-      scroll-margin-top: var(--header-height);
+      scroll-margin-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
     }
 
     main#main-content {
@@ -276,6 +274,59 @@
       top: var(--space-4);
       outline: 2px solid var(--color-accent-gold-soft);
       outline-offset: 2px;
+    }
+
+    .skip-link:focus-visible {
+      top: var(--space-4);
+      outline: 2px solid var(--color-accent-gold, #c9a227);
+      outline-offset: 3px;
+    }
+
+    .skip-link:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    .iif-first-load-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      z-index: 2147483646;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(201, 162, 39, 0.45),
+        rgba(232, 212, 138, 0.35),
+        rgba(201, 162, 39, 0.45),
+        transparent
+      );
+      background-size: 220% 100%;
+      animation: iif-first-load-shimmer 1.15s ease-in-out infinite;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .iif-first-load-shell--hide {
+      opacity: 0;
+      visibility: hidden;
+      animation: none;
+    }
+
+    @keyframes iif-first-load-shimmer {
+      0% {
+        background-position: 120% 0;
+      }
+      100% {
+        background-position: -120% 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .iif-first-load-shell {
+        animation: none;
+        background: rgba(201, 162, 39, 0.55);
+      }
     }
 
     body {
@@ -3477,42 +3528,60 @@
       font-size: 0.95rem;
     }
 
-    /* Search in header */
-    .header-search {
+    /* Search in header — صف منفصل على الشاشات الضيقة */
+    .site-nav .header-search {
       display: flex;
       align-items: center;
       position: relative;
-      margin-left: var(--space-2);
+      flex: 1 1 12rem;
+      min-width: min(100%, 10rem);
+      max-width: 22rem;
+      margin-inline-start: var(--space-2);
+      margin-block-start: 0;
+    }
+
+    .header-search__form {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      display: block;
+      width: 100%;
+      min-width: 0;
     }
 
     .header-search input {
-      width: 160px;
-      padding: 0.2rem 0.5rem 0.2rem 1.75rem;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      padding-block: 0.35rem;
+      padding-inline: 1.85rem 0.65rem;
       border-radius: 999px;
       border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-text-main);
-      font-size: 0.8rem;
-      transition: width 0.2s;
+      background: rgba(255, 255, 255, 0.92);
+      color: #0f172a;
+      font-size: 0.82rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .header-search input::placeholder {
-      color: var(--color-text-muted);
+      color: #64748b;
     }
 
     .header-search input:focus {
       outline: none;
       border-color: var(--color-accent-gold);
-      width: 200px;
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
     }
 
     .header-search::before {
       content: '';
       position: absolute;
-      left: 0.65rem;
+      inset-inline-start: 0.65rem;
       width: 14px;
       height: 14px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23a6b0c2' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") center/contain no-repeat;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2364748b' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") center/contain no-repeat;
+      pointer-events: none;
     }
 
     /* ساعة رقمية — إضاءة لطيفة فاخرة */
@@ -3573,8 +3642,7 @@
     #iif-search-wrap {
       position: absolute;
       top: 100%;
-      left: 0;
-      right: 0;
+      inset-inline: 0;
       margin-top: 0.25rem;
       background: var(--color-surface);
       border: 1px solid var(--color-border-subtle);
@@ -4446,6 +4514,9 @@
       --dash-surface: rgba(255, 255, 255, 0.028);
       --dash-border: rgba(255, 255, 255, 0.065);
       --dash-text-muted: rgba(226, 232, 240, 0.72);
+      --dash-header-height: 3.75rem;
+      --dash-scroll-gap: 12px;
+      --dash-scroll-inset: calc(var(--dash-header-height) + var(--dash-scroll-gap));
       position: fixed;
       inset: 0;
       z-index: 2147483000;
@@ -4466,6 +4537,7 @@
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
       box-sizing: border-box;
+      scroll-padding-top: var(--dash-scroll-inset);
     }
 
     .dashboard-overlay.is-open {
@@ -4596,7 +4668,7 @@
 
     .dashboard-toc {
       position: sticky;
-      top: 3.35rem;
+      top: var(--dash-header-height, 3.75rem);
       z-index: 55;
       display: flex;
       flex-direction: column;
@@ -4608,6 +4680,56 @@
       background: rgba(6, 9, 14, 0.65);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+    }
+
+    .dashboard-toc__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .dashboard-toc__head .dashboard-toc__label {
+      width: auto;
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0 0 0.15rem;
+    }
+
+    .dashboard-toc__toggle {
+      flex-shrink: 0;
+      font-size: 0.72rem !important;
+      padding: 0.32rem 0.75rem !important;
+      border-color: var(--dash-line-strong);
+      color: var(--dash-text-muted);
+    }
+
+    .dashboard-toc__toggle:hover,
+    .dashboard-toc__toggle:focus-visible {
+      color: var(--color-accent-gold-soft);
+      border-color: var(--color-accent-gold-soft);
+    }
+
+    .dashboard-toc.is-collapsed .dashboard-toc-toggle__hide {
+      display: none !important;
+    }
+
+    .dashboard-toc.is-collapsed .dashboard-toc-toggle__show {
+      display: inline !important;
+    }
+
+    .dashboard-toc:not(.is-collapsed) .dashboard-toc-toggle__show {
+      display: none !important;
+    }
+
+    .dashboard-toc:not(.is-collapsed) .dashboard-toc-toggle__hide {
+      display: inline !important;
+    }
+
+    .dashboard-toc.is-collapsed .dashboard-toc__zones {
+      display: none;
     }
 
     .dashboard-toc__row {
@@ -4817,7 +4939,16 @@
     }
 
     .dashboard-section {
-      scroll-margin-top: 6.5rem;
+      scroll-margin-top: var(--dash-scroll-inset, calc(var(--dash-header-height, 3.75rem) + var(--dash-scroll-gap, 12px)));
+    }
+
+    #dashboard-overlay main [id],
+    #dashboard-overlay main .section,
+    #dashboard-overlay main section[id],
+    #dashboard-overlay .dashboard-section,
+    #dashboard-overlay .dashboard-letters[id],
+    #dashboard-overlay #dashboard-letterhead-sheet {
+      scroll-margin-top: var(--dash-scroll-inset, calc(var(--dash-header-height, 3.75rem) + var(--dash-scroll-gap, 12px)));
     }
 
     .dashboard-subheading {
@@ -4890,11 +5021,6 @@
     #fund-member-link-url {
       flex: 1;
       min-width: 180px;
-    }
-
-    #dashboard-overlay .dashboard-letters[id],
-    #dashboard-overlay #dashboard-letterhead-sheet {
-      scroll-margin-top: 7rem;
     }
 
     .dashboard-page-shell h2 {
@@ -5512,7 +5638,7 @@
 
     @media (max-width: 640px) {
       .dashboard-toc {
-        top: 3rem;
+        top: var(--dash-header-height, 3.75rem);
       }
 
       .dashboard-toc a {
@@ -6974,6 +7100,14 @@
         gap: 0.35rem;
       }
 
+      .site-nav .header-search {
+        flex: 1 1 100%;
+        max-width: none;
+        margin-inline-start: 0;
+        margin-block-start: var(--space-3);
+        order: 10;
+      }
+
       main#main-content {
         padding-inline: var(--space-4);
       }
@@ -7514,6 +7648,8 @@
   <a href="#main-content" class="skip-link"><span class="lang-en">Skip to main content</span><span
       class="lang-ar">انتقال إلى المحتوى الرئيسي</span></a>
 
+  <div id="iif-first-load-shell" class="iif-first-load-shell" role="progressbar" aria-label="Loading" aria-busy="true"></div>
+
   <button type="button" id="iif-back-to-top" class="iif-back-to-top" hidden aria-hidden="true">
     <span class="iif-back-to-top__icon" aria-hidden="true">↑</span>
     <span class="lang-en">Back to top</span>
@@ -7797,7 +7933,7 @@
         <a href="#page-representative" class="nav-to-section nav-link--rep-glow"
           data-scroll-to="page-representative"><span class="lang-en">Become representative</span><span
             class="lang-ar">كن ممثلاً لنا</span></a>
-        <a href="#compliance" data-i18n="navLicenses">Licenses</a>
+        <a href="#compliance" data-i18n="footerCompliance">Compliance &amp; licenses</a>
         <a href="#customer-experience"><span class="lang-en">Experience</span><span class="lang-ar">تجربة
             العملاء</span></a>
         <a href="#careers"><span class="lang-en">Careers</span><span class="lang-ar">التوظيف</span></a>
@@ -7819,8 +7955,30 @@
           <span class="lang-ar">تسجيل الخروج</span>
         </button>
         <div class="header-search" id="iif-search-wrap-outer">
-          <input type="search" id="iif-search" autocomplete="off" data-i18n="searchPlaceholder"
-            placeholder="Search site…" aria-label="Search" />
+          <form class="header-search__form" role="search" autocomplete="off" onsubmit="return false;"
+            aria-label="Site search">
+            <input
+              type="text"
+              id="iif-search"
+              name="q"
+              role="searchbox"
+              inputmode="search"
+              enterkeyhint="search"
+              autocomplete="one-time-code"
+              autocapitalize="none"
+              spellcheck="false"
+              data-form-type="other"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore
+              readonly
+              data-iif-search-readonly-until-focus="1"
+              data-i18n="searchPlaceholder"
+              placeholder="Search site…"
+              aria-label="Search"
+              aria-autocomplete="none"
+            />
+          </form>
           <div id="iif-search-wrap"></div>
         </div>
       </nav>
@@ -8677,8 +8835,18 @@
         </div>
 
         <nav class="dashboard-toc" aria-label="Dashboard sections" id="dashboard-toc-nav">
-          <span class="dashboard-toc__label lang-en">Structure — jump to section</span>
-          <span class="dashboard-toc__label lang-ar">الهيكلة — انتقال سريع</span>
+          <div class="dashboard-toc__head">
+            <span class="dashboard-toc__label lang-en">Structure — jump to section</span>
+            <span class="dashboard-toc__label lang-ar">الهيكلة — انتقال سريع</span>
+            <button type="button" class="btn btn--sm btn--ghost dashboard-toc__toggle" id="dashboard-toc-toggle"
+              aria-expanded="true" aria-controls="dashboard-toc-zones">
+              <span class="lang-en dashboard-toc-toggle__show">Show section links</span>
+              <span class="lang-en dashboard-toc-toggle__hide">Hide section links</span>
+              <span class="lang-ar dashboard-toc-toggle__show">إظهار روابط الأقسام</span>
+              <span class="lang-ar dashboard-toc-toggle__hide">إخفاء روابط الأقسام</span>
+            </button>
+          </div>
+          <div id="dashboard-toc-zones" class="dashboard-toc__zones">
           <div class="dashboard-toc__zone" data-toc-zone="ops">
             <span class="dashboard-toc-zone-label lang-en">Operations &amp; content</span>
             <span class="dashboard-toc-zone-label lang-ar">العمليات والمحتوى</span>
@@ -8742,6 +8910,7 @@
               <a href="#dashboard-suggestions" data-toc-target="dashboard-suggestions"><span
                   class="lang-en">Suggestions</span><span class="lang-ar">الاقتراحات</span></a>
             </div>
+          </div>
           </div>
         </nav>
 
@@ -10603,6 +10772,9 @@
   <script src="i18n.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"
     defer></script>
+  <script src="js/site-header-inner-newtab.js"></script>
+  <script src="js/iif-same-page-hash-nav.js"></script>
+  <script src="js/iif-first-load-shell.js"></script>
   <script nonce="iif2026">
     (function () {
       /* إعدادات مركزية — موقع دولي، أعضاء مهمون، لا مجال لمحاولات فاشلة */
@@ -10731,6 +10903,88 @@
         successDismiss: 4000,
         biometricOffer: 2500,
         uploadStatusDismiss: 2500
+      };
+
+      window.IIF_scrollIntoViewClearHeader = function (el, opts) {
+        opts = opts || {};
+        var behavior = opts.behavior === 'smooth' ? 'smooth' : 'auto';
+        var gap = typeof opts.gap === 'number' ? opts.gap : 12;
+        if (!el || !el.getBoundingClientRect) return;
+        try {
+          var dash = document.getElementById('dashboard-overlay');
+          if (dash && dash.classList.contains('is-open') && dash.contains(el)) {
+            try {
+              if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+            } catch (eS) { }
+            var cr = dash.getBoundingClientRect();
+            var bar = dash.querySelector('.dashboard-header-bar');
+            var toc = dash.querySelector('#dashboard-toc-nav, .dashboard-toc');
+            var stickyBottom = cr.top;
+            if (bar) stickyBottom = Math.max(stickyBottom, bar.getBoundingClientRect().bottom);
+            if (toc) {
+              var tcs = window.getComputedStyle(toc);
+              var tr = toc.getBoundingClientRect();
+              if (tcs.display !== 'none' && tcs.visibility !== 'hidden' && tr.height >= 4) {
+                stickyBottom = Math.max(stickyBottom, tr.bottom);
+              }
+            }
+            var pad = Math.max(48, Math.ceil(stickyBottom - cr.top) + gap);
+            var er = el.getBoundingClientRect();
+            var delta = er.top - cr.top - pad;
+            var target = dash.scrollTop + delta;
+            dash.scrollTo({ top: Math.max(0, target), behavior: behavior });
+            return;
+          }
+        } catch (e1) { }
+        try {
+          var hdrH = 0;
+          var headers = document.querySelectorAll('header.site-header');
+          for (var hi = 0; hi < headers.length; hi++) {
+            var hEl = headers[hi];
+            if (el.contains && hEl && el.contains(hEl)) continue;
+            var cs = window.getComputedStyle(hEl);
+            if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+            var rh = hEl.getBoundingClientRect();
+            if (rh.height < 8) continue;
+            hdrH = Math.ceil(rh.height);
+            break;
+          }
+          if (!hdrH) {
+            var v = getComputedStyle(document.documentElement).getPropertyValue('--header-height').trim();
+            if (v) {
+              var px = parseFloat(v);
+              if (!isNaN(px)) hdrH = Math.ceil(px);
+            }
+          }
+          hdrH += gap;
+          var er2 = el.getBoundingClientRect();
+          var y = (window.scrollY || (document.documentElement && document.documentElement.scrollTop) || 0) + er2.top - hdrH;
+          window.scrollTo({ top: Math.max(0, y), behavior: behavior });
+        } catch (e2) {
+          try {
+            el.scrollIntoView({ behavior: behavior, block: 'start' });
+          } catch (e3) { }
+        }
+      };
+
+      window.IIF_tryScrollDashboardHash = function () {
+        try {
+          var dash = document.getElementById('dashboard-overlay');
+          if (!dash || !dash.classList.contains('is-open')) return;
+          var raw = (location.hash || '').replace(/^#/, '').split('?')[0];
+          if (!raw) return;
+          if (typeof window.IIF_hashOpensDashboard === 'function' && window.IIF_hashOpensDashboard('#' + raw)) return;
+          var hel = document.getElementById(raw);
+          if (!hel || !dash.contains(hel)) return;
+          if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+                window.IIF_scrollIntoViewClearHeader(hel, { behavior: 'smooth' });
+              }
+            });
+          });
+        } catch (e) { }
       };
 
       function iifExplicitDashboardEntryIntent() {
@@ -11203,20 +11457,7 @@
         initSiteLang();
       }
 
-      /* روابط التنقل: تمرير سلس إلى القسم عند النقر (من نحن، الخدمات، إلخ) */
-      document.addEventListener('click', function (e) {
-        var a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
-        if (!a || !a.closest('.site-nav')) return;
-        var href = (a.getAttribute('href') || '').trim();
-        if (href === '#' || href === '#!') return;
-        var id = href.slice(1).split('?')[0].split('/')[0];
-        if (!id) return;
-        var el = document.getElementById(id);
-        if (el) {
-          e.preventDefault();
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, true);
+      /* روابط # داخل الصفحة: js/iif-same-page-hash-nav.js (مستمع واحد لكل الموقع ما عدا اللوحة/النماذج). js/site-header-inner-newtab.js للمسارات المختلفة فقط */
 
       /* تحذير HTTPS — إظهار عند فتح الموقع دون HTTPS (ما عدا localhost وGitHub Pages) */
       (function initHttpsWarning() {
@@ -11468,9 +11709,15 @@
       var closeBtn = document.getElementById('auth-close');
       var tabs = document.querySelectorAll('.auth-tab');
       var panels = document.querySelectorAll('.auth-panel');
+      var lastAuthFocusEl = null;
 
       function openAuth(panel) {
         if (overlay) {
+          try {
+            lastAuthFocusEl = document.activeElement;
+          } catch (eFocusStore) {
+            lastAuthFocusEl = null;
+          }
           overlay.classList.add('is-open');
           overlay.setAttribute('aria-hidden', 'false');
           document.body.style.overflow = 'hidden';
@@ -11513,6 +11760,17 @@
             window.IIF_hidePublicSiteChrome();
           }
         } catch (eRehide) { }
+        try {
+          var refA = lastAuthFocusEl;
+          if (refA && typeof refA.focus === 'function' && (!overlay || !overlay.classList.contains('is-open'))) {
+            setTimeout(function () {
+              try {
+                refA.focus();
+              } catch (eRf) {}
+            }, 0);
+          }
+        } catch (eRestA) {}
+        if (!overlay || !overlay.classList.contains('is-open')) lastAuthFocusEl = null;
       }
       function switchTab(tabName) {
         tabs.forEach(function (t) {
@@ -11578,6 +11836,8 @@
           switchTab(t.getAttribute('data-tab'));
         });
       });
+
+      /* روابط # في تاب جديد (اختياري): data-iif-hash-newtab أو class iif-hash-newtab — تُعالَج في js/iif-same-page-hash-nav.js */
 
       /* خدماتنا — قائمة منسدلة: فتح/إغلاق عند النقر على الزر أو خارج القائمة */
       (function initServicesDropdown() {
@@ -13101,7 +13361,13 @@
         if (gotoBtn) gotoBtn.addEventListener('click', function () {
           closeMembershipRequiredModal();
           var section = document.getElementById('payment-section');
-          if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (section) {
+            if (typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+              window.IIF_scrollIntoViewClearHeader(section, { behavior: 'smooth' });
+            } else {
+              section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
         });
         if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeMembershipRequiredModal(); });
       })();
@@ -14952,6 +15218,9 @@
           delaysMs.forEach(function (ms) {
             setTimeout(function () {
               try { IIF_applyDashboardFullpageLayout(); } catch (e) { }
+              try {
+                if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+              } catch (eSync) { }
             }, ms);
           });
         } catch (e) { }
@@ -15058,6 +15327,12 @@
           try {
             IIF_applyDashboardFullpageLayout();
           } catch (ePreLayout) { }
+          try {
+            var aeDash = document.activeElement;
+            if (aeDash && aeDash !== document.body && aeDash !== document.documentElement) {
+              window.IIF_lastFocusBeforeDashboard = aeDash;
+            }
+          } catch (eFsDash) {}
           d.classList.add('is-open');
           try {
             if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
@@ -15071,8 +15346,20 @@
               try {
                 if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
               } catch (eH2) { }
+              try {
+                if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+              } catch (eDashOff) { }
             });
           } catch (eLayout) { }
+          try {
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                try {
+                  if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+                } catch (eDashOff2) { }
+              });
+            });
+          } catch (eDashRaf) { }
           try { IIF_scheduleDashboardFullpageRetries([350, 900, 1600]); } catch (eT) { }
           try { IIF_assertDashboardFullViewport(12); } catch (eAssert) { }
           d.setAttribute('aria-hidden', 'false');
@@ -15114,13 +15401,9 @@
           if (typeof renderSuggestionsArchive === 'function') renderSuggestionsArchive();
           d.classList.add('dashboard-automated');
           try {
-            var hOpen = (window.location.hash || '').replace(/^#/, '').split('?')[0];
-            if (hOpen === 'dashboard-my-content') {
-              setTimeout(function () {
-                var myEl = document.getElementById('dashboard-my-content');
-                if (myEl && typeof myEl.scrollIntoView === 'function') myEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }, 320);
-            }
+            setTimeout(function () {
+              if (typeof window.IIF_tryScrollDashboardHash === 'function') window.IIF_tryScrollDashboardHash();
+            }, 320);
           } catch (eScroll) { }
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
@@ -15192,6 +15475,19 @@
           try {
             if (typeof window.IIF_hidePublicSiteChrome === 'function') window.IIF_hidePublicSiteChrome();
           } catch (eH2) { }
+          try {
+            var refD = window.IIF_lastFocusBeforeDashboard;
+            if (refD && typeof refD.focus === 'function') {
+              setTimeout(function () {
+                try {
+                  refD.focus();
+                } catch (eFd) {}
+              }, 0);
+            }
+          } catch (eRefD) {}
+          try {
+            window.IIF_lastFocusBeforeDashboard = null;
+          } catch (eClrD) {}
         }
       }
 
@@ -15214,7 +15510,8 @@
 
       (function initDashboardTocScrollSpy() {
         var nav = document.getElementById('dashboard-toc-nav');
-        if (!nav || typeof IntersectionObserver === 'undefined') return;
+        var dash = document.getElementById('dashboard-overlay');
+        if (!nav || !dash || typeof IntersectionObserver === 'undefined') return;
         var links = nav.querySelectorAll('a[data-toc-target]');
         if (!links.length) return;
         var sectionEls = [];
@@ -15235,8 +15532,41 @@
           vis.sort(function (a, b) { return (b.intersectionRatio || 0) - (a.intersectionRatio || 0); });
           var id = vis[0].target && vis[0].target.id;
           if (id) setActiveToc(id);
-        }, { root: null, rootMargin: '-14% 0px -52% 0px', threshold: [0, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1] });
+        }, { root: dash, rootMargin: '-10% 0px -55% 0px', threshold: [0, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1] });
         sectionEls.forEach(function (el) { obs.observe(el); });
+      })();
+
+      (function initDashboardTocToggle() {
+        var nav = document.getElementById('dashboard-toc-nav');
+        var btn = document.getElementById('dashboard-toc-toggle');
+        if (!nav || !btn) return;
+        function syncSticky() {
+          try {
+            if (typeof window.IIF_syncDashboardScrollOffsets === 'function') window.IIF_syncDashboardScrollOffsets();
+          } catch (e) { }
+        }
+        var mq = window.matchMedia('(max-width: 1200px)');
+        function applyBreakpoint() {
+          if (mq.matches) {
+            nav.classList.add('is-collapsed');
+            btn.setAttribute('aria-expanded', 'false');
+          } else {
+            nav.classList.remove('is-collapsed');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+          syncSticky();
+        }
+        if (typeof mq.addEventListener === 'function') {
+          mq.addEventListener('change', applyBreakpoint);
+        } else if (typeof mq.addListener === 'function') {
+          mq.addListener(applyBreakpoint);
+        }
+        applyBreakpoint();
+        btn.addEventListener('click', function () {
+          var collapsed = nav.classList.toggle('is-collapsed');
+          btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+          syncSticky();
+        });
       })();
 
       /* فتح لوحة التحكم عند الرابط السري (IIF_CONFIG.dashboardSecretHash) أو #dashboard إن وُجد التوافق */
@@ -15277,6 +15607,11 @@
         window.addEventListener('hashchange', function () {
           try { window.__iifHashDashOpenScheduled = false; } catch (e) {}
           openDashboardIfHash();
+          window.IIF_runAfterUI(function () {
+            try {
+              if (typeof window.IIF_tryScrollDashboardHash === 'function') window.IIF_tryScrollDashboardHash();
+            } catch (eScroll) { }
+          });
         });
       }
 
@@ -15521,7 +15856,7 @@
         });
       })();
 
-      /* روابط التنقّل داخل اللوحة (#…) — مع body overflow:hidden يفشل التمرير الافتراضي أحياناً؛ نمرّر داخل #dashboard-overlay */
+      /* روابط التنقّل داخل اللوحة (#…) — تمرير داخل #dashboard-overlay مع إزاحة شريط اللوحة اللاصق */
       (function initDashboardHashNavigation() {
         var root = document.getElementById('dashboard-overlay');
         if (!root || !root.addEventListener) return;
@@ -15534,13 +15869,24 @@
           if (!id) return;
           var el = document.getElementById(id);
           if (!el || !root.contains(el)) return;
+          if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+          if (typeof e.button === 'number' && e.button !== 0) return;
+          if (a.hasAttribute('data-iif-same-tab')) return;
           e.preventDefault();
-          e.stopPropagation();
-          try {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          } catch (err) {
-            try { el.scrollIntoView(true); } catch (e2) { }
+          if (typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+            window.IIF_scrollIntoViewClearHeader(el, { behavior: 'smooth' });
+          } else {
+            try {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+              try { el.scrollIntoView(true); } catch (e2) { }
+            }
           }
+          try {
+            if (window.history && window.history.replaceState) {
+              window.history.replaceState(null, '', window.location.pathname + window.location.search + '#' + id);
+            }
+          } catch (eH) { }
         }, true);
       })();
 
@@ -15557,7 +15903,13 @@
         var section = document.getElementById('membership');
         if (section) {
           e.preventDefault();
-          setTimeout(function () { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+          setTimeout(function () {
+            if (typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+              window.IIF_scrollIntoViewClearHeader(section, { behavior: 'smooth' });
+            } else {
+              section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
         }
       });
 
@@ -19566,6 +19918,8 @@
               e.preventDefault();
               var calcOpen = document.getElementById('calc-open');
               if (calcOpen) calcOpen.click();
+              closeDropdown();
+              return;
             }
             closeDropdown();
           });
@@ -20925,7 +21279,9 @@
             }
             setTimeout(function () {
               var el = document.getElementById('dashboard-user-profile');
-              if (el && typeof el.scrollIntoView === 'function') {
+              if (el && typeof window.IIF_scrollIntoViewClearHeader === 'function') {
+                window.IIF_scrollIntoViewClearHeader(el, { behavior: 'smooth' });
+              } else if (el && typeof el.scrollIntoView === 'function') {
                 try {
                   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } catch (eSc) {
@@ -21316,6 +21672,60 @@
       display: none !important;
     }
   </style>
+
+  <script nonce="iif2026">
+    (function () {
+      function syncDashboardScrollOffsetsImpl() {
+        try {
+          var dash = document.getElementById('dashboard-overlay');
+          var bar = dash && dash.querySelector('.dashboard-header-bar');
+          if (!dash || !bar || !dash.classList.contains('is-open')) return;
+          var dst = window.getComputedStyle(dash);
+          if (dst.display === 'none' || dst.visibility === 'hidden') return;
+          var br = bar.getBoundingClientRect();
+          var h = Math.ceil(br.height);
+          if (h >= 40) dash.style.setProperty('--dash-header-height', h + 'px');
+          var cr = dash.getBoundingClientRect();
+          var toc = dash.querySelector('#dashboard-toc-nav, .dashboard-toc');
+          var stickyBottom = br.bottom;
+          if (toc) {
+            var tcs = window.getComputedStyle(toc);
+            var tr = toc.getBoundingClientRect();
+            if (tcs.display !== 'none' && tcs.visibility !== 'hidden' && tr.height >= 4) {
+              stickyBottom = Math.max(stickyBottom, tr.bottom);
+            }
+          }
+          var gapPx = 12;
+          var inset = Math.max(48, Math.ceil(stickyBottom - cr.top) + gapPx);
+          dash.style.setProperty('--dash-scroll-inset', inset + 'px');
+        } catch (eDash) { }
+      }
+      function run() {
+        requestAnimationFrame(syncDashboardScrollOffsetsImpl);
+      }
+      try {
+        window.IIF_syncDashboardScrollOffsets = syncDashboardScrollOffsetsImpl;
+      } catch (eEx) { }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
+      }
+      window.addEventListener('resize', run);
+      window.addEventListener('load', run);
+      try {
+        var dashEl = document.getElementById('dashboard-overlay');
+        var dashBar = dashEl && dashEl.querySelector('.dashboard-header-bar');
+        if (dashBar && typeof ResizeObserver !== 'undefined') {
+          new ResizeObserver(run).observe(dashBar);
+        }
+        var dashToc = dashEl && dashEl.querySelector('#dashboard-toc-nav, .dashboard-toc');
+        if (dashToc && typeof ResizeObserver !== 'undefined') {
+          new ResizeObserver(run).observe(dashToc);
+        }
+      } catch (eRO) { }
+    })();
+  </script>
 
 </body>
 

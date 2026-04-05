@@ -75,8 +75,56 @@ Vercel project URL:      (لوحة Vercel → Domains)
 - مسارات **`/api/ollama`** تعمل مع **`npm start`** والخادم المحلي فقط. على GitHub Pages **لا يوجد** Ollama افتراضياً — زر التحليل يحتاج جهازاً يشغّل Ollama ويمرّر البروكسي، أو خادماً خاصاً لاحقاً.
 - عند غياب البحث على الويب (429 أو خطأ شبكة)، يُكمَل سياق النموذج ببيانات البنك الدولي فقط ورسالة حالة في الواجهة.
 
-## Lighthouse (أداء — يدوي)
+## Lighthouse (أداء)
+
+**من المشروع (التقرير الافتراضي `reports/lh-latest.html`، أو أي مسار عبر `IIF_LH_OUT`):**
+
+```bash
+npm run lh -- "http://127.0.0.1:3333/cp"
+# أو
+IIF_LH_URL="https://YOUR_SITE.github.io/REPO/" npm run lh
+```
+
+**يدويًا (مع فتح التقرير):**
 
 ```bash
 npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performance --chrome-flags="--headless=new --no-sandbox" --view
 ```
+
+ملاحظة: `reports/lh-*.html` في `.gitignore` (يُبقى `reports/.gitkeep`).
+
+## خطوط محلية
+
+- بعد `npm install` يُشغَّل `postinstall` ويملأ `assets/fonts/*.woff2` من `@fontsource/*` (أو نفّذ `npm run fonts:vendor`).
+- **GitHub Pages:** ارفع ملفات `assets/fonts/*.woff2` مع المستودع (لا يُشغَّل npm على الخادم).
+- التفاصيل اليدوية: `assets/fonts/HOWTO.txt`.
+
+## i18n (لغات ناقصة جزئياً)
+
+سكربت `npm run i18n:keys` يبيّن أن بعض اللغات (مثل zh، es، de، it، tr) تفتقد مفاتيح كثيرة وتعتمد على الاحتياطي (غالباً الإنجليزية أو الفرنسية). إكمال الترجمة يدوياً أو عبر أدوات مساعدة يبقى عملاً منفصلاً عند الحاجة للجمهور.
+
+## Content-Security-Policy
+
+- **مصدر واحد للنص:** `config/content-security-policy.txt` — ثم شغّل `npm run csp:sync` لتحديث `vercel.json` و`netlify.toml` ووسم `<meta http-equiv="Content-Security-Policy">` في `index.html` و`admin-standalone.html` و`privacy.html` و`about-institution.html`.
+- **Vercel:** ترويسة CSP في `vercel.json` (Translate، `translate-pa.googleapis.com`، `gstatic.com`، اتصال `https:`، خطوط ذاتية).
+- **Netlify:** نفس السياسة في `netlify.toml` ضمن `[[headers]]`.
+- **GitHub Pages:** وسوم `<meta>` في HTML تُفعّل CSP حتى بدون ترويسات الخادم.
+
+## npm audit
+
+تشغيل `npm audit fix` يُصلح جزءاً بسيطاً؛ بقية التنبيهات مرتبطة بـ `sqlite3`/`nodemon`/`xlsx` وتتطلب ترقيات قد تكسر التوافق (`npm audit fix --force`) أو استبدال الحزمة — راجع تقرير `npm audit` قبل الإنتاج.
+
+## Smoke test — قبل/بعد النشر (يدوي ~3 دقائق)
+
+1. **الرئيسية:** شريط التحميل العلوي يختفي بعد اكتمال التحميل؛ تمرير سلس من الهيدر إلى `#contact` و`#faq`.
+2. **روابط الهاش (نفس المستند):** جرّب `#about`، `#compliance`، `#terms` من الهيدر والتذييل — يجب أن يبقى التبويب الحالي وأن تُحدَّث الأقسام الديناميكية إن وُجدت.
+3. **الهيدر (مستندات أخرى):** رابط يشير إلى `privacy.html` أو نطاق خارجي يفتح في تاب جديد كما صُمّم.
+4. **التذييل:** روابط الشروط، الخصوصية، عن الصندوق، **الأسئلة الشائعة**، الامتثال تعمل كما يُتوقع.
+5. **تسجيل الدخول:** فتح النافذة ثم إغلاقها يعيد التركيز إلى الزر/الرابط الذي فتحها.
+6. **لوحة التحكم:** فتح من الهيدر ثم إغلاقها يعيد التركيز إلى زر اللوحة؛ التمرير داخل اللوحة لروابط `#dashboard-…`.
+7. **وضع embed/portal:** `?iif_admin_embed=1` أو `?iif_admin_portal=1` على `admin-standalone.html` — لا يظهر شريط التحميل العام؛ تحقق أن لوحة التحكم تفتح/تغلق والتركيز يعود.
+8. **صفحات فرعية:** `privacy.html` / `about-institution.html` — الروابط تفتح في تاب جديد مع بقاء المقال؛ الخطوط تُحمَّل محلياً.
+9. **ترجمة Google (إن مفعّلة):** تظهر الويدجت دون أخطاء CSP في وحدة التحكم على نشر Vercel/Netlify.
+10. **لوحة مفاتيح:** Tab إلى «تخطي إلى المحتوى» — يظهر حلقة تركيز واضحة (`:focus-visible`).
+
+**English (same checks):** home loader; same-doc hash nav; header cross-doc new tab; footer; auth/dashboard focus; embed/portal; leaf pages + local fonts; Google Translate without CSP console errors; skip-link.

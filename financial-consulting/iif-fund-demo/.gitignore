@@ -149,7 +149,6 @@ docs/dist/
 
 # Performance reports
 performance/
-reports/
 
 # Database files
 *.db
@@ -167,3 +166,7 @@ api-keys/
 *.pem
 *.p12
 .vercel
+
+# Lighthouse (npm run lh)
+lighthouse-report.html
+reports/lh-*.html

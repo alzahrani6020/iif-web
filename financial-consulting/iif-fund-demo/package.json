@@ -8,7 +8,11 @@
     "dev": "nodemon backend-server.js",
     "test": "node scripts/test-budget-parse.js",
     "i18n:keys": "node scripts/check-i18n-keys.js",
-    "i18n:keys:strict": "node scripts/check-i18n-keys.js --strict"
+    "i18n:keys:strict": "node scripts/check-i18n-keys.js --strict",
+    "lh": "node scripts/lighthouse-iif.js",
+    "fonts:vendor": "node scripts/vendor-fontsource-woff2.js",
+    "postinstall": "node scripts/vendor-fontsource-woff2.js",
+    "csp:sync": "node scripts/sync-csp.js"
   },
   "keywords": [
     "government",
@@ -21,6 +25,8 @@
   "author": "Government Search Team",
   "license": "MIT",
   "dependencies": {
+    "@fontsource/noto-sans-arabic": "^5.2.10",
+    "@fontsource/plus-jakarta-sans": "^5.2.8",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",

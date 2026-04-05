@@ -2,20 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.sheetjs.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https:; frame-src https://translate.google.com https://www.google.com https://www.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:; object-src 'none'; upgrade-insecure-requests; worker-src 'self'" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="index,follow" />
   <title>Privacy policy · International Investment Fund</title>
   <meta name="description" content="Privacy policy for the International Investment Fund public website: local storage, third-party services, search, and contact." />
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style"
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap"
-    onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript>
-    <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&display=swap" />
-  </noscript>
+  <link rel="stylesheet" href="css/fonts-hosted.css" />
   <link rel="stylesheet" href="css/design-system.css" />
   <link rel="stylesheet" href="css/public-shell.css" />
   <link rel="stylesheet" href="css/public-components.css" />
@@ -37,7 +30,8 @@
   </style>
 </head>
 <body>
-  <p class="back"><a href="./">← Home</a> · <a href="about-institution.html">About</a> · <a href="index.html#terms">Terms</a></p>
+  <div id="iif-first-load-shell" class="iif-first-load-shell" role="progressbar" aria-label="Loading" aria-busy="true"></div>
+  <p class="back"><a href="index.html">← Home</a> · <a href="about-institution.html">About</a> · <a href="index.html#terms">Terms</a></p>
   <h1>Privacy policy (website)</h1>
   <p class="muted">Last updated with site releases — not legal advice. Institutional processing under KYC/contracts is governed by those instruments and the main <a href="index.html#terms">Terms</a>.</p>
 
@@ -58,7 +52,7 @@
     </thead>
     <tbody>
       <tr><td>Search</td><td>SearXNG instances, Google</td><td>Your query is sent to their servers when you use header links.</td></tr>
-      <tr><td>Fonts / scripts</td><td>Google Fonts, CDNs (e.g. cdnjs, SheetJS)</td><td>Loaded as on the main page; see network tab for current hosts.</td></tr>
+      <tr><td>Fonts / scripts</td><td>Self-hosted WOFF2 (Plus Jakarta, Noto Arabic), CDNs (e.g. cdnjs, SheetJS)</td><td>Main site ships fonts from <code>assets/fonts/</code> after <code>npm install</code>; third-party scripts remain on their hosts.</td></tr>
       <tr><td>Translation</td><td>Google Translate widget</td><td>May set cookies; governed by Google policies.</td></tr>
       <tr><td>Optional API</td><td>Vercel or Cloudflare proxy for analysis</td><td>Forwards search-related requests server-side; see <a href="SITE-OPS.md">SITE-OPS.md</a>.</td></tr>
       <tr><td>Maps / news</td><td>Linked tickers and map providers</td><td>You leave this origin when you follow external links.</td></tr>
@@ -83,7 +77,9 @@
 
   <div class="ar" lang="ar">
     <h2 style="margin-top:0;">ملخص عربي</h2>
-    <p>الموقع الثابت قد يخزّن تفضيلاتك وبيانات الجلسة والملف الشخصي في <strong>متصفحك</strong>. روابط البحث والترجمة والخطوط تتصل بمزوّدين خارجيين. يمكنك مسح بيانات الموقع من إعدادات المتصفح. التفاصيل التعاقدية وKYC تُنظَّم عبر نماذج الصندوق والشروط على الصفحة الرئيسية.</p>
+    <p>الموقع الثابت قد يخزّن تفضيلاتك وبيانات الجلسة والملف الشخصي في <strong>متصفحك</strong>. تُحمَّل خطوط العرض من نفس الأصل عادةً؛ روابط البحث والترجمة وبعض السكربتات تتصل بمزوّدين خارجيين. يمكنك مسح بيانات الموقع من إعدادات المتصفح. التفاصيل التعاقدية وKYC تُنظَّم عبر نماذج الصندوق والشروط على الصفحة الرئيسية.</p>
   </div>
+  <script src="js/iif-first-load-shell.js" defer></script>
+  <script src="js/public-leaf-pages-newtab.js" defer></script>
 </body>
 </html>
