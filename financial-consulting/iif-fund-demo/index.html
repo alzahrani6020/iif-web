@@ -127,6 +127,7 @@
   </script>
   <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
   <link rel="apple-touch-icon" href="assets/emblem.jpg" />
+  <link rel="preload" as="image" href="assets/emblem.jpg" type="image/jpeg" fetchpriority="high" />
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
   <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
   <link rel="dns-prefetch" href="https://translate.google.com" />
@@ -4822,11 +4823,30 @@
     .ticker-item .ticker-logo {
       width: 16px;
       height: 16px;
+      aspect-ratio: 1;
       margin-left: 0.4rem;
       border-radius: 2px;
-      object-fit: cover;
+      object-fit: contain;
       flex-shrink: 0;
       vertical-align: middle;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-track {
+        animation: none !important;
+      }
+
+      .ticker-track__copy {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem 0.75rem;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .site-logo:hover {
+        transform: none;
+      }
     }
 
     .ticker-item span {
@@ -8356,7 +8376,7 @@
           <span class="site-logo__emblem site-logo__emblem--crest" aria-hidden="true">
             <img src="assets/emblem.jpg"
               alt="صندوق الاستثمار الدولي — International Investment Fund — شعار الصندوق الرسمي" class="site-logo__img"
-              width="56" height="56" loading="eager" />
+              width="56" height="56" loading="eager" fetchpriority="high" decoding="async" />
           </span>
           <span class="site-logo__text">
             <span class="site-logo__title" data-i18n="logoTitle">International Investment Fund</span>
@@ -8678,114 +8698,114 @@
         <div class="ticker-track" id="ticker-track">
           <div class="ticker-track__copy">
             <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
               <span data-i18n="tickerReutersMarkets">Reuters Markets</span>
             </a>
             <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
                 class="ticker-logo">
               <span data-i18n="tickerBloomberg">Bloomberg</span>
             </a>
             <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
                 class="ticker-logo">
               <span data-i18n="tickerFinancialTimes">Financial Times</span>
             </a>
             <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
               <span data-i18n="tickerCnbcWorld">CNBC World</span>
             </a>
             <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
               <span data-i18n="tickerWsjMarketData">WSJ Market Data</span>
             </a>
             <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
               class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
               <span data-i18n="tickerEcb">ECB</span>
             </a>
             <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
                 class="ticker-logo">
               <span data-i18n="tickerFederalReserve">Federal Reserve</span>
             </a>
             <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
               <span data-i18n="tickerImf">IMF</span>
             </a>
             <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
                 class="ticker-logo">
               <span data-i18n="tickerWorldBank">World Bank</span>
             </a>
             <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
                 class="ticker-logo">
               <span data-i18n="tickerArabNewsEconomy">Arab News Economy</span>
             </a>
             <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
               <span data-i18n="tickerSpaEconomy">SPA Economy</span>
             </a>
             <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
                 class="ticker-logo">
               <span data-i18n="tickerTradingView">TradingView</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true">
             <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
               <span data-i18n="tickerReutersMarkets">Reuters Markets</span>
             </a>
             <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
                 class="ticker-logo">
               <span data-i18n="tickerBloomberg">Bloomberg</span>
             </a>
             <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
                 class="ticker-logo">
               <span data-i18n="tickerFinancialTimes">Financial Times</span>
             </a>
             <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
               <span data-i18n="tickerCnbcWorld">CNBC World</span>
             </a>
             <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
               <span data-i18n="tickerWsjMarketData">WSJ Market Data</span>
             </a>
             <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
               class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
               <span data-i18n="tickerEcb">ECB</span>
             </a>
             <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
                 class="ticker-logo">
               <span data-i18n="tickerFederalReserve">Federal Reserve</span>
             </a>
             <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
               <span data-i18n="tickerImf">IMF</span>
             </a>
             <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
                 class="ticker-logo">
               <span data-i18n="tickerWorldBank">World Bank</span>
             </a>
             <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
                 class="ticker-logo">
               <span data-i18n="tickerArabNewsEconomy">Arab News Economy</span>
             </a>
             <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
               <span data-i18n="tickerSpaEconomy">SPA Economy</span>
             </a>
             <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
                 class="ticker-logo">
               <span data-i18n="tickerTradingView">TradingView</span>
             </a>
@@ -8798,73 +8818,73 @@
         <div class="ticker-track" id="ticker-asian-track">
           <div class="ticker-track__copy" id="ticker-asian-copy">
             <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
                 class="ticker-logo">
               <span data-i18n="tickerNikkeiAsia">Nikkei Asia</span>
             </a>
             <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
                 class="ticker-logo">
               <span data-i18n="tickerChinaDaily">China Daily</span>
             </a>
             <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
                 class="ticker-logo">
               <span data-i18n="tickerStraitsTimes">Straits Times</span>
             </a>
             <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
                 class="ticker-logo">
               <span data-i18n="tickerKoreaHerald">Korea Herald</span>
             </a>
             <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
                 class="ticker-logo">
               <span data-i18n="tickerBangkokPost">Bangkok Post</span>
             </a>
             <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
                 class="ticker-logo">
               <span data-i18n="tickerTheHindu">The Hindu</span>
             </a>
             <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
               <span data-i18n="tickerDawn">Dawn</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true" id="ticker-asian-copy2">
             <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
                 class="ticker-logo">
               <span data-i18n="tickerNikkeiAsia">Nikkei Asia</span>
             </a>
             <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
                 class="ticker-logo">
               <span data-i18n="tickerChinaDaily">China Daily</span>
             </a>
             <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
                 class="ticker-logo">
               <span data-i18n="tickerStraitsTimes">Straits Times</span>
             </a>
             <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
                 class="ticker-logo">
               <span data-i18n="tickerKoreaHerald">Korea Herald</span>
             </a>
             <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
                 class="ticker-logo">
               <span data-i18n="tickerBangkokPost">Bangkok Post</span>
             </a>
             <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
                 class="ticker-logo">
               <span data-i18n="tickerTheHindu">The Hindu</span>
             </a>
             <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
               <span data-i18n="tickerDawn">Dawn</span>
             </a>
           </div>
@@ -8876,74 +8896,74 @@
         <div class="ticker-track" id="ticker-arab-track">
           <div class="ticker-track__copy" id="ticker-arab-copy">
             <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
                 class="ticker-logo">
               <span data-i18n="tickerAlJazeeraEconomy">Al Jazeera Economy</span>
             </a>
             <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
                 class="ticker-logo">
               <span data-i18n="tickerAsharqBusiness">Asharq Business</span>
             </a>
             <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
                 class="ticker-logo">
               <span data-i18n="tickerAlArabiyaFinance">Al Arabiya Finance</span>
             </a>
             <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
                 class="ticker-logo">
               <span data-i18n="tickerMubasher">Mubasher</span>
             </a>
             <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
                 class="ticker-logo">
               <span data-i18n="tickerArabianBusiness">Arabian Business</span>
             </a>
             <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
                 class="ticker-logo">
               <span data-i18n="tickerEgyptTodayEconomy">Egypt Today Economy</span>
             </a>
             <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
                 class="ticker-logo">
               <span data-i18n="tickerAlIttihadBusiness">Al Ittihad Business</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true" id="ticker-arab-copy2">
             <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
                 class="ticker-logo">
               <span data-i18n="tickerAlJazeeraEconomy">Al Jazeera Economy</span>
             </a>
             <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
                 class="ticker-logo">
               <span data-i18n="tickerAsharqBusiness">Asharq Business</span>
             </a>
             <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
                 class="ticker-logo">
               <span data-i18n="tickerAlArabiyaFinance">Al Arabiya Finance</span>
             </a>
             <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
                 class="ticker-logo">
               <span data-i18n="tickerMubasher">Mubasher</span>
             </a>
             <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
                 class="ticker-logo">
               <span data-i18n="tickerArabianBusiness">Arabian Business</span>
             </a>
             <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
                 class="ticker-logo">
               <span data-i18n="tickerEgyptTodayEconomy">Egypt Today Economy</span>
             </a>
             <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
-              <img src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
+              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
                 class="ticker-logo">
               <span data-i18n="tickerAlIttihadBusiness">Al Ittihad Business</span>
             </a>

@@ -75,7 +75,8 @@
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
 
-  --header-height: 9rem;
+  /* يُحدَّث ديناميكياً من index.html (ارتفاع الهيدر الفعلي)؛ القيمة الاحتياطية للهيدر العريض + الشريط */
+  --header-height: clamp(11.5rem, 30vh, 24rem);
   --service-back-bar-height: 4rem;
 
   --z-dropdown: 1000;
@@ -110,6 +111,7 @@ body {
   color: var(--color-text-main);
   background-color: var(--color-bg);
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
 }
 
 [dir="rtl"] {

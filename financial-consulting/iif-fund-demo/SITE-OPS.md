@@ -93,6 +93,8 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 
 ملاحظة: `reports/lh-*.html` في `.gitignore` (يُبقى `reports/.gitkeep`).
 
+**في المصدر (مرجع سريع):** preload لـ `assets/emblem.jpg` مع `fetchpriority="high"` على شعار الهيدر؛ أيقونات التيكر بـ `loading="lazy"` وأبعاد صريحة؛ `prefers-reduced-motion` يعطّل حركة التيكر والتمرير اللانهائي؛ `text-rendering: optimizeLegibility` على `body` في `design-system.css`.
+
 ## خطوط محلية
 
 - بعد `npm install` يُشغَّل `postinstall` ويملأ `assets/fonts/*.woff2` من `@fontsource/*` (أو نفّذ `npm run fonts:vendor`).
@@ -126,5 +128,6 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 8. **صفحات فرعية:** `privacy.html` / `about-institution.html` — الروابط تفتح في تاب جديد مع بقاء المقال؛ الخطوط تُحمَّل محلياً.
 9. **ترجمة Google (إن مفعّلة):** تظهر الويدجت دون أخطاء CSP في وحدة التحكم على نشر Vercel/Netlify.
 10. **لوحة مفاتيح:** Tab إلى «تخطي إلى المحتوى» — يظهر حلقة تركيز واضحة (`:focus-visible`).
+11. **تقليل الحركة:** في إعدادات النظام/المتصفح فعّل «تقليل الحركة» — يجب أن يتوقف تمرير التيكر ويصبح التمرير بين الأقسام فورياً (بدون `smooth`).
 
-**English (same checks):** home loader; same-doc hash nav; header cross-doc new tab; footer; auth/dashboard focus; embed/portal; leaf pages + local fonts; Google Translate without CSP console errors; skip-link.
+**English (same checks):** home loader; same-doc hash nav; header cross-doc new tab; footer; auth/dashboard focus; embed/portal; leaf pages + local fonts; Google Translate without CSP console errors; skip-link; reduced-motion ticker + scroll.

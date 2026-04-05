@@ -32,17 +32,33 @@
   outline-offset: 2px;
 }
 
+.skip-link:focus-visible {
+  top: var(--space-4);
+  outline: 2px solid var(--iif-focus-ring);
+  outline-offset: var(--iif-focus-ring-offset);
+}
+
+.skip-link:focus:not(:focus-visible) {
+  outline: none;
+}
+
 html {
   scroll-behavior: smooth;
-  /* صفحات ثانوية بدون --header-height في :root */
-  scroll-padding-top: var(--header-height, 9rem);
+  /* يُضبط ديناميكياً من index.html؛ الاحتياطي للهيدر العريض. الهيدر يضمّ safe-area عبر padding في index */
+  scroll-padding-top: var(--header-height, clamp(11.5rem, 30vh, 24rem));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 [id],
 .section,
 section[id],
 main [id] {
-  scroll-margin-top: var(--header-height, 9rem);
+  scroll-margin-top: var(--header-height, clamp(11.5rem, 30vh, 24rem));
 }
 
 /* Public home only — dashboard uses main.dashboard-main inside #dashboard-overlay */
@@ -80,4 +96,48 @@ main#main-content .btn:focus-visible {
 body:not(:has(#main-content)) a:focus-visible {
   outline: 2px solid var(--iif-focus-ring);
   outline-offset: var(--iif-focus-ring-offset);
+}
+
+/* شريط علوي خفيف أثناء أول تحميل — يُزال بواسطة js/iif-first-load-shell.js */
+.iif-first-load-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 2147483646;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.45),
+    rgba(232, 212, 138, 0.35),
+    rgba(201, 162, 39, 0.45),
+    transparent
+  );
+  background-size: 220% 100%;
+  animation: iif-first-load-shimmer 1.15s ease-in-out infinite;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.iif-first-load-shell--hide {
+  opacity: 0;
+  visibility: hidden;
+  animation: none;
+}
+
+@keyframes iif-first-load-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iif-first-load-shell {
+    animation: none;
+    background: rgba(201, 162, 39, 0.55);
+  }
 }

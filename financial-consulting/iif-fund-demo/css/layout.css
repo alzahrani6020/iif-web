@@ -206,6 +206,16 @@
   align-items: center;
 }
 
+.header-search__form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .header-search input {
   width: 160px;
   padding: var(--space-2) var(--space-3) var(--space-2) 2.5rem;
@@ -386,5 +396,11 @@
   
   .hero__title {
     font-size: var(--font-size-2xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-logo:hover {
+    transform: none;
   }
 }
