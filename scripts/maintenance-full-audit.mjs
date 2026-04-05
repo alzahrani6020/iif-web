@@ -119,7 +119,17 @@ function resolveInternalTarget(fromFile, ref) {
     const pathPart = (mapped || u).replace(/^\/+/, '');
     abs = path.join(ROOT, pathPart.split('/').join(path.sep));
   } else {
-    abs = path.normalize(path.join(path.dirname(fromFile), u));
+    let baseDir = path.dirname(fromFile);
+    const parentName = path.basename(baseDir);
+    const grandParent = path.dirname(baseDir);
+    if (
+      !u.startsWith('..') &&
+      parentName === 'components' &&
+      path.basename(grandParent) === 'iif-fund-demo'
+    ) {
+      baseDir = grandParent;
+    }
+    abs = path.normalize(path.join(baseDir, u));
   }
   if (!abs.startsWith(ROOT)) return { kind: 'outside', abs };
   return { kind: 'internal', abs, rootPathname };
@@ -149,6 +159,7 @@ function targetExists(absPath) {
 function skipLinkAuditFile(file) {
   const lower = file.toLowerCase();
   if (lower.includes(`${path.sep}archive${path.sep}`)) return true;
+  if (lower.includes(`${path.sep}gh-pages-dist${path.sep}`)) return true;
   if (lower.endsWith(`${path.sep}index-comprehensive.html`)) return true;
   return false;
 }
