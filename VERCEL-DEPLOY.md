@@ -33,7 +33,8 @@
 
 1. **Settings → Git:** المستودع `alzahrani6020/iif-web`، الفرع **`main`**, تفعيل **Automatic deployments**.
 2. **Root Directory:** `financial-consulting/iif-fund-demo` (حيث `index.html` الكبير و`vercel.json`).
-3. **Deployments:** إن لم يتحدث الإنتاج بعد `git push`، استخدم **Redeploy**.
+3. **Build Command:** يُعرَّف في `vercel.json` كـ `npm run i18n:packs` حتى تُحدَّث `i18n-service-packs-*.js` و`i18n-service-packs-all.js` عند كل نشر (مع `npm install` الافتراضي من Vercel). إن غيّرت الأمر في لوحة Vercel فتأكد أنه يشمل توليد الحزم.
+4. **Deployments:** إن لم يتحدث الإنتاج بعد `git push`، استخدم **Redeploy**.
 
 ## أوامر CLI (من مجلد الواجهة)
 

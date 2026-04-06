@@ -3909,6 +3909,69 @@
       font-size: 0.95rem;
     }
 
+    .iif-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .iif-lang-combobox-wrap {
+      position: relative;
+      min-width: 10rem;
+      max-width: 16rem;
+    }
+
+    .iif-lang-combobox-wrap .iif-lang-combobox-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      background: #fff;
+      color: #111;
+      font-size: 0.85rem;
+    }
+
+    .iif-lang-combobox-wrap .iif-lang-combobox-input:focus {
+      outline: none;
+      border-color: var(--color-accent-gold);
+    }
+
+    .iif-lang-combobox-list {
+      position: absolute;
+      z-index: 120;
+      left: 0;
+      right: 0;
+      top: calc(100% + 2px);
+      max-height: 14rem;
+      overflow: auto;
+      margin: 0;
+      padding: 0.25rem 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .iif-lang-combobox-list li[role="option"] {
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+      color: #111;
+      cursor: pointer;
+    }
+
+    .iif-lang-combobox-list li[role="option"]:hover,
+    .iif-lang-combobox__opt--active {
+      background: rgba(201, 162, 39, 0.15);
+    }
+
     /* Search in header — صف منفصل على الشاشات الضيقة */
     .site-nav .header-search {
       display: flex;
@@ -8289,70 +8352,13 @@
           <div class="lang-picker-wrap" aria-label="Language">
             <span class="lang-picker-label lang-en">Language</span>
             <span class="lang-picker-label lang-ar">اللغة</span>
-            <select id="iif-lang-picker" title="Language">
-              <option value="en">English</option>
-              <option value="ar">العربية</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="es">Español</option>
-              <option value="pt">Português</option>
-              <option value="it">Italiano</option>
-              <option value="ru">Русский</option>
-              <option value="zh">中文</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-              <option value="hi">हिन्दी</option>
-              <option value="bn">বাংলা</option>
-              <option value="tr">Türkçe</option>
-              <option value="fa">فارسی</option>
-              <option value="ur">اردو</option>
-              <option value="id">Bahasa Indonesia</option>
-              <option value="ms">Bahasa Melayu</option>
-              <option value="th">ไทย</option>
-              <option value="vi">Tiếng Việt</option>
-              <option value="pl">Polski</option>
-              <option value="nl">Nederlands</option>
-              <option value="el">Ελληνικά</option>
-              <option value="sv">Svenska</option>
-              <option value="no">Norsk</option>
-              <option value="da">Dansk</option>
-              <option value="fi">Suomi</option>
-              <option value="uk">Українська</option>
-              <option value="ro">Română</option>
-              <option value="hu">Magyar</option>
-              <option value="cs">Čeština</option>
-              <option value="sk">Slovenčina</option>
-              <option value="bg">Български</option>
-              <option value="hr">Hrvatski</option>
-              <option value="sr">Српски</option>
-              <option value="sl">Slovenščina</option>
-              <option value="he">עברית</option>
-              <option value="am">አማርኛ</option>
-              <option value="sw">Kiswahili</option>
-              <option value="ne">नेपाली</option>
-              <option value="si">සිංහල</option>
-              <option value="my">မြန်မာ</option>
-              <option value="km">ភាសាខ្មែរ</option>
-              <option value="lo">ລາວ</option>
-              <option value="ta">தமிழ்</option>
-              <option value="te">తెలుగు</option>
-              <option value="mr">मराठी</option>
-              <option value="gu">ગુજરાતી</option>
-              <option value="kn">ಕನ್ನಡ</option>
-              <option value="ml">മലയാളം</option>
-              <option value="pa">ਪੰਜਾਬੀ</option>
-              <option value="sq">Shqip</option>
-              <option value="mk">Македонски</option>
-              <option value="hy">Հայերեն</option>
-              <option value="ka">ქართული</option>
-              <option value="az">Azərbaycan</option>
-              <option value="kk">Қазақ</option>
-              <option value="uz">Oʻzbek</option>
-              <option value="mn">Монгол</option>
-              <option value="ca">Català</option>
-              <option value="eu">Euskara</option>
-              <option value="gl">Galego</option>
-            </select>
+            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap">
+              <input type="text" id="iif-lang-picker-input" class="iif-lang-combobox-input" autocomplete="off"
+                role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-list"
+                aria-autocomplete="list" title="Language" />
+              <ul class="iif-lang-combobox-list" id="iif-lang-picker-list" role="listbox" hidden></ul>
+              <select id="iif-lang-picker" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
+            </div>
           </div>
           <script>
             (function () {
@@ -9392,7 +9398,13 @@
           </div>
           <div class="lang-picker-wrap lang-picker-wrap--dashboard" aria-label="Language">
             <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
-            <select id="iif-lang-picker-dashboard" title="Language"></select>
+            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap-dashboard">
+              <input type="text" id="iif-lang-picker-dashboard-input" class="iif-lang-combobox-input" autocomplete="off"
+                role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
+                aria-autocomplete="list" title="Language" />
+              <ul class="iif-lang-combobox-list" id="iif-lang-picker-dashboard-list" role="listbox" hidden></ul>
+              <select id="iif-lang-picker-dashboard" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
+            </div>
           </div>
           <div class="site-header__auth-btns">
             <button type="button" class="site-header__auth-btn site-header__auth-btn--dashboard-close"
@@ -11360,7 +11372,9 @@
   </div>
 
 
+  <script src="i18n-service-packs-all.js" defer></script>
   <script src="i18n.js" defer></script>
+  <script src="js/iif-lang-combobox.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"
     defer></script>
   <script src="js/site-header-inner-newtab.js"></script>
@@ -11970,13 +11984,11 @@
         } catch (eLangEx) { }
       }
       function initDashboardLangPickerSync() {
-        var IIF_DASH_LANG_PRIORITY = ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'];
         var mainEl = document.getElementById('iif-lang-picker');
         var dash = document.getElementById('iif-lang-picker-dashboard');
         if (!dash) return;
         function rebuildDashOptions() {
           dash.innerHTML = '';
-          var cur = (document.documentElement.getAttribute('data-lang') || DEFAULT_LANG).trim().toLowerCase();
           var added = Object.create(null);
           function addCode(code) {
             if (!code || added[code]) return;
@@ -11995,9 +12007,19 @@
             dash.appendChild(opt);
             added[code] = true;
           }
-          if (cur && IIF_DASH_LANG_PRIORITY.indexOf(cur) < 0) addCode(cur);
-          for (var pi = 0; pi < IIF_DASH_LANG_PRIORITY.length; pi++) {
-            addCode(IIF_DASH_LANG_PRIORITY[pi]);
+          if (mainEl && mainEl.options && mainEl.options.length) {
+            for (var oi = 0; oi < mainEl.options.length; oi++) {
+              addCode((mainEl.options[oi].value || '').trim().toLowerCase());
+            }
+          } else if (window.IIF_I18N && IIF_I18N.codes && IIF_I18N.codes.length) {
+            for (var ci = 0; ci < IIF_I18N.codes.length; ci++) {
+              addCode(IIF_I18N.codes[ci]);
+            }
+          } else {
+            var fallback = ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'];
+            for (var fi = 0; fi < fallback.length; fi++) {
+              addCode(fallback[fi]);
+            }
           }
         }
         rebuildDashOptions();
@@ -12029,6 +12051,9 @@
       function initSiteLang() {
         var picker = document.getElementById('iif-lang-picker');
         if (window.IIF_I18N) {
+          if (typeof window.IIF_fillLangSelectFromI18n === 'function' && picker) {
+            try { window.IIF_fillLangSelectFromI18n(picker); } catch (eFill) { }
+          }
           var lang = '';
           try { lang = localStorage.getItem(LANG_STORAGE_KEY) || ''; } catch (e) { }
           if (!lang) lang = IIF_I18N.detect();
@@ -12102,6 +12127,9 @@
         try {
           initDashboardLangPickerSync();
         } catch (eDashLangPick) { }
+        if (typeof window.IIF_initLangPickerUI === 'function') {
+          try { window.IIF_initLangPickerUI(); } catch (eCombo) { }
+        }
       }
 
       /* قوائم التنقل المنسدلة — إبقاء القائمة داخل عرض الشاشة (يجب تعريفها قبل initSiteLang) */

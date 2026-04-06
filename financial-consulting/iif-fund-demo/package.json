@@ -9,6 +9,8 @@
     "test": "node scripts/test-budget-parse.js",
     "i18n:keys": "node scripts/check-i18n-keys.js",
     "i18n:keys:strict": "node scripts/check-i18n-keys.js --strict",
+    "i18n:locales": "node scripts/verify-i18n-locales.cjs",
+    "i18n:packs": "node emit-service-packs.cjs",
     "lh": "node scripts/lighthouse-iif.js",
     "fonts:vendor": "node scripts/vendor-fontsource-woff2.js",
     "postinstall": "node scripts/vendor-fontsource-woff2.js",

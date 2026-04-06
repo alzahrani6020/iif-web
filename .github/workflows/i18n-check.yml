@@ -5,11 +5,17 @@ on:
     paths:
       - 'financial-consulting/iif-fund-demo/i18n.js'
       - 'financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js'
+      - 'financial-consulting/iif-fund-demo/pack-data*.cjs'
+      - 'financial-consulting/iif-fund-demo/emit-service-packs.cjs'
+      - 'financial-consulting/iif-fund-demo/i18n-service-packs-*.js'
       - '.github/workflows/i18n-check.yml'
   pull_request:
     paths:
       - 'financial-consulting/iif-fund-demo/i18n.js'
       - 'financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js'
+      - 'financial-consulting/iif-fund-demo/pack-data*.cjs'
+      - 'financial-consulting/iif-fund-demo/emit-service-packs.cjs'
+      - 'financial-consulting/iif-fund-demo/i18n-service-packs-*.js'
       - '.github/workflows/i18n-check.yml'
   workflow_dispatch:
 
@@ -21,10 +27,16 @@ jobs:
         working-directory: financial-consulting/iif-fund-demo
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
+      - name: Emit service packs (same as deploy build)
+        run: node emit-service-packs.cjs
+      - name: Committed pack JS must match pack-data sources
+        working-directory: ${{ github.workspace }}
+        run: npm run verify:i18n-packs-sync
       - name: Syntax check i18n.js
+        working-directory: financial-consulting/iif-fund-demo
         run: node --check i18n.js
       - name: Key parity (IMPORTANT_15 vs English)
         run: node scripts/check-i18n-keys.js

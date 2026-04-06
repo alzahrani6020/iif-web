@@ -34,6 +34,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Emit i18n service packs (before static copy)
+        run: node financial-consulting/iif-fund-demo/emit-service-packs.cjs
+
       - name: Prepare Pages site (exclude Vercel-only api/ serverless sources)
         run: |
           set -e

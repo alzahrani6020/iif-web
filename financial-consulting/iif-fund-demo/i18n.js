@@ -68,6 +68,7 @@ window.IIF_I18N = (function() {
   };
 
   var T = {};
+  var EXT_SVC = (typeof window !== 'undefined' && window.IIF_SERVICE_PACKS) ? window.IIF_SERVICE_PACKS : {};
   var def = {
     logoTitle: 'International Investment Fund',
     logoSubtitle: 'Financing for Global Prosperity · All Nations Globally',
@@ -292,6 +293,25 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Industry, logistics & real assets',
     exampleProj6: 'Environment & youth employment',
     govBotComplianceLink: 'Compliance, licenses & AML/CFT →',
+    govBotBullet1: 'Act as the <strong>central umbrella</strong> for one or more host states under BOT-style structures.',
+    govBotBullet2: '<strong>Manage delivery</strong> with global companies that have proven execution capacity.',
+    govBotBullet3: '<strong>Mobilize banks and project-finance institutions</strong> that can fund and accept BOT/project models.',
+    govBotBullet4: 'Align roles and benefits across <strong>governments, contractors, financiers, and the Fund</strong> under clear governance.',
+    servicesComplianceLinkHint: 'This link jumps to the Compliance & licenses section on this page (registrations, transparency context, and AML/CFT references).',
+    servicesBriefDisclaimer: 'Service descriptions here are informational; binding scope follows contracts, KYC, and applicable law — see Terms.',
+    servicesGridKicker: 'Choose a card below to open the related section — <strong>forms</strong>, <strong>sectors</strong>, <strong>governance</strong>, or <strong>contact</strong>.',
+    servicesAudienceLead: 'Typical counterparts:',
+    servicesChipGov: 'Governments & public entities',
+    servicesChipCompanies: 'Companies & contractors',
+    servicesChipInvestors: 'Investors & institutions',
+    servicesJumpLabel: 'On this page',
+    servicesJumpBot: 'BOT overview',
+    servicesJumpCards: 'Service catalogue',
+    servicesJumpCompliance: 'Compliance',
+    servicesTrustKicker: 'Institutional engagement is contract- and KYC-governed — see <a href="#trust-entry">Trust &amp; paths</a> and <a href="#compliance">Compliance</a>.',
+    servicesCatalogJump: 'Jump to the <strong>14-service catalogue</strong> →',
+    servicesStickyNavAria: 'Services — quick links on this page',
+    govBotBadge: 'BOT',
     footerCompliance: 'Compliance & licenses',
     footerTerms: 'Terms',
     footerPrivacyPolicy: 'Privacy policy',
@@ -304,7 +324,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: 'Governance',
     leafNavCompliance: 'Compliance',
     leafNavA11ySiteShortcuts: 'Site shortcuts',
-    servicesInstitutionalHint: 'Institutional advisory, financing, and feasibility mandates are subject to separate suitability, contracts, and KYC — not implied by browsing or using free site tools alone.',
+    servicesInstitutionalHint: 'Advisory, financing, and feasibility require separate contracts and KYC — <strong>not</strong> implied by browsing or free site tools. See <a href="#trust-entry">Trust &amp; paths</a> · <a href="#terms">Terms</a>.',
     trustEntryTitle: 'Trust, clarity, and how to engage',
     trustEntryLead: 'We publish compliance references and separate <strong>platform tools</strong> from <strong>institutional mandates</strong>. Use the paths below for financing, advisory, or government BOT coordination — then contracts and KYC apply as appropriate.',
     trustStrip1: 'Transparency & licenses → <a href="#compliance">Compliance</a>',
@@ -2045,6 +2065,25 @@ window.IIF_I18N = (function() {
     exampleProj5: 'صناعة ولوجستيات وأصول حقيقية',
     exampleProj6: 'بيئة وتوظيف شباب',
     govBotComplianceLink: 'الامتثال والتراخيص ومكافحة غسل الأموال ←',
+    govBotBullet1: 'العمل كـ <strong>مظلة مركزية</strong> لدولة مستضيفة أو أكثر ضمن هيكل من نوع BOT.',
+    govBotBullet2: '<strong>إدارة التسليم</strong> مع شركات عالمية ذات قدرة تنفيذية مثبتة.',
+    govBotBullet3: '<strong>حشد بنوك ومؤسسات تمويل مشاريع</strong> تستطيع التمويل وقبول نماذج BOT/المشروع.',
+    govBotBullet4: 'مواءمة الأدوار والمنافع بين <strong>الحكومات والمقاولين والممولين والصندوق</strong> ضمن حوكمة واضحة.',
+    servicesComplianceLinkHint: 'ينتقل إلى قسم الامتثال والتراخيص في هذه الصفحة (التسجيلات، سياق الشفافية، ومراجع مكافحة غسل الأموال).',
+    servicesBriefDisclaimer: 'أوصاف الخدمات هنا توضيحية؛ النطاق الإلزامي يحدده العقد واعرف عميلك والقانون المعمول — راجع الشروط.',
+    servicesGridKicker: 'اختر بطاقة أدناه للانتقال إلى القسم المرتبط — <strong>نماذج</strong>، <strong>قطاعات</strong>، <strong>حوكمة</strong>، أو <strong>تواصل</strong>.',
+    servicesAudienceLead: 'شركاء نموذجيون:',
+    servicesChipGov: 'الحكومات والجهات العامة',
+    servicesChipCompanies: 'الشركات والمقاولون',
+    servicesChipInvestors: 'المستثمرون والمؤسسات',
+    servicesJumpLabel: 'في هذه الصفحة',
+    servicesJumpBot: 'نظرة عامة على BOT',
+    servicesJumpCards: 'دليل الخدمات',
+    servicesJumpCompliance: 'الامتثال',
+    servicesTrustKicker: 'التعامل المؤسسي يخضع للعقود واعرف عميلك — راجع <a href="#trust-entry">الثقة والمسارات</a> و<a href="#compliance">الامتثال</a>.',
+    servicesCatalogJump: 'الانتقال إلى <strong>كتالوج الخدمات الـ 14</strong> ←',
+    servicesStickyNavAria: 'الخدمات — روابط سريعة في هذه الصفحة',
+    govBotBadge: 'BOT',
     footerCompliance: 'الامتثال والتراخيص',
     footerTerms: 'الشروط والأحكام',
     footerPrivacyPolicy: 'سياسة الخصوصية',
@@ -2057,7 +2096,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: 'الحوكمة',
     leafNavCompliance: 'الامتثال',
     leafNavA11ySiteShortcuts: 'اختصارات الموقع',
-    servicesInstitutionalHint: 'الاستشارة والتمويل ودراسات الجدوى المؤسسية تخضع لملاءمة وعقود واعرف عميلك منفصلة — ولا تُستنتج من مجرد التصفح أو استخدام أدوات الموقع المجانية.',
+    servicesInstitutionalHint: 'الاستشارة والتمويل والجدوى تتطلب عقوداً واعرف عميلك منفصلين — <strong>ولا تُستنتج</strong> من التصفح أو الأدوات المجانية. راجع <a href="#trust-entry">الثقة والمسارات</a> · <a href="#terms">الشروط</a>.',
     trustEntryTitle: 'الثقة، الوضوح، وكيفية التعامل',
     trustEntryLead: 'ننشر مراجع الامتثال ونفصل بين <strong>أدوات المنصة</strong> و<strong>التكليفات المؤسسية</strong>. استخدم المسارات أدناه للتمويل أو الاستشارة أو تنسيق BOT الحكومي — ثم تُطبَّق العقود واعرف عميلك حسب الحالة.',
     trustStrip1: 'الشفافية والتراخيص ← <a href="#compliance">الامتثال</a>',
@@ -3650,6 +3689,25 @@ window.IIF_I18N = (function() {
     sectionCouncil: 'Conseil international des affaires',
     sectionMembership: 'Adhésion',
     sectionFinancing: 'Demande de financement',
+    govBotBullet1: 'Servir de <strong>parapluie central</strong> pour un ou plusieurs États hôtes dans des structures de type BOT.',
+    govBotBullet2: '<strong>Piloter la mise en œuvre</strong> avec des entreprises mondiales ayant une capacité d\'exécution éprouvée.',
+    govBotBullet3: '<strong>Mobiliser banques et institutions de financement de projets</strong> pouvant financer et accepter des modèles BOT/projet.',
+    govBotBullet4: 'Aligner rôles et bénéfices entre <strong>gouvernements, contractants, financeurs et le Fonds</strong> sous une gouvernance claire.',
+    servicesComplianceLinkHint: 'Ce lien mène à la section Conformité et licences de cette page (immatriculations, contexte de transparence, références LBC-FT).',
+    servicesBriefDisclaimer: 'Les descriptions de services sont indicatives ; le périmètre contraignant suit contrats, KYC et droit applicable — voir les Conditions.',
+    servicesGridKicker: 'Choisissez une carte ci-dessous pour ouvrir la section associée — <strong>formulaires</strong>, <strong>secteurs</strong>, <strong>gouvernance</strong> ou <strong>contact</strong>.',
+    servicesAudienceLead: 'Contreparties typiques :',
+    servicesChipGov: 'Gouvernements et entités publiques',
+    servicesChipCompanies: 'Entreprises et contractants',
+    servicesChipInvestors: 'Investisseurs et institutions',
+    servicesJumpLabel: 'Sur cette page',
+    servicesJumpBot: 'Aperçu BOT',
+    servicesJumpCards: 'Catalogue des services',
+    servicesJumpCompliance: 'Conformité',
+    servicesTrustKicker: 'L\'engagement institutionnel est encadré par contrats et KYC — voir <a href="#trust-entry">Confiance et parcours</a> et <a href="#compliance">Conformité</a>.',
+    servicesCatalogJump: 'Aller au <strong>catalogue des 14 services</strong> →',
+    servicesStickyNavAria: 'Services — liens rapides sur cette page',
+    govBotBadge: 'BOT',
     sectionFeasibility: 'Étude de faisabilité',
     sectionInvestors: 'Enregistrement investisseurs',
     sectionUpload: 'Dépôt de documents et description du projet',
@@ -5135,6 +5193,7 @@ window.IIF_I18N = (function() {
     schemaOrgName: 'Fonds international d\'investissement',
     schemaOrgAltName: 'FII',
     schemaKnowsAboutCsv: 'Financement de projets|BOT|PPP public-privé|Études de faisabilité|Investissement institutionnel|Finance souveraine|Relations investisseurs|KYC|Lutte contre le blanchiment',
+    servicesInstitutionalHint: 'Le conseil, le financement et la faisabilité exigent des contrats et un KYC distincts — <strong>non</strong> impliqués par la seule navigation ou les outils gratuits. Voir <a href="#trust-entry">Confiance et parcours</a> · <a href="#terms">Conditions</a>.',
     trustEntryTitle: 'Confiance, clarté et modalités d\'engagement',
     trustEntryLead: 'Nous publions les références de conformité et distinguons les <strong>outils de plateforme</strong> des <strong>mandats institutionnels</strong>. Utilisez les parcours ci-dessous pour le financement, le conseil ou la coordination BOT avec l\'État — puis contrats et KYC s\'appliquent le cas échéant.',
     trustStrip1: 'Transparence et licences → <a href="#compliance">Conformité</a>',
@@ -5368,6 +5427,25 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Industrie, Logistik und Sachwerte',
     exampleProj6: 'Umwelt und Jugendbeschäftigung',
     govBotComplianceLink: 'Compliance, Lizenzen und AML/CFT ←',
+    govBotBullet1: 'Als <strong>zentrale Dachstruktur</strong> für einen oder mehrere Gaststaaten unter BOT-Strukturen fungieren.',
+    govBotBullet2: '<strong>Umsetzung steuern</strong> mit globalen Unternehmen mit nachgewiesener Durchführungskapazität.',
+    govBotBullet3: '<strong>Banken und Projektfinanzierer mobilisieren</strong>, die BOT-/Projektfinanzierung tragen und akzeptieren.',
+    govBotBullet4: 'Rollen und Vorteile von <strong>Regierungen, Auftragnehmern, Kapitalgebern und Fonds</strong> unter klarer Governance abstimmen.',
+    servicesComplianceLinkHint: 'Führt zum Abschnitt Compliance, Lizenzen und AML/CFT auf dieser Seite (Registrierungen, Transparenzkontext, AML/CFT-Referenzen).',
+    servicesBriefDisclaimer: 'Die Servicebeschreibungen sind informativ; der verbindliche Umfang folgt Verträgen, KYC und geltendem Recht — siehe AGB.',
+    servicesGridKicker: 'Wählen Sie unten eine Karte, um den passenden Abschnitt zu öffnen — <strong>Formulare</strong>, <strong>Branchen</strong>, <strong>Governance</strong> oder <strong>Kontakt</strong>.',
+    servicesAudienceLead: 'Typische Gegenparteien:',
+    servicesChipGov: 'Regierungen & öffentliche Stellen',
+    servicesChipCompanies: 'Unternehmen & Auftragnehmer',
+    servicesChipInvestors: 'Investoren & Institute',
+    servicesJumpLabel: 'Auf dieser Seite',
+    servicesJumpBot: 'BOT-Überblick',
+    servicesJumpCards: 'Servicekatalog',
+    servicesJumpCompliance: 'Compliance',
+    servicesTrustKicker: 'Institutionelle Zusammenarbeit erfolgt vertraglich und per KYC — siehe <a href="#trust-entry">Vertrauen &amp; Wege</a> und <a href="#compliance">Compliance</a>.',
+    servicesCatalogJump: 'Zum <strong>14-Services-Katalog</strong> →',
+    servicesStickyNavAria: 'Services — Schnelllinks auf dieser Seite',
+    govBotBadge: 'BOT',
     footerCompliance: 'Compliance und Lizenzen',
     footerTransparencyPage: 'Transparenzübersicht',
     footerPrivacyNote: 'Datenschutz und Daten: siehe AGB und Kontakt/KYC.',
@@ -5377,7 +5455,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: 'Governance',
     leafNavCompliance: 'Compliance',
     leafNavA11ySiteShortcuts: 'Website-Kurzwahl',
-    servicesInstitutionalHint: 'Institutionelle Beratung, Finanzierung und Machbarkeit unterliegen separater Compliance, Vertrag und KYC — die Nutzung kostenloser Website-Tools allein bedeutet das nicht.',
+    servicesInstitutionalHint: 'Beratung, Finanzierung und Machbarkeit erfordern separate Verträge und KYC — <strong>nicht</strong> durch bloßes Surfen oder kostenlose Tools. Siehe <a href="#trust-entry">Vertrauen &amp; Wege</a> · <a href="#terms">AGB</a>.',
     trustEntryTitle: 'Vertrauen, Transparenz und Wege der Zusammenarbeit',
     trustEntryLead: 'Wir veröffentlichen Compliance-Referenzen und unterscheiden <strong>Plattform-Tools</strong> von <strong>institutionellen Pflichten</strong>. Für Finanzierung, Beratung oder Koordination staatlicher BOT nutzen Sie die folgenden Wege — danach Vertrag und KYC gemäß Vorschriften.',
     trustStrip1: 'Transparenz und Lizenzen ← <a href="#compliance">Compliance</a>',
@@ -5717,6 +5795,25 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Industria, logistica e asset reali',
     exampleProj6: 'Ambiente e occupazione giovanile',
     govBotComplianceLink: 'Conformità, licenze e AML/CFT ←',
+    govBotBullet1: 'Agire come <strong>ombrello centrale</strong> per uno o più Stati ospiti in strutture di tipo BOT.',
+    govBotBullet2: '<strong>Gestire l\'esecuzione</strong> con imprese globali con capacità esecutiva comprovata.',
+    govBotBullet3: '<strong>Mobilizzare banche e istituti di project finance</strong> che possono finanziare e accettare modelli BOT/progetto.',
+    govBotBullet4: 'Allineare ruoli e benefici tra <strong>governi, appaltatori, finanziatori e Fondo</strong> sotto una governance chiara.',
+    servicesComplianceLinkHint: 'Porta alla sezione Conformità, licenze e AML/CFT in questa pagina (registrazioni, contesto di trasparenza, riferimenti AML/CFT).',
+    servicesBriefDisclaimer: 'Le descrizioni dei servizi sono indicative; l\'ambito vincolante segue contratti, KYC e legge applicabile — vedi Condizioni.',
+    servicesGridKicker: 'Scegli una scheda qui sotto per aprire la sezione correlata — <strong>moduli</strong>, <strong>settori</strong>, <strong>governance</strong> o <strong>contatti</strong>.',
+    servicesAudienceLead: 'Controparti tipiche:',
+    servicesChipGov: 'Governi ed enti pubblici',
+    servicesChipCompanies: 'Imprese e appaltatori',
+    servicesChipInvestors: 'Investitori e istituzioni',
+    servicesJumpLabel: 'In questa pagina',
+    servicesJumpBot: 'Panoramica BOT',
+    servicesJumpCards: 'Catalogo servizi',
+    servicesJumpCompliance: 'Conformità',
+    servicesTrustKicker: 'Il coinvolgimento istituzionale è regolato da contratti e KYC — vedi <a href="#trust-entry">Fiducia e percorsi</a> e <a href="#compliance">Conformità</a>.',
+    servicesCatalogJump: 'Vai al <strong>catalogo di 14 servizi</strong> →',
+    servicesStickyNavAria: 'Servizi — collegamenti rapidi in questa pagina',
+    govBotBadge: 'BOT',
     footerCompliance: 'Conformità e licenze',
     footerTransparencyPage: 'Sintesi trasparenza',
     footerPrivacyNote: 'Privacy e dati: vedi termini e contatto/KYC.',
@@ -5726,7 +5823,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: 'Governance',
     leafNavCompliance: 'Conformità',
     leafNavA11ySiteShortcuts: 'Collegamenti rapidi',
-    servicesInstitutionalHint: 'Consulenza, finanziamento e fattibilità istituzionali sono soggetti a conformità, contratto e KYC separati — usare solo gli strumenti gratuiti del sito non implica ciò.',
+    servicesInstitutionalHint: 'Consulenza, finanziamento e fattibilità richiedono contratti e KYC separati — <strong>non</strong> impliciti nella sola navigazione o negli strumenti gratuiti. Vedi <a href="#trust-entry">Fiducia e percorsi</a> · <a href="#terms">Condizioni</a>.',
     trustEntryTitle: 'Fiducia, trasparenza e modalità di coinvolgimento',
     trustEntryLead: 'Pubblichiamo riferimenti di conformità e distinguiamo <strong>strumenti di piattaforma</strong> da <strong>obblighi istituzionali</strong>. Per finanziamento, consulenza o coordinamento BOT governativo usi i percorsi sotto — poi contratto e KYC secondo normativa.',
     trustStrip1: 'Trasparenza e licenze ← <a href="#compliance">Conformità</a>',
@@ -6066,6 +6163,25 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Industria, logística y activos reales',
     exampleProj6: 'Medio ambiente y empleo juvenil',
     govBotComplianceLink: 'Cumplimiento, licencias y AML/CFT ←',
+    govBotBullet1: 'Actuar como <strong>paraguas central</strong> para uno o varios Estados anfitriones bajo estructuras tipo BOT.',
+    govBotBullet2: '<strong>Gestionar la ejecución</strong> con empresas globales con capacidad probada de entrega.',
+    govBotBullet3: '<strong>Movilizar bancos e instituciones de financiación de proyectos</strong> que puedan financiar y aceptar modelos BOT/proyecto.',
+    govBotBullet4: 'Alinear roles y beneficios entre <strong>gobiernos, contratistas, financiadores y el Fondo</strong> bajo gobernanza clara.',
+    servicesComplianceLinkHint: 'Va a la sección Cumplimiento, licencias y AML/CFT de esta página (registros, contexto de transparencia, referencias de LBC/FT).',
+    servicesBriefDisclaimer: 'Las descripciones de servicios son informativas; el ámbito vinculante sigue contratos, KYC y ley aplicable — ver Condiciones.',
+    servicesGridKicker: 'Elija una tarjeta abajo para abrir la sección relacionada — <strong>formularios</strong>, <strong>sectores</strong>, <strong>gobernanza</strong> o <strong>contacto</strong>.',
+    servicesAudienceLead: 'Contrapartes típicas:',
+    servicesChipGov: 'Gobiernos y entidades públicas',
+    servicesChipCompanies: 'Empresas y contratistas',
+    servicesChipInvestors: 'Inversores e instituciones',
+    servicesJumpLabel: 'En esta página',
+    servicesJumpBot: 'Resumen BOT',
+    servicesJumpCards: 'Catálogo de servicios',
+    servicesJumpCompliance: 'Cumplimiento',
+    servicesTrustKicker: 'La relación institucional se rige por contratos y KYC — ver <a href="#trust-entry">Confianza y rutas</a> y <a href="#compliance">Cumplimiento</a>.',
+    servicesCatalogJump: 'Ir al <strong>catálogo de 14 servicios</strong> →',
+    servicesStickyNavAria: 'Servicios — enlaces rápidos en esta página',
+    govBotBadge: 'BOT',
     footerCompliance: 'Cumplimiento y licencias',
     footerTransparencyPage: 'Resumen de transparencia',
     footerPrivacyNote: 'Privacidad y datos: vea términos y contacto/KYC.',
@@ -6075,7 +6191,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: 'Gobernanza',
     leafNavCompliance: 'Cumplimiento',
     leafNavA11ySiteShortcuts: 'Accesos del sitio',
-    servicesInstitutionalHint: 'La asesoría, financiación y viabilidad institucionales están sujetas a cumplimiento, contrato y KYC aparte — usar solo herramientas gratuitas del sitio no implica eso.',
+    servicesInstitutionalHint: 'La asesoría, el financiamiento y la viabilidad requieren contratos y KYC separados — <strong>no</strong> se deducen solo por navegar o usar herramientas gratuitas. Ver <a href="#trust-entry">Confianza y rutas</a> · <a href="#terms">Términos</a>.',
     trustEntryTitle: 'Confianza, transparencia y formas de colaboración',
     trustEntryLead: 'Publicamos referencias de cumplimiento y distinguimos <strong>herramientas de plataforma</strong> de <strong>obligaciones institucionales</strong>. Para financiación, asesoría o coordinación BOT estatal use las rutas siguientes — luego contrato y KYC según normativa.',
     trustStrip1: 'Transparencia y licencias ← <a href="#compliance">Cumplimiento</a>',
@@ -6321,6 +6437,60 @@ window.IIF_I18N = (function() {
     sectionPartners: 'Ortaklar',
     sectionContact: 'İletişim',
     sectionCompliance: 'Uyum ve lisanslar',
+    servicesLead: 'Devletler, kurumlar, şirketler, fonlar, aile ofisleri ve kâr amacı gütmeyen kuruluşlar için yapılandırılmış — Fon misyonunun <strong>öncelik sırasına</strong> göre: önce danışmanlık ve çalışmalar, ardından sermaye ve arabuluculuk, yönetişim, sektör programları ve destek kanalları.',
+    servicesInstitutionalHint: 'Danışmanlık, finansman ve fizibilite ayrı sözleşme ve KYC gerektirir — yalnızca gezinme veya ücretsiz araçlarla <strong>ima edilmez</strong>. Bkz. <a href="#trust-entry">Güven ve yollar</a> · <a href="#terms">Şartlar</a>.',
+    govBotTitle: 'Kamu BOT — Fon liderliğinde şemsiye yapı',
+    govBotBody: 'Bir veya daha fazla ev sahibi devlet için Fon <strong>merkezi şemsiye</strong> olarak hareket edebilir: <strong>BOT</strong> katılımının yapılandırılması, uygulama kapasitesi bulunan küresel şirketlerle <strong>teslimatın yönetilmesi</strong> ve BOT/proje finansmanını üstlenebilecek <strong>uluslararası finans kurumları ile bankaların</strong> devreye alınması — hükümetler, küresel yükleniciler, finansörler ve Fon çıkarlarının hizalanması.',
+    govBotComplianceLink: 'Uyum, lisanslar ve AML/UYM ←',
+    govBotBullet1: 'BOT tarzı yapılar altında bir veya daha fazla ev sahibi devlet için <strong>merkezi şemsiye</strong> olarak hareket etmek.',
+    govBotBullet2: 'Kanıtlanmış uygulama kapasitesine sahip küresel şirketlerle <strong>teslimatı yönetmek</strong>.',
+    govBotBullet3: 'BOT/proje modellerini finanse edip kabul edebilen <strong>bankaları ve proje finansmanı kurumlarını</strong> harekete geçirmek.',
+    govBotBullet4: 'Açık yönetişim çerçevesinde <strong>hükümetler, yükleniciler, finansörler ve Fon</strong> arasındaki rolleri ve faydaları hizalamak.',
+    servicesComplianceLinkHint: 'Bu bağlantı, bu sayfadaki Uyum ve lisanslar bölümüne gider (kayıtlar, şeffaflık bağlamı ve AML/UYM referansları).',
+    servicesBriefDisclaimer: 'Buradaki hizmet açıklamaları bilgilendiricidir; bağlayıcı kapsam sözleşmelere, KYC\'ye ve yürürlükteki hukuka tabidir — Şartlar\'a bakın.',
+    servicesGridKicker: 'İlgili bölümü açmak için aşağıdan bir kart seçin — <strong>formlar</strong>, <strong>sektörler</strong>, <strong>yönetişim</strong> veya <strong>iletişim</strong>.',
+    servicesAudienceLead: 'Tipik karşı taraflar:',
+    servicesChipGov: 'Hükümetler ve kamu kurumları',
+    servicesChipCompanies: 'Şirketler ve yükleniciler',
+    servicesChipInvestors: 'Yatırımcılar ve kurumlar',
+    servicesJumpLabel: 'Bu sayfada',
+    servicesJumpBot: 'BOT özeti',
+    servicesJumpCards: 'Hizmet kataloğu',
+    servicesJumpCompliance: 'Uyum',
+    servicesTrustKicker: 'Kurumsal ilişkiler sözleşme ve KYC ile yönetilir — <a href="#trust-entry">Güven ve yollar</a> ile <a href="#compliance">Uyum</a> bölümlerine bakın.',
+    servicesCatalogJump: '<strong>14 hizmetli kataloğa</strong> git →',
+    servicesStickyNavAria: 'Hizmetler — bu sayfadaki hızlı bağlantılar',
+    govBotBadge: 'BOT',
+    servicesNoteCore: '<strong>Fonun çekirdeğine ayrıca şunlar da girer:</strong> aktif bir <strong>yatırım projesi</strong> hattı, finansörler ile yararlanıcılar arasında (sınır ötesi işlemler dahil) <strong>arabuluculuk</strong> ve <strong>küresel şirketlere ve yatırımcılara erişim</strong> — ayrıntılar için aşağıdaki projeler bölümüne ve iletişim kanallarına bakın.',
+    servicesNoteHint: 'Her kart ilgili bölümü açar: formlar, projeler, yönetişim, sektörler veya programlar.',
+    svc01Title: '1 · Finansal danışmanlık',
+    svc01Desc: 'Sermaye planlaması, borç ve kurumsal yeniden yapılandırma, değerlemeler — kamu, özel ve üçüncü sektör müşterileri için.',
+    svc02Title: '2 · Çalışmalar ve fizibilite',
+    svc02Desc: 'Projeler ve yatırımlar için teknik, ekonomik ve mali çalışmalar.',
+    svc03Title: '3 · Sermaye ve finansman',
+    svc03Desc: 'Projeleri ve istihdamı finanse etmek için devletlerden, bankalardan, fonlardan ve yatırımcılardan sermaye harekete geçirmek ve yapılandırmak.',
+    svc04Title: '4 · Yatırım projeleri ve küresel erişim',
+    svc04Desc: 'Hükümet ve sınır ötesi programlar için hat — <strong>BOT şemsiyesi</strong> teslimatı dahil; küresel yüklenicileri ve finansörleri çekmek (Hizmetler bölümündeki <strong>Kamu BOT</strong> bloğuna bakın).',
+    svc05Title: '5 · Aracılık ve anlaşmalar',
+    svc05Desc: 'Finansörler ile yararlanıcılar arasında arabuluculuk; sınır ötesi ticaret, finans ve ticari anlaşmalarda aracılık — proje düzeyinde tanıştırmalar dahil.',
+    svc06Title: '6 · Birleşmeler ve satın almalar',
+    svc06Desc: 'Alım/satım tarafı, durum tespiti ve birleşme sonrası entegrasyon — farklı şirket türleri.',
+    svc07Title: '7 · Yönetişim ve performans',
+    svc07Desc: 'Kurumsal yönetişim çerçeveleri ve kurumsal performansı geliştirmeye destek.',
+    svc08Title: '8 · Şirket ve kuruluş kurulumu',
+    svc08Desc: 'Finansal, endüstriyel, tarımsal, teknoloji ve güvenlik varlıkları kurmak; uygun olduğunda Ar-Ge laboratuvarları.',
+    svc09Title: '9 · Yap–işlet–devret (BOT)',
+    svc09Desc: 'Hükümet ve çok ülkeli BOT programları: altyapı ve sosyal varlıklar, küresel uygulama ortaklarıyla Fon şemsiyesi altında teslim edilir.',
+    svc10Title: '10 · Enerji ve su',
+    svc10Desc: 'Arıtma, temiz enerji, şebekeler ve verimlilik yatırımları.',
+    svc11Title: '11 · Teknoloji ve yapay zekâ',
+    svc11Desc: 'Dijital dönüşüm, siber güvenlik, teknoloji transferi ve Ar-Ge.',
+    svc12Title: '12 · Halka arz ve sermaye piyasaları',
+    svc12Desc: 'Hisse, sukuk ve tahviller — geçerli düzenlemelere uygun; yapılandırılmış enstrümanlar için iletişimi kullanın.',
+    svc13Title: '13 · Fon ve değerli eşya transferi',
+    svc13Desc: 'Sınır ötesi fon ve değerli eşya hareketi — sıkı uyum altında.',
+    svc14Title: '14 · Eğitim ve iş gücü',
+    svc14Desc: 'İstihdam yaratmak ve işsizliği azaltmak için eğitim ve beceri geliştirme.',
     formEmail: 'E-posta',
     formPassword: 'Şifre',
     formName: 'Ad soyad',
@@ -6717,6 +6887,25 @@ window.IIF_I18N = (function() {
     exampleProj5: '工业、物流与实物资产',
     exampleProj6: '环境与青年就业',
     govBotComplianceLink: '合规、许可与 AML/CFT ←',
+    govBotBullet1: '在 BOT 类结构下，为<strong>一个或多个东道国</strong>充当<strong>中央总括方</strong>。',
+    govBotBullet2: '与具备<strong>成熟交付能力</strong>的全球企业共同<strong>管理交付</strong>。',
+    govBotBullet3: '<strong>动员银行与项目融资机构</strong>，能够资助并接受 BOT/项目融资模式。',
+    govBotBullet4: '在明确治理下协调<strong>政府、承包商、资金方与基金</strong>的角色与利益。',
+    servicesComplianceLinkHint: '跳转至本页的「合规、许可与 AML/CFT」板块（注册信息、透明度背景及反洗钱参考）。',
+    servicesBriefDisclaimer: '此处服务说明仅供参考；具约束力的范围以合同、KYC 及适用法律为准 — 详见条款。',
+    servicesGridKicker: '点击下方卡片打开对应版块 — <strong>表单</strong>、<strong>领域</strong>、<strong>治理</strong>或<strong>联系我们</strong>。',
+    servicesAudienceLead: '典型合作方：',
+    servicesChipGov: '政府与公共机构',
+    servicesChipCompanies: '企业与承包商',
+    servicesChipInvestors: '投资者与机构',
+    servicesJumpLabel: '本页导读',
+    servicesJumpBot: 'BOT 概览',
+    servicesJumpCards: '服务目录',
+    servicesJumpCompliance: '合规',
+    servicesTrustKicker: '机构合作受合同与 KYC 约束 — 参见<a href="#trust-entry">信任与路径</a>和<a href="#compliance">合规</a>。',
+    servicesCatalogJump: '跳转至<strong>14 项服务目录</strong> →',
+    servicesStickyNavAria: '服务 — 本页快速链接',
+    govBotBadge: 'BOT',
     footerCompliance: '合规与许可',
     footerTransparencyPage: '透明度概览',
     footerPrivacyNote: '隐私与数据：请见条款及联系我们/KYC。',
@@ -6726,7 +6915,7 @@ window.IIF_I18N = (function() {
     leafNavGovernance: '治理',
     leafNavCompliance: '合规',
     leafNavA11ySiteShortcuts: '网站快捷方式',
-    servicesInstitutionalHint: '机构顾问、融资与可行性受单独合规、合同与 KYC 约束 — 仅使用网站免费工具并不意味如此。',
+    servicesInstitutionalHint: '顾问、融资与可行性须单独的合同与 KYC — <strong>并非</strong>仅靠浏览或使用免费工具即可。参见 <a href="#trust-entry">信任与路径</a> · <a href="#terms">条款</a>。',
     trustEntryTitle: '信任、透明与参与路径',
     trustEntryLead: '我们发布合规参考并区分<strong>平台工具</strong>与<strong>机构义务</strong>。融资、顾问或政府 BOT 协调请使用下列路径 — 随后按适用法规签订合同并完成 KYC。',
     trustStrip1: '透明度与许可 ← <a href="#compliance">合规</a>',
@@ -7255,10 +7444,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'صنعت، لجستیک و دارایی‌های حقیقی',
     exampleProj6: 'محیط زیست و اشتغال جوانان',
     govBotComplianceLink: 'انطباق، مجوزها و AML/CFT ←',
+    govBotBullet1: 'عمل به‌عنوان <strong>چتر مرکزی</strong> برای یک یا چند کشور میزبان در چارچوب ساختارهای از نوع BOT.',
+    govBotBullet2: '<strong>مدیریت تحویل</strong> با شرکت‌های جهانی دارای ظرفیت اجرایی اثبات‌شده.',
+    govBotBullet3: '<strong>بسیج بانک‌ها و نهادهای تأمین مالی پروژه</strong> که بتوانند BOT/تأمین مالی پروژه را بپذیرند.',
+    govBotBullet4: 'هم‌راستاسازی نقش‌ها و منافع <strong>دولت‌ها، پیمانکاران، ممولان و صندوق</strong> تحت حاکمیت روشن.',
+    servicesComplianceLinkHint: 'پرش به بخش انطباق، مجوزها و AML/CFT در همین صفحه (ثبت‌نام، زمینه شفافیت و ارجاعات AML/CFT).',
+    servicesBriefDisclaimer: 'توضیحات خدمات صرفاً اطلاع‌رسانی است؛ دامنه الزام‌آور تابع قرارداد، KYC و قانون حاکم است — شرایط را ببینید.',
+    servicesGridKicker: 'برای رفتن به بخش مرتبط، یکی از کارت‌های زیر را انتخاب کنید — <strong>فرم‌ها</strong>، <strong>بخش‌ها</strong>، <strong>حاکمیت</strong> یا <strong>تماس</strong>.',
+    servicesAudienceLead: 'طرف‌های متداول:',
+    servicesChipGov: 'دولت‌ها و نهادهای عمومی',
+    servicesChipCompanies: 'شرکت‌ها و پیمانکاران',
+    servicesChipInvestors: 'سرمایه‌گذاران و نهادها',
+    servicesJumpLabel: 'در این صفحه',
+    servicesJumpBot: 'مرور BOT',
+    servicesJumpCards: 'فهرست خدمات',
+    servicesJumpCompliance: 'انطباق',
+    servicesTrustKicker: 'تعامل نهادی تحت قرارداد و KYC است — <a href="#trust-entry">اعتماد و مسیرها</a> و <a href="#compliance">انطباق</a> را ببینید.',
+    servicesCatalogJump: 'رفتن به <strong>فهرست ۱۴ خدمت</strong> ←',
+    servicesStickyNavAria: 'خدمات — پیوندهای سریع در این صفحه',
+    govBotBadge: 'BOT',
     footerCompliance: 'انطباق و مجوزها',
     footerPrivacyNote: 'حریم خصوصی و داده: بخش‌های شرایط و تماس/KYC را ببینید.',
     footerPlatformFundNote: 'ابزارهای بستر و میزبانی با خدمات نهادی صندوق یکسان نیستند — شرایط را ببینید.',
-    servicesInstitutionalHint: 'مشاوره، تأمین مالی و امکان‌سنجی نهادی تابع انطباق، قرارداد و KYC جداست — صرف مرور یا استفاده از ابزارهای رایگان سایت به‌تنهایی به معنای آن نیست.',
+    servicesInstitutionalHint: 'مشاوره، تأمین مالی و امکان‌سنجی نیازمند قرارداد و KYC جداگانه است — با مرور یا ابزارهای رایگان <strong>به‌تنهایی</strong> استنباط نمی‌شود. <a href="#trust-entry">اعتماد و مسیرها</a> · <a href="#terms">شرایط</a> را ببینید.',
     trustEntryTitle: 'اعتماد، شفافیت و مسیر تعامل',
     trustEntryLead: 'مراجع انطباق را منتشر می‌کنیم و <strong>ابزارهای بستر</strong> را از <strong>تکالیف نهادی</strong> جدا می‌کنیم. برای تأمین مالی، مشاوره یا هماهنگی BOT دولتی از مسیرهای زیر استفاده کنید — سپس قرارداد و KYC مطابق مقررات اعمال می‌شود.',
     trustStrip1: 'شفافیت و مجوزها ← <a href="#compliance">انطباق</a>',
@@ -7563,10 +7771,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'صنعت، لاجسٹکس اور حقیقی اثاثے',
     exampleProj6: 'ماحولیات اور نوجوانوں کی روزگار',
     govBotComplianceLink: 'مطابقت، لائسنس اور AML/CFT ←',
+    govBotBullet1: 'ایک یا زائد میزبان ممالک کے لیے BOT طرز کی ڈھانچے میں <strong>مرکزی چھتری</strong> کے طور پر کام کریں۔',
+    govBotBullet2: '<strong>ترسیل کا انتظام</strong> عالمی کمپنیوں کے ساتھ جن کی ثابت شدہ عملی صلاحیت ہو۔',
+    govBotBullet3: '<strong>بینکوں اور منصوبہ مالیاتی اداروں کو متحرک کریں</strong> جو BOT/منصوبہ ماڈلز کو فنڈ اور قبول کر سکیں۔',
+    govBotBullet4: 'واضح حکمرانی کے تحت <strong>حکومتوں، ٹھیکیداروں، سرمایہ فراہم کرنے والوں اور فنڈ</strong> کے درمیان کردار اور فوائد کو ہم آہنگ کریں۔',
+    servicesComplianceLinkHint: 'یہ لنک اس صفحے کے مطابقت، لائسنس اور AML/CFT سیکشن پر جاتا ہے (رجسٹریشن، شفافیت کا سیاق، AML/CFT حوالے)۔',
+    servicesBriefDisclaimer: 'یہاں خدمات کی وضاحت معلوماتی ہے؛ پابند حدود معاہدے، KYC اور لاگو قانون کے مطابق ہے — شرائط دیکھیں۔',
+    servicesGridKicker: 'متعلقہ حصہ کھولنے کے لیے نیچے سے ایک کارڈ منتخب کریں — <strong>فارم</strong>، <strong>شعبے</strong>، <strong>حکمرانی</strong>، یا <strong>رابطہ</strong>۔',
+    servicesAudienceLead: 'عام حریف:',
+    servicesChipGov: 'حکومتیں اور عوامی ادارے',
+    servicesChipCompanies: 'کمپنیاں اور ٹھیکیدار',
+    servicesChipInvestors: 'سرمایہ کار اور ادارے',
+    servicesJumpLabel: 'اس صفحے پر',
+    servicesJumpBot: 'BOT جائزہ',
+    servicesJumpCards: 'خدمات کی فہرست',
+    servicesJumpCompliance: 'مطابقت',
+    servicesTrustKicker: 'ادارہ جاتی حصول معاہدے اور KYC سے چلتا ہے — <a href="#trust-entry">اعتماد اور راستے</a> اور <a href="#compliance">مطابقت</a> دیکھیں۔',
+    servicesCatalogJump: '<strong>14 خدمات کی فہرست</strong> پر جائیں →',
+    servicesStickyNavAria: 'خدمات — اس صفحے پر فوری روابط',
+    govBotBadge: 'BOT',
     footerCompliance: 'مطابقت اور لائسنس',
     footerPrivacyNote: 'رازداری اور ڈیٹا: شرائط اور رابطہ/KYC کے حصے دیکھیں۔',
     footerPlatformFundNote: 'پلیٹ فارم کے اوزار اور ہوسٹنگ فنڈ کی ادارہ جاتی خدمات کے مترادف نہیں — شرائط دیکھیں۔',
-    servicesInstitutionalHint: 'ادارہ جاتی مشورہ، مالیات اور امکانیات الگ مطابقت، معاہدے اور KYC کے تابع ہیں — صرف سائٹ کے مفت اوزار استعمال کرنے کا مطلب یہ نہیں۔',
+    servicesInstitutionalHint: 'مشورہ، مالیات اور امکانیات کے لیے الگ معاہدے اور KYC درکار ہیں — صرف براؤزنگ یا مفت ٹولز سے <strong>خودبخود نہیں</strong>۔ <a href="#trust-entry">اعتماد اور راستے</a> · <a href="#terms">شرائط</a> دیکھیں۔',
     trustEntryTitle: 'اعتماد، شفافیت اور بات چیت کا راستہ',
     trustEntryLead: 'ہم مطابقت کے حوالے شائع کرتے ہیں اور <strong>پلیٹ فارم کے اوزار</strong> کو <strong>ادارہ جاتی ذمہ داریوں</strong> سے الگ رکھتے ہیں۔ مالیات، مشورہ یا حکومتی BOT کی ہم آہنگی کے لیے ذیل کے راستے استعمال کریں — پھر معاہدہ اور KYC ریگولیشن کے مطابق لاگو ہوتا ہے۔',
     trustStrip1: 'شفافیت اور لائسنس ← <a href="#compliance">مطابقت</a>',
@@ -7652,7 +7879,7 @@ window.IIF_I18N = (function() {
     heroBookingCta: 'سیشن شیڈول کریں',
     navFaq: 'عام سوالات'
   });
-  T.am = extend(def, {
+  T.am = extend(extend(def, EXT_SVC.am || {}), {
     logoTitle: 'ዓለም አቀፍ የኢንቬስትመንት ፎንድ',
     navAbout: 'ስለኛ',
     navServices: 'አገልግሎቶች',
@@ -7676,7 +7903,7 @@ window.IIF_I18N = (function() {
     heroBookingCta: 'ስብሰባ ያስይዙ',
     navFaq: 'ጥያቄዎች'
   });
-  T.id = extend(def, {
+  T.id = extend(extend(def, EXT_SVC.id || {}), {
     logoTitle: 'Dana Investasi Internasional',
     logoSubtitle: 'Pembiayaan untuk kemakmuran global · Semua bangsa',
     navAbout: 'Tentang kami',
@@ -7691,7 +7918,6 @@ window.IIF_I18N = (function() {
     navTranslation: 'Terjemahan',
     navInvestors: 'Investor',
     navLicenses: 'Lisensi',
-    navContact: 'Kontak',
     navLogin: 'Masuk / Daftar',
     heroEyebrow: 'Dana Investasi Internasional · Paris · FII',
     heroTitle: 'Visi mulia untuk investasi dan kemakmuran global',
@@ -7718,7 +7944,6 @@ window.IIF_I18N = (function() {
     navGovSnapshot: 'Ikhtisar tata kelola',
     navPartnersRecog: 'Mitra & pengakuan resmi',
     navRequestsForms: 'Permintaan & formulir',
-    navFinConsult: 'Konsultasi keuangan',
     navUrgentConsult: 'Konsultasi daring mendesak',
     navFeasibilityStudyLong: 'Minta studi kelayakan untuk proyek Anda',
     navBudgetAnalyze: 'Analisis anggaran Anda',
@@ -7743,13 +7968,11 @@ window.IIF_I18N = (function() {
     btnSearch: 'Cari',
     searchPlaceholder: 'Cari di situs…',
     sectionAbout: 'Tentang Dana',
-    sectionServices: 'Layanan',
     sectionSectors: 'Sektor & program',
     sectionMission: 'Misi & tata kelola',
     sectionHow: 'Cara kami bekerja',
     sectionCouncil: 'Dewan Bisnis Internasional',
     sectionMembership: 'Keanggotaan',
-    sectionFinancing: 'Permohonan pembiayaan',
     sectionFeasibility: 'Studi kelayakan',
     sectionInvestors: 'Pendaftaran investor',
     sectionUpload: 'Unggah dokumen & deskripsi proyek',
@@ -7845,11 +8068,7 @@ window.IIF_I18N = (function() {
     tickerArabianBusiness: 'Arabian Business',
     tickerEgyptTodayEconomy: 'Egypt Today Ekonomi',
     tickerAlIttihadBusiness: 'Al Ittihad Business',
-    servicesLead: 'Disusun untuk pemerintah, lembaga, perusahaan, dana, family office, dan organisasi nirlaba—<strong>sesuai prioritas</strong> misi Dana: dahulu konsultasi & studi, lalu modal & perantaraan, tata kelola, program sektoral, dan saluran pendukung.',
-    govBotTitle: 'BOT pemerintah—payung dipimpin Dana',
     govBotBody: 'Untuk satu atau lebih negara tuan rumah, Dana dapat berfungsi sebagai <strong>payung pusat</strong>: struktur kemitraan <strong>BOT</strong>, <strong>pengelolaan pelaksanaan</strong> dengan perusahaan global yang mampu, dan <strong>rekrutmen lembaga keuangan & bank internasional</strong> yang dapat menerima BOT/pembiayaan proyek—agar pemerintah, kontraktor global, penyedia modal, dan Dana sejalan.',
-    servicesNoteCore: '<strong>Inti Dana juga meliputi:</strong> pipa aktif <strong>proyek investasi</strong>, <strong>perantaraan</strong> antara penyedia modal dan pemangku kepentingan (termasuk transaksi lintas batas), dan <strong>koneksi ke perusahaan & investor global</strong>—lihat bagian proyek dan kontak di bawah.',
-    servicesNoteHint: 'Setiap kartu sektor membuka bagian terkait: formulir, proyek, tata kelola, sektor, atau program.',
     navGovBot: 'BOT pemerintah (payung)',
     navPartnersJoin: 'Mitra—kontraktor & bank',
     navWhyFund: 'Mengapa Dana',
@@ -7894,11 +8113,9 @@ window.IIF_I18N = (function() {
     exampleProj4: 'Teknologi, keamanan siber & inovasi',
     exampleProj5: 'Industri, logistik & aset riil',
     exampleProj6: 'Lingkungan & pekerjaan pemuda',
-    govBotComplianceLink: 'Kepatuhan, lisensi & AML/CFT ←',
     footerCompliance: 'Kepatuhan & lisensi',
     footerPrivacyNote: 'Privasi & data: lihat bagian syarat dan kontak/KYC.',
     footerPlatformFundNote: 'Alat platform & hosting bukan sama dengan layanan institusional Dana—lihat syarat.',
-    servicesInstitutionalHint: 'Konsultasi institusional, pembiayaan, dan kelayakan tunduk pada kepatuhan, kontrak, dan KYC terpisah—hanya menjelajahi atau memakai alat gratis situs tidak berarti itu.',
     trustEntryTitle: 'Kepercayaan, transparansi & jalur interaksi',
     trustEntryLead: 'Kami menerbitkan referensi kepatuhan dan membedakan <strong>alat platform</strong> dari <strong>kewajiban institusional</strong>. Untuk pembiayaan, konsultasi, atau koordinasi BOT pemerintah gunakan jalur di bawah—kemudian kontrak dan KYC berlaku sesuai regulasi.',
     trustStrip1: 'Transparansi & lisensi ← <a href="#compliance">Kepatuhan</a>',
@@ -7984,7 +8201,7 @@ window.IIF_I18N = (function() {
     heroBookingCta: 'Jadwalkan sesi',
     navFaq: 'FAQ'
   });
-  T.ms = extend(def, {
+  T.ms = extend(extend(def, EXT_SVC.ms || {}), {
     logoTitle: 'Dana Pelaburan Antarabangsa',
     logoSubtitle: 'Pembiayaan untuk kemakmuran global · Semua bangsa',
     navAbout: 'Tentang kami',
@@ -7999,7 +8216,6 @@ window.IIF_I18N = (function() {
     navTranslation: 'Terjemahan',
     navInvestors: 'Pelabur',
     navLicenses: 'Lesen',
-    navContact: 'Hubungi',
     navLogin: 'Log masuk / Daftar',
     heroEyebrow: 'Dana Pelaburan Antarabangsa · Paris · FII',
     heroTitle: 'Wawasan mulia untuk pelaburan dan kemakmuran global',
@@ -8026,7 +8242,6 @@ window.IIF_I18N = (function() {
     navGovSnapshot: 'Gambaran tadbir urus',
     navPartnersRecog: 'Rakan kongsi & pengiktirafan rasmi',
     navRequestsForms: 'Permintaan & borang',
-    navFinConsult: 'Nasihat kewangan',
     navUrgentConsult: 'Nasihat dalam talian segera',
     navFeasibilityStudyLong: 'Minta kajian kemungkinan untuk projek anda',
     navBudgetAnalyze: 'Analisis bajet anda',
@@ -8051,13 +8266,11 @@ window.IIF_I18N = (function() {
     btnSearch: 'Cari',
     searchPlaceholder: 'Cari di laman…',
     sectionAbout: 'Tentang Dana',
-    sectionServices: 'Perkhidmatan',
     sectionSectors: 'Sektor & program',
     sectionMission: 'Misi & tadbir urus',
     sectionHow: 'Cara kami beroperasi',
     sectionCouncil: 'Dewan Perniagaan Antarabangsa',
     sectionMembership: 'Keanggotaan',
-    sectionFinancing: 'Permohonan pembiayaan',
     sectionFeasibility: 'Kajian kemungkinan',
     sectionInvestors: 'Pendaftaran pelabur',
     sectionUpload: 'Muat naik dokumen & huraian projek',
@@ -8153,11 +8366,7 @@ window.IIF_I18N = (function() {
     tickerArabianBusiness: 'Arabian Business',
     tickerEgyptTodayEconomy: 'Egypt Today Ekonomi',
     tickerAlIttihadBusiness: 'Al Ittihad Business',
-    servicesLead: 'Disusun untuk kerajaan, institusi, syarikat, dana, pejabat keluarga, dan organisasi bukan untung—<strong>mengikut keutamaan</strong> misi Dana: dahulu nasihat & kajian, kemudian modal & perantaraan, tadbir urus, program sektor, dan saluran sokongan.',
-    govBotTitle: 'BOT kerajaan—payung dipimpin Dana',
     govBotBody: 'Untuk satu atau lebih negara tuan rumah, Dana boleh berfungsi sebagai <strong>payung pusat</strong>: struktur perkongsian <strong>BOT</strong>, <strong>pengurusan pelaksanaan</strong> dengan syarikat global yang berkemampuan, dan <strong>rekrutmen institusi kewangan & bank antarabangsa</strong> yang boleh menerima BOT/pembiayaan projek—supaya kerajaan, kontraktor global, pembekal modal, dan Dana selaras.',
-    servicesNoteCore: '<strong>Teras Dana juga merangkumi:</strong> paip aktif <strong>projek pelaburan</strong>, <strong>perantaraan</strong> antara pembekal modal dan pemegang kepentingan (termasuk urus niaga rentas sempadan), dan <strong>sambungan ke syarikat & pelabur global</strong>—lihat bahagian projek dan hubungi di bawah.',
-    servicesNoteHint: 'Setiap kad sektor membuka bahagian berkaitan: borang, projek, tadbir urus, sektor, atau program.',
     navGovBot: 'BOT kerajaan (payung)',
     navPartnersJoin: 'Rakan kongsi—kontraktor & bank',
     navWhyFund: 'Mengapa Dana',
@@ -8202,11 +8411,9 @@ window.IIF_I18N = (function() {
     exampleProj4: 'Teknologi, keselamatan siber & inovasi',
     exampleProj5: 'Industri, logistik & aset nyata',
     exampleProj6: 'Alam sekitar & pekerjaan belia',
-    govBotComplianceLink: 'Pematuhan, lesen & AML/CFT ←',
     footerCompliance: 'Pematuhan & lesen',
     footerPrivacyNote: 'Privasi & data: lihat bahagian terma dan hubungi/KYC.',
     footerPlatformFundNote: 'Alat platform & pengehosan bukan sama dengan perkhidmatan institusi Dana—lihat terma.',
-    servicesInstitutionalHint: 'Nasihat institusi, pembiayaan, dan kemungkinan tertakluk kepada pematuhan, kontrak, dan KYC berasingan—hanya melayari atau menggunakan alat percuma laman tidak bermaksud itu.',
     trustEntryTitle: 'Kepercayaan, ketelusan & laluan interaksi',
     trustEntryLead: 'Kami menerbitkan rujukan pematuhan dan membezakan <strong>alat platform</strong> daripada <strong>kewajipan institusi</strong>. Untuk pembiayaan, nasihat, atau penyelarasan BOT kerajaan gunakan laluan di bawah—kemudian kontrak dan KYC terpakai mengikut kawal selia.',
     trustStrip1: 'Ketelusan & lesen ← <a href="#compliance">Pematuhan</a>',
@@ -8292,7 +8499,7 @@ window.IIF_I18N = (function() {
     heroBookingCta: 'Jadual sesi',
     navFaq: 'Soalan lazim'
   });
-  T.sw = extend(def, {
+  T.sw = extend(extend(def, EXT_SVC.sw || {}), {
     logoTitle: 'Mfuko wa Uwekezaji wa Kimataifa',
     navAbout: 'Kuhusu sisi',
     navServices: 'Huduma',
@@ -8539,10 +8746,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'תעשייה, לוגיסטיקה ונכסים מוחשיים',
     exampleProj6: 'סביבה ותעסוקת צעירים',
     govBotComplianceLink: 'ציות, רישיונות ו-AML/CFT ←',
+    govBotBullet1: 'לפעול כ<strong>מטרייה מרכזית</strong> למדינה אחת או מספר מדינות מארחות במסגרת מבני BOT.',
+    govBotBullet2: '<strong>לנהל מסירה</strong> עם חברות גלובליות בעלות יכולת ביצוע מוכחת.',
+    govBotBullet3: '<strong>לגייס בנקים ומוסדות מימון פרויקטים</strong> שיכולים לממן ולקבל מודלי BOT/פרויקט.',
+    govBotBullet4: 'ליישר תפקידים ויתרונות בין <strong>ממשלות, קבלנים, מממנים והקרן</strong> תחת ממשל ברור.',
+    servicesComplianceLinkHint: 'הקישור מוביל לקטע ציות, רישיונות ו-AML/CFT בעמוד זה (רישומים, הקשר שקיפות והפניות AML/CFT).',
+    servicesBriefDisclaimer: 'תיאורי השירות כאן לידע כללי; ההיקף המחייב נקבע לפי חוזים, KYC ודין החל — ראו תנאים.',
+    servicesGridKicker: 'בחרו כרטיס למטה כדי לפתוח את הסעיף הרלוונטי — <strong>טפסים</strong>, <strong>מגזרים</strong>, <strong>ממשל</strong> או <strong>יצירת קשר</strong>.',
+    servicesAudienceLead: 'צדדים נפוצים:',
+    servicesChipGov: 'ממשלות וגופים ציבוריים',
+    servicesChipCompanies: 'חברות וקבלנים',
+    servicesChipInvestors: 'משקיעים ומוסדות',
+    servicesJumpLabel: 'בעמוד זה',
+    servicesJumpBot: 'סקירת BOT',
+    servicesJumpCards: 'קטלוג שירותים',
+    servicesJumpCompliance: 'ציות',
+    servicesTrustKicker: 'מעורבות מוסדית כפופה לחוזים ו-KYC — ראו <a href="#trust-entry">אמון ונתיבים</a> ו-<a href="#compliance">ציות</a>.',
+    servicesCatalogJump: 'מעבר ל<strong>קטלוג 14 שירותים</strong> →',
+    servicesStickyNavAria: 'שירותים — קישורים מהירים בעמוד זה',
+    govBotBadge: 'BOT',
     footerCompliance: 'ציות ורישיונות',
     footerPrivacyNote: 'פרטיות ונתונים: ראו מקטעי תנאים וצור קשר/KYC.',
     footerPlatformFundNote: 'כלי פלטפורמה ואירוח אינם זהים לשירותים המוסדיים של הקרן — ראו תנאים.',
-    servicesInstitutionalHint: 'ייעוץ, מימון והערכת היתכנות מוסדיים כפופים לציות, חוזה ו-KYC נפרדים — גלישה או שימוש בכלי חינם באתר בלבד אינו משמעותם.',
+    servicesInstitutionalHint: 'ייעוץ, מימון והיתכנות דורשים חוזים ו-KYC נפרדים — <strong>לא</strong> משתמעים מגלישה או כלים חינמיים בלבד. ראו <a href="#trust-entry">אמון ונתיבים</a> · <a href="#terms">תנאים</a>.',
     trustEntryTitle: 'אמון, שקיפות ונתיב אינטראקציה',
     trustEntryLead: 'אנו מפרסמים הפניות ציות ומבדילים בין <strong>כלי פלטפורמה</strong> לבין <strong>חובות מוסדיות</strong>. למימון, ייעוץ או תיאום BOT ממשלתי השתמשו בנתיבים שלהלן — לאחר מכן חוזה ו-KYC לפי רגולציה.',
     trustStrip1: 'שקיפות ורישיונות ← <a href="#compliance">ציות</a>',
@@ -8848,10 +9074,29 @@ window.IIF_I18N = (function() {
     exampleProj5: '산업, 물류, 실물 자산',
     exampleProj6: '환경 및 청년 고용',
     govBotComplianceLink: '컴플라이언스, 라이선스 및 AML/CFT ←',
+    govBotBullet1: 'BOT 유형 구조에서 하나 이상의 호스트 국가를 위해 <strong>중앙 우산</strong>으로 기능합니다.',
+    govBotBullet2: '검증된 실행 역량을 갖춘 글로벌 기업과 함께 <strong>인도를 관리</strong>합니다.',
+    govBotBullet3: 'BOT/프로젝트 모델을 자금 조달·수용할 수 있는 <strong>은행과 프로젝트 금융 기관을 모집</strong>합니다.',
+    govBotBullet4: '명확한 거버넌스 아래 <strong>정부, 시공사, 자금 공급자, 기금</strong>의 역할과 이익을 조정합니다.',
+    servicesComplianceLinkHint: '이 링크는 이 페이지의 컴플라이언스·라이선스·AML/CFT 섹션으로 이동합니다(등록, 투명성 맥락, AML/CFT 참고).',
+    servicesBriefDisclaimer: '여기 서비스 설명은 안내용입니다. 구속력 있는 범위는 계약, KYC 및 적용 법률을 따릅니다 — 약관을 참고하세요.',
+    servicesGridKicker: '아래 카드를 선택하면 관련 섹션으로 이동합니다 — <strong>양식</strong>, <strong>분야</strong>, <strong>거버넌스</strong>, <strong>문의</strong>.',
+    servicesAudienceLead: '일반적인 거래 상대:',
+    servicesChipGov: '정부 및 공공 기관',
+    servicesChipCompanies: '기업 및 시공사',
+    servicesChipInvestors: '투자자 및 기관',
+    servicesJumpLabel: '이 페이지에서',
+    servicesJumpBot: 'BOT 개요',
+    servicesJumpCards: '서비스 목록',
+    servicesJumpCompliance: '컴플라이언스',
+    servicesTrustKicker: '기관 간 협력은 계약과 KYC로 규율됩니다 — <a href="#trust-entry">신뢰 및 경로</a>와 <a href="#compliance">컴플라이언스</a>를 참고하세요.',
+    servicesCatalogJump: '<strong>14개 서비스 목록</strong>으로 이동 →',
+    servicesStickyNavAria: '서비스 — 이 페이지의 빠른 링크',
+    govBotBadge: 'BOT',
     footerCompliance: '컴플라이언스 및 라이선스',
     footerPrivacyNote: '개인정보 및 데이터: 약관 및 문의/KYC 섹션을 참고하세요.',
     footerPlatformFundNote: '플랫폼 도구 및 호스팅은 기금의 기관 서비스와 동일하지 않습니다—약관을 참고하세요.',
-    servicesInstitutionalHint: '기관 자문, 자금 조달, 타당성은 별도의 컴플라이언스, 계약, KYC의 대상입니다—사이트 무료 도구만 사용한다는 의미는 아닙니다.',
+    servicesInstitutionalHint: '자문·자금 조달·타당성은 별도 계약과 KYC가 필요합니다 — 브라우징이나 무료 도구만으로는 <strong>의미되지 않습니다</strong>. <a href="#trust-entry">신뢰 및 경로</a> · <a href="#terms">약관</a>을 참고하세요.',
     trustEntryTitle: '신뢰, 투명성 및 소통 경로',
     trustEntryLead: '컴플라이언스 참고 자료를 게시하고 <strong>플랫폼 도구</strong>와 <strong>기관 의무</strong>를 구분합니다. 자금, 자문 또는 정부 BOT 조정은 아래 경로를 사용하세요—이후 규정에 따라 계약과 KYC가 적용됩니다.',
     trustStrip1: '투명성 및 라이선스 ← <a href="#compliance">컴플라이언스</a>',
@@ -9157,10 +9402,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Промышленность, логистика и материальные активы',
     exampleProj6: 'Экология и занятость молодёжи',
     govBotComplianceLink: 'Комплаенс, лицензии и AML/CFT ←',
+    govBotBullet1: 'Выступать как <strong>центральный зонт</strong> для одной или нескольких стран-хозяев в структурах типа BOT.',
+    govBotBullet2: '<strong>Управлять поставкой</strong> с глобальными компаниями с подтверждённой способностью к исполнению.',
+    govBotBullet3: '<strong>Привлекать банки и институты проектного финансирования</strong>, способные финансировать и принимать модели BOT/проекта.',
+    govBotBullet4: 'Согласовывать роли и выгоды <strong>правительств, подрядчиков, кредиторов и фонда</strong> при ясном управлении.',
+    servicesComplianceLinkHint: 'Ссылка ведёт к разделу «Комплаенс, лицензии и AML/CFT» на этой странице (регистрации, контекст прозрачности, ссылки по AML/CFT).',
+    servicesBriefDisclaimer: 'Описания услуг носят ознакомительный характер; обязательный объём определяется договорами, KYC и применимым правом — см. условия.',
+    servicesGridKicker: 'Выберите карточку ниже, чтобы открыть раздел — <strong>формы</strong>, <strong>отрасли</strong>, <strong>управление</strong> или <strong>контакты</strong>.',
+    servicesAudienceLead: 'Типичные контрагенты:',
+    servicesChipGov: 'Правительства и публичные органы',
+    servicesChipCompanies: 'Компании и подрядчики',
+    servicesChipInvestors: 'Инвесторы и институты',
+    servicesJumpLabel: 'На этой странице',
+    servicesJumpBot: 'Обзор BOT',
+    servicesJumpCards: 'Каталог услуг',
+    servicesJumpCompliance: 'Комплаенс',
+    servicesTrustKicker: 'Институциональное сотрудничество регламентируется договорами и KYC — см. <a href="#trust-entry">Доверие и пути</a> и <a href="#compliance">Комплаенс</a>.',
+    servicesCatalogJump: 'К <strong>каталогу из 14 услуг</strong> →',
+    servicesStickyNavAria: 'Услуги — быстрые ссылки на этой странице',
+    govBotBadge: 'BOT',
     footerCompliance: 'Комплаенс и лицензии',
     footerPrivacyNote: 'Конфиденциальность и данные: см. условия и раздел контактов/KYC.',
     footerPlatformFundNote: 'Инструменты платформы и хостинг не равны институциональным услугам фонда — см. условия.',
-    servicesInstitutionalHint: 'Институциональный консалтинг, финансирование и ТЭО требуют отдельного комплаенса, договора и KYC — бесплатные инструменты на сайте сами по себе этого не означают.',
+    servicesInstitutionalHint: 'Консалтинг, финансирование и ТЭО требуют отдельных договора и KYC — <strong>не</strong> следуют из одного просмотра или бесплатных инструментов. См. <a href="#trust-entry">Доверие и пути</a> · <a href="#terms">условия</a>.',
     trustEntryTitle: 'Доверие, прозрачность и пути взаимодействия',
     trustEntryLead: 'Мы публикуем справочные материалы по комплаенсу и разделяем <strong>инструменты платформы</strong> и <strong>институциональные обязательства</strong>. Для финансирования, консалтинга или координации гос-BOT используйте каналы ниже — затем договор и KYC по регламенту.',
     trustStrip1: 'Прозрачность и лицензии ← <a href="#compliance">Комплаенс</a>',
@@ -9466,10 +9730,29 @@ window.IIF_I18N = (function() {
     exampleProj5: '産業、物流、実物資産',
     exampleProj6: '環境と若年雇用',
     govBotComplianceLink: 'コンプライアンス、ライセンス、AML/CFT ←',
+    govBotBullet1: 'BOT型の枠組みで、一国または複数のホスト国に対し<strong>中央アンブレラ</strong>として機能します。',
+    govBotBullet2: '実績のある実行力を持つグローバル企業と<strong>デリバリーを管理</strong>します。',
+    govBotBullet3: 'BOT/プロジェクトモデルの資金提供・受け入れができる<strong>銀行・プロジェクトファイナンス機関を動員</strong>します。',
+    govBotBullet4: '明確なガバナンスのもと、<strong>政府、請負業者、資本提供者、ファンド</strong>の役割と便益を整合させます。',
+    servicesComplianceLinkHint: 'このリンクは本ページのコンプライアンス・ライセンス・AML/CFTの節へ移動します（登録、透明性の文脈、AML/CFTの参照）。',
+    servicesBriefDisclaimer: 'ここでのサービス説明は参考情報です。拘束力のある範囲は契約、KYC、適用法に従います — 利用規約をご覧ください。',
+    servicesGridKicker: '下のカードを選ぶと該当セクションへ移動します — <strong>フォーム</strong>、<strong>分野</strong>、<strong>ガバナンス</strong>、<strong>お問い合わせ</strong>。',
+    servicesAudienceLead: '典型的な相手方:',
+    servicesChipGov: '政府・公共機関',
+    servicesChipCompanies: '企業・請負業者',
+    servicesChipInvestors: '投資家・機関投資家',
+    servicesJumpLabel: 'このページ内',
+    servicesJumpBot: 'BOTの概要',
+    servicesJumpCards: 'サービス一覧',
+    servicesJumpCompliance: 'コンプライアンス',
+    servicesTrustKicker: '機関間の関与は契約とKYCにより定められます — <a href="#trust-entry">信頼とパス</a>・<a href="#compliance">コンプライアンス</a>をご覧ください。',
+    servicesCatalogJump: '<strong>14のサービス一覧</strong>へ →',
+    servicesStickyNavAria: 'サービス — このページのクイックリンク',
+    govBotBadge: 'BOT',
     footerCompliance: 'コンプライアンスとライセンス',
     footerPrivacyNote: 'プライバシーとデータ：利用規約とお問い合わせ/KYCをご覧ください。',
     footerPlatformFundNote: 'プラットフォームツールとホスティングは、ファンドの機関サービスと同一ではありません — 規約をご覧ください。',
-    servicesInstitutionalHint: '機関向けアドバイザリー、資金調達、実現可能性は別途コンプライアンス、契約、KYCの対象です — サイトの無料ツールのみの利用を意味しません。',
+    servicesInstitutionalHint: 'アドバイザリー・資金調達・実現可能性には別途の契約とKYCが必要です — 閲覧や無料ツールだけでは<strong>意味しません</strong>。<a href="#trust-entry">信頼とパス</a> · <a href="#terms">利用規約</a>をご覧ください。',
     trustEntryTitle: '信頼、透明性、関与の経路',
     trustEntryLead: 'コンプライアンス参照を公開し、<strong>プラットフォームツール</strong>と<strong>機関上の義務</strong>を区別します。資金、アドバイザリー、政府BOTの調整は以下の経路を — その後、規制に従い契約とKYCが適用されます。',
     trustStrip1: '透明性とライセンス ← <a href="#compliance">コンプライアンス</a>',
@@ -9775,10 +10058,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'Indústria, logística e ativos reais',
     exampleProj6: 'Ambiente e emprego jovem',
     govBotComplianceLink: 'Conformidade, licenças e AML/CFT ←',
+    govBotBullet1: 'Atuar como <strong>guarda-chuva central</strong> para um ou vários Estados anfitriões em estruturas tipo BOT.',
+    govBotBullet2: '<strong>Gerir a entrega</strong> com empresas globais com capacidade de execução comprovada.',
+    govBotBullet3: '<strong>Mobilizar bancos e instituições de financiamento de projetos</strong> que possam financiar e aceitar modelos BOT/projeto.',
+    govBotBullet4: 'Alinhar papéis e benefícios entre <strong>governos, empreiteiros, financiadores e o Fundo</strong> sob governação clara.',
+    servicesComplianceLinkHint: 'Leva à secção Conformidade, licenças e AML/CFT nesta página (registos, contexto de transparência, referências AML/CFT).',
+    servicesBriefDisclaimer: 'As descrições de serviços são informativas; o âmbito vinculativo segue contratos, KYC e lei aplicável — ver Termos.',
+    servicesGridKicker: 'Escolha um cartão abaixo para abrir a secção relacionada — <strong>formulários</strong>, <strong>setores</strong>, <strong>governação</strong> ou <strong>contacto</strong>.',
+    servicesAudienceLead: 'Contrapartes típicas:',
+    servicesChipGov: 'Governos e entidades públicas',
+    servicesChipCompanies: 'Empresas e empreiteiros',
+    servicesChipInvestors: 'Investidores e instituições',
+    servicesJumpLabel: 'Nesta página',
+    servicesJumpBot: 'Visão geral BOT',
+    servicesJumpCards: 'Catálogo de serviços',
+    servicesJumpCompliance: 'Conformidade',
+    servicesTrustKicker: 'O envolvimento institucional rege-se por contratos e KYC — ver <a href="#trust-entry">Confiança e percursos</a> e <a href="#compliance">Conformidade</a>.',
+    servicesCatalogJump: 'Ir ao <strong>catálogo de 14 serviços</strong> →',
+    servicesStickyNavAria: 'Serviços — ligações rápidas nesta página',
+    govBotBadge: 'BOT',
     footerCompliance: 'Conformidade e licenças',
     footerPrivacyNote: 'Privacidade e dados: veja termos e contacto/KYC.',
     footerPlatformFundNote: 'Ferramentas de plataforma e alojamento não equivalem aos serviços institucionais do Fundo — veja os termos.',
-    servicesInstitutionalHint: 'Consultoria, financiamento e viabilidade institucionais estão sujeitos a conformidade, contrato e KYC próprios — usar apenas ferramentas gratuitas no site não implica isso.',
+    servicesInstitutionalHint: 'Consultoria, financiamento e viabilidade exigem contratos e KYC separados — <strong>não</strong> se deduzem só por navegar ou usar ferramentas gratuitas. Ver <a href="#trust-entry">Confiança e percursos</a> · <a href="#terms">Termos</a>.',
     trustEntryTitle: 'Confiança, transparência e formas de envolvimento',
     trustEntryLead: 'Publicamos referências de conformidade e distinguimos <strong>ferramentas de plataforma</strong> de <strong>obrigações institucionais</strong>. Para financiamento, consultoria ou coordenação BOT estatal, use os caminhos abaixo — depois contrato e KYC conforme a regulamentação.',
     trustStrip1: 'Transparência e licenças ← <a href="#compliance">Conformidade</a>',
@@ -10084,10 +10386,29 @@ window.IIF_I18N = (function() {
     exampleProj5: 'उद्योग, लॉजिस्टिक्स व भौतिक संपत्ति',
     exampleProj6: 'पर्यावरण व युवा रोज़गार',
     govBotComplianceLink: 'अनुपालन, लाइसेंस व AML/CFT ←',
+    govBotBullet1: 'BOT-शैली की संरचनाओं में एक या अधिक मेज़बान राज्यों के लिए <strong>केंद्रीय छत्र</strong> के रूप में कार्य करें।',
+    govBotBullet2: 'सिद्ध निष्पादन क्षमता वाली वैश्विक कंपनियों के साथ <strong>डिलीवरी प्रबंधित</strong> करें।',
+    govBotBullet3: '<strong>बैंक और परियोजना वित्त संस्थानों को जुटाएँ</strong> जो BOT/परियोजना मॉडल को वित्तपोषित और स्वीकार कर सकें।',
+    govBotBullet4: 'स्पष्ट शासन के तहत <strong>सरकारों, ठेकेदारों, वित्त प्रदाताओं और कोष</strong> के बीच भूमिकाओं और लाभों को संरेखित करें।',
+    servicesComplianceLinkHint: 'यह लिंक इस पृष्ठ के अनुपालन, लाइसेंस और AML/CFT अनुभाग पर जाता है (पंजीकरण, पारदर्शिता संदर्भ, AML/CFT संदर्भ)।',
+    servicesBriefDisclaimer: 'यहाँ सेवा विवरण सूचनात्मक हैं; बाध्यकारी दायरा अनुबंध, KYC और लागू कानून के अधीन है — शर्तें देखें।',
+    servicesGridKicker: 'संबंधित अनुभाग खोलने के लिए नीचे एक कार्ड चुनें — <strong>फ़ॉर्म</strong>, <strong>क्षेत्र</strong>, <strong>शासन</strong>, या <strong>संपर्क</strong>।',
+    servicesAudienceLead: 'सामान्य प्रतिपक्ष:',
+    servicesChipGov: 'सरकारें और सार्वजनिक निकाय',
+    servicesChipCompanies: 'कंपनियाँ और ठेकेदार',
+    servicesChipInvestors: 'निवेशक और संस्थान',
+    servicesJumpLabel: 'इस पृष्ठ पर',
+    servicesJumpBot: 'BOT अवलोकन',
+    servicesJumpCards: 'सेवा सूची',
+    servicesJumpCompliance: 'अनुपालन',
+    servicesTrustKicker: 'संस्थागत संलग्नता अनुबंध व KYC से शासित है — <a href="#trust-entry">विश्वास व रास्ते</a> व <a href="#compliance">अनुपालन</a> देखें।',
+    servicesCatalogJump: '<strong>14 सेवाओं की सूची</strong> पर जाएँ →',
+    servicesStickyNavAria: 'सेवाएँ — इस पृष्ठ पर त्वरित लिंक',
+    govBotBadge: 'BOT',
     footerCompliance: 'अनुपालन व लाइसेंस',
     footerPrivacyNote: 'गोपनीयता व डेटा: शर्तें व संपर्क/KYC देखें।',
     footerPlatformFundNote: 'प्लेटफ़ॉर्म उपकरण व होस्टिंग कोष की संस्थागत सेवाओं के समान नहीं — शर्तें देखें।',
-    servicesInstitutionalHint: 'संस्थागत परामर्श, वित्तपोषण व व्यवहार्यता अलग अनुपालन, अनुबंध व KYC के अधीन — केवल मुफ़्त साइट उपकरणों का उपयोग इसका अर्थ नहीं।',
+    servicesInstitutionalHint: 'परामर्श, वित्तपोषण व व्यवहार्यता के लिए अलग अनुबंध व KYC चाहिए — केवल ब्राउज़िंग या मुफ़्त उपकरणों से <strong>नहीं निकलता</strong>। <a href="#trust-entry">विश्वास व रास्ते</a> · <a href="#terms">शर्तें</a> देखें।',
     trustEntryTitle: 'विश्वास, पारदर्शिता व जुड़ाव के मार्ग',
     trustEntryLead: 'हम अनुपालन संदर्भ प्रकाशित करते हैं और <strong>प्लेटफ़ॉर्म उपकरणों</strong> व <strong>संस्थागत दायित्वों</strong> को अलग करते हैं। वित्त, परामर्श या सरकारी BOT समन्वय हेतु नीचे दिए मार्ग उपयोग करें — फिर विनियमानुसार अनुबंध व KYC।',
     trustStrip1: 'पारदर्शिता व लाइसेंस ← <a href="#compliance">अनुपालन</a>',
@@ -10174,7 +10495,7 @@ window.IIF_I18N = (function() {
     navFaq: 'सामान्य प्रश्न'
   });
 
-  T.vi = extend(def, {
+  T.vi = extend(extend(def, EXT_SVC.vi || {}), {
     faqTitle: 'Câu hỏi thường gặp',
     faqIntro: 'Câu trả lời ngắn cho chính phủ, nhà đầu tư và đối tác. Để được hướng dẫn riêng, hãy dùng mục Liên hệ.',
     faq1Q: 'Quỹ làm gì trong khuôn khổ BOT của chính phủ?',
@@ -10194,7 +10515,7 @@ window.IIF_I18N = (function() {
     navFaq: 'Hỏi đáp'
   });
 
-  T.th = extend(def, {
+  T.th = extend(extend(def, EXT_SVC.th || {}), {
     faqTitle: 'คำถามที่พบบ่อย',
     faqIntro: 'คำตอบสั้นๆ สำหรับรัฐบาล นักลงทุน และพันธมิตร หากต้องการคำแนะนำเฉพาะ โปรดใช้ติดต่อ',
     faq1Q: 'กองทุนทำอะไรภายใต้ร่ม BOT ของรัฐบาล?',
@@ -10214,7 +10535,7 @@ window.IIF_I18N = (function() {
     navFaq: 'คำถามที่พบบ่อย'
   });
 
-  T.bn = extend(def, {
+  T.bn = extend(extend(def, EXT_SVC.bn || {}), {
     faqTitle: 'সাধারণ জিজ্ঞাসা',
     faqIntro: 'সরকার, বিনিয়োগকারী ও অংশীদারদের জন্য সংক্ষিপ্ত উত্তর। ব্যক্তিগত নির্দেশনার জন্য যোগাযোগ ব্যবহার করুন।',
     faq1Q: 'সরকারি BOT ছাতার অধীনে তহবিল কী করে?',
@@ -10234,7 +10555,7 @@ window.IIF_I18N = (function() {
     navFaq: 'প্রশ্নোত্তর'
   });
 
-  T.pl = extend(def, {
+  T.pl = extend(extend(def, EXT_SVC.pl || {}), {
     faqTitle: 'Najczęściej zadawane pytania',
     faqIntro: 'Krótkie odpowiedzi dla rządów, inwestorów i partnerów. W celu indywidualnego doradztwa skorzystaj z Kontaktu.',
     faq1Q: 'Co robi Fundusz w ramach rządowego programu BOT?',
@@ -10254,7 +10575,7 @@ window.IIF_I18N = (function() {
     navFaq: 'FAQ'
   });
 
-  T.nl = extend(def, {
+  T.nl = extend(extend(def, EXT_SVC.nl || {}), {
     faqTitle: 'Veelgestelde vragen',
     faqIntro: 'Korte antwoorden voor overheden, investeerders en partners. Voor persoonlijke begeleiding gebruikt u Contact.',
     faq1Q: 'Wat doet het Fonds onder een overheids-BOT-paraplu?',
@@ -10274,7 +10595,7 @@ window.IIF_I18N = (function() {
     navFaq: 'Vragen'
   });
 
-  T.uk = extend(def, {
+  T.uk = extend(extend(def, EXT_SVC.uk || {}), {
     faqTitle: 'Часті запитання',
     faqIntro: 'Короткі відповіді для урядів, інвесторів і партнерів. Для персональних консультацій використовуйте розділ Контакти.',
     faq1Q: 'Що робить Фонд у рамках державної моделі BOT?',
@@ -10294,7 +10615,7 @@ window.IIF_I18N = (function() {
     navFaq: 'Запитання'
   });
 
-  T.el = extend(def, {
+  T.el = extend(extend(def, EXT_SVC.el || {}), {
     faqTitle: 'Συχνές ερωτήσεις',
     faqIntro: 'Σύντομες απαντήσεις για κυβερνήσεις, επενδυτές και εταίρους. Για εξατομικευμένη καθοδήγηση χρησιμοποιήστε την Επικοινωνία.',
     faq1Q: 'Τι κάνει το Ταμείο στα πλαίσια κυβερνητικού BOT;',
@@ -10314,7 +10635,7 @@ window.IIF_I18N = (function() {
     navFaq: 'FAQ'
   });
 
-  T.sv = extend(def, {
+  T.sv = extend(extend(def, EXT_SVC.sv || {}), {
     faqTitle: 'Vanliga frågor',
     faqIntro: 'Korta svar för myndigheter, investerare och partners. För personlig vägledning, använd Kontakt.',
     faq1Q: 'Vad gör Fonden inom en statlig BOT-paraply?',
@@ -10334,7 +10655,7 @@ window.IIF_I18N = (function() {
     navFaq: 'FAQ'
   });
 
-  T.no = extend(def, {
+  T.no = extend(extend(def, EXT_SVC.no || {}), {
     faqTitle: 'Ofte stilte spørsmål',
     faqIntro: 'Korte svar for myndigheter, investorer og partnere. For personlig veiledning, bruk Kontakt.',
     faq1Q: 'Hva gjør Fondet under et statlig BOT-paraply?',
@@ -10354,7 +10675,7 @@ window.IIF_I18N = (function() {
     navFaq: 'OSS'
   });
 
-  T.da = extend(def, {
+  T.da = extend(extend(def, EXT_SVC.da || {}), {
     faqTitle: 'Ofte stillede spørgsmål',
     faqIntro: 'Korte svar til regeringer, investorer og partnere. Til personlig vejledning brug Kontakt.',
     faq1Q: 'Hvad gør Fonden under et statsligt BOT-paraply?',
@@ -10374,7 +10695,7 @@ window.IIF_I18N = (function() {
     navFaq: 'FAQ'
   });
 
-  T.fi = extend(def, {
+  T.fi = extend(extend(def, EXT_SVC.fi || {}), {
     faqTitle: 'Usein kysytyt kysymykset',
     faqIntro: 'Lyhyitä vastauksia hallituksille, sijoittajille ja kumppaneille. Henkilökohtaista neuvontaa varten käytä Yhteystiedot.',
     faq1Q: 'Mitä Rahasto tekee valtion BOT-sateenvarjon alla?',
@@ -10394,7 +10715,7 @@ window.IIF_I18N = (function() {
     navFaq: 'UKK'
   });
 
-  T.cs = extend(def, {
+  T.cs = extend(extend(def, EXT_SVC.cs || {}), {
     faqTitle: 'Často kladené otázky',
     faqIntro: 'Stručné odpovědi pro vlády, investory a partnery. Pro individuální poradenství použijte Kontakt.',
     faq1Q: 'Co dělá Fond v rámci státního BOT deštníku?',
@@ -10414,7 +10735,7 @@ window.IIF_I18N = (function() {
     navFaq: 'FAQ'
   });
 
-  T.hu = extend(def, {
+  T.hu = extend(extend(def, EXT_SVC.hu || {}), {
     faqTitle: 'Gyakran ismételt kérdések',
     faqIntro: 'Rövid válaszok kormányoknak, befektetőknek és partnereknek. Személyre szabott útmutatásért használja a Kapcsolatot.',
     faq1Q: 'Mit tesz az Alap kormányzati BOT-ernyő alatt?',
@@ -10434,7 +10755,7 @@ window.IIF_I18N = (function() {
     navFaq: 'GYIK'
   });
 
-  T.ro = extend(def, {
+  T.ro = extend(extend(def, EXT_SVC.ro || {}), {
     faqTitle: 'Întrebări frecvente',
     faqIntro: 'Răspunsuri scurte pentru guverne, investitori și parteneri. Pentru îndrumare personalizată folosiți Contact.',
     faq1Q: 'Ce face Fondul în cadrul umbrelei guvernamentale BOT?',
@@ -10454,7 +10775,7 @@ window.IIF_I18N = (function() {
     navFaq: 'Întrebări'
   });
 
-  T.ne = extend(def, {
+  T.ne = extend(extend(def, EXT_SVC.ne || {}), {
     faqTitle: 'बारम्बार सोधिने प्रश्नहरू',
     faqIntro: 'सरकार, लगानीकर्ता र साझेदारहरूका लागि संक्षिप्त उत्तरहरू। व्यक्तिगत मार्गदर्शनका लागि सम्पर्क प्रयोग गर्नुहोस्।',
     faq1Q: 'सरकारी BOT छाता अन्तर्गत कोष के गर्छ?',
@@ -10474,7 +10795,7 @@ window.IIF_I18N = (function() {
     navFaq: 'प्रश्नोत्तर'
   });
 
-  T.ta = extend(def, {
+  T.ta = extend(extend(def, EXT_SVC.ta || {}), {
     faqTitle: 'அடிக்கடி கேட்கப்படும் கேள்விகள்',
     faqIntro: 'அரசுகள், முதலீட்டாளர்கள் மற்றும் கூட்டாளர்களுக்கு சுருக்கமான பதில்கள். தனிப்பயன் வழிகாட்டுதலுக்கு தொடர்பு பயன்படுத்தவும்.',
     faq1Q: 'அரசு BOT குடையின் கீழ் நிதி என்ன செய்கிறது?',
@@ -10494,7 +10815,7 @@ window.IIF_I18N = (function() {
     navFaq: 'கேள்விகள்'
   });
 
-  T.te = extend(def, {
+  T.te = extend(extend(def, EXT_SVC.te || {}), {
     faqTitle: 'తరచుగా అడిగే ప్రశ్నలు',
     faqIntro: 'ప్రభుత్వాలు, పెట్టుబడిదారులు మరియు భాగస్వాముల కోసం సంక్షిప్త సమాధానాలు. వ్యక్తిగత మార్గదర్శనానికి సంప్రదింపు వినియోగించండి.',
     faq1Q: 'ప్రభుత్వ BOT కుటీరం కింద నిధి ఏమి చేస్తుంది?',
@@ -10514,7 +10835,7 @@ window.IIF_I18N = (function() {
     navFaq: 'ప్రశ్నలు'
   });
 
-  T.mr = extend(def, {
+  T.mr = extend(extend(def, EXT_SVC.mr || {}), {
     faqTitle: 'वारंवार विचारले जाणारे प्रश्न',
     faqIntro: 'सरकार, गुंतवणूकदार आणि भागीदारांसाठी संक्षिप्त उत्तरे. वैयक्तिक मार्गदर्शनासाठी संपर्क वापरा.',
     faq1Q: 'सरकारी BOT छत्राखाली निधी काय करतो?',
@@ -10534,7 +10855,7 @@ window.IIF_I18N = (function() {
     navFaq: 'प्रश्न'
   });
 
-  T.gu = extend(def, {
+  T.gu = extend(extend(def, EXT_SVC.gu || {}), {
     faqTitle: 'વારંવાર પૂછાતા પ્રશ્નો',
     faqIntro: 'સરકારો, રોકાણકારો અને ભાગીદારો માટે ટૂંકા જવાબો. વ્યક્તિગત માર્ગદર્શન માટે સંપર્ક વાપરો.',
     faq1Q: 'સરકારી BOT છત્ર હેઠળ નિધિ શું કરે છે?',
@@ -10554,7 +10875,7 @@ window.IIF_I18N = (function() {
     navFaq: 'પ્રશ્નો'
   });
 
-  T.kn = extend(def, {
+  T.kn = extend(extend(def, EXT_SVC.kn || {}), {
     faqTitle: 'ಪದೇ ಪದೇ ಕೇಳಲಾಗುವ ಪ್ರಶ್ನೆಗಳು',
     faqIntro: 'ಸರ್ಕಾರಗಳು, ಹೂಡಿಕೆದಾರರು ಮತ್ತು ಪಾಲುದಾರರಿಗೆ ಸಂಕ್ಷಿಪ್ತ ಉತ್ತರಗಳು. ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶನಕ್ಕೆ ಸಂಪರ್ಕ ಬಳಸಿ.',
     faq1Q: 'ಸರ್ಕಾರಿ BOT ಕೊಡೆಯ ಕೆಳಗೆ ನಿಧಿ ಏನು ಮಾಡುತ್ತದೆ?',
@@ -10574,7 +10895,7 @@ window.IIF_I18N = (function() {
     navFaq: 'ಪ್ರಶ್ನೆಗಳು'
   });
 
-  T.ml = extend(def, {
+  T.ml = extend(extend(def, EXT_SVC.ml || {}), {
     faqTitle: 'പതിവായി ചോദിക്കുന്ന ചോദ്യങ്ങൾ',
     faqIntro: 'സർക്കാരുകൾ, നിക്ഷേപകരും പങ്കാളികൾക്കും ചെറിയ ഉത്തരങ്ങൾ. വ്യക്തിഗത മാർഗദർശനത്തിന് ബന്ധം ഉപയോഗിക്കുക.',
     faq1Q: 'സർക്കാർ BOT കുടക്കീഴിൽ ഫണ്ട് എന്തുചെയ്യുന്നു?',
@@ -10594,7 +10915,7 @@ window.IIF_I18N = (function() {
     navFaq: 'ചോദ്യങ്ങൾ'
   });
 
-  T.pa = extend(def, {
+  T.pa = extend(extend(def, EXT_SVC.pa || {}), {
     faqTitle: 'ਅਕਸਰ ਪੁੱਛੇ ਜਾਣ ਵਾਲੇ ਸਵਾਲ',
     faqIntro: 'ਸਰਕਾਰਾਂ, ਨਿਵੇਸ਼ਕਾਂ ਅਤੇ ਭਾਈਵਾਲਾਂ ਲਈ ਛੋਟੇ ਜਵਾਬ। ਵਿਅਕਤੀਗਤ ਮਾਰਗਦਰਸ਼ਨ ਲਈ ਸੰਪਰਕ ਵਰਤੋ।',
     faq1Q: 'ਸਰਕਾਰੀ BOT ਛਤਰ ਹੇਠ ਫੰਡ ਕੀ ਕਰਦਾ ਹੈ?',
@@ -10614,11 +10935,11 @@ window.IIF_I18N = (function() {
     navFaq: 'ਸਵਾਲ'
   });
 
-  /* لغات المنتقي بدون حزمة مخصصة: نفس النصوص الإنجليزية الكاملة (بما فيها الميزانية) */
+  /* picker languages: full services from window.IIF_SERVICE_PACKS (i18n-service-packs-*.js, before i18n.js) */
   ;[
     'sk', 'bg', 'hr', 'sr', 'sl', 'si', 'my', 'km', 'lo', 'sq', 'mk', 'hy', 'ka', 'az', 'kk', 'uz', 'mn', 'ca', 'eu', 'gl'
   ].forEach(function (lng) {
-    T[lng] = def;
+    T[lng] = extend(def, EXT_SVC[lng] || {});
   });
 
   var codes = ['en','ar','fr','de','es','pt','it','ru','zh','ja','ko','hi','bn','tr','fa','ur','id','ms','th','vi','pl','nl','el','sv','no','da','fi','uk','ro','hu','cs','sk','bg','hr','sr','sl','he','am','sw','ne','si','my','km','lo','ta','te','mr','gu','kn','ml','pa','sq','mk','hy','ka','az','kk','uz','mn','ca','eu','gl'];

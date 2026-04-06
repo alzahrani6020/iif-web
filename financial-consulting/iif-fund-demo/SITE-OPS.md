@@ -136,6 +136,9 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 
 سكربت `npm run i18n:keys` يبيّن أن بعض اللغات (مثل zh، es، de، it، tr) تفتقد مفاتيح كثيرة وتعتمد على الاحتياطي (غالباً الإنجليزية أو الفرنسية). إكمال الترجمة يدوياً أو عبر أدوات مساعدة يبقى عملاً منفصلاً عند الحاجة للجمهور.
 
+- **حزم قسم الخدمات (الأوزان الثقيلة):** تُولَّد تلقائياً عند **`npm run build`** من **جذر المستودع** (`i18n:packs` → `i18n-service-packs-{a–d}.js` و`i18n-service-packs-all.js`). يدوياً من مجلد الواجهة: `npm run i18n:packs`. **GitHub Pages** يشغّل `emit-service-packs.cjs` في workflow قبل نسخ الملفات الثابتة.
+- **تطابق رموز اللغات:** `npm run i18n:locales` يتحقق من تطابق مصفوفة `codes` مع مفاتيح جدول `L` في `i18n.js`.
+
 ### CI (GitHub Actions)
 
 - Workflow: `.github/workflows/i18n-check.yml` — عند تغيير `i18n.js` أو `scripts/check-i18n-keys.js` يشغّل `node --check i18n.js` ثم `node scripts/check-i18n-keys.js` من مجلد `financial-consulting/iif-fund-demo`.

@@ -1654,14 +1654,6 @@
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
     }
 
-    .services-highlight h3 {
-      font-size: 1.12rem;
-      font-weight: 650;
-      margin: 0 0 var(--space-3);
-      line-height: 1.35;
-      color: var(--color-text-main);
-    }
-
     .services-highlight p {
       font-size: 0.95rem;
       line-height: 1.68;
@@ -1671,6 +1663,192 @@
 
     .services-highlight p:last-child {
       margin-bottom: 0;
+    }
+
+    .services-audience-block {
+      margin-bottom: var(--space-5);
+      max-width: min(48rem, 100%);
+    }
+
+    .services-audience-lead {
+      margin: 0 0 var(--space-2);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .services-audience-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .services-chip {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(201, 162, 39, 0.08);
+      border: 1px solid rgba(201, 162, 39, 0.22);
+      color: var(--color-text-main);
+    }
+
+    .services-toc {
+      margin-bottom: var(--space-6);
+      max-width: min(48rem, 100%);
+    }
+
+    .services-toc__heading {
+      margin: 0 0 var(--space-2);
+      font-size: 0.82rem;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted);
+    }
+
+    .services-toc__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2) var(--space-4);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .services-toc__list a {
+      color: var(--color-accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+    }
+
+    .services-toc__list a:hover,
+    .services-toc__list a:focus-visible {
+      text-decoration: underline;
+    }
+
+    .services-bot-points {
+      margin: 0 0 var(--space-4);
+      padding-inline-start: 1.25rem;
+      font-size: 0.95rem;
+      line-height: 1.68;
+      color: var(--color-text-main);
+    }
+
+    .services-bot-points li {
+      margin-bottom: var(--space-2);
+    }
+
+    .services-bot-points li:last-child {
+      margin-bottom: 0;
+    }
+
+    .services-compliance-link-hint {
+      margin: var(--space-2) 0 0;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--color-text-muted);
+    }
+
+    .services-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-5);
+    }
+
+    .services-actions--above-grid {
+      margin-top: var(--space-3);
+    }
+
+    .services-grid-head {
+      margin-bottom: var(--space-6);
+      max-width: min(52rem, 100%);
+    }
+
+    .services-grid-kicker {
+      margin: 0 0 var(--space-2);
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.55;
+      color: var(--color-text-main);
+    }
+
+    .services-grid-kicker a {
+      color: var(--color-accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .services-grid-kicker a:hover,
+    .services-grid-kicker a:focus-visible {
+      text-decoration: underline;
+    }
+
+    .section--services .services-institutional-hint {
+      margin-top: var(--space-4);
+      max-width: 52rem;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--color-text-muted);
+      color: color-mix(in srgb, var(--color-text-main) 82%, var(--color-text-muted) 18%);
+    }
+
+    .section--services .services-institutional-hint a {
+      color: var(--color-accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .section--services .services-institutional-hint a:hover,
+    .section--services .services-institutional-hint a:focus-visible {
+      text-decoration: underline;
+    }
+
+    #services {
+      scroll-margin-top: calc(var(--header-height, clamp(11.5rem, 30vh, 24rem)) + var(--space-3));
+    }
+
+    .services-disclaimer {
+      margin-bottom: var(--space-5);
+      max-width: min(46rem, 100%);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+    }
+
+    .services-preface .services-intro {
+      margin-bottom: 0;
+      max-width: none;
+    }
+
+    .services-preface .services-audience-block {
+      margin-bottom: 0;
+      margin-top: var(--space-5);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--color-border-subtle);
+      max-width: none;
+    }
+
+    .services-preface .services-toc {
+      margin-bottom: 0;
+      margin-top: var(--space-5);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--color-border-subtle);
+      max-width: none;
+    }
+
+    .services-postface .services-note {
+      margin-bottom: var(--space-4);
+      max-width: none;
+    }
+
+    .services-postface .services-disclaimer {
+      margin-bottom: 0;
+      max-width: none;
     }
 
     .services-grid {
@@ -1688,6 +1866,128 @@
       font-size: 1rem;
       line-height: 1.35;
       margin-bottom: var(--space-2);
+    }
+
+    .services-trust-kicker {
+      margin: calc(var(--space-2) * -1) 0 var(--space-5);
+      max-width: min(48rem, 100%);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--color-text-muted);
+      color: color-mix(in srgb, var(--color-text-main) 75%, var(--color-text-muted) 25%);
+    }
+
+    .services-trust-kicker a {
+      color: var(--color-accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .services-trust-kicker a:hover,
+    .services-trust-kicker a:focus-visible {
+      text-decoration: underline;
+    }
+
+    .services-catalog-jump-wrap {
+      margin-bottom: var(--space-6);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .services-catalog-jump {
+      font-weight: 650;
+    }
+
+    .services-sticky-subnav {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .services-sticky-subnav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: var(--space-2) var(--space-3);
+        position: sticky;
+        top: calc(var(--header-height, clamp(11.5rem, 30vh, 24rem)) + var(--space-2));
+        z-index: 8;
+        margin: 0 0 var(--space-5);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border-subtle);
+        background: linear-gradient(180deg, rgba(8, 10, 14, 0.92) 0%, rgba(8, 10, 14, 0.88) 100%);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .services-sticky-subnav a {
+        font-size: 0.78rem;
+        font-weight: 650;
+        color: var(--color-accent-gold);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .services-sticky-subnav a:hover,
+      .services-sticky-subnav a:focus-visible {
+        text-decoration: underline;
+      }
+
+      .services-sticky-subnav .services-sticky-subnav__sep {
+        color: var(--color-border-subtle);
+        font-size: 0.65rem;
+        user-select: none;
+      }
+    }
+
+    @media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+      .services-sticky-subnav {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+    }
+
+    .services-highlight__title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: var(--space-3);
+      margin: 0 0 var(--space-3);
+      font-size: 1.12rem;
+      font-weight: 650;
+      line-height: 1.35;
+      color: var(--color-text-main);
+    }
+
+    .services-highlight__title .gov-bot-badge {
+      flex-shrink: 0;
+      font-size: 0.68rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(201, 162, 39, 0.45);
+      background: rgba(201, 162, 39, 0.12);
+      color: var(--color-accent-gold-soft);
+    }
+
+    .services-highlight__title .gov-bot-title-text {
+      flex: 1 1 12rem;
+      min-width: 0;
+    }
+
+    .services-grid .service-card-anchor {
+      border-inline-start: 3px solid rgba(201, 162, 39, 0.35);
+      transition: border-inline-start-color var(--transition), transform var(--transition);
+    }
+
+    .services-grid .service-card-anchor:hover,
+    .services-grid .service-card-anchor:focus-visible {
+      border-inline-start-color: var(--color-accent-gold);
     }
 
     @media (min-width: 601px) and (max-width: 900px) {
@@ -1714,6 +2014,57 @@
 
     .section:first-of-type {
       border-top: none;
+    }
+
+    /* توحيد مظهر جميع أقسام الصفحة العامة: إطار واحد لكل قسم (ما عدا البطل) */
+    #main-content > .section {
+      padding: var(--space-10) var(--space-6);
+      margin-bottom: var(--space-5);
+      border-top: none;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border-subtle);
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    #main-content > .section .section__title {
+      margin-bottom: var(--space-6);
+    }
+
+    /* قسم الخدمات له بطاقات داخلية مخصصة — لا إطار خارجي مزدوج */
+    #main-content > .section.section--services {
+      padding: var(--space-16) 0;
+      margin-bottom: var(--space-5);
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    #main-content > .section.section--services .section__title {
+      margin-bottom: var(--space-10);
+    }
+
+    @media (max-width: 600px) {
+      #main-content > .section {
+        padding: var(--space-8) var(--space-4);
+        margin-bottom: var(--space-4);
+      }
+
+      #main-content > .section.section--services {
+        padding: var(--space-12) 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #main-content > .section {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
     }
 
     .section__title {
@@ -1834,6 +2185,19 @@
     .card:hover {
       box-shadow: var(--shadow-card-hover);
       border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .card.services-preface {
+      margin-bottom: var(--space-6);
+      padding: var(--space-6) var(--space-7);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    }
+
+    .card.services-postface {
+      margin-bottom: var(--space-6);
+      padding: var(--space-5) var(--space-6);
+      max-width: min(52rem, 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
     }
 
     .card h3 {
@@ -4044,6 +4408,69 @@
       color: #111 !important;
       padding: 0.5rem;
       font-size: 0.95rem;
+    }
+
+    .iif-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .iif-lang-combobox-wrap {
+      position: relative;
+      min-width: 10rem;
+      max-width: 16rem;
+    }
+
+    .iif-lang-combobox-wrap .iif-lang-combobox-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      background: #fff;
+      color: #111;
+      font-size: 0.85rem;
+    }
+
+    .iif-lang-combobox-wrap .iif-lang-combobox-input:focus {
+      outline: none;
+      border-color: var(--color-accent-gold);
+    }
+
+    .iif-lang-combobox-list {
+      position: absolute;
+      z-index: 80;
+      left: 0;
+      right: 0;
+      top: calc(100% + 2px);
+      max-height: 14rem;
+      overflow: auto;
+      margin: 0;
+      padding: 0.25rem 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .iif-lang-combobox-list li[role="option"] {
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+      color: #111;
+      cursor: pointer;
+    }
+
+    .iif-lang-combobox-list li[role="option"]:hover,
+    .iif-lang-combobox__opt--active {
+      background: rgba(201, 162, 39, 0.15);
     }
 
     /* Search in header — صف منفصل على الشاشات الضيقة حتى لا يغطي القوائم */
@@ -9035,70 +9462,13 @@
           </div>
           <div class="lang-picker-wrap" aria-label="Language">
             <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
-            <select id="iif-lang-picker" title="Language">
-              <option value="en">English</option>
-              <option value="ar">العربية</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="es">Español</option>
-              <option value="pt">Português</option>
-              <option value="it">Italiano</option>
-              <option value="ru">Русский</option>
-              <option value="zh">中文</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
-              <option value="hi">हिन्दी</option>
-              <option value="bn">বাংলা</option>
-              <option value="tr">Türkçe</option>
-              <option value="fa">فارسی</option>
-              <option value="ur">اردو</option>
-              <option value="id">Bahasa Indonesia</option>
-              <option value="ms">Bahasa Melayu</option>
-              <option value="th">ไทย</option>
-              <option value="vi">Tiếng Việt</option>
-              <option value="pl">Polski</option>
-              <option value="nl">Nederlands</option>
-              <option value="el">Ελληνικά</option>
-              <option value="sv">Svenska</option>
-              <option value="no">Norsk</option>
-              <option value="da">Dansk</option>
-              <option value="fi">Suomi</option>
-              <option value="uk">Українська</option>
-              <option value="ro">Română</option>
-              <option value="hu">Magyar</option>
-              <option value="cs">Čeština</option>
-              <option value="sk">Slovenčina</option>
-              <option value="bg">Български</option>
-              <option value="hr">Hrvatski</option>
-              <option value="sr">Српски</option>
-              <option value="sl">Slovenščina</option>
-              <option value="he">עברית</option>
-              <option value="am">አማርኛ</option>
-              <option value="sw">Kiswahili</option>
-              <option value="ne">नेपाली</option>
-              <option value="si">සිංහල</option>
-              <option value="my">မြန်မာ</option>
-              <option value="km">ភាសាខ្មែរ</option>
-              <option value="lo">ລາວ</option>
-              <option value="ta">தமிழ்</option>
-              <option value="te">తెలుగు</option>
-              <option value="mr">मराठी</option>
-              <option value="gu">ગુજરાતી</option>
-              <option value="kn">ಕನ್ನಡ</option>
-              <option value="ml">മലയാളം</option>
-              <option value="pa">ਪੰਜਾਬੀ</option>
-              <option value="sq">Shqip</option>
-              <option value="mk">Македонски</option>
-              <option value="hy">Հայերեն</option>
-              <option value="ka">ქართული</option>
-              <option value="az">Azərbaycan</option>
-              <option value="kk">Қазақ</option>
-              <option value="uz">Oʻzbek</option>
-              <option value="mn">Монгол</option>
-              <option value="ca">Català</option>
-              <option value="eu">Euskara</option>
-              <option value="gl">Galego</option>
-            </select>
+            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap">
+              <input type="text" id="iif-lang-picker-input" class="iif-lang-combobox-input" autocomplete="off"
+                role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-list"
+                aria-autocomplete="list" placeholder="" title="Language" />
+              <ul class="iif-lang-combobox-list" id="iif-lang-picker-list" role="listbox" hidden></ul>
+              <select id="iif-lang-picker" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
+            </div>
           </div>
           <script>
             (function () {
@@ -9980,7 +10350,13 @@
           </div>
           <div class="lang-picker-wrap lang-picker-wrap--dashboard" aria-label="Language">
             <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
-            <select id="iif-lang-picker-dashboard" title="Language"></select>
+            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap-dashboard">
+              <input type="text" id="iif-lang-picker-dashboard-input" class="iif-lang-combobox-input" autocomplete="off"
+                role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
+                aria-autocomplete="list" title="Language" />
+              <ul class="iif-lang-combobox-list" id="iif-lang-picker-dashboard-list" role="listbox" hidden></ul>
+              <select id="iif-lang-picker-dashboard" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
+            </div>
           </div>
           <div class="site-header__auth-btns">
             <!-- Local only: Search engine (SearXNG) — same pattern as main site header -->
@@ -12274,33 +12650,82 @@
     <!-- Services — أولوية مهام الصندوق + صريح: مشاريع، وساطات، استقطاب دولي (انظر المقدمة والبطاقة ٤) -->
     <section id="services" class="section section--services">
       <h2 class="section__title" data-i18n="sectionServices">Services</h2>
-      <div class="services-intro">
-        <p data-i18n="servicesLead" data-i18n-html="true">Structured for governments, institutions, corporates, funds,
-          family offices, and NGOs — <strong>ordered by priority</strong> from the Fund’s mandate: advisory and studies
-          first, then capital and mediation, governance, sector programs, and supporting channels.</p>
-        <p data-i18n="servicesInstitutionalHint" class="services-institutional-hint"
-          style="margin-top: var(--space-4); font-size: 0.92rem; color: var(--color-text-muted); max-width: 52rem;">Institutional advisory, financing, and feasibility mandates are subject to separate suitability, contracts, and KYC — not implied by browsing or using free site tools alone.</p>
+      <p class="services-trust-kicker" data-i18n="servicesTrustKicker" data-i18n-html="true">Institutional engagement is contract- and KYC-governed — see <a href="#trust-entry">Trust &amp; paths</a> and <a href="#compliance">Compliance</a>.</p>
+      <div class="services-catalog-jump-wrap">
+        <a href="#services-cards" class="btn btn--primary btn-sm services-catalog-jump" data-i18n="servicesCatalogJump" data-i18n-html="true">Jump to the <strong>14-service catalogue</strong> →</a>
       </div>
-      <div class="card services-highlight" id="government-bot" role="region" aria-label="Government BOT umbrella">
-        <h3 data-i18n="govBotTitle">Government BOT — Fund-led umbrella</h3>
-        <p data-i18n="govBotBody" data-i18n-html="true">For one or more host states, the Fund can act as the
-          <strong>central umbrella</strong>: structuring <strong>BOT</strong> participation, <strong>managing
-            delivery</strong> with global companies that have the capacity to execute, and <strong>attracting international
-            financing firms and banks</strong> that can fund and accept BOT/project-finance models—so governments, global
-          contractors, financiers, and the Fund share aligned benefits.</p>
+      <nav class="services-sticky-subnav" data-i18n-aria-label="servicesStickyNavAria" aria-label="Services — quick links on this page">
+        <a href="#services-cards" data-i18n="servicesJumpCards">Service catalogue</a>
+        <span class="services-sticky-subnav__sep" aria-hidden="true">·</span>
+        <a href="#government-bot" data-i18n="servicesJumpBot">BOT overview</a>
+        <span class="services-sticky-subnav__sep" aria-hidden="true">·</span>
+        <a href="#compliance" data-i18n="servicesJumpCompliance">Compliance</a>
+      </nav>
+      <div class="card services-preface">
+        <div class="services-intro">
+          <p data-i18n="servicesLead" data-i18n-html="true">Structured for governments, institutions, corporates, funds,
+            family offices, and NGOs — <strong>ordered by priority</strong> from the Fund’s mandate: advisory and studies
+            first, then capital and mediation, governance, sector programs, and supporting channels.</p>
+          <p data-i18n="servicesInstitutionalHint" data-i18n-html="true" class="services-institutional-hint">Institutional advisory, financing, and feasibility require separate contracts and KYC — <strong>not</strong> implied by browsing or free site tools. See <a href="#trust-entry">Trust &amp; paths</a> · <a href="#terms">Terms</a>.</p>
+        </div>
+        <div class="services-audience-block">
+          <p class="services-audience-lead" data-i18n="servicesAudienceLead">Typical counterparts:</p>
+          <ul class="services-audience-chips" role="list">
+            <li><span class="services-chip" data-i18n="servicesChipGov">Governments &amp; public entities</span></li>
+            <li><span class="services-chip" data-i18n="servicesChipCompanies">Companies &amp; contractors</span></li>
+            <li><span class="services-chip" data-i18n="servicesChipInvestors">Investors &amp; institutions</span></li>
+          </ul>
+        </div>
+        <nav class="services-toc" aria-labelledby="services-toc-heading">
+          <p id="services-toc-heading" class="services-toc__heading" data-i18n="servicesJumpLabel">On this page</p>
+          <ul class="services-toc__list">
+            <li><a href="#government-bot" data-i18n="servicesJumpBot">BOT overview</a></li>
+            <li><a href="#services-cards" data-i18n="servicesJumpCards">Service catalogue</a></li>
+            <li><a href="#compliance" data-i18n="servicesJumpCompliance">Compliance</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="card services-highlight" id="government-bot" role="region" aria-labelledby="gov-bot-heading">
+        <h3 id="gov-bot-heading" class="services-highlight__title">
+          <span class="gov-bot-badge" data-i18n="govBotBadge">BOT</span>
+          <span class="gov-bot-title-text" data-i18n="govBotTitle">Government BOT — Fund-led umbrella</span>
+        </h3>
+        <ul class="services-bot-points">
+          <li data-i18n="govBotBullet1" data-i18n-html="true">Act as the <strong>central umbrella</strong> for one or more host states under BOT-style structures.</li>
+          <li data-i18n="govBotBullet2" data-i18n-html="true"><strong>Manage delivery</strong> with global companies that have proven execution capacity.</li>
+          <li data-i18n="govBotBullet3" data-i18n-html="true"><strong>Mobilize banks and project-finance institutions</strong> that can fund and accept BOT/project models.</li>
+          <li data-i18n="govBotBullet4" data-i18n-html="true">Align roles and benefits across <strong>governments, contractors, financiers, and the Fund</strong> under clear governance.</li>
+        </ul>
+        <div class="services-actions">
+          <a href="#financial-consultation" class="btn btn--ghost btn-sm" data-i18n="navFinConsult">Financial consultation</a>
+          <a href="#financing-request" class="btn btn--ghost btn-sm" data-i18n="sectionFinancing">Financing request</a>
+          <a href="#contact" class="btn btn--ghost btn-sm" data-i18n="navContact">Contact</a>
+        </div>
         <p class="services-compliance-hint" style="margin-top: var(--space-4); font-size: 0.92rem;"><a href="#compliance"
             data-i18n="govBotComplianceLink" data-iif-track="link-gov-bot-compliance">Compliance, licenses &amp;
             AML/CFT →</a></p>
+        <p class="services-compliance-link-hint" data-i18n="servicesComplianceLinkHint">This link jumps to the Compliance &amp; licenses section on this page (registrations, transparency context, and AML/CFT references).</p>
       </div>
-      <div class="services-note">
-        <p data-i18n="servicesNoteCore" data-i18n-html="true"><strong>Also core to the Fund:</strong> an active pipeline
-          of <strong>investment projects</strong>, <strong>mediation</strong> between financiers and beneficiaries
-          (including cross-border deals), and <strong>outreach to global companies and investors</strong> — see the
-          projects section and contact channels below.</p>
-        <p data-i18n="servicesNoteHint">Each card opens the related section: forms, projects, governance, sectors, or
-          programs.</p>
+      <div class="card services-postface">
+        <div class="services-note">
+          <p data-i18n="servicesNoteCore" data-i18n-html="true"><strong>Also core to the Fund:</strong> an active pipeline
+            of <strong>investment projects</strong>, <strong>mediation</strong> between financiers and beneficiaries
+            (including cross-border deals), and <strong>outreach to global companies and investors</strong> — see the
+            projects section and contact channels below.</p>
+          <p data-i18n="servicesNoteHint">Each card opens the related section: forms, projects, governance, sectors, or
+            programs.</p>
+        </div>
+        <p class="services-disclaimer" data-i18n="servicesBriefDisclaimer">Service descriptions here are informational; binding scope follows contracts, KYC, and applicable law — see Terms.</p>
       </div>
-      <div class="grid-3 services-grid">
+      <div class="services-grid-head">
+        <p id="services-grid-kicker" class="services-grid-kicker" data-i18n="servicesGridKicker" data-i18n-html="true">Choose a card below to open the related section — forms, sectors, governance, or contact.</p>
+        <div class="services-actions services-actions--above-grid" role="group" aria-labelledby="services-grid-kicker">
+          <a href="#financial-consultation" class="btn btn--ghost btn-sm" data-i18n="navFinConsult">Financial consultation</a>
+          <a href="#financing-request" class="btn btn--ghost btn-sm" data-i18n="sectionFinancing">Financing request</a>
+          <a href="#contact" class="btn btn--ghost btn-sm" data-i18n="navContact">Contact</a>
+        </div>
+      </div>
+      <div id="services-cards" class="grid-3 services-grid">
         <a href="#financial-consultation" class="card service-card-anchor">
           <h3 data-i18n="svc01Title">1 · Financial Advisory</h3>
           <p data-i18n="svc01Desc">Capital planning, debt & corporate restructuring, and valuations — for public, private,
@@ -15421,7 +15846,9 @@ Generated: ${new Date().toLocaleString()}
   <script src="js/iif-same-page-hash-nav.js"></script>
   <script src="js/iif-header-links-toggle.js"></script>
   <script src="js/iif-first-load-shell.js"></script>
+  <script src="i18n-service-packs-all.js" defer></script>
   <script src="i18n.js" defer></script>
+  <script src="js/iif-lang-combobox.js" defer></script>
   <script src="iif-machine-translate.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"
     defer></script>
@@ -16213,13 +16640,11 @@ Generated: ${new Date().toLocaleString()}
         } catch (eSyncUrl) { }
       }
       function initDashboardLangPickerSync() {
-        var IIF_DASH_LANG_PRIORITY = ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'];
         var mainEl = document.getElementById('iif-lang-picker');
         var dash = document.getElementById('iif-lang-picker-dashboard');
         if (!dash) return;
         function rebuildDashOptions() {
           dash.innerHTML = '';
-          var cur = (document.documentElement.getAttribute('data-lang') || DEFAULT_LANG).trim().toLowerCase();
           var added = Object.create(null);
           function addCode(code) {
             if (!code || added[code]) return;
@@ -16238,9 +16663,19 @@ Generated: ${new Date().toLocaleString()}
             dash.appendChild(opt);
             added[code] = true;
           }
-          if (cur && IIF_DASH_LANG_PRIORITY.indexOf(cur) < 0) addCode(cur);
-          for (var pi = 0; pi < IIF_DASH_LANG_PRIORITY.length; pi++) {
-            addCode(IIF_DASH_LANG_PRIORITY[pi]);
+          if (mainEl && mainEl.options && mainEl.options.length) {
+            for (var oi = 0; oi < mainEl.options.length; oi++) {
+              addCode((mainEl.options[oi].value || '').trim().toLowerCase());
+            }
+          } else if (window.IIF_I18N && IIF_I18N.codes && IIF_I18N.codes.length) {
+            for (var ci = 0; ci < IIF_I18N.codes.length; ci++) {
+              addCode(IIF_I18N.codes[ci]);
+            }
+          } else {
+            var fallback = ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'];
+            for (var fi = 0; fi < fallback.length; fi++) {
+              addCode(fallback[fi]);
+            }
           }
         }
         rebuildDashOptions();
@@ -16272,6 +16707,9 @@ Generated: ${new Date().toLocaleString()}
       function initSiteLang() {
         var picker = document.getElementById('iif-lang-picker');
         if (window.IIF_I18N) {
+          if (typeof window.IIF_fillLangSelectFromI18n === 'function' && picker) {
+            try { window.IIF_fillLangSelectFromI18n(picker); } catch (eFill) { }
+          }
           var lang = '';
           var params = new URLSearchParams(window.location.search || '');
           var qLang = (params.get('lang') || '').trim().toLowerCase();
@@ -16369,6 +16807,9 @@ Generated: ${new Date().toLocaleString()}
         try {
           initDashboardLangPickerSync();
         } catch (eDashLangPick) { }
+        if (typeof window.IIF_initLangPickerUI === 'function') {
+          try { window.IIF_initLangPickerUI(); } catch (eCombo) { }
+        }
       }
 
       /* قوائم التنقل المنسدلة — إبقاء القائمة داخل عرض الشاشة (يجب تعريفها قبل initSiteLang) */
