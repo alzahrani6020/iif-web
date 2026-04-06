@@ -5461,6 +5461,47 @@
       padding: 0.55rem clamp(var(--space-4), 3vw, var(--space-8));
       min-height: 3.25rem;
       box-sizing: border-box;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+    }
+
+    #dashboard-overlay .dashboard-header-bar .site-header__brand {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex: 0 1 auto;
+    }
+
+    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard .lang-picker-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(226, 232, 240, 0.88);
+      white-space: nowrap;
+    }
+
+    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard select {
+      max-width: min(52vw, 220px);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm, 6px);
+    }
+
+    @media (max-width: 480px) {
+      #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard .lang-picker-label {
+        display: none;
+      }
+
+      #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard select {
+        max-width: min(72vw, 280px);
+      }
     }
 
     @media (max-width: 640px) {
@@ -9936,6 +9977,10 @@
             <strong class="site-name" id="dashboard-overlay-title">
               <span data-i18n="dashTitle">International Investment Fund — Dashboard</span>
             </strong>
+          </div>
+          <div class="lang-picker-wrap lang-picker-wrap--dashboard" aria-label="Language">
+            <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
+            <select id="iif-lang-picker-dashboard" title="Language"></select>
           </div>
           <div class="site-header__auth-btns">
             <!-- Local only: Search engine (SearXNG) — same pattern as main site header -->
@@ -16167,6 +16212,63 @@ Generated: ${new Date().toLocaleString()}
           if (next !== cur) history.replaceState({}, '', next);
         } catch (eSyncUrl) { }
       }
+      function initDashboardLangPickerSync() {
+        var IIF_DASH_LANG_PRIORITY = ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'];
+        var mainEl = document.getElementById('iif-lang-picker');
+        var dash = document.getElementById('iif-lang-picker-dashboard');
+        if (!dash) return;
+        function rebuildDashOptions() {
+          dash.innerHTML = '';
+          var cur = (document.documentElement.getAttribute('data-lang') || DEFAULT_LANG).trim().toLowerCase();
+          var added = Object.create(null);
+          function addCode(code) {
+            if (!code || added[code]) return;
+            if (window.IIF_I18N && IIF_I18N.codes && IIF_I18N.codes.indexOf(code) < 0) return;
+            var opt = document.createElement('option');
+            opt.value = code;
+            var label = '';
+            if (mainEl) {
+              var srcOpt = mainEl.querySelector('option[value="' + code + '"]');
+              if (srcOpt && srcOpt.textContent) label = String(srcOpt.textContent).trim();
+            }
+            if (!label && window.IIF_I18N && IIF_I18N.langs && IIF_I18N.langs[code]) {
+              label = IIF_I18N.langs[code].name || code;
+            }
+            opt.textContent = label || code;
+            dash.appendChild(opt);
+            added[code] = true;
+          }
+          if (cur && IIF_DASH_LANG_PRIORITY.indexOf(cur) < 0) addCode(cur);
+          for (var pi = 0; pi < IIF_DASH_LANG_PRIORITY.length; pi++) {
+            addCode(IIF_DASH_LANG_PRIORITY[pi]);
+          }
+        }
+        rebuildDashOptions();
+        function syncDashFromDoc() {
+          var l = (document.documentElement.getAttribute('data-lang') || DEFAULT_LANG).trim().toLowerCase();
+          if (!dash.querySelector('option[value="' + l + '"]')) rebuildDashOptions();
+          if (dash.querySelector('option[value="' + l + '"]')) dash.value = l;
+        }
+        syncDashFromDoc();
+        if (!window._iifDashLangListenersBound) {
+          window._iifDashLangListenersBound = true;
+          dash.addEventListener('change', function () {
+            var v = (this.value || '').trim().toLowerCase() || DEFAULT_LANG;
+            var m = document.getElementById('iif-lang-picker');
+            if (m && m.options && m.querySelector('option[value="' + v + '"]')) {
+              m.value = v;
+              m.dispatchEvent(new Event('change', { bubbles: true }));
+            } else if (window.IIF_I18N && typeof IIF_I18N.apply === 'function') {
+              IIF_I18N.apply(v);
+              if (typeof iifSyncLangQueryParam === 'function') iifSyncLangQueryParam(v);
+            }
+          });
+          window.addEventListener('iif-lang-change', function () {
+            syncDashFromDoc();
+          });
+        }
+      }
+
       function initSiteLang() {
         var picker = document.getElementById('iif-lang-picker');
         if (window.IIF_I18N) {
@@ -16264,6 +16366,9 @@ Generated: ${new Date().toLocaleString()}
             gEl.style.display = isLocal || isGhPages ? 'inline-flex' : 'none';
           });
         } catch (eLocalOnly) { }
+        try {
+          initDashboardLangPickerSync();
+        } catch (eDashLangPick) { }
       }
 
       /* قوائم التنقل المنسدلة — إبقاء القائمة داخل عرض الشاشة (يجب تعريفها قبل initSiteLang) */
