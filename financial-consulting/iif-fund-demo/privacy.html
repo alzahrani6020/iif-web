@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-iif-leaf-static="1">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.sheetjs.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https:; frame-src https://translate.google.com https://www.google.com https://www.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:; object-src 'none'; upgrade-insecure-requests; worker-src 'self'" />
@@ -22,7 +22,6 @@
     h2 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: #c9a227; }
     p, li { margin: 0.5rem 0; }
     ul { padding-inline-start: 1.25rem; }
-    .back { margin-bottom: 1.25rem; }
     .ar { direction: rtl; font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; border-inline-start: 3px solid rgba(201, 162, 39, 0.55); padding-inline-start: 1rem; margin-top: 1.25rem; color: #cbd5e1; }
     .muted { color: #94a3b8; font-size: 0.9rem; }
     table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0.75rem 0; }
@@ -32,7 +31,15 @@
 </head>
 <body>
   <div id="iif-first-load-shell" class="iif-first-load-shell" role="progressbar" aria-label="Loading" aria-busy="true"></div>
-  <p class="back"><a href="index.html">← Home</a> · <a href="about-institution.html">About</a> · <a href="index.html#terms">Terms</a></p>
+  <nav class="iif-leaf-nav" data-i18n-aria-label="leafNavA11ySiteShortcuts" aria-label="Site shortcuts">
+    <ul class="iif-leaf-nav__list">
+      <li><a href="index.html"><span data-i18n="leafNavHome">← Home</span></a></li>
+      <li><a href="privacy.html"><span data-i18n="navPrivacyPage">Privacy</span></a></li>
+      <li><a href="transparency.html"><span data-i18n="leafNavTransparency">Transparency</span></a></li>
+      <li><a href="about-institution.html"><span data-i18n="navAbout">About</span></a></li>
+      <li><a href="index.html#terms"><span data-i18n="footerTerms">Terms</span></a></li>
+    </ul>
+  </nav>
   <h1>Privacy policy (website)</h1>
   <p class="muted">Last updated with site releases — not legal advice. Institutional processing under KYC/contracts is governed by those instruments and the main <a href="index.html#terms">Terms</a>.</p>
 
@@ -80,6 +87,8 @@
     <h2 style="margin-top:0;">ملخص عربي</h2>
     <p>الموقع الثابت قد يخزّن تفضيلاتك وبيانات الجلسة والملف الشخصي في <strong>متصفحك</strong>. تُحمَّل خطوط العرض من نفس الأصل عادةً؛ روابط البحث والترجمة وبعض السكربتات تتصل بمزوّدين خارجيين. يمكنك مسح بيانات الموقع من إعدادات المتصفح. التفاصيل التعاقدية وKYC تُنظَّم عبر نماذج الصندوق والشروط على الصفحة الرئيسية.</p>
   </div>
+  <script src="i18n.js" defer></script>
+  <script src="js/iif-leaf-i18n-boot.js" defer></script>
   <script src="js/iif-first-load-shell.js" defer></script>
   <script src="js/public-leaf-pages-newtab.js" defer></script>
 </body>

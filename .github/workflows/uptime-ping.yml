@@ -32,6 +32,14 @@ jobs:
           echo "$code <- $url"
           test "$code" = "200"
 
+      - name: GitHub Pages — transparency.html
+        run: |
+          set -e
+          url="https://alzahrani6020.github.io/iif-web/transparency.html"
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -L --max-time 45 "$url")
+          echo "$code <- $url"
+          test "$code" = "200"
+
   vercel-searx-proxy-optional:
     runs-on: ubuntu-latest
     steps:

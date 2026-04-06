@@ -1,5 +1,10 @@
 (function () {
-  var STORAGE_KEY = 'iif-header-section-links-hidden';
+  var STORAGE_KEY = 'iif-header-collapsed';
+  var LEGACY_KEY = 'iif-header-section-links-hidden';
+
+  function mainPublicHeader() {
+    return document.querySelector('body > header.site-header:not(.dashboard-header-bar)');
+  }
 
   function closeAuxMenus() {
     var govBtn = document.getElementById('gov-menu-btn');
@@ -22,17 +27,25 @@
     if (md) md.setAttribute('aria-hidden', 'true');
   }
 
+  function migrateLegacyStorage() {
+    try {
+      if (localStorage.getItem(LEGACY_KEY) === '1' && localStorage.getItem(STORAGE_KEY) == null) {
+        localStorage.setItem(STORAGE_KEY, '1');
+      }
+      localStorage.removeItem(LEGACY_KEY);
+    } catch (e) { /* ignore */ }
+  }
+
   function init() {
     var btn = document.getElementById('iif-toggle-section-links');
     if (!btn) return;
-    var targets = document.querySelectorAll('.iif-header-collapsible-target');
-    if (!targets.length) return;
+    var header = mainPublicHeader();
+    if (!header) return;
+
+    migrateLegacyStorage();
 
     function setCollapsed(collapsed) {
-      targets.forEach(function (el) {
-        if (collapsed) el.setAttribute('hidden', '');
-        else el.removeAttribute('hidden');
-      });
+      header.classList.toggle('iif-header-collapsed', collapsed);
       btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
       var hideLbl = btn.querySelector('[data-iif-toggle-label="hide"]');
       var showLbl = btn.querySelector('[data-iif-toggle-label="show"]');

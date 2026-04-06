@@ -1,0 +1,30 @@
+name: i18n check
+
+on:
+  push:
+    paths:
+      - 'financial-consulting/iif-fund-demo/i18n.js'
+      - 'financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js'
+      - '.github/workflows/i18n-check.yml'
+  pull_request:
+    paths:
+      - 'financial-consulting/iif-fund-demo/i18n.js'
+      - 'financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js'
+      - '.github/workflows/i18n-check.yml'
+  workflow_dispatch:
+
+jobs:
+  i18n:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: financial-consulting/iif-fund-demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Syntax check i18n.js
+        run: node --check i18n.js
+      - name: Key parity (IMPORTANT_15 vs English)
+        run: node scripts/check-i18n-keys.js

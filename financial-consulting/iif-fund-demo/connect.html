@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-iif-leaf-static="1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -23,7 +23,15 @@
   </style>
 </head>
 <body>
-  <p class="muted"><a href="index.html">← Home</a></p>
+  <nav class="iif-leaf-nav" data-i18n-aria-label="leafNavA11ySiteShortcuts" aria-label="Site shortcuts">
+    <ul class="iif-leaf-nav__list">
+      <li><a href="index.html"><span data-i18n="leafNavHome">← Home</span></a></li>
+      <li><a href="privacy.html"><span data-i18n="navPrivacyPage">Privacy</span></a></li>
+      <li><a href="transparency.html"><span data-i18n="leafNavTransparency">Transparency</span></a></li>
+      <li><a href="about-institution.html"><span data-i18n="navAbout">About</span></a></li>
+      <li><a href="index.html#terms"><span data-i18n="footerTerms">Terms</span></a></li>
+    </ul>
+  </nav>
   <h1>Connect (APIs)</h1>
   <p class="muted">When served via the project dev server or Vercel, typical public JSON endpoints include:</p>
   <ul>
@@ -32,5 +40,7 @@
     <li><code>/diagnostics.json</code> — lightweight dev diagnostics (when enabled)</li>
   </ul>
   <p class="muted">See <code>SITE-OPS.md</code> and <code>.env.example</code> for environment variables and deployment notes.</p>
+  <script src="i18n.js" defer></script>
+  <script src="js/iif-leaf-i18n-boot.js" defer></script>
 </body>
 </html>

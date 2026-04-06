@@ -141,3 +141,33 @@ body:not(:has(#main-content)) a:focus-visible {
     background: rgba(201, 162, 39, 0.55);
   }
 }
+
+/* Leaf / static pages — top shortcut row (unified look vs inline .back / .muted strips) */
+.iif-leaf-nav {
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.iif-leaf-nav__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.15rem;
+  row-gap: 0.35rem;
+}
+
+.iif-leaf-nav__list li {
+  display: flex;
+  align-items: center;
+}
+
+.iif-leaf-nav__list li + li::before {
+  content: '·';
+  color: #94a3b8;
+  margin: 0 0.35rem;
+  pointer-events: none;
+}

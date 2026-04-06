@@ -50,7 +50,7 @@ if (cspIdx < 0) {
 }
 
 /* HTML */
-const htmlFiles = ['index.html', 'admin-standalone.html', 'privacy.html', 'about-institution.html'];
+const htmlFiles = ['index.html', 'admin-standalone.html', 'privacy.html', 'transparency.html', 'about-institution.html'];
 const metaLine = htmlMetaLine();
 
 for (const name of htmlFiles) {

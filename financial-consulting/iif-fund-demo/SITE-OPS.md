@@ -43,6 +43,13 @@ Vercel project URL:      (لوحة Vercel → Domains)
 2. من موقع GitHub Pages: ميزة التحليل التي تستدعي `fetchSearxPack` تعمل دون خطأ CORS.
 3. راجع **Logs** في Vercel إذا ازدادت الطلبات غير المتوقعة.
 
+### فحص واجهة الصندوق محلياً (بعد تغييرات UI أو RSS)
+
+من جذر المستودع:
+
+- `npm run smoke:with-server` — خادم مؤقت ثم فحص HTML وروابط و`/api/news`.
+- `npm run check:news-feeds` — التحقق من استجابة خلاصات RSS المعرّفة في `api/news.js`.
+
 ## GitHub Pages
 
 - Workflow **excludes** `api/` from the static artifact so serverless source is not published as raw files on Pages.
@@ -64,9 +71,26 @@ Vercel project URL:      (لوحة Vercel → Domains)
 - Workflow **Uptime ping** checks the GitHub Pages home URL and `privacy.html`, and performs an informational request to the Vercel proxy URL.
 - في GitHub: **Settings → Notifications → Actions** — فعّل إشعار فشل سير العمل إن رغبت (لا يُضبط من المستودع).
 
+## سجل نسخ نصوص حساسة (يدوي)
+
+عند تغيير نصوص تؤثر على الامتثال أو التوقعات القانونية للزائر، سجّل صفاً في الجدول أدناه (أو في نظام تذاكركم) حتى يتسنّى المراجعة لاحقاً.
+
+| التاريخ (UTC) | القسم / الملف | ملخص التغيير |
+|---------------|---------------|----------------|
+| 2026-04-05 | `index.html` — تذييل | إضافة رابط `transparency.html` مع `footerTransparencyPage` (ترجمة في `i18n.js` en/ar/fr) |
+| 2026-04-05 | `i18n.js` — `T.fr` | إكمال نصوص قسم الثقة (#trust-entry … #partners-trust) بالفرنسية بدل الاعتماد على الإنجليزية |
+| 2026-04-05 | `i18n.js` — `T.fr` | إكمال بقية المفاتيح الناقصة مقابل `T.en` (خدمات، قطاعات، تذييل إداري، مؤشرات إخبارية، إلخ) — تكافؤ مفاتيح كامل للفرنسية |
+| 2026-04-05 | `i18n.js` — `de`/`it`/`es`/`zh`/`tr` | إضافة `footerTransparencyPage` المترجمة بجانب الحزم الجزئية |
+| 2026-04-05 | `about-institution.html` | رابط `transparency.html` في شريط التنقل العلوي مع الخصوصية والحوكمة |
+| 2026-04-05 | `i18n.js` — `extend(def)` | `footerTransparencyPage` بلغات الحزم الجزئية (فا، أردو، أمهرية، … بنجالي) |
+| 2026-04-05 | صفحات ورقية متعددة | توحيد شريط روابط (Home · Privacy · Transparency · About · Terms) في `search`، `health`، `diagnostics`، `analysis`، `connect`، `start-here`، `news-sources`؛ و`transparency.html` |
+| _مثال_ | `index.html` — استشارة عاجلة أونلاين | توضيح SLA والرد خلال ~48 ساعة عمل |
+| _مثال_ | `i18n.js` — `urgentOnline*` | ترجمة أو صياغة جديدة |
+| _مثال_ | `privacy.html` / KYC | بيانات أو أطراف ثالثة |
+
 ## Modularization (phased)
 
-- `index.html` is intentionally monolithic for now. Safer splits: move rare sections into separate HTML pages (like `privacy.html` / `about-institution.html`) and link from the footer or nav; avoid breaking inline script IDs.
+- `index.html` is intentionally monolithic for now. Safer splits: move rare sections into separate HTML pages (like `privacy.html` / `transparency.html` / `about-institution.html`) and link from the footer or nav; avoid breaking inline script IDs.
 
 ## مسار المستخدم (داخلي)
 
@@ -112,9 +136,20 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 
 سكربت `npm run i18n:keys` يبيّن أن بعض اللغات (مثل zh، es، de، it، tr) تفتقد مفاتيح كثيرة وتعتمد على الاحتياطي (غالباً الإنجليزية أو الفرنسية). إكمال الترجمة يدوياً أو عبر أدوات مساعدة يبقى عملاً منفصلاً عند الحاجة للجمهور.
 
+### CI (GitHub Actions)
+
+- Workflow: `.github/workflows/i18n-check.yml` — عند تغيير `i18n.js` أو `scripts/check-i18n-keys.js` يشغّل `node --check i18n.js` ثم `node scripts/check-i18n-keys.js` من مجلد `financial-consulting/iif-fund-demo`.
+- محلياً: نفس الأمرين بعد أي تعديل كبير على `i18n.js`. للتحقق الصارم من ثقب الـ dashboard في de/es/it/zh: `node scripts/check-i18n-keys.js --strict`.
+
+### صفحات ثابتة — شريط الاختصارات
+
+- الصفحات `privacy.html`، `transparency.html`، `about-institution.html`، وأدوات `search` / `diagnostics` / `health` / `analysis` / `connect` / `start-here` / `news-sources` تستخدم `<nav class="iif-leaf-nav" aria-label="Site shortcuts">` مع قائمة `<ul class="iif-leaf-nav__list">`؛ الأنماط في `css/public-shell.css`.
+- `transparency.html`: سطر تمهيدي يذكر «Last updated with site releases» بأسلوب موازٍ لـ `privacy.html`.
+- **ترجمة الشريط:** الصفحات الثابتة تحمّل `i18n.js` و`js/iif-leaf-i18n-boot.js`؛ `<html data-iif-leaf-static="1">` يمنع استبدال عنوان الصفحة وSEO. اللغة من `iif-lang` أو `?lang=`. مفاتيح `leafNav*` مترجمة في الحزم الصريحة `ar` / `fr` / `de` / `es` / `it` / `zh` / `tr`؛ اللغات المبنية على `extend(def, …)` ترث نص الإنجليزية من `def` ما لم تُخصَّص.
+
 ## Content-Security-Policy
 
-- **مصدر واحد للنص:** `config/content-security-policy.txt` — ثم شغّل `npm run csp:sync` لتحديث `vercel.json` و`netlify.toml` ووسم `<meta http-equiv="Content-Security-Policy">` في `index.html` و`admin-standalone.html` و`privacy.html` و`about-institution.html`.
+- **مصدر واحد للنص:** `config/content-security-policy.txt` — ثم شغّل `npm run csp:sync` لتحديث `vercel.json` و`netlify.toml` ووسم `<meta http-equiv="Content-Security-Policy">` في `index.html` و`admin-standalone.html` و`privacy.html` و`transparency.html` و`about-institution.html`.
 - **Vercel:** ترويسة CSP في `vercel.json` (Translate، `translate-pa.googleapis.com`، `gstatic.com`، اتصال `https:`، خطوط ذاتية).
 - **Netlify:** نفس السياسة في `netlify.toml` ضمن `[[headers]]`.
 - **GitHub Pages:** وسوم `<meta>` في HTML تُفعّل CSP حتى بدون ترويسات الخادم.
@@ -132,7 +167,7 @@ npx lighthouse@11 "https://YOUR_SITE.github.io/REPO/" --only-categories=performa
 5. **تسجيل الدخول:** فتح النافذة ثم إغلاقها يعيد التركيز إلى الزر/الرابط الذي فتحها.
 6. **لوحة التحكم:** فتح من الهيدر ثم إغلاقها يعيد التركيز إلى زر اللوحة؛ التمرير داخل اللوحة لروابط `#dashboard-…`.
 7. **وضع embed/portal:** `?iif_admin_embed=1` أو `?iif_admin_portal=1` على `admin-standalone.html` — لا يظهر شريط التحميل العام؛ تحقق أن لوحة التحكم تفتح/تغلق والتركيز يعود.
-8. **صفحات فرعية:** `privacy.html` / `about-institution.html` — الروابط تفتح في تاب جديد مع بقاء المقال؛ الخطوط تُحمَّل محلياً.
+8. **صفحات فرعية:** `privacy.html` / `transparency.html` / `about-institution.html` — الروابط تفتح في تاب جديد مع بقاء المقال؛ الخطوط تُحمَّل محلياً.
 9. **ترجمة Google (إن مفعّلة):** تظهر الويدجت دون أخطاء CSP في وحدة التحكم على نشر Vercel/Netlify.
 10. **لوحة مفاتيح:** Tab إلى «تخطي إلى المحتوى» — يظهر حلقة تركيز واضحة (`:focus-visible`).
 11. **تقليل الحركة:** في إعدادات النظام/المتصفح فعّل «تقليل الحركة» — يجب أن يتوقف تمرير التيكر ويصبح التمرير بين الأقسام فورياً (بدون `smooth`).

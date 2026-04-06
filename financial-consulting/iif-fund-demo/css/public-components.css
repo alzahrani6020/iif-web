@@ -27,3 +27,39 @@
 .logo picture {
   display: contents;
 }
+
+/* طي الهيدر العام: شريط علوي مضغوط (شعار + زر التوسيع)، إخفاء التنقّل والموجز واللوحة الجانبية */
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .site-header__tickers,
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed #iif-header-main-nav {
+  display: none !important;
+}
+
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed #iif-header-toolbar-links,
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .site-clock--in-brand {
+  display: none !important;
+}
+
+/* إبقاء اختيار اللغة ظاهراً عند طي الهيدر؛ إخفاء الدخول وبطاقة المستخدم فقط */
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .iif-header-brand-account {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2, 0.5rem);
+}
+
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .iif-header-brand-account .site-header__auth-btns--top,
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .iif-header-brand-account .header-user-card,
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .iif-header-brand-account .letterhead-header-qr-host {
+  display: none !important;
+}
+
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .site-logo__subtitle {
+  display: none;
+}
+
+body > header.site-header:not(.dashboard-header-bar).iif-header-collapsed .site-header__inner {
+  padding-block: var(--space-2, 0.5rem);
+  align-items: center;
+}

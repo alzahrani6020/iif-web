@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-iif-leaf-static="1">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -23,9 +23,19 @@
   </style>
 </head>
 <body>
-  <p class="muted"><a href="index.html">← Home</a></p>
+  <nav class="iif-leaf-nav" data-i18n-aria-label="leafNavA11ySiteShortcuts" aria-label="Site shortcuts">
+    <ul class="iif-leaf-nav__list">
+      <li><a href="index.html"><span data-i18n="leafNavHome">← Home</span></a></li>
+      <li><a href="privacy.html"><span data-i18n="navPrivacyPage">Privacy</span></a></li>
+      <li><a href="transparency.html"><span data-i18n="leafNavTransparency">Transparency</span></a></li>
+      <li><a href="about-institution.html"><span data-i18n="navAbout">About</span></a></li>
+      <li><a href="index.html#terms"><span data-i18n="footerTerms">Terms</span></a></li>
+    </ul>
+  </nav>
   <h1>Web search</h1>
   <p>On the main page, use the header search box for in-site lookup. For a self-hosted meta-search stack, run the repo dev server and open SearXNG per <code>SITE-OPS.md</code> (local default often <code>http://127.0.0.1:18080/</code>).</p>
   <p class="muted">Government entity lookup lives under the government-search flows linked from the main site.</p>
+  <script src="i18n.js" defer></script>
+  <script src="js/iif-leaf-i18n-boot.js" defer></script>
 </body>
 </html>

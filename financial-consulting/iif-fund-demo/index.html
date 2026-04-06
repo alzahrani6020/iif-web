@@ -359,9 +359,9 @@
     }
 
     .btn--ghost {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-      color: var(--color-text-main);
-      border-color: rgba(255, 255, 255, 0.25);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+      color: #f1f5fb;
+      border-color: rgba(255, 255, 255, 0.38);
       box-shadow:
         0 3px 0 rgba(0, 0, 0, 0.2),
         0 4px 12px rgba(0, 0, 0, 0.15),
@@ -369,8 +369,8 @@
     }
 
     .btn--ghost:hover {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
-      border-color: rgba(255, 255, 255, 0.35);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border-color: rgba(255, 255, 255, 0.48);
       box-shadow:
         0 4px 0 rgba(0, 0, 0, 0.15),
         0 6px 16px rgba(0, 0, 0, 0.2),
@@ -7327,10 +7327,71 @@
 
     .urgent-online-features {
       margin-bottom: var(--space-12);
+      align-items: stretch;
     }
 
     .urgent-feature-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
+      height: 100%;
+    }
+
+    .urgent-feature-card > p {
+      flex: 1 1 auto;
+      margin-bottom: var(--space-3);
+    }
+
+    .urgent-online-steps {
+      margin: 0 0 var(--space-6);
+      padding-inline-start: 1.35rem;
+      max-width: 44rem;
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .urgent-online-steps li {
+      margin-bottom: var(--space-2);
+    }
+
+    @media (max-width: 480px) {
+      .urgent-online-section .urgent-online-steps {
+        padding-inline-start: 1.1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .urgent-online-meta {
+      max-width: 44rem;
+      margin: 0 0 var(--space-6);
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      line-height: 1.55;
+    }
+
+    .urgent-online-meta a {
+      color: var(--color-accent-gold, #c9a227);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .urgent-online-meta a:hover {
+      opacity: 0.92;
+    }
+
+    .urgent-feature-card__actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      width: 100%;
+      max-width: 280px;
+      margin-top: var(--space-2);
+    }
+
+    .urgent-feature-card__actions .btn {
+      margin-top: 0;
     }
 
     .urgent-feature-icon {
@@ -7402,6 +7463,19 @@
       color: var(--color-accent-emerald);
     }
 
+    .urgent-online-success p {
+      margin: 0.4rem 0 0;
+    }
+
+    .urgent-online-success p:first-child {
+      margin-top: 0;
+    }
+
+    .urgent-online-success .urgent-online-success__next {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
     .payment-method-box {
       max-width: 560px;
       margin-bottom: var(--space-10);
@@ -7463,7 +7537,7 @@
     }
 
     .urgent-feature-card .btn {
-      margin-top: var(--space-4);
+      margin-top: 0;
     }
 
     .investor-payment-box {
@@ -8781,7 +8855,7 @@
     <span data-i18n="uiBackToTop">Back to top</span>
   </button>
 
-  <header class="site-header">
+  <header class="site-header" id="iif-public-site-header">
     <div class="site-header__inner">
       <div class="site-header__brand">
         <div class="iif-header-primary-bar">
@@ -8810,9 +8884,9 @@
             <span class="site-clock__date" id="site-clock-date"></span>
           </div>
           <button type="button" id="iif-toggle-section-links" class="iif-section-links-toggle" aria-expanded="true"
-            aria-controls="iif-header-toolbar-links iif-header-main-nav">
-            <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Hide section links</span>
-            <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Show section links</span>
+            aria-controls="iif-public-site-header">
+            <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Collapse header</span>
+            <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Expand header</span>
           </button>
           </div>
           <div id="iif-header-toolbar-links" class="iif-header-collapsible-target iif-header-toolbar-panel">
@@ -11631,6 +11705,7 @@
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip2" data-i18n-html="true">KYC / AML — see <a href="#terms">Terms</a></span>
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip3">Mandates are contractual — not implied by forms alone</span>
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip4" data-i18n-html="true">No financing approval from website submission alone → <a href="#terms">Terms</a></span>
+        <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip5" data-i18n-html="true">Unified transparency summary → <a href="transparency.html">Overview</a></span>
       </div>
       <p data-i18n="trustPathsKicker" style="font-size: 0.9rem; font-weight: 600; margin-bottom: var(--space-4); color: var(--color-text-main);">Three institutional entry points</p>
       <div class="iif-trust-paths">
@@ -11973,34 +12048,58 @@
     <!-- Urgent consultation — online (video/audio, secure chat, payment link) -->
     <section id="urgent-consultation-online" class="section urgent-online-section">
       <h2 class="section__title" data-i18n="urgentOnlineTitle">Urgent consultation — online</h2>
-      <p data-i18n="urgentOnlineIntro" style="margin-bottom: var(--space-8); max-width: 720px;">Dedicated platform of the
+      <p data-i18n="urgentOnlineIntro" style="margin-bottom: var(--space-5); max-width: 720px;">Dedicated platform of the
         International Investment Fund. Professional, high-quality online consultation with secure video/audio,
         multi-party support, encrypted chatbot, and optional payment link.</p>
+      <ol class="urgent-online-steps" aria-label="Steps">
+        <li data-i18n="urgentOnlineStep1">Pick a channel below—instant meeting, secure chat request, or payment details.</li>
+        <li data-i18n="urgentOnlineStep2">Complete the request form. KYC fields may be required before a live session or payment follow-up.</li>
+        <li data-i18n="urgentOnlineStep3">We confirm next steps by email.</li>
+      </ol>
+      <p class="urgent-online-meta" data-i18n="urgentOnlineResponseTime">Typical first acknowledgement within 1–2 business days. Flag urgency clearly in your note if timing is critical.</p>
+      <p class="urgent-online-meta" data-i18n="urgentOnlineSlaNote">When you clearly mark your note as urgent, we triage with priority where operations allow.</p>
+      <p class="urgent-online-meta" data-i18n="urgentOnlineTrustHtml" data-i18n-html="true">For how we collect, use, and retain personal data, see our <a href="privacy.html">privacy policy</a>.</p>
       <div class="grid-3 urgent-online-features">
         <div class="card urgent-feature-card">
           <div class="urgent-feature-icon" aria-hidden="true">📹</div>
           <h3 data-i18n="urgentFeatVideoTitle">Video &amp; audio call</h3>
           <p data-i18n="urgentFeatVideoDesc">High-quality, professional online meeting hosted by the Fund. Add multiple participants
             (video and audio). Secure, end-to-end protected environment.</p>
-          <button type="button" class="btn btn--primary urgent-request-video-btn" id="urgent-request-video-btn" data-i18n="urgentFeatVideoBtn">
-            Request video/audio call
-          </button>
+          <div class="urgent-feature-card__actions">
+            <button type="button" class="btn btn--primary urgent-request-video-btn" id="urgent-request-video-btn" data-i18n="urgentFeatVideoBtn">
+              Request video/audio call
+            </button>
+            <button type="button" class="btn btn--ghost btn-sm" id="urgent-schedule-video-btn" data-i18n="urgentFeatVideoBtnSchedule">
+              Coordinate via form
+            </button>
+          </div>
         </div>
         <div class="card urgent-feature-card">
           <div class="urgent-feature-icon" aria-hidden="true">🔒</div>
           <h3 data-i18n="urgentFeatChatTitle">Secure chatbot</h3>
           <p data-i18n="urgentFeatChatDesc">Encrypted chat with the Fund’s team. Protected against eavesdropping, interception, and
             unauthorized access. No spyware or breach.</p>
+          <div class="urgent-feature-card__actions">
+            <button type="button" class="btn btn--primary" id="urgent-request-chat-btn" data-i18n="urgentFeatChatBtn">
+              Request secure chat
+            </button>
+          </div>
         </div>
         <div class="card urgent-feature-card">
           <div class="urgent-feature-icon" aria-hidden="true">💳</div>
           <h3 data-i18n="urgentFeatPayTitle">Payment link</h3>
           <p data-i18n="urgentFeatPayDesc">Option to link your payment method (bank account number) for secure, compliant settlement
             of consultation fees. Handled in strict confidence.</p>
+          <div class="urgent-feature-card__actions">
+            <button type="button" class="btn btn--primary" id="urgent-proceed-pay-btn" data-i18n="urgentFeatPayBtn">
+              Official bank details
+            </button>
+          </div>
         </div>
       </div>
+      <p class="urgent-online-meta urgent-online-chat-pilot" data-i18n="urgentOnlineChatPilotHtml">The secure chat path is rolling out in stages.</p>
       <!-- طريقة الدفع — آمنة ونظامية، الحساب الرسمي للصندوق فقط -->
-      <div class="payment-method-box">
+      <div class="payment-method-box" id="urgent-payment-method">
         <p class="payment-secure-badge" data-i18n="paymentSecureBadge">Secure &amp; regulated</p>
         <h3 data-i18n="paymentFundBankTitle">Fund bank account — official payment method</h3>
         <p data-i18n="paymentFundBankDesc" style="margin-bottom: var(--space-4); font-size: 0.9rem;">For consultation fees and related
@@ -12021,6 +12120,7 @@
         </div>
       </div>
       <div class="urgent-online-form-wrap" id="urgent-request-form">
+        <p class="urgent-online-meta urgent-online-kyc-preface" style="margin-bottom: var(--space-4);" data-i18n="urgentOnlineKycHint">Identity verification (KYC) below may be required for regulatory compliance before a scheduled session or bank-related instructions.</p>
         <h3 data-i18n="urgentRequestAccessTitle">Request access</h3>
         <form id="form-urgent-online" class="urgent-online-form">
           <div class="form-row">
@@ -12119,7 +12219,10 @@
           <p class="urgent-online-form-note" data-i18n="urgentFormNote">The Fund will contact you to arrange the secure session. Data is
             handled in confidence.</p>
         </form>
-        <div id="urgent-online-success" class="urgent-online-success" hidden aria-live="polite"></div>
+        <div id="urgent-online-success" class="urgent-online-success" hidden aria-live="polite">
+          <p class="urgent-online-success__lead"></p>
+          <p class="urgent-online-success__next"></p>
+        </div>
       </div>
     </section>
 
@@ -15226,6 +15329,8 @@ Generated: ${new Date().toLocaleString()}
       <span aria-hidden="true"> · </span>
       <a href="privacy.html" data-i18n="footerPrivacyPolicy" data-iif-track="footer-privacy-page">Privacy policy</a>
       <span aria-hidden="true"> · </span>
+      <a href="transparency.html" data-i18n="footerTransparencyPage" data-iif-track="footer-transparency-page">Transparency overview</a>
+      <span aria-hidden="true"> · </span>
       <a href="about-institution.html" data-i18n="footerAboutInstitution" data-iif-track="footer-about-institution">About &amp; leadership</a>
       <span aria-hidden="true"> · </span>
       <a href="#compliance" data-i18n="footerCompliance" data-iif-track="footer-compliance">Compliance &amp;
@@ -16707,6 +16812,38 @@ Generated: ${new Date().toLocaleString()}
             }
           });
         }
+      })();
+
+      /* إغلاق قوائم التنقل المنسدلة بمفتاح Escape وإعادة التركيز إلى الزر */
+      (function initNavDropdownEscape() {
+        var configs = [
+          { wrap: 'about-dropdown-wrap', trigger: 'about-dropdown-trigger', menu: 'about-dropdown' },
+          { wrap: 'services-dropdown-wrap', trigger: 'services-dropdown-trigger', menu: 'services-dropdown' },
+          { wrap: 'more-dropdown-wrap', trigger: 'more-dropdown-trigger', menu: 'more-dropdown' }
+        ];
+        document.addEventListener('keydown', function (e) {
+          if (e.key !== 'Escape' && e.keyCode !== 27) return;
+          for (var i = 0; i < configs.length; i++) {
+            var c = configs[i];
+            var w = document.getElementById(c.wrap);
+            if (!w || !w.classList.contains('is-open')) continue;
+            w.classList.remove('is-open');
+            var tr = document.getElementById(c.trigger);
+            if (tr) tr.setAttribute('aria-expanded', 'false');
+            var dd = document.getElementById(c.menu);
+            if (dd) {
+              dd.setAttribute('aria-hidden', 'true');
+              dd.style.setProperty('--iif-dd-x', '0px');
+            }
+            if (tr) {
+              try {
+                tr.focus();
+              } catch (errF) { /* ignore */ }
+            }
+            e.preventDefault();
+            break;
+          }
+        });
       })();
 
       // إزالة الأكواد المكررة والمعطوبة
@@ -27352,6 +27489,45 @@ Generated: ${new Date().toLocaleString()}
           openVideoCallOverlay();
         });
       }
+      function scrollToUrgentTarget(targetId, options) {
+        options = options || {};
+        var el = document.getElementById(targetId);
+        if (!el) return;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.setTimeout(function () {
+          if (options.channel && urgentChannel) urgentChannel.value = options.channel;
+          if (options.focusId) {
+            var fe = document.getElementById(options.focusId);
+            if (fe) {
+              try {
+                fe.focus({ preventScroll: true });
+              } catch (e1) {
+                try {
+                  fe.focus();
+                } catch (e2) { /* ignore */ }
+              }
+            }
+          }
+        }, 380);
+      }
+      var urgentScheduleVideoBtn = document.getElementById('urgent-schedule-video-btn');
+      var urgentRequestChatBtn = document.getElementById('urgent-request-chat-btn');
+      var urgentProceedPayBtn = document.getElementById('urgent-proceed-pay-btn');
+      if (urgentScheduleVideoBtn) {
+        urgentScheduleVideoBtn.addEventListener('click', function () {
+          scrollToUrgentTarget('urgent-request-form', { channel: 'video', focusId: 'urgent-name' });
+        });
+      }
+      if (urgentRequestChatBtn) {
+        urgentRequestChatBtn.addEventListener('click', function () {
+          scrollToUrgentTarget('urgent-request-form', { channel: 'chat', focusId: 'urgent-name' });
+        });
+      }
+      if (urgentProceedPayBtn) {
+        urgentProceedPayBtn.addEventListener('click', function () {
+          scrollToUrgentTarget('urgent-payment-method');
+        });
+      }
       if (formUrgentOnline) formUrgentOnline.addEventListener('submit', function (e) {
         e.preventDefault();
         var name = (document.getElementById('urgent-name') && document.getElementById('urgent-name').value) || '';
@@ -27360,7 +27536,15 @@ Generated: ${new Date().toLocaleString()}
         getSubmissionLocation(function (loc) {
           addSubmission('urgent', { name: name, email: email, channel: channel }, loc || {});
           if (urgentOnlineSuccess) {
-            urgentOnlineSuccess.textContent = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessMsg') : 'Request received. The Fund will contact you to arrange the secure online session.';
+            var leadEl = urgentOnlineSuccess.querySelector('.urgent-online-success__lead');
+            var nextEl = urgentOnlineSuccess.querySelector('.urgent-online-success__next');
+            var msgLead = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessMsg') : 'Request received. The Fund will contact you to arrange the secure online session.';
+            var msgNext = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessNext') : 'You should hear back within about 1–2 business days at the email you provided. This message is not financing approval or a mandate — see Terms.';
+            if (leadEl) leadEl.textContent = msgLead;
+            if (nextEl) {
+              nextEl.textContent = msgNext || '';
+              nextEl.hidden = !msgNext;
+            }
             urgentOnlineSuccess.hidden = false;
             formUrgentOnline.reset();
           }
