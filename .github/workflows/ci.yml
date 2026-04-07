@@ -35,3 +35,36 @@ jobs:
 
       - name: i18n strict — لا ثغرات dash|cert|videoCall لـ de/es/it/zh (احتياطي عبر T.fr)
         run: node financial-consulting/iif-fund-demo/scripts/check-i18n-keys.js --strict
+
+  iif-fund-site:
+    name: IIF public site (anchors + Playwright + a11y)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: financial-consulting/iif-fund-demo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+          cache-dependency-path: financial-consulting/iif-fund-demo/package-lock.json
+
+      - name: Cache Playwright browsers (subproject)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-iif-pw-${{ hashFiles('financial-consulting/iif-fund-demo/package-lock.json') }}
+
+      - name: Install subproject dependencies
+        run: npm ci
+
+      - name: Playwright Chromium + OS deps
+        run: npx playwright install --with-deps chromium
+
+      - name: test:site (anchors + E2E)
+        run: npm run test:site
+        env:
+          CI: true

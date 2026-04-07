@@ -72,19 +72,19 @@
       }
     } catch (e) { }
   </script>
-  <title>صندوق الاستثمار الدولي · International Investment Fund · FII · Paris</title>
+  <title>صندوق الاستثمار الدولي · International Investment Fund (IIF) · Paris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0e18" />
   <meta name="iif-build" content="dashboard-fullpage-v8-fix-main-close" />
   <meta name="description"
-    content="International Investment Fund (FII), Paris — institutional project finance, sovereign & government-aligned capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed in France & USA. For investors, governments, and partners seeking compliant global financing." />
+    content="International Investment Fund (IIF), Paris — institutional project finance, sovereign & government-aligned capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed in France & USA. For investors, governments, and partners seeking compliant global financing." />
   <meta name="keywords"
     content="International Investment Fund, FII, IIF, Paris, institutional investors, project finance, sovereign finance, government BOT, PPP, feasibility study, global financing, mediation, governance, EU Transparency Register, France license, USA license, KYC, AML, investment fund" />
   <meta name="robots" content="index,follow" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="International Investment Fund · IIF · Paris" />
   <meta property="og:description"
-    content="International Investment Fund (FII), Paris — institutional project finance, sovereign & government capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed France & USA." />
+    content="International Investment Fund (IIF), Paris — institutional project finance, sovereign & government capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed France & USA." />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="International Investment Fund · IIF · Paris" />
@@ -98,7 +98,7 @@
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "International Investment Fund",
-    "alternateName": "FII",
+    "alternateName": ["IIF", "FII"],
     "description": "International economic and financial organization — institutional project finance, sovereign and government-aligned capital, BOT coordination, feasibility studies, mediation and governance. EU Transparency Register; licensed in France and the United States.",
     "url": "https://alzahrani6020.github.io/iif-web/",
     "logo": "https://alzahrani6020.github.io/iif-web/assets/emblem.jpg",
@@ -111,7 +111,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "International Investment Fund · IIF · Paris",
-    "description": "International Investment Fund (FII), Paris — institutional project finance, sovereign & government-aligned capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed in France & USA.",
+    "description": "International Investment Fund (IIF), Paris — institutional project finance, sovereign & government-aligned capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed in France & USA.",
     "url": "https://alzahrani6020.github.io/iif-web/",
     "inLanguage": "en",
     "isPartOf": {
@@ -8847,11 +8847,62 @@
       border-top: none;
     }
 
+    #trust-entry .trust-entry__subhead {
+      max-width: 46rem;
+      margin: 0 0 var(--space-3);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--color-accent-gold-soft);
+    }
+
+    #trust-entry .trust-entry__strip-hint {
+      max-width: 44rem;
+      margin: 0 auto var(--space-8);
+      text-align: center;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: var(--color-text-muted);
+    }
+
+    #trust-entry .trust-paths-kicker {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: var(--space-5);
+      color: var(--color-text-main);
+    }
+
+    #trust-entry .iif-trust-summary-pill-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-6);
+    }
+
+    #trust-entry .iif-trust-summary-pill {
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-main);
+      padding: 0.55rem 1.15rem;
+      border: 1px solid rgba(201, 162, 39, 0.55);
+      border-radius: var(--radius-md);
+      background: rgba(201, 162, 39, 0.09);
+      line-height: 1.45;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    #trust-entry .iif-trust-summary-pill a {
+      color: var(--color-accent-gold-soft);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
     #trust-entry .iif-trust-strip {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-3);
-      margin-bottom: var(--space-8);
+      margin-bottom: var(--space-3);
       justify-content: center;
     }
 
@@ -8859,7 +8910,7 @@
       font-size: 0.82rem;
       color: var(--color-text-muted);
       padding: 0.45rem 0.8rem;
-      border: 1px solid rgba(120, 160, 180, 0.35);
+      border: 1px solid rgba(201, 162, 39, 0.32);
       border-radius: var(--radius-md);
       background: rgba(255, 255, 255, 0.03);
       line-height: 1.4;
@@ -8885,10 +8936,13 @@
     }
 
     .iif-path-card {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: 100%;
       padding: var(--space-5);
       border-radius: var(--radius-md);
-      border: 1px solid rgba(120, 160, 180, 0.4);
+      border: 1px solid rgba(201, 162, 39, 0.38);
       background: rgba(255, 255, 255, 0.04);
       text-decoration: none;
       color: inherit;
@@ -8914,6 +8968,133 @@
       font-size: 0.9rem;
       color: var(--color-text-muted);
       line-height: 1.55;
+      flex: 1 1 auto;
+    }
+
+    .iif-path-card__cta {
+      display: block;
+      margin-top: var(--space-4);
+      padding-top: var(--space-3);
+      border-top: 1px solid rgba(201, 162, 39, 0.22);
+      font-size: 0.86rem;
+      font-weight: 650;
+      color: var(--color-accent-gold-soft);
+      line-height: 1.4;
+    }
+
+    .iif-path-card:hover .iif-path-card__cta,
+    .iif-path-card:focus-visible .iif-path-card__cta {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .hero__legal-hint {
+      margin: var(--space-3) 0 0;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      color: var(--color-text-muted);
+    }
+
+    .hero__legal-hint a {
+      color: var(--color-accent-gold-soft);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .hero__legal-hint a:hover,
+    .hero__legal-hint a:focus-visible {
+      color: var(--color-accent-gold);
+    }
+
+    .iif-site-updated {
+      max-width: 48rem;
+      margin: 0 0 var(--space-5);
+      padding: 0.55rem 0.85rem;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      color: var(--color-text-muted);
+      border-inline-start: 3px solid rgba(201, 162, 39, 0.55);
+      background: rgba(201, 162, 39, 0.06);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .iif-site-updated time {
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    #after-submission .iif-after-submit-steps {
+      max-width: 48rem;
+      margin: 0;
+      padding: 0;
+      list-style: decimal;
+      padding-inline-start: 1.35rem;
+      color: var(--color-text-main);
+    }
+
+    #after-submission .iif-after-submit-steps li {
+      margin-bottom: var(--space-5);
+      font-size: 0.97rem;
+      line-height: 1.65;
+      color: #c5d2e3;
+    }
+
+    #after-submission .iif-after-submit-steps strong {
+      color: var(--color-accent-gold-soft);
+      font-weight: 650;
+    }
+
+    #after-submission .iif-after-submit-foot {
+      max-width: 46rem;
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid rgba(201, 162, 39, 0.16);
+      font-size: 0.88rem;
+      line-height: 1.62;
+      color: #b8c5d8;
+    }
+
+    @media print {
+      html, body {
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      .site-header,
+      .site-footer__fab,
+      #iif-back-to-top,
+      #iif-toggle-section-links,
+      .iif-header-toolbar-panel,
+      .skip-link {
+        display: none !important;
+      }
+
+      #terms,
+      #compliance,
+      #after-submission,
+      .section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      #terms a,
+      #compliance a,
+      #after-submission a,
+      .hero__legal-hint a {
+        color: #000 !important;
+        text-decoration: underline;
+      }
+
+      .section__title,
+      #after-submission .iif-after-submit-steps strong {
+        color: #000 !important;
+      }
+
+      #after-submission .iif-after-submit-steps li,
+      .iif-site-updated,
+      p {
+        color: #222 !important;
+      }
     }
 
     #stakeholders .iif-stakeholders-grid {
@@ -8929,28 +9110,193 @@
       }
     }
 
+    /* معايير اختيار + لمحة حوكمة — لوحة أوضح، تباين، روابط ذهبية */
+    #selection-criteria.iif-section--inst-panel,
+    #governance-snapshot.iif-section--inst-panel,
+    #stakeholders.iif-section--inst-panel,
+    #after-submission.iif-section--inst-panel {
+      padding: var(--space-8) clamp(var(--space-4), 4vw, var(--space-10));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(201, 162, 39, 0.22);
+      background: linear-gradient(
+        165deg,
+        rgba(201, 162, 39, 0.07) 0%,
+        rgba(255, 255, 255, 0.03) 45%,
+        rgba(5, 8, 16, 0.35) 100%
+      );
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    #selection-criteria .iif-section-kicker,
+    #governance-snapshot .iif-section-kicker,
+    #stakeholders .iif-section-kicker,
+    #after-submission .iif-section-kicker {
+      max-width: 48rem;
+      margin: 0 0 var(--space-3);
+      font-size: 0.88rem;
+      font-weight: 650;
+      line-height: 1.55;
+      letter-spacing: 0.02em;
+      color: var(--color-accent-gold-soft);
+    }
+
+    #selection-criteria .iif-section-lead,
+    #governance-snapshot .iif-section-lead,
+    #stakeholders .iif-section-lead,
+    #after-submission .iif-section-lead {
+      max-width: 48rem;
+      margin: 0 0 var(--space-5);
+      padding-bottom: var(--space-5);
+      border-bottom: 1px solid rgba(201, 162, 39, 0.18);
+      font-size: 0.98rem;
+      line-height: 1.68;
+      color: #cad6e6;
+    }
+
+    #selection-criteria .iif-section-lead a,
+    #selection-criteria .iif-section-lead a:link,
+    #selection-criteria .iif-section-lead a:visited,
+    #governance-snapshot .iif-section-lead a,
+    #governance-snapshot .iif-section-lead a:link,
+    #governance-snapshot .iif-section-lead a:visited,
+    #stakeholders .iif-section-lead a,
+    #stakeholders .iif-section-lead a:link,
+    #stakeholders .iif-section-lead a:visited,
+    #after-submission .iif-section-lead a,
+    #after-submission .iif-section-lead a:link,
+    #after-submission .iif-section-lead a:visited,
+    #selection-criteria .iif-criteria-list a,
+    #selection-criteria .iif-criteria-list a:link,
+    #selection-criteria .iif-criteria-list a:visited,
+    #governance-snapshot .iif-gov-card a,
+    #governance-snapshot .iif-gov-card p a:link,
+    #governance-snapshot .iif-gov-card p a:visited,
+    #after-submission .iif-after-submit-foot a {
+      color: var(--color-accent-gold-soft);
+      text-decoration: underline;
+      text-decoration-color: rgba(232, 212, 138, 0.55);
+      text-underline-offset: 3px;
+      font-weight: 600;
+    }
+
+    #selection-criteria .iif-section-lead a:hover,
+    #selection-criteria .iif-section-lead a:focus-visible,
+    #governance-snapshot .iif-section-lead a:hover,
+    #governance-snapshot .iif-section-lead a:focus-visible,
+    #stakeholders .iif-section-lead a:hover,
+    #stakeholders .iif-section-lead a:focus-visible,
+    #after-submission .iif-section-lead a:hover,
+    #after-submission .iif-section-lead a:focus-visible,
+    #after-submission .iif-after-submit-foot a:hover,
+    #after-submission .iif-after-submit-foot a:focus-visible,
+    #selection-criteria .iif-criteria-list a:hover,
+    #selection-criteria .iif-criteria-list a:focus-visible,
+    #governance-snapshot .iif-gov-card a:hover,
+    #governance-snapshot .iif-gov-card a:focus-visible {
+      color: var(--color-accent-gold);
+    }
+
+    #stakeholders .iif-stakeholder-card {
+      margin: 0;
+      padding: var(--space-5) var(--space-5) var(--space-6);
+      border: 1px solid rgba(201, 162, 39, 0.26);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.032);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    #stakeholders .iif-stakeholder-card:hover {
+      border-color: rgba(201, 162, 39, 0.48);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    #stakeholders .iif-stakeholder-card:focus-within {
+      outline: 2px solid rgba(232, 212, 138, 0.65);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #stakeholders .iif-stakeholder-card {
+        transition: none;
+      }
+
+      #stakeholders .iif-stakeholder-card:hover {
+        transform: none;
+      }
+    }
+
+    #stakeholders .iif-stakeholder-card__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.65rem;
+      height: 2.65rem;
+      margin-bottom: var(--space-3);
+      border-radius: var(--radius-sm);
+      background: rgba(201, 162, 39, 0.14);
+      color: var(--color-accent-gold-soft);
+      flex-shrink: 0;
+    }
+
+    #stakeholders .iif-stakeholder-card__icon svg {
+      display: block;
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+
+    /* عملات Lucide تميل بصرياً نحو يسار الـ viewBox؛ في RTL تكبير خفيف + إزاحة نحو بداية القراءة */
+    html[dir="rtl"] #stakeholders .iif-stakeholder-card__icon--capital svg {
+      transform: scale(1.1) translateX(3px);
+      transform-origin: center center;
+    }
+
+    #stakeholders .iif-stakeholder-card h3 {
+      font-size: 1.06rem;
+      color: var(--color-accent-gold-soft);
+      margin: 0 0 var(--space-3);
+      font-weight: 650;
+    }
+
+    #stakeholders .iif-stakeholder-card p {
+      font-size: 0.93rem;
+      line-height: 1.62;
+      color: #c5d2e3;
+      margin: 0;
+    }
+
     #selection-criteria .iif-criteria-list {
       list-style: none;
       padding: 0;
-      margin: var(--space-4) 0 0;
+      margin: var(--space-2) 0 0;
       max-width: 48rem;
+      counter-reset: iif-crit;
     }
 
     #selection-criteria .iif-criteria-list li {
-      position: relative;
-      padding-inline-start: 1.75rem;
-      margin-bottom: var(--space-3);
-      font-size: 0.95rem;
-      line-height: 1.55;
-      color: var(--color-text-main);
+      counter-increment: iif-crit;
+      display: grid;
+      grid-template-columns: 2.65rem minmax(0, 1fr);
+      gap: 0 var(--space-3);
+      align-items: start;
+      margin-bottom: var(--space-5);
+      font-size: 0.97rem;
+      line-height: 1.65;
+      color: #e8eef7;
     }
 
     #selection-criteria .iif-criteria-list li::before {
-      content: "✓";
-      position: absolute;
-      inset-inline-start: 0;
+      content: counter(iif-crit) "\202F✓";
+      font-weight: 750;
+      font-size: 0.82rem;
+      line-height: 1.5;
       color: var(--color-accent-gold-soft);
-      font-weight: 700;
+      text-align: end;
+      padding-top: 0.12em;
+    }
+
+    html[dir="rtl"] #selection-criteria .iif-criteria-list li::before {
+      text-align: start;
     }
 
     .hero__stats-note {
@@ -8969,31 +9315,173 @@
       margin-top: var(--space-6);
     }
 
+    #governance-snapshot .iif-gov-card {
+      margin: 0;
+      padding: var(--space-5) var(--space-5) var(--space-6);
+      border: 1px solid rgba(201, 162, 39, 0.28);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.035);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    #governance-snapshot .iif-gov-card:hover {
+      border-color: rgba(201, 162, 39, 0.52);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+      transform: translateY(-2px);
+    }
+
+    #governance-snapshot .iif-gov-card:focus-within {
+      outline: 2px solid rgba(232, 212, 138, 0.65);
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #governance-snapshot .iif-gov-card {
+        transition: none;
+      }
+
+      #governance-snapshot .iif-gov-card:hover {
+        transform: none;
+      }
+    }
+
+    #governance-snapshot .iif-gov-card__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.65rem;
+      height: 2.65rem;
+      margin-bottom: var(--space-3);
+      border-radius: var(--radius-sm);
+      background: rgba(201, 162, 39, 0.14);
+      color: var(--color-accent-gold-soft);
+      flex-shrink: 0;
+    }
+
+    #governance-snapshot .iif-gov-card__icon svg {
+      display: block;
+      width: 1.4rem;
+      height: 1.4rem;
+    }
+
+    #governance-snapshot .iif-gov-card h3 {
+      font-size: 1.06rem;
+      color: var(--color-accent-gold-soft);
+      margin: 0 0 var(--space-3);
+      font-weight: 650;
+    }
+
+    #governance-snapshot .iif-gov-card p {
+      font-size: 0.93rem;
+      line-height: 1.62;
+      color: #c5d2e3;
+      margin: 0;
+    }
+
     @media (max-width: 900px) {
       #governance-snapshot .iif-gov-grid {
         grid-template-columns: 1fr;
       }
     }
 
+    @media print {
+      #selection-criteria.iif-section--inst-panel,
+      #governance-snapshot.iif-section--inst-panel,
+      #stakeholders.iif-section--inst-panel,
+      #after-submission.iif-section--inst-panel {
+        box-shadow: none;
+        border-color: #ccc;
+        background: #fff;
+      }
+
+      #governance-snapshot .iif-gov-card:hover,
+      #stakeholders .iif-stakeholder-card:hover {
+        transform: none;
+      }
+
+      #governance-snapshot .iif-gov-card a,
+      #governance-snapshot .iif-gov-card p a:link,
+      #governance-snapshot .iif-gov-card p a:visited {
+        color: #000 !important;
+        text-decoration-color: #000 !important;
+      }
+
+      #governance-snapshot .iif-gov-card__icon {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+      }
+
+      #stakeholders .iif-stakeholder-card__icon {
+        background: #f0f0f0 !important;
+        color: #333 !important;
+      }
+
+      html[dir="rtl"] #stakeholders .iif-stakeholder-card__icon--capital svg {
+        transform: none !important;
+      }
+
+      #partners-trust .iif-partners-strip {
+        border-color: #999 !important;
+        background: #fafafa !important;
+      }
+
+      #partners-trust .iif-partners-strip__empty {
+        color: #222 !important;
+      }
+
+      #partners-trust .iif-partners-strip__slot {
+        border-color: #bbb !important;
+        background: #eee !important;
+      }
+    }
+
     #partners-trust .iif-partners-strip {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-4);
+      min-height: 5rem;
+      padding: var(--space-6);
+      border: 1px dashed rgba(201, 162, 39, 0.4);
+      border-radius: var(--radius-md);
+      background: rgba(201, 162, 39, 0.04);
+    }
+
+    #partners-trust .iif-partners-strip__empty {
+      margin: 0;
+      text-align: center;
+      font-size: 0.86rem;
+      line-height: 1.55;
+      color: #b8c5d8;
+    }
+
+    #partners-trust .iif-partners-strip__slots {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-4);
       align-items: center;
       justify-content: center;
-      min-height: 5rem;
-      padding: var(--space-6);
-      border: 1px dashed rgba(120, 160, 180, 0.45);
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.02);
     }
 
     #partners-trust .iif-partners-strip__slot {
+      flex: 0 0 auto;
       width: 7rem;
       height: 3rem;
       border-radius: 6px;
-      border: 1px solid rgba(120, 160, 180, 0.25);
+      border: 1px solid rgba(201, 162, 39, 0.28);
       background: rgba(0, 0, 0, 0.15);
+    }
+
+    #partners-trust p a {
+      color: var(--color-accent-gold-soft);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 600;
+    }
+
+    #partners-trust p a:hover,
+    #partners-trust p a:focus-visible {
+      color: var(--color-accent-gold);
     }
 
     .iif-fab-contact {
@@ -9382,7 +9870,8 @@
             <span class="site-clock__date" id="site-clock-date"></span>
           </div>
           <button type="button" id="iif-toggle-section-links" class="iif-section-links-toggle" aria-expanded="true"
-            aria-controls="iif-public-site-header">
+            aria-controls="iif-public-site-header"
+            data-i18n-title="navSectionLinksToggleTitle">
             <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Collapse header</span>
             <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Expand header</span>
           </button>
@@ -9560,6 +10049,7 @@
             aria-hidden="true">
             <a href="#services" role="menuitem" data-i18n="navServicesOverview">Services overview</a>
             <a href="#trust-entry" role="menuitem" data-i18n="navTrustPaths">Trust &amp; institutional paths</a>
+            <a href="#after-submission" role="menuitem" data-i18n="seoNavAfterSubmit">After submitting — what happens next</a>
             <a href="#governance-snapshot" role="menuitem" data-i18n="navGovSnapshot">Governance snapshot</a>
             <a href="#partners-trust" role="menuitem" data-i18n="navPartnersRecog">Partners &amp; recognitions</a>
             <hr class="site-nav__dropdown-divider" aria-hidden="true" />
@@ -9691,114 +10181,114 @@
         <span class="ticker-label" data-i18n="tickerGlobalMarkets">Global Markets</span>
         <div class="ticker-track" id="ticker-track">
           <div class="ticker-track__copy">
-            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
               <span data-i18n="tickerReutersMarkets">Reuters Markets</span>
             </a>
-            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
                 class="ticker-logo">
               <span data-i18n="tickerBloomberg">Bloomberg</span>
             </a>
-            <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.ft.com/markets" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
                 class="ticker-logo">
               <span data-i18n="tickerFinancialTimes">Financial Times</span>
             </a>
-            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
               <span data-i18n="tickerCnbcWorld">CNBC World</span>
             </a>
-            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
               <span data-i18n="tickerWsjMarketData">WSJ Market Data</span>
             </a>
-            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
+            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener noreferrer"
               class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
               <span data-i18n="tickerEcb">ECB</span>
             </a>
-            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
                 class="ticker-logo">
               <span data-i18n="tickerFederalReserve">Federal Reserve</span>
             </a>
-            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
               <span data-i18n="tickerImf">IMF</span>
             </a>
-            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
                 class="ticker-logo">
               <span data-i18n="tickerWorldBank">World Bank</span>
             </a>
-            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
                 class="ticker-logo">
               <span data-i18n="tickerArabNewsEconomy">Arab News Economy</span>
             </a>
-            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
               <span data-i18n="tickerSpaEconomy">SPA Economy</span>
             </a>
-            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
                 class="ticker-logo">
               <span data-i18n="tickerTradingView">TradingView</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true">
-            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
               <span data-i18n="tickerReutersMarkets">Reuters Markets</span>
             </a>
-            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
                 class="ticker-logo">
               <span data-i18n="tickerBloomberg">Bloomberg</span>
             </a>
-            <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.ft.com/markets" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
                 class="ticker-logo">
               <span data-i18n="tickerFinancialTimes">Financial Times</span>
             </a>
-            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
               <span data-i18n="tickerCnbcWorld">CNBC World</span>
             </a>
-            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
               <span data-i18n="tickerWsjMarketData">WSJ Market Data</span>
             </a>
-            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
+            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener noreferrer"
               class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
               <span data-i18n="tickerEcb">ECB</span>
             </a>
-            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
                 class="ticker-logo">
               <span data-i18n="tickerFederalReserve">Federal Reserve</span>
             </a>
-            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
               <span data-i18n="tickerImf">IMF</span>
             </a>
-            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
                 class="ticker-logo">
               <span data-i18n="tickerWorldBank">World Bank</span>
             </a>
-            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
                 class="ticker-logo">
               <span data-i18n="tickerArabNewsEconomy">Arab News Economy</span>
             </a>
-            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
               <span data-i18n="tickerSpaEconomy">SPA Economy</span>
             </a>
-            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
                 class="ticker-logo">
               <span data-i18n="tickerTradingView">TradingView</span>
@@ -9811,73 +10301,73 @@
         <span class="ticker-label" data-i18n="tickerAsianMarketsLabel">Asian Markets</span>
         <div class="ticker-track" id="ticker-asian-track">
           <div class="ticker-track__copy" id="ticker-asian-copy">
-            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
                 class="ticker-logo">
               <span data-i18n="tickerNikkeiAsia">Nikkei Asia</span>
             </a>
-            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
                 class="ticker-logo">
               <span data-i18n="tickerChinaDaily">China Daily</span>
             </a>
-            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
                 class="ticker-logo">
               <span data-i18n="tickerStraitsTimes">Straits Times</span>
             </a>
-            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
                 class="ticker-logo">
               <span data-i18n="tickerKoreaHerald">Korea Herald</span>
             </a>
-            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
                 class="ticker-logo">
               <span data-i18n="tickerBangkokPost">Bangkok Post</span>
             </a>
-            <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.thehindu.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
                 class="ticker-logo">
               <span data-i18n="tickerTheHindu">The Hindu</span>
             </a>
-            <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.dawn.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
               <span data-i18n="tickerDawn">Dawn</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true" id="ticker-asian-copy2">
-            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
                 class="ticker-logo">
               <span data-i18n="tickerNikkeiAsia">Nikkei Asia</span>
             </a>
-            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
                 class="ticker-logo">
               <span data-i18n="tickerChinaDaily">China Daily</span>
             </a>
-            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
                 class="ticker-logo">
               <span data-i18n="tickerStraitsTimes">Straits Times</span>
             </a>
-            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
                 class="ticker-logo">
               <span data-i18n="tickerKoreaHerald">Korea Herald</span>
             </a>
-            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
                 class="ticker-logo">
               <span data-i18n="tickerBangkokPost">Bangkok Post</span>
             </a>
-            <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.thehindu.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
                 class="ticker-logo">
               <span data-i18n="tickerTheHindu">The Hindu</span>
             </a>
-            <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.dawn.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
               <span data-i18n="tickerDawn">Dawn</span>
             </a>
@@ -9889,74 +10379,74 @@
         <span class="ticker-label" data-i18n="tickerArabMarketsLabel">Arab Markets</span>
         <div class="ticker-track" id="ticker-arab-track">
           <div class="ticker-track__copy" id="ticker-arab-copy">
-            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
                 class="ticker-logo">
               <span data-i18n="tickerAlJazeeraEconomy">Al Jazeera Economy</span>
             </a>
-            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
                 class="ticker-logo">
               <span data-i18n="tickerAsharqBusiness">Asharq Business</span>
             </a>
-            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
                 class="ticker-logo">
               <span data-i18n="tickerAlArabiyaFinance">Al Arabiya Finance</span>
             </a>
-            <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.mubasher.info/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
                 class="ticker-logo">
               <span data-i18n="tickerMubasher">Mubasher</span>
             </a>
-            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
                 class="ticker-logo">
               <span data-i18n="tickerArabianBusiness">Arabian Business</span>
             </a>
-            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
                 class="ticker-logo">
               <span data-i18n="tickerEgyptTodayEconomy">Egypt Today Economy</span>
             </a>
-            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
                 class="ticker-logo">
               <span data-i18n="tickerAlIttihadBusiness">Al Ittihad Business</span>
             </a>
           </div>
           <div class="ticker-track__copy" aria-hidden="true" id="ticker-arab-copy2">
-            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
                 class="ticker-logo">
               <span data-i18n="tickerAlJazeeraEconomy">Al Jazeera Economy</span>
             </a>
-            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
                 class="ticker-logo">
               <span data-i18n="tickerAsharqBusiness">Asharq Business</span>
             </a>
-            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
                 class="ticker-logo">
               <span data-i18n="tickerAlArabiyaFinance">Al Arabiya Finance</span>
             </a>
-            <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.mubasher.info/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
                 class="ticker-logo">
               <span data-i18n="tickerMubasher">Mubasher</span>
             </a>
-            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
                 class="ticker-logo">
               <span data-i18n="tickerArabianBusiness">Arabian Business</span>
             </a>
-            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
                 class="ticker-logo">
               <span data-i18n="tickerEgyptTodayEconomy">Egypt Today Economy</span>
             </a>
-            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
+            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener noreferrer" class="ticker-item">
               <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
                 class="ticker-logo">
               <span data-i18n="tickerAlIttihadBusiness">Al Ittihad Business</span>
@@ -9981,7 +10471,7 @@
           <h2 class="video-call-modal__title" data-i18n="videoCallTitle">International Investment Fund — Video &amp; audio call</h2>
         </div>
         <a href="#" class="video-call-modal__link" id="video-call-share-link" target="_blank"
-          rel="noopener" data-i18n="videoCallShareLink">Open in new tab / Share link</a>
+          rel="noopener noreferrer" data-i18n="videoCallShareLink">Open in new tab / Share link</a>
         <button type="button" class="auth-modal__close" id="video-call-close" aria-label="Close">&times;</button>
       </div>
       <div class="video-call-modal__body">
@@ -10225,7 +10715,7 @@
           <div class="form-group terms-accept-wrap">
             <label class="terms-accept-label">
               <input type="checkbox" id="reg-terms-accept" name="terms_accept" required />
-              <span data-i18n="authRegTermsAcceptHtml" data-i18n-html="true">I accept the <a href="#terms" target="_blank" rel="noopener">Terms &amp;
+              <span data-i18n="authRegTermsAcceptHtml" data-i18n-html="true">I accept the <a href="#terms" target="_blank" rel="noopener noreferrer">Terms &amp;
                   Conditions</a> and grant the Fund full authority in compliance with applicable laws. I am solely
                 responsible for the accuracy of my information.</span>
             </label>
@@ -10268,7 +10758,7 @@
           decoding="async" onerror="this.style.display='none'" />
       </picture>
       <h2 class="cert-title" id="certificate-title" data-i18n="certTitle">Digital membership card</h2>
-      <p class="cert-subtitle" id="certificate-subtitle" data-i18n="certSubtitle">International Investment Fund — FII</p>
+      <p class="cert-subtitle" id="certificate-subtitle" data-i18n="certSubtitle">International Investment Fund — IIF</p>
       <div class="cert-member-images" id="certificate-member-images"
         style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); min-height: 60px;">
       </div>
@@ -10292,7 +10782,7 @@
         style="margin-top: var(--space-4); display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center;">
         <button type="button" class="btn btn--primary btn-sm" id="certificate-download-btn"><span
             data-i18n="certDownloadBtn">Download digital card</span></button>
-        <a href="#" class="btn btn--ghost btn-sm" id="certificate-email-link" target="_blank" rel="noopener"><span
+        <a href="#" class="btn btn--ghost btn-sm" id="certificate-email-link" target="_blank" rel="noopener noreferrer"><span
             data-i18n="certEmailCopy">Send copy to my email</span></a>
       </div>
       <button type="button" class="btn btn--ghost btn-sm" id="certificate-close-btn"
@@ -10734,7 +11224,7 @@
           <div class="card chairman-dashboard-card">
             <div class="chairman-dashboard-card__head">
               <div class="chairman-image-container">
-                <span class="chairman-image-placeholder" aria-hidden="true">FII</span>
+                <span class="chairman-image-placeholder" aria-hidden="true">IIF</span>
               </div>
               <div class="chairman-dashboard-card__titles">
                 <h3 data-i18n="dashChairmanBoardTitle">Chairman of the Board &amp; Fund Owner</h3>
@@ -12092,7 +12582,7 @@
     <!-- Hero -->
     <section class="hero">
       <div>
-        <div class="hero__eyebrow" data-i18n="heroEyebrow">International Investment Fund · Paris · FII</div>
+        <div class="hero__eyebrow" data-i18n="heroEyebrow">International Investment Fund · Paris · IIF</div>
         <h1 data-i18n="heroTitle">A royal vision for global investment & prosperity</h1>
         <p data-i18n="heroPara">An international economic and financial organization under French law, registered in the EU Transparency Register and licensed in France and the United States. Recognized by the European Parliament for Development and Planning and the Arab-African Economic Parliament. We aggregate capital from governments, sovereign entities, and leading institutions to finance high-impact, fully compliant development projects—with a focus on diplomacy, peace, and social justice.</p>
         <div class="hero__mission" role="region" aria-label="Government BOT delivery model">
@@ -12134,6 +12624,7 @@
         </div>
         <p class="hero__stats-note" data-i18n="heroStatsDisclaimer">Figures shown are illustrative. Each mandate is assessed on its own merits;
           nothing here is an offer, approval, or guarantee of financing.</p>
+        <p class="hero__legal-hint" data-i18n="heroLegalLinksHtml" data-i18n-html="true"><a href="/legal/disclaimer.html">Legal disclaimer</a> · <a href="#terms">Terms</a> · <a href="#compliance">Compliance</a></p>
         <nav class="iif-seo-keynav" id="iif-seo-keynav" aria-labelledby="iif-seo-keynav-h">
           <h2 id="iif-seo-keynav-h" class="iif-seo-keynav__title" data-i18n="seoKeySectionsHeading">Key sections for investors, governments &amp; partners</h2>
           <ul class="iif-seo-keynav__list">
@@ -12143,6 +12634,7 @@
             <li><a href="#investor-registration" data-i18n="seoNavInvestors">Investor registration</a></li>
             <li><a href="#feasibility-study" data-i18n="seoNavFeasibility">Feasibility study &amp; project analysis</a></li>
             <li><a href="#compliance" data-i18n="seoNavCompliance">Compliance, licenses &amp; EU transparency</a></li>
+            <li><a href="#after-submission" data-i18n="seoNavAfterSubmit">After submitting — what happens next</a></li>
             <li><a href="#contact" data-i18n="seoNavContact">Contact &amp; KYC intake</a></li>
             <li><a href="#faq" data-i18n="seoNavFaq">FAQ — funding, BOT &amp; compliance</a></li>
           </ul>
@@ -12152,7 +12644,7 @@
         <span class="hero-emblem hero-emblem--crest">
           <picture>
             <source type="image/webp" srcset="assets/emblem.webp" />
-            <img src="assets/emblem.jpg" alt="" class="hero-emblem__img" width="280" height="336" decoding="async" />
+            <img src="assets/emblem.jpg" alt="" class="hero-emblem__img" width="280" height="336" decoding="async" fetchpriority="high" loading="eager" sizes="(max-width: 900px) 60vw, 280px" />
           </picture>
         </span>
       </div>
@@ -12161,54 +12653,97 @@
     <!-- Trust strip + three institutional paths — المرحلة 1–2 من خطة الثقة -->
     <section id="trust-entry" class="section" aria-labelledby="trust-entry-title">
       <h2 id="trust-entry-title" class="section__title" data-i18n="trustEntryTitle">Trust, clarity, and how to engage</h2>
-      <p data-i18n="trustEntryLead" data-i18n-html="true" style="max-width: 48rem; margin-bottom: var(--space-6); color: var(--color-text-muted); font-size: 0.95rem;">We publish compliance references and separate <strong>platform tools</strong> from <strong>institutional mandates</strong>. Use the paths below for financing, advisory, or government BOT coordination — then contracts and KYC apply as appropriate.</p>
-      <div class="iif-trust-strip" role="list">
+      <p class="trust-entry__subhead" data-i18n="trustEntrySubhead">This hub separates browsing from institutional steps — nothing here is auto-approval.</p>
+      <p class="trust-entry__lead" data-i18n="trustEntryLead" data-i18n-html="true" style="max-width: 48rem; margin-bottom: var(--space-6); color: var(--color-text-muted); font-size: 0.95rem;">We publish compliance references and separate <strong>platform tools</strong> from <strong>institutional mandates</strong>. Use the paths below for financing, advisory, or government BOT coordination — then contracts and KYC apply as appropriate.</p>
+      <div class="iif-trust-summary-pill-wrap">
+        <span class="iif-trust-summary-pill" data-i18n="trustStrip5" data-i18n-html="true">Unified transparency summary → <a href="transparency.html">Overview</a></span>
+      </div>
+      <div class="iif-trust-strip" role="list" data-i18n-aria-label="trustStripListAria">
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip1" data-i18n-html="true">Transparency &amp; licenses → <a href="#compliance">Compliance</a></span>
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip2" data-i18n-html="true">KYC / AML — see <a href="#terms">Terms</a></span>
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip3">Mandates are contractual — not implied by forms alone</span>
         <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip4" data-i18n-html="true">No financing approval from website submission alone → <a href="#terms">Terms</a></span>
-        <span class="iif-trust-strip__item" role="listitem" data-i18n="trustStrip5" data-i18n-html="true">Unified transparency summary → <a href="transparency.html">Overview</a></span>
       </div>
-      <p data-i18n="trustPathsKicker" style="font-size: 0.9rem; font-weight: 600; margin-bottom: var(--space-4); color: var(--color-text-main);">Three institutional entry points</p>
-      <div class="iif-trust-paths">
+      <p class="trust-entry__strip-hint" data-i18n="trustStripHint">Each chip jumps to compliance, terms, or the transparency overview on this site.</p>
+      <p id="iif-trust-paths-label" class="trust-paths-kicker" data-i18n="trustPathsKicker">Three institutional entry points</p>
+      <nav class="iif-trust-paths" aria-labelledby="iif-trust-paths-label">
         <a href="#financing-request" class="iif-path-card" data-iif-track="trust-path-financing">
           <h3 data-i18n="trustPathFinTitle">Capital &amp; financing</h3>
           <p data-i18n="trustPathFinDesc">Submit a financing request with KYC fields as required. This is an expression of interest, not an approval.</p>
+          <span class="iif-path-card__cta" data-i18n="trustPathFinCta">Continue to financing request</span>
         </a>
         <a href="#financial-consultation" class="iif-path-card" data-iif-track="trust-path-consultation">
           <h3 data-i18n="trustPathAdvTitle">Financial advisory</h3>
           <p data-i18n="trustPathAdvDesc">Structured advice and studies — separate from free website tools; see Terms for scope.</p>
+          <span class="iif-path-card__cta" data-i18n="trustPathAdvCta">Continue to financial consultation</span>
         </a>
         <a href="#government-bot" class="iif-path-card" data-iif-track="trust-path-bot">
           <h3 data-i18n="trustPathBotTitle">Government BOT &amp; delivery</h3>
           <p data-i18n="trustPathBotDesc">Umbrella coordination for host states, financiers, and contractors — roles clarified in governance and contracts.</p>
+          <span class="iif-path-card__cta" data-i18n="trustPathBotCta">Continue to government BOT section</span>
         </a>
-      </div>
+      </nav>
       <p data-i18n="trustEntryFooterLinks" data-i18n-html="true" style="font-size: 0.85rem; color: var(--color-text-muted);"><a href="#stakeholders">Who we coordinate with</a> · <a href="#selection-criteria">Selection criteria</a> · <a href="#terms">Full Terms</a></p>
     </section>
 
-    <section id="stakeholders" class="section" aria-labelledby="stakeholders-title">
+    <section id="after-submission" class="section iif-section--inst-panel" aria-labelledby="after-submission-title">
+      <h2 id="after-submission-title" class="section__title" data-i18n="afterSubmitTitle">After you submit a request</h2>
+      <p class="iif-section-kicker" data-i18n="afterSubmitKicker">Outline only — timelines and obligations follow contracts and regulations.</p>
+      <p class="iif-section-lead" data-i18n="afterSubmitLead">Website submissions are not approvals. A typical institutional path looks like this:</p>
+      <ol class="iif-after-submit-steps">
+        <li>
+          <strong data-i18n="afterSubmitStep1Title">Acknowledgement</strong>
+          <span data-i18n="afterSubmitStep1Desc"> We confirm receipt when contact details are valid; automated messages may still require human triage.</span>
+        </li>
+        <li>
+          <strong data-i18n="afterSubmitStep2Title">KYC / AML checks</strong>
+          <span data-i18n="afterSubmitStep2Desc"> Where a mandate applies, suitability and documentation are completed outside anonymous browsing.</span>
+        </li>
+        <li>
+          <strong data-i18n="afterSubmitStep3Title">Mandate review</strong>
+          <span data-i18n="afterSubmitStep3Desc"> Risk, structure, and regulatory fit are assessed — timelines vary by complexity and jurisdiction.</span>
+        </li>
+        <li>
+          <strong data-i18n="afterSubmitStep4Title">Outcome</strong>
+          <span data-i18n="afterSubmitStep4Desc"> You receive a substantive response or a scoped next step — or a decline without obligation to finance.</span>
+        </li>
+      </ol>
+      <p data-i18n="afterSubmitFootHtml" data-i18n-html="true" class="iif-after-submit-foot">This is a general description only. Binding process is defined in <a href="#terms">Terms</a> and in executed agreements.</p>
+    </section>
+
+    <section id="stakeholders" class="section iif-section--inst-panel" aria-labelledby="stakeholders-title">
       <h2 id="stakeholders-title" class="section__title" data-i18n="stakeholdersTitle">Stakeholders in a typical mandate</h2>
-      <p data-i18n="stakeholdersLead" data-i18n-html="true" style="max-width: 48rem; margin-bottom: var(--space-4); color: var(--color-text-muted);">The Fund often sits between <strong>host governments</strong>, <strong>capital providers</strong>, and <strong>executing companies</strong> (including BOT-style delivery). Final risk allocation is defined in contracts and law — not by this website alone.</p>
+      <p class="iif-section-kicker" data-i18n="stakeholdersKicker">Illustrative roles in a structured mandate — not an exhaustive list of parties.</p>
+      <p class="iif-section-lead" data-i18n="stakeholdersLead" data-i18n-html="true">The Fund often sits between <strong>host governments</strong>, <strong>capital providers</strong>, and <strong>executing companies</strong> (including BOT-style delivery). Final risk allocation is defined in contracts and law — not by this website alone.</p>
       <div class="iif-stakeholders-grid">
-        <div class="card">
-          <h3 data-i18n="stakeholderHostTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);">Host state / government</h3>
-          <p data-i18n="stakeholderHostDesc" style="font-size:0.92rem;color:var(--color-text-muted);">Policy, concessions, permits, and public-sector counterparties — aligned with national law and project agreements.</p>
+        <div class="card iif-stakeholder-card">
+          <div class="iif-stakeholder-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h3 data-i18n="stakeholderHostTitle">Host state / government</h3>
+          <p data-i18n="stakeholderHostDesc">Policy, concessions, permits, and public-sector counterparties — aligned with national law and project agreements.</p>
         </div>
-        <div class="card">
-          <h3 data-i18n="stakeholderCapitalTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);">Capital &amp; institutions</h3>
-          <p data-i18n="stakeholderCapitalDesc" style="font-size:0.92rem;color:var(--color-text-muted);">Banks, funds, and institutional investors — diligence, covenants, and suitability checks before disbursement.</p>
+        <div class="card iif-stakeholder-card">
+          <div class="iif-stakeholder-card__icon iif-stakeholder-card__icon--capital" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 3"/><path d="M14 14a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6v-1a6 6 0 0 1 6-6h.01"/></svg>
+          </div>
+          <h3 data-i18n="stakeholderCapitalTitle">Capital &amp; institutions</h3>
+          <p data-i18n="stakeholderCapitalDesc">Banks, funds, and institutional investors — diligence, covenants, and suitability checks before disbursement.</p>
         </div>
-        <div class="card">
-          <h3 data-i18n="stakeholderExecTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);">Executors &amp; contractors</h3>
-          <p data-i18n="stakeholderExecDesc" style="font-size:0.92rem;color:var(--color-text-muted);">EPC, O&amp;M, and specialist firms — delivery, milestones, and performance under agreed contracts (including BOT where applicable).</p>
+        <div class="card iif-stakeholder-card">
+          <div class="iif-stakeholder-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a6 6 0 0 0-6-6h-8a6 6 0 0 0-6 6v2z"/><path d="M12 10v4"/><path d="M8 14h8"/></svg>
+          </div>
+          <h3 data-i18n="stakeholderExecTitle">Executors &amp; contractors</h3>
+          <p data-i18n="stakeholderExecDesc">EPC, O&amp;M, and specialist firms — delivery, milestones, and performance under agreed contracts (including BOT where applicable).</p>
         </div>
       </div>
     </section>
 
-    <section id="selection-criteria" class="section" aria-labelledby="selection-criteria-title">
+    <section id="selection-criteria" class="section iif-section--inst-panel" aria-labelledby="selection-criteria-title">
       <h2 id="selection-criteria-title" class="section__title" data-i18n="selectionCriteriaTitle">High-level selection criteria</h2>
-      <p data-i18n="selectionCriteriaLead" data-i18n-html="true" style="max-width: 46rem; color: var(--color-text-muted);">Published criteria reduce ambiguity. Detailed assessment, documentation, and regulatory steps follow after initial fit — see <a href="#contact">Contact</a> and <a href="#terms">Terms</a>.</p>
+      <p class="iif-section-kicker" data-i18n="selectionCriteriaKicker">Checklist for counterparties — not a substitute for contracts, KYC, or formal diligence.</p>
+      <p class="iif-section-lead" data-i18n="selectionCriteriaLead" data-i18n-html="true">Published criteria reduce ambiguity. Detailed assessment, documentation, and regulatory steps follow after initial fit — see <a href="#contact">Contact</a> and <a href="#terms">Terms</a>.</p>
       <ul class="iif-criteria-list">
         <li data-i18n="selectionCrit1">Strategic fit with mandate: development impact, diplomacy, and compliance culture.</li>
         <li data-i18n="selectionCrit2">Bankable structure: clear revenue or sovereign support, realistic risk allocation.</li>
@@ -12219,21 +12754,31 @@
     </section>
 
     <!-- Governance snapshot — أدوار واضحة؛ الأسماء/الصور عند الجاهزية -->
-    <section id="governance-snapshot" class="section" aria-labelledby="governance-snapshot-title">
+    <section id="governance-snapshot" class="section iif-section--inst-panel" aria-labelledby="governance-snapshot-title">
       <h2 id="governance-snapshot-title" class="section__title" data-i18n="governanceSnapshotTitle">Governance snapshot</h2>
-      <p data-i18n="governanceSnapshotLead" data-i18n-html="true" style="max-width: 48rem; color: var(--color-text-muted);">Oversight is structured by role — <strong>not</strong> by marketing copy. Named biographies and photos are added when formal communications allow; until then, roles describe how decisions and compliance are separated.</p>
+      <p class="iif-section-kicker" data-i18n="governanceSnapshotKicker">Biographies follow official communications; use the in-card links to jump to related sections on this page.</p>
+      <p class="iif-section-lead" data-i18n="governanceSnapshotLead" data-i18n-html="true">Oversight is structured by role — <strong>not</strong> by marketing copy. Named biographies and photos are added when formal communications allow; until then, roles describe how decisions and compliance are separated.</p>
       <div class="iif-gov-grid">
-        <div class="card">
-          <h3 data-i18n="govCardBoardTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);margin-top:0;">Board &amp; strategy</h3>
-          <p data-i18n="govCardBoardBody" data-i18n-html="true" style="font-size:0.92rem;color:var(--color-text-muted);margin:0;">Sets mandate, risk appetite, and delegated authorities. See also <a href="#leadership">Leadership</a> and <a href="#hizkama">Corporate governance</a>.</p>
+        <div class="card iif-gov-card">
+          <div class="iif-gov-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="11" width="18" height="5" rx="1"/><rect x="3" y="18" width="11" height="3" rx="1"/></svg>
+          </div>
+          <h3 data-i18n="govCardBoardTitle">Board &amp; strategy</h3>
+          <p data-i18n="govCardBoardBody" data-i18n-html="true">Sets mandate, risk appetite, and delegated authorities. See also <a href="#leadership">Leadership</a> and <a href="#hizkama">Corporate governance</a>.</p>
         </div>
-        <div class="card">
-          <h3 data-i18n="govCardRiskTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);margin-top:0;">Risk &amp; compliance</h3>
-          <p data-i18n="govCardRiskBody" data-i18n-html="true" style="font-size:0.92rem;color:var(--color-text-muted);margin:0;">KYC/AML/CFT alignment with documented checks — not implied by website forms alone. <a href="#compliance">Compliance</a> · <a href="#terms">Terms</a>.</p>
+        <div class="card iif-gov-card">
+          <div class="iif-gov-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3 data-i18n="govCardRiskTitle">Risk &amp; compliance</h3>
+          <p data-i18n="govCardRiskBody" data-i18n-html="true">KYC/AML/CFT alignment with documented checks — not implied by website forms alone. <a href="#compliance">Compliance</a> · <a href="#terms">Terms</a>.</p>
         </div>
-        <div class="card">
-          <h3 data-i18n="govCardInvTitle" style="font-size:1.05rem;color:var(--color-accent-gold-soft);margin-top:0;">Investment &amp; execution</h3>
-          <p data-i18n="govCardInvBody" data-i18n-html="true" style="font-size:0.92rem;color:var(--color-text-muted);margin:0;">Suitability, diligence, and structuring for capital and BOT-style delivery — coordinated with <a href="#stakeholders">stakeholder roles</a>.</p>
+        <div class="card iif-gov-card">
+          <div class="iif-gov-card__icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m18 9-5 5-4-4-3 3"/></svg>
+          </div>
+          <h3 data-i18n="govCardInvTitle">Investment &amp; execution</h3>
+          <p data-i18n="govCardInvBody" data-i18n-html="true">Suitability, diligence, and structuring for capital and BOT-style delivery — coordinated with <a href="#stakeholders">stakeholder roles</a>.</p>
         </div>
       </div>
     </section>
@@ -12242,11 +12787,15 @@
     <section id="partners-trust" class="section" aria-labelledby="partners-trust-title">
       <h2 id="partners-trust-title" class="section__title" data-i18n="partnersTrustTitle">Partners &amp; recognitions</h2>
       <p data-i18n="partnersTrustLead" data-i18n-html="true" style="max-width: 46rem; color: var(--color-text-muted);">Logos and testimonials appear here only with <strong>written permission</strong> from the partner. Slots below are placeholders — not an endorsement until a logo is published.</p>
-      <div class="iif-partners-strip" aria-hidden="true">
-        <span class="iif-partners-strip__slot"></span>
-        <span class="iif-partners-strip__slot"></span>
-        <span class="iif-partners-strip__slot"></span>
-        <span class="iif-partners-strip__slot"></span>
+      <div class="iif-partners-strip" role="region" data-i18n-aria-label="partnersStripAria" aria-label="Partner logo placeholders — not endorsements until published">
+        <p class="iif-partners-strip__empty" data-i18n="partnersStripEmpty">No partner logos are shown yet. The boxes below are layout placeholders only until written permission is received.</p>
+        <div class="iif-partners-strip__slots">
+          <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
+          <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
+          <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
+          <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
+          <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
+        </div>
       </div>
       <p data-i18n="partnersTrustLive" data-i18n-html="true" style="margin-top: var(--space-4); font-size: 0.88rem; color: var(--color-text-muted); max-width: 42rem;"><strong>Live chat:</strong> when a staffed widget is configured, it will load from site settings; until then, use <a href="#contact">Contact</a> for a traceable institutional response.</p>
     </section>
@@ -12374,7 +12923,7 @@
     <!-- About -->
     <section id="about" class="section">
       <h2 class="section__title" data-i18n="sectionAbout">About the Fund</h2>
-      <p data-i18n="aboutFundBodyHtml" data-i18n-html="true" style="max-width: 52rem;">The International Investment Fund (FII) — <em>Le fond international d'investissement</em> — is a French SARL
+      <p data-i18n="aboutFundBodyHtml" data-i18n-html="true" style="max-width: 52rem;">The International Investment Fund (IIF) — <em>Le fond international d'investissement</em> — is a French SARL
         registered at the Guichet Unique (formalité J00029775095, 08/08/2023), <strong>registered in the EU Transparency
           Register</strong>, and operates under French law with licenses and recognitions in France and the United
         States. It operates inclusively—without discrimination or exclusion except where required by international
@@ -13810,6 +14359,7 @@ Generated: ${new Date().toLocaleString()}
     <!-- Compliance, Licenses & Transparency -->
     <section id="compliance" class="section">
       <h2 class="section__title" data-i18n="sectionCompliance">Compliance, Licenses & Transparency</h2>
+      <p class="iif-site-updated" data-i18n="siteContentUpdatedHtml" data-i18n-html="true" role="status">Content last reviewed: <time datetime="2026-04-07">7 April 2026</time> — trust paths, after-submission flow, and compliance intro.</p>
       <p data-i18n="compIntroHtml" data-i18n-html="true" style="margin-bottom: var(--space-6);">
         The International Investment Fund is <strong>registered in the EU Transparency Register</strong> and holds
         licenses and recognitions from French, European, African, and US authorities. Operations comply with AML/CFT and
@@ -15672,7 +16222,7 @@ Generated: ${new Date().toLocaleString()}
     <section id="terms" class="section terms-section">
       <h2 class="section__title" data-i18n="termsTitle">Terms &amp; Conditions</h2>
       <div class="terms-content card">
-        <p data-i18n="termsLeadHtml" data-i18n-html="true"><strong>By registering or using the International Investment Fund (FII) services, you agree
+        <p data-i18n="termsLeadHtml" data-i18n-html="true"><strong>By registering or using the International Investment Fund (IIF) services, you agree
             to the following. Acceptance is required to create an account.</strong></p>
         <div class="terms-platform-fund-split card"
           style="margin: var(--space-6) 0; padding: var(--space-5); border: 1px solid rgba(120, 160, 180, 0.35); background: rgba(255, 255, 255, 0.03); border-radius: var(--radius-md);">
@@ -15729,7 +16279,7 @@ Generated: ${new Date().toLocaleString()}
           <li><strong>Amendments:</strong> The Fund may update these terms. Continued use after changes constitutes
             acceptance.</li>
         </ul>
-        <p class="terms-footer" data-i18n="termsFooterMeta">Last updated: 2025. International Investment Fund (FII) — Registered in France.
+        <p class="terms-footer" data-i18n="termsFooterMeta">Last updated: 2026. International Investment Fund (IIF) — Registered in France.
           For questions: info@iiffund.com</p>
       </div>
     </section>
@@ -18880,7 +19430,7 @@ Generated: ${new Date().toLocaleString()}
           html += '<li style="padding: var(--space-3); border-bottom: 1px solid var(--color-border-subtle); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);">';
           html += '<span style="flex:1; min-width:0;">' + escapeHtml(r.email) + '</span>';
           html += '<span style="font-size:0.85rem; color: var(--color-accent-gold-soft);">' + escapeHtml(daysLabel) + '</span>';
-          html += '<a href="' + escapeHtml(mailto) + '" target="_blank" rel="noopener" class="btn btn--ghost btn-sm">' + escapeHtml(iifMessage('reminderBtnSendEmail')) + '</a>';
+          html += '<a href="' + escapeHtml(mailto) + '" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn-sm">' + escapeHtml(iifMessage('reminderBtnSendEmail')) + '</a>';
           html += '<button type="button" class="btn btn--ghost btn-sm reminder-mark-sent" data-email="' + escapeHtml(r.email) + '" data-key="' + escapeHtml(r.key) + '">' + escapeHtml(iifMessage('reminderBtnMarkSent')) + '</button>';
           html += '</li>';
         });
@@ -19190,7 +19740,7 @@ Generated: ${new Date().toLocaleString()}
           ctx.fillText(iifMessage('certTitleDigitalCard'), w / 2, 70);
           ctx.fillStyle = '#94a3b8';
           ctx.font = '14px system-ui, sans-serif';
-          ctx.fillText('International Investment Fund — FII', w / 2, 95);
+          ctx.fillText('International Investment Fund — IIF', w / 2, 95);
         }
         function drawMemberImagesAndRest(imagesLoaded) {
           var imgY = 108;
@@ -22290,7 +22840,7 @@ Generated: ${new Date().toLocaleString()}
               if (qr.indexOf('data:image/') === 0 && qr.indexOf(';base64,') > 0 && qr.length < 500000 && qr.indexOf('"') === -1 && qr.indexOf('<') === -1 && qr.indexOf('>') === -1)
                 qrImg = '<div class="letter-qr-print"><img src="' + qr.replace(/&/g, '&amp;') + '" alt="' + escapeHtml(iifMessage('letterQrAlt')).replace(/"/g, '&quot;') + '" width="120" height="120"/><p style="font-size:0.8rem; margin-top:0.25rem;">' + escapeHtml(iifMessage('letterQrCaption')) + '</p></div>';
             }
-            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Letter - IIF</title><style>body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:1.5rem;color:#111;}.letterhead-title{font-size:1.25rem;font-weight:700;margin-bottom:0.5rem;}.letter-meta-print{margin:0.25rem 0;}.letter-body-print{white-space:pre-wrap;line-height:1.6;margin-bottom:1rem;}.letter-qr-print{margin-top:1.5rem;}.sader-num{color:#c00;font-weight:700;}</style></head><body class="letter-print-area"><div class="letterhead-title">International Investment Fund · FII · Paris</div><p class="letter-meta-print">Financing for Global Prosperity</p>' + dateLine + subjectLine + saderLine + toLine + refLine + bodyHtml + qrImg + '</body></html>';
+            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Letter - IIF</title><style>body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:1.5rem;color:#111;}.letterhead-title{font-size:1.25rem;font-weight:700;margin-bottom:0.5rem;}.letter-meta-print{margin:0.25rem 0;}.letter-body-print{white-space:pre-wrap;line-height:1.6;margin-bottom:1rem;}.letter-qr-print{margin-top:1.5rem;}.sader-num{color:#c00;font-weight:700;}</style></head><body class="letter-print-area"><div class="letterhead-title">International Investment Fund · IIF · Paris</div><p class="letter-meta-print">Financing for Global Prosperity</p>' + dateLine + subjectLine + saderLine + toLine + refLine + bodyHtml + qrImg + '</body></html>';
             var w = window.open('', '_blank');
             if (w) { w.document.write(html); w.document.close(); w.focus(); w.print(); }
           });

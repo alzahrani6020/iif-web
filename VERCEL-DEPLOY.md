@@ -38,6 +38,10 @@
 3. **Build Command:** يُعرَّف في `vercel.json` كـ `npm run i18n:packs` حتى تُحدَّث `i18n-service-packs-*.js` و`i18n-service-packs-all.js` عند كل نشر (مع `npm install` الافتراضي من Vercel). إن غيّرت الأمر في لوحة Vercel فتأكد أنه يشمل توليد الحزم.
 4. **Deployments:** إن لم يتحدث الإنتاج بعد `git push`، استخدم **Redeploy**.
 
+### ويبهوك تسجيل (اختياري)
+
+بعد إنشاء حساب جديد من الواجهة يُستدعى `POST /api/user-registration-forward`. لإعادة التوجيه إلى خدمة خارجية عيّنوا في **Settings → Environment Variables:** `IIF_USER_WEBHOOK_URL` (HTTPS) واختيارياً `IIF_USER_WEBHOOK_SECRET`. التفاصيل: [DEPLOY-AND-MONITOR.md](./DEPLOY-AND-MONITOR.md) (قسم «ويبهوك تسجيل»).
+
 ## أوامر CLI (من مجلد الواجهة)
 
 ```bash

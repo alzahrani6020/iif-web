@@ -142,6 +142,8 @@ test/
 tests/
 *.test.js
 *.spec.js
+# استثناء اختبارات Playwright للواجهة العامة
+!e2e/**/*.spec.js
 
 # Documentation build
 docs/build/
@@ -170,3 +172,9 @@ api-keys/
 # Lighthouse (npm run lh)
 lighthouse-report.html
 reports/lh-*.html
+
+# Playwright (npm run test:e2e)
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

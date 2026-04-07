@@ -7,13 +7,19 @@
     "start": "node backend-server.js",
     "dev": "nodemon backend-server.js",
     "test": "node scripts/test-budget-parse.js",
+    "test:anchors": "node scripts/check-anchor-targets.cjs",
+    "test:site": "npm run test:anchors && npm run test:e2e",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "playwright:install": "playwright install chromium",
     "i18n:keys": "node scripts/check-i18n-keys.js",
     "i18n:keys:strict": "node scripts/check-i18n-keys.js --strict",
     "i18n:locales": "node scripts/verify-i18n-locales.cjs",
     "i18n:packs": "node emit-service-packs.cjs",
     "lh": "node scripts/lighthouse-iif.js",
     "fonts:vendor": "node scripts/vendor-fontsource-woff2.js",
-    "postinstall": "node scripts/vendor-fontsource-woff2.js",
+    "postinstall": "node scripts/postinstall.cjs",
     "csp:sync": "node scripts/sync-csp.js",
     "assets:optimize": "node scripts/optimize-assets.js"
   },
@@ -39,6 +45,8 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1",
     "nodemon": "^2.0.22",
     "sharp": "^0.34.5"
   },
