@@ -1570,15 +1570,22 @@
     /* لماذا الصندوق — بطاقات سريعة القراءة */
     .why-fund-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: var(--space-4);
       margin-top: var(--space-6);
     }
 
+    .why-fund-grid .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 8.5rem;
+    }
+
     .why-fund-grid .card p {
       margin: 0;
+      flex: 1 1 auto;
       font-size: 0.95rem;
-      line-height: 1.55;
+      line-height: 1.6;
       color: var(--color-text-muted);
     }
 
@@ -9473,7 +9480,7 @@
     }
 
     #partners-trust p a {
-      color: var(--color-accent-gold-soft);
+      color: #e8d79a;
       text-decoration: underline;
       text-underline-offset: 3px;
       font-weight: 600;
@@ -9481,8 +9488,103 @@
 
     #partners-trust p a:hover,
     #partners-trust p a:focus-visible {
-      color: var(--color-accent-gold);
+      color: #f5ecc8;
     }
+
+    .iif-section-heading--badge {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .iif-section-heading--badge .section__title {
+      margin-bottom: 0;
+    }
+
+    .iif-badge--planning {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(201, 162, 39, 0.45);
+      background: rgba(201, 162, 39, 0.12);
+      color: #f0e4b8;
+    }
+
+    html[dir="rtl"] .iif-badge--planning {
+      text-transform: none;
+      letter-spacing: 0.02em;
+      font-size: 0.78rem;
+    }
+
+    .iif-partners-policy {
+      margin-top: var(--space-3) !important;
+      max-width: 46rem;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--color-text-muted);
+    }
+
+    .iif-partners-chat-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+      padding: var(--space-5);
+      max-width: 42rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(201, 162, 39, 0.28);
+      background: linear-gradient(145deg, rgba(201, 162, 39, 0.08) 0%, rgba(8, 12, 20, 0.5) 100%);
+    }
+
+    .iif-partners-chat-card__icon {
+      flex-shrink: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      background: rgba(201, 162, 39, 0.15);
+      color: #f0e4b8;
+    }
+
+    .iif-partners-chat-card__icon svg {
+      width: 1.35rem;
+      height: 1.35rem;
+    }
+
+    .iif-partners-chat-card__title {
+      margin: 0 0 var(--space-2);
+      font-size: 1rem;
+      font-weight: 650;
+      color: var(--color-text-main);
+    }
+
+    .iif-partners-chat-card__body {
+      margin: 0 0 var(--space-4);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--color-text-muted);
+    }
+
+    .iif-partners-chat-card__body a {
+      color: #e8d79a;
+      font-weight: 600;
+    }
+
+    .iif-partners-chat-card__body a:hover,
+    .iif-partners-chat-card__body a:focus-visible {
+      color: #f5ecc8;
+    }
+
 
     .iif-fab-contact {
       position: fixed;
@@ -9870,7 +9972,7 @@
             <span class="site-clock__date" id="site-clock-date"></span>
           </div>
           <button type="button" id="iif-toggle-section-links" class="iif-section-links-toggle" aria-expanded="true"
-            aria-controls="iif-public-site-header"
+            aria-controls="iif-header-toolbar-links"
             data-i18n-title="navSectionLinksToggleTitle">
             <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Collapse header</span>
             <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Expand header</span>
@@ -12785,8 +12887,12 @@
 
     <!-- Partner logos — شعارات عند الإذن؛ فتحات بصرية فقط حالياً -->
     <section id="partners-trust" class="section" aria-labelledby="partners-trust-title">
-      <h2 id="partners-trust-title" class="section__title" data-i18n="partnersTrustTitle">Partners &amp; recognitions</h2>
+      <div class="iif-section-heading iif-section-heading--badge">
+        <h2 id="partners-trust-title" class="section__title" data-i18n="partnersTrustTitle">Partners &amp; recognitions</h2>
+        <span class="iif-badge iif-badge--planning" data-i18n="partnersTrustBadge">Coming soon</span>
+      </div>
       <p data-i18n="partnersTrustLead" data-i18n-html="true" style="max-width: 46rem; color: var(--color-text-muted);">Logos and testimonials appear here only with <strong>written permission</strong> from the partner. Slots below are placeholders — not an endorsement until a logo is published.</p>
+      <p class="iif-partners-policy" data-i18n="partnersTrustPolicyLine" data-i18n-html="true"></p>
       <div class="iif-partners-strip" role="region" data-i18n-aria-label="partnersStripAria" aria-label="Partner logo placeholders — not endorsements until published">
         <p class="iif-partners-strip__empty" data-i18n="partnersStripEmpty">No partner logos are shown yet. The boxes below are layout placeholders only until written permission is received.</p>
         <div class="iif-partners-strip__slots">
@@ -12797,7 +12903,16 @@
           <span class="iif-partners-strip__slot" role="img" data-i18n-aria-label="partnersSlotAria" aria-label="Empty partner logo slot"></span>
         </div>
       </div>
-      <p data-i18n="partnersTrustLive" data-i18n-html="true" style="margin-top: var(--space-4); font-size: 0.88rem; color: var(--color-text-muted); max-width: 42rem;"><strong>Live chat:</strong> when a staffed widget is configured, it will load from site settings; until then, use <a href="#contact">Contact</a> for a traceable institutional response.</p>
+      <div class="iif-partners-chat-card" role="region" aria-labelledby="partners-chat-card-title">
+        <div class="iif-partners-chat-card__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+        </div>
+        <div class="iif-partners-chat-card__content">
+          <p id="partners-chat-card-title" class="iif-partners-chat-card__title" data-i18n="partnersTrustChatTitle">Live messaging</p>
+          <p class="iif-partners-chat-card__body" data-i18n="partnersTrustChatBody" data-i18n-html="true"></p>
+          <a href="#contact" class="btn btn--ghost btn--sm" data-i18n="navContact">Contact</a>
+        </div>
+      </div>
     </section>
 
     <!-- Why the Fund — أهداف واضحة للزائر المؤسسي -->
@@ -17481,7 +17596,7 @@ Generated: ${new Date().toLocaleString()}
             btn.removeAttribute('hidden');
             btn.setAttribute('aria-hidden', 'false');
             var ar = document.documentElement.getAttribute('data-lang') === 'ar';
-            var label = ar ? 'العودة لأعلى الصفحة' : 'Back to top of page';
+            var label = ar ? 'أعلى الصفحة' : 'Top of page';
             btn.setAttribute('aria-label', label);
             btn.setAttribute('title', label);
           } else {
