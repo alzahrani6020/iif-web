@@ -5,6 +5,9 @@
   "functions": {
     "api/searx/search.js": {
       "maxDuration": 60
+    },
+    "api/user-registration-forward.js": {
+      "maxDuration": 15
     }
   },
   "headers": [

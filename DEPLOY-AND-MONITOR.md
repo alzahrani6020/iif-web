@@ -52,3 +52,14 @@ npm run check:deploy
 3. صمموا مسارات واضحة: تسجيل، جلسة، قائمة مستخدمين للأدمن — ثم اربطوا الواجهة تدريجياً بدل الاعتماد الكامل على `localStorage`.
 
 نموذج متغيرات اختيارية (مستقبلية) — انظر [.env.example](./.env.example).
+
+### 6.1) ويبهوك تسجيل (Vercel — اختياري)
+
+بعد **إنشاء حساب جديد** من الواجهة، المتصفح يرسل طلباً إلى `POST /api/user-registration-forward` على نفس النطاق (لا يؤثر على GitHub Pages إن لم يكن هناك API).
+
+- **بدون إعداد:** الاستجابة `skipped` — لا خطأ في الواجهة.
+- **مع إعداد:** في لوحة Vercel → Environment Variables:
+  - `IIF_USER_WEBHOOK_URL` — عنوان **HTTPS** فقط (مثلاً Zapier/Make أو API داخلي).
+  - `IIF_USER_WEBHOOK_SECRET` (اختياري) — يُرسل كـ `Authorization: Bearer …` للويبهوك.
+
+الحمولة المرسلة للويبهوك: `{ email, name, at, source }` (بدون كلمة مرور).

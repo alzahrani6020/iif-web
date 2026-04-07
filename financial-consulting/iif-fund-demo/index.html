@@ -20278,6 +20278,22 @@ Generated: ${new Date().toLocaleString()}
             var nameVal = (nameElReg && nameElReg.value) ? nameElReg.value.trim() : newEmail;
             upsertSiteUser(newEmail, nameVal);
           }
+          try {
+            var regFwd = {
+              email: String(newEmail || '').trim().toLowerCase(),
+              name: String((nameElReg && nameElReg.value) ? nameElReg.value.trim() : '').slice(0, 500),
+              at: new Date().toISOString(),
+              source: 'register'
+            };
+            if (regFwd.email) {
+              fetch((location.origin || '') + '/api/user-registration-forward', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(regFwd),
+                credentials: 'same-origin'
+              }).then(function () { }).catch(function () { });
+            }
+          } catch (regFwdErr) { }
         };
         if (typeof setCredentialForEmail === 'function') {
           setCredentialForEmail(newEmail, pw).then(function (ok) {

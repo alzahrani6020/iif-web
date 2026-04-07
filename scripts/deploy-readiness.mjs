@@ -22,6 +22,7 @@ function readText(rel) {
 
 must('.nvmrc', 'Node version for CI and local');
 must('financial-consulting/iif-fund-demo/vercel.json');
+must('financial-consulting/iif-fund-demo/api/user-registration-forward.js');
 must('financial-consulting/iif-fund-demo/emit-service-packs.cjs');
 must('.github/workflows/ci.yml');
 must('.github/workflows/github-pages.yml');
