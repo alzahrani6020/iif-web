@@ -27,6 +27,9 @@ jobs:
       - name: i18n service packs — الملفات المُيدعة يجب أن تطابق pack-data (بعد build)
         run: npm run verify:i18n-packs-sync
 
+      - name: Deploy layout sanity (no platform API calls)
+        run: npm run check:deploy
+
       - name: Syntax check Vercel SearX proxy
         run: node --check financial-consulting/iif-fund-demo/api/searx/search.js
 
