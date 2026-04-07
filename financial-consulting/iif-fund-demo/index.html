@@ -9082,7 +9082,7 @@
 
 <body>
   <a href="#main-content" class="iif-skip-link" data-i18n="seoSkipLink">Skip to main content</a>
-  <div id="iif-static-host-banner" class="iif-static-host-banner" role="region" aria-label="Static hosting notice" hidden>
+  <div id="iif-static-host-banner" class="iif-static-host-banner" role="region" aria-label="Static hosting notice" aria-live="polite" hidden>
     <div class="iif-static-host-banner__inner">
       <div class="iif-static-host-banner__copy">
         <p dir="ltr"><strong>Static hosting:</strong> sign-in and dashboard data stay in <strong>this browser only</strong>. Other devices do not share it. Admins: <strong>Dashboard → Export JSON / Import JSON</strong> to merge.</p>
@@ -21694,16 +21694,46 @@ Generated: ${new Date().toLocaleString()}
           reader.onload = function () {
             try {
               var obj = JSON.parse(reader.result);
-              var n = 0;
-              if (obj && typeof obj === 'object') {
-                Object.keys(obj).forEach(function (k) {
-                  if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) {
-                    localStorage.setItem(k, obj[k] == null ? '' : String(obj[k]));
-                    n++;
-                  }
-                });
+              if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+                setStatus('JSON must be a single object / يجب أن يكون الملف كائناً واحداً.', true);
+                return;
               }
-              setStatus('Imported ' + n + ' keys from JSON');
+              var keysToApply = [];
+              Object.keys(obj).forEach(function (k) {
+                if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) keysToApply.push(k);
+              });
+              if (keysToApply.length === 0) {
+                setStatus('No iif* keys in file / لا توجد مفاتيح iif* في الملف.', true);
+                return;
+              }
+              var newKeys = 0;
+              var overwrite = 0;
+              var same = 0;
+              keysToApply.forEach(function (k) {
+                try {
+                  var cur = localStorage.getItem(k);
+                  var next = obj[k] == null ? '' : String(obj[k]);
+                  if (cur === null) newKeys++;
+                  else if (cur !== next) overwrite++;
+                  else same++;
+                } catch (eC) {}
+              });
+              var confirmMsg =
+                'استيراد ' + keysToApply.length + ' مفتاحاً (iif*) إلى هذا المتصفح.\n' +
+                'جديدة: ' + newKeys + ' · تحديث قيمة: ' + overwrite + ' · نفس القيمة: ' + same + '\n\n' +
+                'Import ' + keysToApply.length + ' iif* key(s) into this browser.\n' +
+                'New: ' + newKeys + ' · value updates: ' + overwrite + ' · unchanged: ' + same + '\n\n' +
+                'متابعة؟ / Proceed?';
+              if (typeof window.confirm === 'function' && !window.confirm(confirmMsg)) {
+                setStatus('استيراد JSON أُلغي / Import cancelled.');
+                return;
+              }
+              var n = 0;
+              keysToApply.forEach(function (k) {
+                localStorage.setItem(k, obj[k] == null ? '' : String(obj[k]));
+                n++;
+              });
+              setStatus('Imported ' + n + ' keys from JSON / تم استيراد ' + n + ' مفتاحاً.');
               refreshDashboardListsFromStorage();
             } catch (e) {
               setStatus((iifMessage('jsErrorPrefix') || '') + (e && e.message ? e.message : 'invalid JSON'), true);

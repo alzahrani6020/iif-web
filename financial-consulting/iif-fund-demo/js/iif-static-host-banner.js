@@ -36,7 +36,8 @@
       '.iif-static-host-banner__copy{flex:1 1 16rem;font-size:0.78rem;line-height:1.45;color:#cbd5e1}' +
       '.iif-static-host-banner__copy p{margin:0 0 0.35rem}' +
       '.iif-static-host-banner__btn{flex:0 0 auto;padding:0.35rem 0.9rem;border-radius:6px;' +
-      'border:1px solid rgba(201,162,39,.55);background:rgba(201,162,39,.15);color:#f5e9b8;cursor:pointer;font-size:0.85rem}';
+      'border:1px solid rgba(201,162,39,.55);background:rgba(201,162,39,.15);color:#f5e9b8;cursor:pointer;font-size:0.85rem}' +
+      '.iif-static-host-banner__btn:focus-visible{outline:2px solid #e8d48a;outline-offset:3px}';
     var s = document.createElement('style');
     s.id = 'iif-static-host-banner-styles';
     s.textContent = css;
@@ -49,6 +50,7 @@
     wrap.className = 'iif-static-host-banner';
     wrap.setAttribute('role', 'region');
     wrap.setAttribute('aria-label', 'Static hosting notice');
+    wrap.setAttribute('aria-live', 'polite');
     wrap.innerHTML =
       '<div class="iif-static-host-banner__inner">' +
       '<div class="iif-static-host-banner__copy">' +
@@ -71,6 +73,22 @@
     });
   }
 
+  function focusBannerDismiss() {
+    try {
+      var bar = document.getElementById('iif-static-host-banner');
+      if (!bar || bar.hidden) return;
+      var btn = document.getElementById('iif-static-host-banner-dismiss');
+      if (!btn) return;
+      setTimeout(function () {
+        try {
+          btn.focus({ preventScroll: true });
+        } catch (e) {
+          btn.focus();
+        }
+      }, 100);
+    } catch (e2) {}
+  }
+
   function initBanner() {
     if (!window.iifIsStaticPublicHost()) return;
     try {
@@ -84,6 +102,7 @@
     }
     b.hidden = false;
     wireDismiss(document.getElementById('iif-static-host-banner-dismiss'), b);
+    focusBannerDismiss();
   }
 
   window.IIF_showStaticHostBannerAgain = function () {
@@ -98,6 +117,7 @@
     }
     b.hidden = false;
     wireDismiss(document.getElementById('iif-static-host-banner-dismiss'), b);
+    focusBannerDismiss();
     try {
       b.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     } catch (e2) {}
