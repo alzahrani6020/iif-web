@@ -9477,6 +9477,17 @@
       border-radius: 6px;
       border: 1px solid rgba(201, 162, 39, 0.28);
       background: rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    /* عند إدراج شعارات لاحقاً: حجم ثابت + احتواء بدون قفز تخطيط */
+    #partners-trust .iif-partners-strip__slot img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.2rem;
+      box-sizing: border-box;
     }
 
     #partners-trust p a {
