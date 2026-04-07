@@ -24,4 +24,22 @@ test.describe('Accessibility (axe)', function () {
       critical.length ? JSON.stringify(critical, null, 2) : ''
     ).toHaveLength(0);
   });
+
+  test('contact: no critical axe violations (scoped)', async function ({ page }) {
+    await page.goto('/index.html#contact', { waitUntil: 'domcontentloaded' });
+    await page.locator('#contact').waitFor({ state: 'visible', timeout: 30 * 1000 });
+
+    var results = await new AxeBuilder({ page })
+      .include('#contact')
+      .disableRules(['color-contrast'])
+      .analyze();
+
+    var critical = results.violations.filter(function (v) {
+      return v.impact === 'critical';
+    });
+    expect(
+      critical,
+      critical.length ? JSON.stringify(critical, null, 2) : ''
+    ).toHaveLength(0);
+  });
 });

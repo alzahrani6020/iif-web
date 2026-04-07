@@ -73,7 +73,7 @@ $env:EXTERNAL_URL_STRICT='1'; node scripts/maintenance-full-audit.mjs --external
 | الفحص | الوصف |
 |--------|--------|
 | **`CI / verify`** | `npm ci` في الجذر، ثم `npm run verify`، `maintenance-full-audit`، مزامنة حزم i18n، `check:deploy`، تدقيق SearX، و`check-i18n-keys --strict`. |
-| **`CI / IIF public site (anchors + Playwright + a11y)`** | بعد نجاح `verify`: في `financial-consulting/iif-fund-demo` يُشغَّل `npm run test:site` (مراسي ثابتة، E2E، وaxe على `#trust-entry`). |
+| **`CI / IIF public site (anchors + Playwright + a11y)`** | بعد نجاح `verify`: في `financial-consulting/iif-fund-demo` يُشغَّل `npm run test:site` (مراسي ثابتة، E2E، وaxe محدود النطاق على `#trust-entry` و`#contact`). |
 
 تشغيل محلي مكافئ لاختبارات موقع الصندوق (من جذر المستودع):
 

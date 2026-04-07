@@ -12,7 +12,7 @@
 
 **للمبتدئين — رفع المشروع إلى GitHub ثم Netlify (بدون مصطلحات معقدة):** [دليل-المبتدئ-النشر.md](./دليل-المبتدئ-النشر.md)
 
-**قبل إصدار أو رابط رسمي:** [docs/PRE-RELEASE-CHECKLIST.md](./docs/PRE-RELEASE-CHECKLIST.md) · **حماية الفرع `main`:** [docs/BRANCH-PROTECTION.md](./docs/BRANCH-PROTECTION.md) · **مراقبة توفر المواقع:** سير العمل **Uptime ping** في Actions (جدول + تشغيل يدوي).
+**قبل إصدار أو رابط رسمي:** [docs/PRE-RELEASE-CHECKLIST.md](./docs/PRE-RELEASE-CHECKLIST.md) · **حماية الفرع `main`:** [docs/BRANCH-PROTECTION.md](./docs/BRANCH-PROTECTION.md) · **CI وفحوصات الدمج:** [CONTRIBUTING.md#ci](./CONTRIBUTING.md#ci) · **مراقبة توفر المواقع:** سير العمل **Uptime ping** في Actions (جدول + تشغيل يدوي).
 
 **المستودع على GitHub:** [alzahrani6020/iif-web](https://github.com/alzahrani6020/iif-web)
 
