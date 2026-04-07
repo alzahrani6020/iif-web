@@ -89,3 +89,7 @@ npm run test:site
 ```
 
 متغيرات مفيدة: `SKIP_PLAYWRIGHT_INSTALL=1` عند `npm ci` إن كنت تثبّت المتصفحات يدوياً؛ `PLAYWRIGHT_BASE_URL` لتوجيه E2E نحو خادم محلي غير الافتراضي (انظر `playwright.config.cjs`).
+
+**حماية الفرع `main`:** اضبط فحصين مطلوبين كما في [docs/BRANCH-PROTECTION.md](./docs/BRANCH-PROTECTION.md).
+
+**Lighthouse (إعلامي):** سير العمل [`.github/workflows/lighthouse-scheduled.yml`](./.github/workflows/lighthouse-scheduled.yml) يشغّل تقريراً شهرياً على URL نشر GitHub Pages ويرفع `reports/lh-latest.html` كـ artifact — لا يُشترط لدمج PR.

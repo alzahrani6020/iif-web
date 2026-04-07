@@ -14,6 +14,8 @@ test.describe('Partners & trust section', function () {
     var contactInCard = page.locator('#partners-trust .iif-partners-chat-card a[href="#contact"]');
     await expect(contactInCard).toBeVisible();
     await expect(contactInCard).toHaveAttribute('href', '#contact');
+    var termsHint = page.locator('#partners-trust .iif-partners-terms-hint a[href="#terms"]');
+    await expect(termsHint).toBeVisible();
   });
 
   test('Arabic: RTL and contact link in card', async function ({ page }) {
