@@ -30,6 +30,7 @@
     "verify:proxy": "node scripts/verify-netlify-proxy.mjs",
     "verify:stack": "npm run verify && npm run verify:searx",
     "qa:iif-fund": "node scripts/smoke-html-check.mjs",
+    "test:iif-site": "npm run test:site --prefix financial-consulting/iif-fund-demo",
     "e2e:dashboard": "node scripts/e2e-dashboard-playwright.mjs",
     "e2e:public": "node scripts/e2e-public-viewports.mjs",
     "report:index-size": "node scripts/report-index-size.mjs",

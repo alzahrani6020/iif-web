@@ -7,8 +7,16 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   verify:
+    name: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +46,7 @@ jobs:
 
   iif-fund-site:
     name: IIF public site (anchors + Playwright + a11y)
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 25
     defaults:
@@ -60,6 +69,8 @@ jobs:
 
       - name: Install subproject dependencies
         run: npm ci
+        env:
+          SKIP_PLAYWRIGHT_INSTALL: 1
 
       - name: Playwright Chromium + OS deps
         run: npx playwright install --with-deps chromium
