@@ -2,7 +2,7 @@
 
 ## المتطلبات
 
-- Node.js **20+**
+- Node.js **22+** (مطابق لـ `engines` في `package.json`)
 
 ## التثبيت
 
@@ -64,4 +64,28 @@ $env:EXTERNAL_URL_STRICT='1'; node scripts/maintenance-full-audit.mjs --external
 ## CI
 
 عند الدفع إلى `main` أو `master` أو عند فتح Pull Request، يعمل GitHub Actions  
-(`.github/workflows/ci.yml`) على `npm ci` ثم `npm run verify` و`maintenance-full-audit.mjs`.
+(`.github/workflows/ci.yml`).
+
+### فحوصات مطلوبة على الفرع `main`
+
+قبل دمج Pull Request يجب أن تنجح المهمتان التاليتان (مفعّلة في **Branch protection**):
+
+| الفحص | الوصف |
+|--------|--------|
+| **`CI / verify`** | `npm ci` في الجذر، ثم `npm run verify`، `maintenance-full-audit`، مزامنة حزم i18n، `check:deploy`، تدقيق SearX، و`check-i18n-keys --strict`. |
+| **`CI / IIF public site (anchors + Playwright + a11y)`** | بعد نجاح `verify`: في `financial-consulting/iif-fund-demo` يُشغَّل `npm run test:site` (مراسي ثابتة، E2E، وaxe على `#trust-entry`). |
+
+تشغيل محلي مكافئ لاختبارات موقع الصندوق (من جذر المستودع):
+
+```bash
+npm run test:iif-site
+```
+
+أو من المجلد الفرعي:
+
+```bash
+cd financial-consulting/iif-fund-demo
+npm run test:site
+```
+
+متغيرات مفيدة: `SKIP_PLAYWRIGHT_INSTALL=1` عند `npm ci` إن كنت تثبّت المتصفحات يدوياً؛ `PLAYWRIGHT_BASE_URL` لتوجيه E2E نحو خادم محلي غير الافتراضي (انظر `playwright.config.cjs`).
