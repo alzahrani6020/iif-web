@@ -9386,12 +9386,12 @@
           <!-- موجز للمستويات الرفيعة — وثيقة مؤسسية للاطلاع الرسمي -->
           <div class="site-header__auth-btns"
             style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <a href="/executive-brief.html" class="site-header__auth-btn site-header__auth-btn--login"
+            <a href="start-here.html" class="site-header__auth-btn site-header__auth-btn--login"
               style="text-decoration: none; display: inline-block; background: rgba(248, 250, 252, 0.06); border-color: rgba(201, 162, 39, 0.45); font-size: 0.82rem;"
               title="Executive Brief — موجز للمستويات الرفيعة">
               <span data-i18n="navExecutiveBriefLink">Executive Brief</span>
             </a>
-            <a href="/sovereign-standards.html" class="site-header__auth-btn site-header__auth-btn--login"
+            <a href="transparency.html" class="site-header__auth-btn site-header__auth-btn--login"
               style="text-decoration: none; display: inline-block; background: rgba(248, 250, 252, 0.04); border-color: rgba(148, 163, 184, 0.35); font-size: 0.82rem;"
               title="Sovereign-tier standards — معايير المستوى السيادي">
               <span data-i18n="navSovereignStandards">Sovereign standards</span>
@@ -10803,8 +10803,12 @@
               <button type="button" class="btn btn--ghost" id="db-load-btn">
                 <span data-i18n="dashDbLoadBtn">Load from database</span>
               </button>
+              <button type="button" class="btn btn--ghost" id="ls-export-file-btn" title="Download all iif* keys from this browser as JSON (move to another PC)">Export JSON</button>
+              <button type="button" class="btn btn--ghost" id="ls-import-file-btn" title="Merge keys from a JSON file into this browser">Import JSON</button>
+              <input type="file" id="ls-import-file-input" accept="application/json,.json" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none" aria-hidden="true" tabindex="-1" />
             </div>
             <p id="db-status" class="dashboard-tool-card__status"></p>
+            <p class="dashboard-tool-card__note" style="font-size:0.78rem;margin-top:0.5rem;opacity:0.9" dir="ltr">Use <strong>Export JSON</strong> on the device where users registered, then <strong>Import JSON</strong> on the admin device to see the same registry (keep files confidential).</p>
           </div>
         </div>
 
@@ -11278,6 +11282,10 @@
             paid membership. <strong>Member</strong> = paid subscription (listed as fund member). Use <em>Exclude
               registered</em> for someone who only signed up; use <em>Exclude member</em> for someone who paid and
             appears in fund members.</p>
+          <div class="dashboard-callout dashboard-callout--warn" role="note" style="margin: 0.75rem 0 1rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(201, 162, 39, 0.45); background: rgba(201, 162, 39, 0.08); font-size: 0.82rem; line-height: 1.45;">
+            <p dir="ltr" style="margin: 0 0 0.5rem;"><strong>Static hosting (e.g. GitHub Pages):</strong> accounts and lists below live in <strong>this browser only</strong> (localStorage). A user who registers on another device will <strong>not</strong> appear here until you <strong>import</strong> their data (JSON file below) or use the same device. There is no shared server database in this deployment.</p>
+            <p dir="rtl" style="margin: 0;"><strong>استضافة ثابتة (مثل GitHub Pages):</strong> الحسابات والقوائم أدناه تُخزَّن في <strong>هذا المتصفح فقط</strong>. المستخدم المسجّل من جهاز آخر <strong>لن يظهر</strong> هنا حتى تستورد نسخة البيانات (ملف JSON أدناه) أو تستخدم نفس الجهاز. لا يوجد خادم مركزي لهذا النشر.</p>
+          </div>
           <h4 class="dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep" data-i18n="dashRegistryHMembershipApps">
             Membership applications (form)</h4>
           <ul class="dashboard-list" id="dashboard-membership-apps-list"></ul>
@@ -20945,7 +20953,7 @@ Generated: ${new Date().toLocaleString()}
                 } catch (e) {
                   var Te = dashT();
                   bar.innerHTML = Te.dashSystemStatusUnavailableHtml ||
-                    '<span>System status: unavailable — local dev only (<code>/healthz</code>). <a href="/healthz" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Open JSON</a> · <a href="/health.html" style="color:inherit;text-decoration:underline;">Health page</a></span>';
+                    '<span>System status: unavailable — static or local. <a href="health.html" style="color:inherit;text-decoration:underline;">Health page</a> · <a href="diagnostics.html" style="color:inherit;text-decoration:underline;">Diagnostics</a></span>';
                 }
               }
 
@@ -21608,10 +21616,68 @@ Generated: ${new Date().toLocaleString()}
             req.onerror = function () { db.close(); setStatus(iifMessage('jsDbLoadFailed'), true); };
           }).catch(function (e) { setStatus(iifMessage('jsErrorPrefix') + (e && e.message ? e.message : iifMessage('jsIndexeddbFailed')), true); });
         }
+        function exportLocalStorageJsonFile() {
+          var obj = {};
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) obj[k] = localStorage.getItem(k) || '';
+            }
+          } catch (e) { }
+          try {
+            var blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'iif-site-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            setStatus('Exported ' + Object.keys(obj).length + ' keys to JSON file');
+          } catch (e2) {
+            setStatus((iifMessage('jsErrorPrefix') || '') + (e2 && e2.message ? e2.message : 'export failed'), true);
+          }
+        }
+        function importLocalStorageJsonFile(file) {
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var obj = JSON.parse(reader.result);
+              var n = 0;
+              if (obj && typeof obj === 'object') {
+                Object.keys(obj).forEach(function (k) {
+                  if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) {
+                    localStorage.setItem(k, obj[k] == null ? '' : String(obj[k]));
+                    n++;
+                  }
+                });
+              }
+              setStatus('Imported ' + n + ' keys from JSON');
+              refreshDashboardListsFromStorage();
+            } catch (e) {
+              setStatus((iifMessage('jsErrorPrefix') || '') + (e && e.message ? e.message : 'invalid JSON'), true);
+            }
+          };
+          reader.onerror = function () { setStatus('File read failed', true); };
+          reader.readAsText(file, 'utf-8');
+        }
         var saveBtn = document.getElementById('db-save-btn');
         var loadBtn = document.getElementById('db-load-btn');
+        var exBtn = document.getElementById('ls-export-file-btn');
+        var imBtn = document.getElementById('ls-import-file-btn');
+        var imInp = document.getElementById('ls-import-file-input');
         if (saveBtn) saveBtn.addEventListener('click', saveAllToDB);
         if (loadBtn) loadBtn.addEventListener('click', loadAllFromDB);
+        if (exBtn) exBtn.addEventListener('click', exportLocalStorageJsonFile);
+        if (imBtn && imInp) {
+          imBtn.addEventListener('click', function () { imInp.click(); });
+          imInp.addEventListener('change', function () {
+            var f = imInp.files && imInp.files[0];
+            if (f) importLocalStorageJsonFile(f);
+            imInp.value = '';
+          });
+        }
       })();
 
       /* قبول ممثلاً لنا + إضافة أعضاء مباشرة (مشروع واحد على الهارد سي) */
