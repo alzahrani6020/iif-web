@@ -30701,25 +30701,7 @@ Generated: ${new Date().toLocaleString()}
 
   </script>
 
-  <script nonce="iif2026">
-    (function () {
-      function initFabLiveChat() {
-        try {
-          var cfg = window.IIF_CONFIG || {};
-          if (cfg.liveChatScriptUrl && typeof cfg.liveChatScriptUrl === 'string' && /^https?:\/\//i.test(cfg.liveChatScriptUrl)) {
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = cfg.liveChatScriptUrl;
-            document.head.appendChild(s);
-          }
-          var fab = document.getElementById('iif-fab-contact');
-          if (fab && cfg.showQuickContactFab === false) fab.setAttribute('hidden', '');
-        } catch (e) { }
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initFabLiveChat);
-      else initFabLiveChat();
-    })();
-  </script>
+  <script src="js/iif-fab-livechat-boot.js"></script>
 
   <!-- قفل ملء الشفّافة: يُحمّل بعد كل الأنماط في <head> فيفوق التعارضات -->
   <style id="iif-dashboard-fullpage-lock">
@@ -30827,63 +30809,7 @@ Generated: ${new Date().toLocaleString()}
 
   <!-- Google Translate: يُفعّل تلقائياً عبر cookie عند اختيار لغة «جزئية» في iif-machine-translate.js -->
   <div id="google_translate_element" class="iif-gtranslate-host" aria-hidden="true"></div>
-  <script nonce="iif2026">
-    window.googleTranslateElementInit = function googleTranslateElementInit() {
-      try {
-        if (!window.google || !google.translate || !google.translate.TranslateElement) return;
-        new google.translate.TranslateElement(
-          {
-            pageLanguage: 'en',
-            includedLanguages:
-              'ar,am,az,bg,bn,ca,cs,da,de,el,en,es,eu,fi,fr,gl,gu,hi,hr,hu,hy,id,it,iw,ja,ka,kk,km,kn,ko,lo,mk,ml,mn,mr,ms,my,ne,nl,no,pa,pl,pt,ro,ru,si,sk,sl,sq,sr,sv,sw,ta,te,th,tr,uk,ur,uz,vi,zh-CN',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-          },
-          'google_translate_element'
-        );
-      } catch (eGt) { }
-    };
-  </script>
-  <script nonce="iif2026">
-    (function () {
-      // Some Google Translate widget builds inject an English "languages supported" notice.
-      // We never want that text visible anywhere on the page.
-      var RX = /languages\\s+supported\\b[\\s\\S]*?no\\s+content/i;
-      function scrub(node) {
-        try {
-          if (!node) return;
-          if (node.nodeType === Node.TEXT_NODE) {
-            var t = String(node.nodeValue || '');
-            if (RX.test(t)) node.nodeValue = '';
-            return;
-          }
-          if (node.nodeType !== Node.ELEMENT_NODE) return;
-          var el = node;
-          // Remove any small gadget blocks that contain the notice.
-          if (el.textContent && RX.test(el.textContent)) {
-            el.remove();
-            return;
-          }
-          var kids = el.childNodes;
-          if (!kids || !kids.length) return;
-          for (var i = kids.length - 1; i >= 0; i--) scrub(kids[i]);
-        } catch (e) { }
-      }
-      function run() {
-        try { scrub(document.body); } catch (e) { }
-      }
-      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-      else run();
-      try {
-        var mo = new MutationObserver(function (mutations) {
-          mutations.forEach(function (m) {
-            if (m.addedNodes) m.addedNodes.forEach(scrub);
-          });
-        });
-        mo.observe(document.documentElement, { childList: true, subtree: true });
-      } catch (e2) { }
-    })();
-  </script>
+  <script src="js/iif-gtranslate-init-and-scrub.js"></script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" nonce="iif2026"
     defer></script>
   <style nonce="iif2026">
@@ -30904,79 +30830,7 @@ Generated: ${new Date().toLocaleString()}
     #goog-gt-tt { display: none !important; }
   </style>
 
-  <script nonce="iif2026">
-    (function () {
-      function syncHeaderHeight() {
-        try {
-          var hdr = document.querySelector('header.site-header');
-          if (!hdr) return;
-          var st = window.getComputedStyle(hdr);
-          if (st.display === 'none' || st.visibility === 'hidden') return;
-          var h = Math.ceil(hdr.getBoundingClientRect().height);
-          if (h < 48) return;
-          document.documentElement.style.setProperty('--header-height', h + 12 + 'px');
-        } catch (eSync) { }
-      }
-      function syncDashboardScrollOffsetsImpl() {
-        try {
-          var dash = document.getElementById('dashboard-overlay');
-          var bar = dash && dash.querySelector('.dashboard-header-bar');
-          if (!dash || !bar || !dash.classList.contains('is-open')) return;
-          var dst = window.getComputedStyle(dash);
-          if (dst.display === 'none' || dst.visibility === 'hidden') return;
-          var br = bar.getBoundingClientRect();
-          var h = Math.ceil(br.height);
-          if (h >= 40) dash.style.setProperty('--dash-header-height', h + 'px');
-          var cr = dash.getBoundingClientRect();
-          var toc = dash.querySelector('#dashboard-toc-nav, .dashboard-toc');
-          var stickyBottom = br.bottom;
-          if (toc) {
-            var tcs = window.getComputedStyle(toc);
-            var tr = toc.getBoundingClientRect();
-            if (tcs.display !== 'none' && tcs.visibility !== 'hidden' && tr.height >= 4) {
-              stickyBottom = Math.max(stickyBottom, tr.bottom);
-            }
-          }
-          var gapPx = 12;
-          var inset = Math.max(48, Math.ceil(stickyBottom - cr.top) + gapPx);
-          dash.style.setProperty('--dash-scroll-inset', inset + 'px');
-        } catch (eDash) { }
-      }
-      function run() {
-        requestAnimationFrame(function () {
-          syncHeaderHeight();
-          syncDashboardScrollOffsetsImpl();
-        });
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', run);
-      } else {
-        run();
-      }
-      window.addEventListener('resize', run);
-      window.addEventListener('load', run);
-      try {
-        var hdrObs = document.querySelector('header.site-header');
-        if (hdrObs && typeof ResizeObserver !== 'undefined') {
-          new ResizeObserver(run).observe(hdrObs);
-        }
-      } catch (eRO) { }
-      try {
-        var dashEl = document.getElementById('dashboard-overlay');
-        var dashBar = dashEl && dashEl.querySelector('.dashboard-header-bar');
-        if (dashBar && typeof ResizeObserver !== 'undefined') {
-          new ResizeObserver(run).observe(dashBar);
-        }
-        var dashToc = dashEl && dashEl.querySelector('#dashboard-toc-nav, .dashboard-toc');
-        if (dashToc && typeof ResizeObserver !== 'undefined') {
-          new ResizeObserver(run).observe(dashToc);
-        }
-      } catch (eRO2) { }
-      try {
-        window.IIF_syncDashboardScrollOffsets = syncDashboardScrollOffsetsImpl;
-      } catch (eEx) { }
-    })();
-  </script>
+  <script src="js/iif-header-dash-layout-sync.js"></script>
 
 </body>
 
