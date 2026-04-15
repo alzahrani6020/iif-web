@@ -3929,16 +3929,19 @@
       z-index: 1000;
     }
 
+    .iif-lang-combobox-wrap.iif-lang-combobox--open {
+      z-index: 2147483000;
+    }
+
     .iif-lang-combobox-row {
       display: flex;
       align-items: stretch;
       gap: 0.25rem;
     }
 
-    .iif-lang-combobox-row .iif-lang-combobox-input {
+    .iif-lang-combobox-display {
       flex: 1 1 auto;
       min-width: 0;
-      width: auto;
       box-sizing: border-box;
       padding: 0.35rem 0.6rem;
       border-radius: var(--radius-sm);
@@ -3946,11 +3949,22 @@
       background: #fff;
       color: #111;
       font-size: 0.85rem;
+      font-family: inherit;
+      text-align: start;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
     }
 
-    .iif-lang-combobox-row .iif-lang-combobox-input:focus {
+    .iif-lang-combobox-display:hover {
+      border-color: rgba(201, 162, 39, 0.45);
+    }
+
+    .iif-lang-combobox-display:focus {
       outline: none;
       border-color: var(--color-accent-gold);
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
     }
 
     .iif-lang-combobox-toggle {
@@ -3971,21 +3985,56 @@
       background: rgba(201, 162, 39, 0.12);
     }
 
-    .iif-lang-combobox-list {
+    .iif-lang-combobox-panel {
       position: absolute;
-      z-index: 10000;
       left: 0;
       right: 0;
-      top: calc(100% + 2px);
-      max-height: 18rem;
-      overflow: auto;
+      top: calc(100% + 3px);
+      z-index: 2147483001;
+      display: none;
+      flex-direction: column;
+      max-height: min(72vh, 26rem);
+      background: #fff;
+      color: #111;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+
+    .iif-lang-combobox-panel:not([hidden]) {
+      display: flex;
+    }
+
+    .iif-lang-combobox-filter {
+      flex: 0 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.4rem 0.55rem;
+      border: 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      font-size: 0.82rem;
+      font-family: inherit;
+    }
+
+    .iif-lang-combobox-filter:focus {
+      outline: none;
+      background: rgba(201, 162, 39, 0.06);
+    }
+
+    .iif-lang-combobox-list {
+      position: static;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow-y: auto;
       margin: 0;
       padding: 0.25rem 0;
       list-style: none;
       background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      border-radius: var(--radius-sm);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .iif-lang-combobox-list[hidden] {
@@ -8386,16 +8435,19 @@
             <span class="lang-picker-label lang-ar">اللغة</span>
             <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap">
               <div class="iif-lang-combobox-row">
-                <input type="search" id="iif-lang-picker-input" class="iif-lang-combobox-input"
-                  name="iif-language"
-                  autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="search"
-                  role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-list"
-                  aria-autocomplete="list" title="Language" />
+                <button type="button" id="iif-lang-picker-display" class="iif-lang-combobox-display" role="combobox"
+                  aria-haspopup="listbox" aria-expanded="false" aria-controls="iif-lang-picker-list"
+                  title="Language"></button>
                 <button type="button" class="iif-lang-combobox-toggle" id="iif-lang-picker-toggle"
-                  aria-expanded="false" aria-controls="iif-lang-picker-list"
+                  aria-expanded="false" aria-controls="iif-lang-picker-panel"
                   title="عرض كل اللغات / Show all languages">▾</button>
               </div>
-              <ul class="iif-lang-combobox-list" id="iif-lang-picker-list" role="listbox" hidden></ul>
+              <div class="iif-lang-combobox-panel" id="iif-lang-picker-panel" hidden>
+                <input type="text" id="iif-lang-picker-filter" class="iif-lang-combobox-filter" inputmode="search"
+                  spellcheck="false" autocomplete="off" aria-label="Filter languages / تصفية اللغات"
+                  title="Filter / تصفية" />
+                <ul class="iif-lang-combobox-list" id="iif-lang-picker-list" role="listbox"></ul>
+              </div>
               <select id="iif-lang-picker" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
             </div>
           </div>
@@ -9439,16 +9491,19 @@
             <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
             <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap-dashboard">
               <div class="iif-lang-combobox-row">
-                <input type="search" id="iif-lang-picker-dashboard-input" class="iif-lang-combobox-input"
-                  name="iif-language-dashboard"
-                  autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="search"
-                  role="combobox" aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
-                  aria-autocomplete="list" title="Language" />
+                <button type="button" id="iif-lang-picker-dashboard-display" class="iif-lang-combobox-display" role="combobox"
+                  aria-haspopup="listbox" aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
+                  title="Language"></button>
                 <button type="button" class="iif-lang-combobox-toggle" id="iif-lang-picker-dashboard-toggle"
-                  aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
+                  aria-expanded="false" aria-controls="iif-lang-picker-dashboard-panel"
                   title="عرض كل اللغات / Show all languages">▾</button>
               </div>
-              <ul class="iif-lang-combobox-list" id="iif-lang-picker-dashboard-list" role="listbox" hidden></ul>
+              <div class="iif-lang-combobox-panel" id="iif-lang-picker-dashboard-panel" hidden>
+                <input type="text" id="iif-lang-picker-dashboard-filter" class="iif-lang-combobox-filter" inputmode="search"
+                  spellcheck="false" autocomplete="off" aria-label="Filter languages / تصفية اللغات"
+                  title="Filter / تصفية" />
+                <ul class="iif-lang-combobox-list" id="iif-lang-picker-dashboard-list" role="listbox"></ul>
+              </div>
               <select id="iif-lang-picker-dashboard" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
             </div>
           </div>
