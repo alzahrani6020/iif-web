@@ -7,6 +7,31 @@ export class Router {
     this.basePath = '/';
   }
 
+  // Read a value from localStorage, supporting both:
+  // 1) legacy raw values (stringified user / token)
+  // 2) StorageManager wrapper format: { value: "<json>", timestamp, ttl, encrypted }
+  readStoredValue(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      // If it's a wrapped StorageManager payload, unwrap it.
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && 'value' in parsed && 'timestamp' in parsed) {
+        const inner = parsed.value;
+        // inner may be JSON string (user object) or token string (JSON encoded).
+        try {
+          return JSON.parse(inner);
+        } catch (e) {
+          return inner;
+        }
+      }
+      return parsed;
+    } catch (e) {
+      // Not JSON: treat as raw string.
+      try { return localStorage.getItem(key); } catch (e2) { return null; }
+    }
+  }
+
   // Add a new route
   addRoute(path, handler, options = {}) {
     const route = {
@@ -162,16 +187,33 @@ export class Router {
 
   // Check if user is authenticated
   isAuthenticated() {
-    // This should be integrated with your auth system
-    const token = localStorage.getItem('iif-token');
-    return !!token;
+    try {
+      // Primary: StorageManager/AuthManager keys
+      const token = this.readStoredValue('iif-token');
+      if (token) return true;
+    } catch (e) { }
+    try {
+      // Compatibility: index.html auth keys
+      if (localStorage.getItem('iif-logged-in') === '1') return true;
+      if (sessionStorage.getItem('iif-logged-in') === '1') return true;
+      const email = (localStorage.getItem('iif-user-email') || '').trim();
+      if (email && localStorage.getItem('iif-is-admin') === '1') return true;
+    } catch (e2) { }
+    return false;
   }
 
   // Check if user is admin
   isAdmin() {
-    // This should be integrated with your auth system
-    const user = JSON.parse(localStorage.getItem('iif-user') || '{}');
-    return user.role === 'admin';
+    try {
+      // Primary: StorageManager/AuthManager key
+      const user = this.readStoredValue('iif-user');
+      if (user && user.role === 'admin') return true;
+    } catch (e) { }
+    try {
+      // Compatibility: index.html auth keys
+      if (localStorage.getItem('iif-is-admin') === '1') return true;
+    } catch (e2) { }
+    return false;
   }
 
   // Get current route

@@ -1,6 +1,7 @@
 /**
- * Fills language <select>s from IIF_I18N.codes + langs; optional combobox UI with search.
- * Expects IIF_I18N after i18n.js. Call IIF_initLangPickerUI() before applying saved language.
+ * Language picker: hidden <select> + visible button (no text field in header = no Chrome password autofill).
+ * Optional filter field inside the dropdown panel. Expects IIF_I18N from i18n.js.
+ * Call IIF_initLangPickerUI() after DOM + i18n are ready.
  */
 (function () {
   function fillSelect(sel) {
@@ -18,22 +19,34 @@
     }
   }
 
-  function syncInputFromSelect(sel, input) {
-    if (!sel || !input) return;
+  function syncDisplayFromSelect(sel, display) {
+    if (!sel || !display) return;
     var o = sel.options[sel.selectedIndex];
-    input.value = o ? o.textContent : '';
+    display.textContent = o ? o.textContent + ' · ' + o.value : '';
   }
 
   function initCombobox(cfg) {
     var wrap = document.getElementById(cfg.wrapId);
     if (wrap && wrap.getAttribute('data-iif-combobox-init') === '1') return;
     var sel = document.getElementById(cfg.selectId);
-    var input = document.getElementById(cfg.inputId);
+    var display = document.getElementById(cfg.displayId);
+    var panel = document.getElementById(cfg.panelId);
     var list = document.getElementById(cfg.listId);
-    if (!sel || !input || !list) return;
+    var filter = cfg.filterId ? document.getElementById(cfg.filterId) : null;
+    var toggle = cfg.toggleId ? document.getElementById(cfg.toggleId) : null;
+    if (!sel || !display || !panel || !list) return;
     if (wrap) wrap.setAttribute('data-iif-combobox-init', '1');
 
     fillSelect(sel);
+
+    if (filter) {
+      try {
+        filter.setAttribute('autocomplete', 'off');
+        filter.setAttribute('data-lpignore', 'true');
+        filter.setAttribute('data-1p-ignore', 'true');
+        filter.setAttribute('data-bwignore', 'true');
+      } catch (eF) { }
+    }
 
     var items = [];
     function rebuildList() {
@@ -54,6 +67,10 @@
 
     var activeIdx = -1;
 
+    function isOpen() {
+      return !panel.hidden;
+    }
+
     function visibleItems() {
       var out = [];
       for (var i = 0; i < items.length; i++) {
@@ -69,6 +86,10 @@
       }
     }
 
+    function filterQuery() {
+      return filter ? String(filter.value || '') : '';
+    }
+
     function filterItems(q) {
       q = (q || '').trim().toLowerCase();
       for (var i = 0; i < items.length; i++) {
@@ -82,16 +103,38 @@
       setActive(activeIdx >= 0 ? vis[activeIdx] : null);
     }
 
-    function openList() {
-      list.hidden = false;
-      input.setAttribute('aria-expanded', 'true');
+    function setExpanded(on) {
+      var v = on ? 'true' : 'false';
+      display.setAttribute('aria-expanded', v);
+      if (toggle) toggle.setAttribute('aria-expanded', v);
     }
 
-    function closeList() {
-      list.hidden = true;
-      input.setAttribute('aria-expanded', 'false');
+    function openPanel() {
+      panel.hidden = false;
+      panel.style.display = 'flex';
+      if (wrap) wrap.classList.add('iif-lang-combobox--open');
+      setExpanded(true);
+      if (filter) filter.value = '';
+      filterItems('');
+    }
+
+    function closePanel() {
+      panel.hidden = true;
+      panel.style.display = 'none';
+      if (wrap) wrap.classList.remove('iif-lang-combobox--open');
+      setExpanded(false);
       activeIdx = -1;
       setActive(null);
+      if (filter) filter.value = '';
+      for (var j = 0; j < items.length; j++) {
+        items[j].style.display = '';
+      }
+      list.hidden = false;
+    }
+
+    function togglePanel() {
+      if (isOpen()) closePanel();
+      else openPanel();
     }
 
     function chooseValue(code) {
@@ -99,30 +142,27 @@
         sel.value = code;
         sel.dispatchEvent(new Event('change', { bubbles: true }));
       }
-      closeList();
-      syncInputFromSelect(sel, input);
+      closePanel();
+      syncDisplayFromSelect(sel, display);
     }
 
-    input.addEventListener('focus', function () {
-      openList();
-      filterItems(input.value);
-    });
-
-    input.addEventListener('input', function () {
-      openList();
-      filterItems(input.value);
-    });
-
-    input.addEventListener('keydown', function (e) {
-      var vis = visibleItems();
+    function onNavKeydown(e) {
       if (e.key === 'Escape') {
-        closeList();
-        syncInputFromSelect(sel, input);
-        e.preventDefault();
+        if (isOpen()) {
+          closePanel();
+          e.preventDefault();
+        }
         return;
       }
+      if (!isOpen()) {
+        if (e.key === 'ArrowDown' || e.key === 'Enter') {
+          openPanel();
+          e.preventDefault();
+        }
+        return;
+      }
+      var vis = visibleItems();
       if (e.key === 'ArrowDown') {
-        if (list.hidden) openList();
         vis = visibleItems();
         if (!vis.length) return;
         activeIdx = Math.min(activeIdx + 1, vis.length - 1);
@@ -141,12 +181,35 @@
       }
       if (e.key === 'Enter') {
         vis = visibleItems();
-        if (!list.hidden && activeIdx >= 0 && vis[activeIdx]) {
+        if (activeIdx >= 0 && vis[activeIdx]) {
           chooseValue(vis[activeIdx].getAttribute('data-value'));
           e.preventDefault();
         }
       }
+    }
+
+    display.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      togglePanel();
     });
+    display.addEventListener('keydown', onNavKeydown);
+
+    if (toggle) {
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePanel();
+      });
+    }
+
+    if (filter) {
+      filter.addEventListener('input', function () {
+        if (!isOpen()) openPanel();
+        filterItems(filterQuery());
+      });
+      filter.addEventListener('keydown', onNavKeydown);
+    }
 
     list.addEventListener('mousedown', function (e) {
       e.preventDefault();
@@ -160,14 +223,16 @@
 
     var wrapEl = document.getElementById(cfg.wrapId);
     document.addEventListener('click', function (e) {
-      if (wrapEl && !wrapEl.contains(e.target)) closeList();
+      if (wrapEl && !wrapEl.contains(e.target)) closePanel();
     });
 
     window.addEventListener('iif-lang-change', function () {
-      syncInputFromSelect(sel, input);
+      syncDisplayFromSelect(sel, display);
     });
 
-    syncInputFromSelect(sel, input);
+    syncDisplayFromSelect(sel, display);
+    setExpanded(false);
+    closePanel();
   }
 
   window.IIF_fillLangSelectFromI18n = fillSelect;
@@ -181,8 +246,11 @@
       initCombobox({
         wrapId: 'iif-lang-combobox-wrap',
         selectId: 'iif-lang-picker',
-        inputId: 'iif-lang-picker-input',
-        listId: 'iif-lang-picker-list'
+        displayId: 'iif-lang-picker-display',
+        filterId: 'iif-lang-picker-filter',
+        panelId: 'iif-lang-picker-panel',
+        listId: 'iif-lang-picker-list',
+        toggleId: 'iif-lang-picker-toggle'
       });
     }
 
@@ -190,8 +258,11 @@
       initCombobox({
         wrapId: 'iif-lang-combobox-wrap-dashboard',
         selectId: 'iif-lang-picker-dashboard',
-        inputId: 'iif-lang-picker-dashboard-input',
-        listId: 'iif-lang-picker-dashboard-list'
+        displayId: 'iif-lang-picker-dashboard-display',
+        filterId: 'iif-lang-picker-dashboard-filter',
+        panelId: 'iif-lang-picker-dashboard-panel',
+        listId: 'iif-lang-picker-dashboard-list',
+        toggleId: 'iif-lang-picker-dashboard-toggle'
       });
     }
   };

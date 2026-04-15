@@ -1,0 +1,46 @@
+# Lighthouse على النشر العام (GitHub Pages) — إعلامي، لا يمنع الدمج.
+# التقرير يُرفع كـ artifact للمراجعة اليدوية.
+name: Lighthouse (scheduled)
+
+on:
+  schedule:
+    - cron: '15 6 1 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: lighthouse-scheduled
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: financial-consulting/iif-fund-demo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+          cache-dependency-path: financial-consulting/iif-fund-demo/package-lock.json
+
+      - name: Install subproject dependencies
+        run: npm ci
+
+      - name: Run Lighthouse (public Pages URL)
+        env:
+          IIF_LH_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: npm run lh
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: financial-consulting/iif-fund-demo/reports/lh-latest.html
