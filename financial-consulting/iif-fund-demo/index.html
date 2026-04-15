@@ -4537,6 +4537,8 @@
       position: relative;
       min-width: 10rem;
       max-width: 16rem;
+      overflow: visible;
+      z-index: 1000;
     }
 
     .iif-lang-combobox-wrap .iif-lang-combobox-input {
@@ -4557,7 +4559,7 @@
 
     .iif-lang-combobox-list {
       position: absolute;
-      z-index: 80;
+      z-index: 10000;
       left: 0;
       right: 0;
       top: calc(100% + 2px);
@@ -4570,6 +4572,11 @@
       border: 1px solid rgba(0, 0, 0, 0.15);
       border-radius: var(--radius-sm);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Ensure `hidden` always collapses the dropdown (some CSS resets can interfere). */
+    .iif-lang-combobox-list[hidden] {
+      display: none !important;
     }
 
     .iif-lang-combobox-list li[role="option"] {

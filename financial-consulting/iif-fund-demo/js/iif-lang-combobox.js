@@ -84,11 +84,13 @@
 
     function openList() {
       list.hidden = false;
+      list.style.display = 'block';
       input.setAttribute('aria-expanded', 'true');
     }
 
     function closeList() {
       list.hidden = true;
+      list.style.display = 'none';
       input.setAttribute('aria-expanded', 'false');
       activeIdx = -1;
       setActive(null);
