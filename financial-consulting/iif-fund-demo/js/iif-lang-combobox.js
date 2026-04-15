@@ -108,6 +108,13 @@
       filterItems(input.value);
     });
 
+    // Some browsers (and some overlays) won't focus reliably on first tap;
+    // ensure click always opens the list.
+    input.addEventListener('click', function () {
+      openList();
+      filterItems(input.value);
+    });
+
     input.addEventListener('input', function () {
       openList();
       filterItems(input.value);

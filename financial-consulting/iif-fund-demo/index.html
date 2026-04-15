@@ -30548,7 +30548,12 @@ Generated: ${new Date().toLocaleString()}
           try {
             if (typeof location !== 'undefined' && location.hostname === '127.0.0.1' && String(location.port || '') === '3333') base = '';
           } catch (eLoc) { }
-          var docLangTicker = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase().trim() || 'en';
+          var docLangTicker = (document.documentElement.getAttribute('data-lang') || document.documentElement.lang || 'en').toLowerCase().trim() || 'en';
+          try {
+            var spLang = new URLSearchParams(window.location.search || '');
+            var qLang = (spLang.get('lang') || '').trim().toLowerCase();
+            if (qLang) docLangTicker = qLang;
+          } catch (eQ) { }
           var qs = '?lang=' + encodeURIComponent(docLangTicker) + '&cat=' + encodeURIComponent(cat);
           var cc = getCountryForCat(cat);
           if (cc) qs += '&country=' + encodeURIComponent(cc);
@@ -30558,6 +30563,15 @@ Generated: ${new Date().toLocaleString()}
             var slice = items.slice(0, 20);
             /* بدون عناصر: نُبقي روابط HTML الافتراضية ولا نستبدلها برسالة فارغة */
             if (!slice.length) return;
+            // Reject "diagnostic" / placeholder payloads (sometimes returned by upstream translation layers).
+            try {
+              var badRx = /(LANGPAIR=|ALMOST\\s+ALL\\s+LANGUAGES\\s+SUPPORTED|SUPPORTED\\s+BUT\\s+SOME\\s+MAY\\s+HAVE\\s+NO\\s+CONTENT)/i;
+              var hasBad = slice.some(function (it) {
+                var t = (it && (it.titleAr || it.titleEn || it.title) ? String(it.titleAr || it.titleEn || it.title) : '');
+                return badRx.test(t);
+              });
+              if (hasBad) return; // keep static HTML
+            } catch (eBad) { }
             /* titleEn/titleAr من الـ API عند التمييز؛ وإلا title واحد للاثنين */
             var bilingual = slice.map(function (it) {
               return { title: it.title, titleEn: it.titleEn, titleAr: it.titleAr, link: it.link, source: it.source };
