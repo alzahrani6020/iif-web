@@ -2,6 +2,21 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
+      "source": "/",
+      "destination": "/financial-consulting/iif-fund-demo/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/financial-consulting/iif-fund-demo",
+      "destination": "/financial-consulting/iif-fund-demo/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/financial-consulting/iif-fund-demo/",
+      "destination": "/financial-consulting/iif-fund-demo/index.html",
+      "permanent": false
+    },
+    {
       "source": "/fund",
       "destination": "/financial-consulting/iif-fund-demo/index.html",
       "permanent": false

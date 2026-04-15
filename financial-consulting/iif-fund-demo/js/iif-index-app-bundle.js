@@ -1,11494 +1,26 @@
-<!doctype html>
-<html lang="en" dir="ltr" data-lang="en">
-
-<head>
-  <script>
-    /* admin-standalone: فرض معاملات فتح اللوحة على الجهاز المحلي فقط */
-    (function () {
-      try {
-        var h = location.hostname || '';
-        if (location.protocol === 'file:') return;
-        if (h !== '127.0.0.1' && h !== 'localhost' && h !== '[::1]') return;
-        var u = new URL(location.href);
-        u.searchParams.set('local_dashboard', '1');
-        u.searchParams.set('iif_admin_portal', '1');
-        u.searchParams.set('open_dashboard', '1');
-        history.replaceState(null, '', u.pathname + u.search + (u.hash || ''));
-      } catch (e) { }
-    })();
-  </script>
-
-  <meta charset="utf-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.sheetjs.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https:; frame-src https://translate.google.com https://www.google.com https://www.gstatic.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:; object-src 'none'; upgrade-insecure-requests; worker-src 'self'" />
-  <!-- جذر المسارات النسبية (assets/، الشعار): اختياري عبر meta iif-app-base؛ وإلا يُحسب من المسار + استثناء npm start (المنفذ 3333) -->
-  <meta name="iif-app-base" content="" />
-  <meta name="iif-contact-form-endpoint" content="" />
-  <base id="iif-document-base" href="/" />
-  <script>
-    (function () {
-      function setIifBase(href) {
-        var b = document.getElementById('iif-document-base');
-        if (b) b.setAttribute('href', href);
-        window.IIF_DOCUMENT_BASE = href;
-      }
-      try {
-        var meta = document.querySelector('meta[name="iif-app-base"]');
-        var manual = meta && meta.getAttribute('content');
-        if (manual != null && String(manual).trim() !== '') {
-          var mb = String(manual).trim();
-          if (!mb.endsWith('/')) mb += '/';
-          setIifBase(mb);
-          return;
-        }
-        var path = location.pathname || '/';
-        var baseHref = '/';
-        var host = location.hostname || '';
-        var port = String(location.port || '');
-        var isLocal = host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
-        /**
-         * scripts/dev-server.js يقدّم / و /index.html من financial-consulting/iif-fund-demo/index.html
-         * بينما pathname يبقى / — فيجب جذر المشروع وليس جذر النطاق حتى تُحمّل assets/emblem.jpg
-         */
-        if (
-          isLocal &&
-          port === '3333' &&
-          (path === '/' ||
-            path === '/index.html' ||
-            path === '/cp' ||
-            path === '/dashboard')
-        ) {
-          baseHref = '/financial-consulting/iif-fund-demo/';
-        } else if (path !== '/' && path !== '') {
-          if (/\.html?$/i.test(path)) {
-            var i = path.lastIndexOf('/');
-            baseHref = i <= 0 ? '/' : path.slice(0, i + 1);
-          } else {
-            baseHref = path.endsWith('/') ? path : path + '/';
-          }
-        }
-        setIifBase(baseHref);
-      } catch (e) {
-        setIifBase('/');
-      }
-    })();
-  </script>
-  <script>
-    /* إذا فتح المستخدم index.html كملف محلي عبر file:// فلن تعمل مسارات dev-server ولا اختصارات الأدمن.
-       نحول تلقائياً إلى خادم التطوير على 3333 لتكون السلوكيات ثابتة. */
-    try {
-      if (location && location.protocol === 'file:') {
-        location.replace('http://127.0.0.1:3333/cp');
-      }
-    } catch (e) { }
-  </script>
-  <script>
-    /**
-     * حل محلي صريح — لا يعمل على Netlify/الإنترنت (hostname ليس 127.0.0.1).
-     * افتح: ...?local_dashboard=1 بعد npm start — أو استخدم OPEN-LOCAL-DASHBOARD.bat
-     * يضبط جلسة المالك ثم يستبدل الاستعلام بـ iif_admin_portal + open_dashboard حتى يمر باقي الصفحة كالمعتاد.
-     */
-    (function () {
-      try {
-        var h = location.hostname || '';
-        var onlyLocal = h === '127.0.0.1' || h === 'localhost' || h === '[::1]';
-        if (!onlyLocal || location.protocol === 'file:') return;
-        var sp = new URLSearchParams(location.search || '');
-        if (sp.get('local_dashboard') !== '1' && sp.get('iif_local_dashboard') !== '1') return;
-        var owner = 'talalkenani@gmail.com';
-        try {
-          localStorage.setItem('iif-logged-in', '1');
-          localStorage.setItem('iif-user-email', owner);
-          localStorage.setItem('iif-is-admin', '1');
-          sessionStorage.setItem('iif_admin_portal_mode', '1');
-          sessionStorage.setItem('iif_pending_open_dashboard', '1');
-        } catch (e0) { }
-        try {
-          var u = new URL(location.href);
-          u.searchParams.delete('local_dashboard');
-          u.searchParams.delete('iif_local_dashboard');
-          u.searchParams.set('iif_admin_portal', '1');
-          u.searchParams.set('open_dashboard', '1');
-          history.replaceState(null, '', u.pathname + u.search + (u.hash || ''));
-        } catch (e1) { }
-      } catch (e) { }
-    })();
-  </script>
-  <title>صندوق الاستثمار الدولي — لوحة التحكم (ملف مستقل)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a0e18" />
-  <meta name="iif-build" content="dashboard-fullpage-v8-fix-main-close" />
-  <meta name="description"
-    content="صندوق الاستثمار الدولي (FII) — International Investment Fund — Financing for global prosperity. Registered in the EU Transparency Register. Licensed in France & USA. European & African Parliament recognition. Sovereign & institutional capital." />
-  <meta name="iif-funcs-base" content="https://iif-fund-dr-talal.vercel.app" />
-  <link rel="icon" href="assets/emblem.webp" type="image/webp" />
-  <link rel="icon" href="assets/emblem.jpg" type="image/jpeg" />
-  <link rel="apple-touch-icon" href="assets/emblem.jpg" />
-  <link rel="preload" as="image" href="assets/emblem.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-  <link rel="preconnect" href="https://cdn.sheetjs.com" crossorigin />
-  <link rel="stylesheet" href="css/fonts-hosted.css" />
-  <link rel="stylesheet" href="css/public-components.css" />
-  <!-- تحقق-النشر: iif-dashboard-fullpage-v3 — إن لم يظهر هذا التعليق في Ctrl+U على Vercel فالنشر قديم -->
-  <style id="iif-dashboard-fullpage-critical-head">
-    /* لوحة التحكم: ملء الشاشة — نسخة مبكّرة في <head> (تُكمّلها iif-dashboard-fullpage-lock في آخر body) */
-    #dashboard-overlay.dashboard-overlay.is-open,
-    html.iif-dashboard-open #dashboard-overlay.dashboard-overlay.is-open {
-      position: fixed !important;
-      inset: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      top: 0 !important;
-      bottom: 0 !important;
-      /* 100vw يتجاوز حاوية fixed ضيقة حيث يفشل width:auto + min-width:100% */
-      width: 100vw !important;
-      min-width: 100vw !important;
-      max-width: none !important;
-      min-height: 100vh !important;
-      min-height: 100dvh !important;
-      max-height: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      transform: none !important;
-      box-sizing: border-box !important;
-      z-index: 2147483647 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
-      background: linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%) !important;
-    }
-
-    #dashboard-overlay.is-open #dashboard-page-shell {
-      width: 100% !important;
-      min-width: 100% !important;
-      max-width: none !important;
-      flex: 1 1 auto !important;
-      margin: 0 !important;
-      box-sizing: border-box !important;
-    }
-
-    #dashboard-overlay.is-open .dashboard-main,
-    #dashboard-overlay.is-open .dashboard-header-bar .site-header__inner {
-      max-width: none !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
-
-    body:has(#dashboard-overlay.is-open) #main-content {
-      display: none !important;
-    }
-
-    /* بدون :has — يعتمد على صنف html.iif-dashboard-open من openDashboard() */
-    html.iif-dashboard-open body>*:not(#dashboard-overlay):not(script) {
-      display: none !important;
-    }
-  </style>
-  <style>
-    :root {
-      --color-primary: #0a0e18;
-      --color-primary-soft: #111827;
-      --color-accent-gold: #c9a227;
-      --color-accent-gold-soft: #e8d48a;
-      --color-accent-gold-glow: rgba(201, 162, 39, 0.22);
-      --color-accent-emerald: #1c8a57;
-      /* مودرن وعصري مع الحفاظ على الفخامة — أزرق داكن + ذهبي */
-      --color-accent-slate: #0f172a;
-      --color-accent-blue: #1e3a5f;
-      --color-accent-blue-soft: rgba(30, 58, 95, 0.35);
-      --color-accent-white: #f8fafc;
-      --color-accent-silver: rgba(255, 255, 255, 0.1);
-
-      --color-bg: #050810;
-      --color-surface: #0c111b;
-      --color-surface-elevated: #131a28;
-      --color-border-subtle: rgba(255, 255, 255, 0.08);
-      --color-glass: rgba(255, 255, 255, 0.04);
-
-      --color-text-main: #f1f5f9;
-      --color-text-muted: #94a3b8;
-
-      --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-
-      --space-2: 0.5rem;
-      --space-3: 0.75rem;
-      --space-4: 1rem;
-      --space-5: 1.25rem;
-      --space-6: 1.5rem;
-      --space-8: 2rem;
-      --space-10: 2.5rem;
-      --space-12: 3rem;
-      --space-16: 4rem;
-      --space-20: 5rem;
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 20px;
-      --radius-xl: 28px;
-      --radius-full: 9999px;
-      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.04);
-      --shadow-card-hover: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
-      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    /* أوزن الصفحات: الهيدر لا يغطي المحتوى — قيمة كافية حتى مع تكرار الهيدر على سطرين */
-    :root {
-      --header-height: clamp(11.5rem, 30vh, 24rem);
-      --service-back-bar-height: 4rem;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-    }
-
-    [id],
-    .section,
-    section[id],
-    main [id] {
-      scroll-margin-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
-    }
-
-    main#main-content {
-      padding-top: 0.5rem;
-    }
-
-    .skip-link {
-      position: absolute;
-      top: -3rem;
-      left: var(--space-4);
-      z-index: 100;
-      padding: 0.6rem 1rem;
-      background: var(--color-accent-gold);
-      color: #1b1b1b;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: var(--radius-sm);
-      transition: top 0.2s ease;
-    }
-
-    .skip-link:focus {
-      top: var(--space-4);
-      outline: 2px solid var(--color-accent-gold-soft);
-      outline-offset: 2px;
-    }
-
-    .skip-link:focus-visible {
-      top: var(--space-4);
-      outline: 2px solid var(--color-accent-gold, #c9a227);
-      outline-offset: 3px;
-    }
-
-    .skip-link:focus:not(:focus-visible) {
-      outline: none;
-    }
-
-    .iif-first-load-shell {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      z-index: 2147483646;
-      pointer-events: none;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(201, 162, 39, 0.45),
-        rgba(232, 212, 138, 0.35),
-        rgba(201, 162, 39, 0.45),
-        transparent
-      );
-      background-size: 220% 100%;
-      animation: iif-first-load-shimmer 1.15s ease-in-out infinite;
-      transition: opacity 0.35s ease, visibility 0.35s ease;
-    }
-
-    .iif-first-load-shell--hide {
-      opacity: 0;
-      visibility: hidden;
-      animation: none;
-    }
-
-    @keyframes iif-first-load-shimmer {
-      0% {
-        background-position: 120% 0;
-      }
-      100% {
-        background-position: -120% 0;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .iif-first-load-shell {
-        animation: none;
-        background: rgba(201, 162, 39, 0.55);
-      }
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: var(--font-sans);
-      background: #03060c;
-      background-image:
-        radial-gradient(ellipse 120% 80% at 50% -20%, var(--color-accent-blue-soft), transparent 50%),
-        radial-gradient(ellipse 80% 50% at 90% 70%, rgba(201, 162, 39, 0.05), transparent 45%),
-        radial-gradient(ellipse 70% 60% at 10% 90%, rgba(15, 42, 78, 0.2), transparent 40%),
-        linear-gradient(180deg, #050810 0%, var(--color-accent-slate) 35%, #080c14 60%, #050810 100%);
-      color: var(--color-text-main);
-      -webkit-font-smoothing: antialiased;
-      font-feature-settings: "ss01", "ss02";
-      text-rendering: optimizeLegibility;
-      position: relative;
-    }
-
-    /* شعار الصندوق خلفية لجميع الصفحات */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('assets/emblem.jpg') center center no-repeat;
-      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center center no-repeat;
-      background-size: min(70vw, 520px) auto;
-      opacity: 0.06;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    p {
-      margin: 0 0 var(--space-4);
-      font-size: 0.98rem;
-      line-height: 1.7;
-      color: var(--color-text-muted);
-    }
-
-    h1,
-    h2,
-    h3,
-    h4 {
-      margin: 0 0 var(--space-3);
-      font-weight: 650;
-      letter-spacing: 0.02em;
-      color: var(--color-text-main);
-    }
-
-    /* لا تستخدم selector عاماً لـ main — يوجد <main class="dashboard-main"> داخل اللوحة فيُطبَّق max-width:1200px على اللوحة فيبدو كنافذة عائمة */
-    main#main-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--space-12) var(--space-4) var(--space-16);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* أزرار بارزة — هيئة أزرار فعلية */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.65rem 1.35rem;
-      border-radius: var(--radius-md);
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      border: 2px solid transparent;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
-      box-sizing: border-box;
-    }
-
-    .btn--primary {
-      background: linear-gradient(180deg, #e0c04a 0%, var(--color-accent-gold) 50%, #a8841a 100%);
-      color: #0d0d0d;
-      border-color: #8b6914;
-      box-shadow:
-        0 4px 0 rgba(0, 0, 0, 0.25),
-        0 6px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    .btn--primary:hover {
-      transform: translateY(-1px);
-      box-shadow:
-        0 5px 0 rgba(0, 0, 0, 0.2),
-        0 8px 24px var(--color-accent-gold-glow),
-        0 0 20px rgba(201, 162, 39, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    .btn--primary:active {
-      transform: translateY(2px);
-      box-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.3),
-        0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn--ghost {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-      color: var(--color-text-main);
-      border-color: rgba(255, 255, 255, 0.25);
-      box-shadow:
-        0 3px 0 rgba(0, 0, 0, 0.2),
-        0 4px 12px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    .btn--ghost:hover {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
-      border-color: rgba(255, 255, 255, 0.35);
-      box-shadow:
-        0 4px 0 rgba(0, 0, 0, 0.15),
-        0 6px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    }
-
-    .btn--ghost:active {
-      transform: translateY(1px);
-      box-shadow:
-        0 1px 0 rgba(0, 0, 0, 0.25),
-        inset 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn.btn-sm,
-    .btn.btn--sm {
-      padding: 0.45rem 0.95rem;
-      font-size: 0.85rem;
-      border-width: 2px;
-      border-radius: var(--radius-sm);
-    }
-
-    .btn.btn-sm.btn--primary:active,
-    .btn.btn--sm.btn--primary:active {
-      transform: translateY(2px);
-    }
-
-    .btn.btn-sm.btn--ghost:active,
-    .btn.btn--sm.btn--ghost:active {
-      transform: translateY(1px);
-    }
-
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(24px) saturate(1.2);
-      -webkit-backdrop-filter: blur(24px) saturate(1.2);
-      background: linear-gradient(to bottom, rgba(3, 6, 12, 0.92) 0%, rgba(3, 6, 12, 0.75) 100%);
-      border-bottom: 1px solid var(--color-border-subtle);
-      transition: box-shadow var(--transition);
-    }
-
-    .site-header::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -1px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--color-accent-gold-glow), var(--color-accent-silver), var(--color-accent-gold-glow), transparent);
-      opacity: 0.8;
-      pointer-events: none;
-    }
-
-    .site-header__inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0.55rem var(--space-4) 0.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: flex-start;
-      gap: var(--space-4);
-      flex-wrap: nowrap;
-    }
-
-    .site-header__inner > .site-nav {
-      align-self: stretch;
-      max-width: 100%;
-    }
-
-    .site-header__tickers {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .ticker-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.45rem 0.85rem;
-      padding: 0.35rem 0.5rem 0.45rem 6rem;
-      border-bottom: 1px solid var(--color-border-subtle);
-      background: rgba(10, 14, 24, 0.92);
-      font-size: 0.78rem;
-    }
-
-    [dir="rtl"] .ticker-toolbar {
-      padding: 0.35rem 6rem 0.45rem 0.5rem;
-    }
-
-    .ticker-toolbar label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      color: var(--color-text-muted, #94a3b8);
-    }
-
-    .ticker-toolbar select {
-      max-width: 10rem;
-      padding: 0.2rem 0.45rem;
-      border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: rgba(12, 16, 26, 0.95);
-      color: var(--color-text-main);
-      font-size: 0.76rem;
-    }
-
-    .ticker-toolbar .btn--ticker-pause {
-      margin-inline-end: auto;
-      padding: 0.25rem 0.55rem;
-      font-size: 0.76rem;
-    }
-
-    [dir="rtl"] .ticker-toolbar .btn--ticker-pause {
-      margin-inline-end: 0;
-      margin-inline-start: auto;
-    }
-
-    .site-header__tickers--paused .ticker-track {
-      animation-play-state: paused !important;
-    }
-
-    .site-logo {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .site-logo__emblem {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      height: 56px;
-      width: 56px;
-      filter: drop-shadow(0 4px 20px var(--color-accent-gold-glow));
-      transition: transform var(--transition);
-    }
-
-    .site-logo:hover .site-logo__emblem {
-      transform: scale(1.03);
-    }
-
-    .site-logo__emblem svg,
-    .site-logo__emblem .site-logo__img {
-      height: 100%;
-      width: 100%;
-      display: block;
-      object-fit: contain;
-    }
-
-    .site-logo__emblem picture,
-    .hero-emblem picture,
-    .video-call-modal__brand picture,
-    #certificate-card > picture,
-    .letterhead-sheet__head-left picture {
-      display: contents;
-    }
-
-    .site-logo__text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .site-logo__title {
-      font-size: 1.05rem;
-      font-weight: 650;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--color-text-main);
-    }
-
-    .site-logo__subtitle {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--color-text-muted);
-    }
-
-    .site-header__brand {
-      display: block;
-      width: 100%;
-    }
-
-    /* شريط علوي واحد: الشعار + الساعة + الاختصارات + الحساب */
-    .iif-header-primary-bar {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem 0.75rem;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.5rem 0.75rem;
-      border-radius: 14px;
-      border: 1px solid rgba(201, 162, 39, 0.16);
-      background:
-        linear-gradient(168deg, rgba(255, 255, 255, 0.045) 0%, transparent 38%),
-        linear-gradient(180deg, rgba(22, 26, 34, 0.92) 0%, rgba(10, 12, 18, 0.96) 100%);
-      box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.25) inset,
-        0 1px 0 rgba(255, 255, 255, 0.05) inset,
-        0 4px 18px rgba(0, 0, 0, 0.12);
-      -webkit-backdrop-filter: blur(12px) saturate(1.08);
-      backdrop-filter: blur(12px) saturate(1.08);
-    }
-
-    @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-      .iif-header-primary-bar {
-        background: linear-gradient(180deg, rgba(22, 26, 34, 0.98) 0%, rgba(10, 12, 18, 0.99) 100%);
-      }
-    }
-
-    .iif-header-primary-bar .site-logo {
-      flex: 0 1 auto;
-      min-width: 0;
-      margin-inline-end: 0.15rem;
-    }
-
-    .site-header__clock-lang {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
-      flex: 1 1 220px;
-      min-width: min(100%, 12rem);
-      max-width: none;
-      flex-shrink: 1;
-    }
-
-    .iif-header-brand-stack {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.45rem 0.55rem;
-      width: 100%;
-    }
-
-    .iif-header-brand-top {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.45rem 0.55rem;
-      flex: 0 1 auto;
-    }
-
-    .iif-header-brand-top .site-clock--in-brand {
-      flex: 0 1 auto;
-      min-width: 0;
-    }
-
-    .iif-header-brand-top .iif-section-links-toggle {
-      flex: 0 1 auto;
-      min-width: min(100%, 9.5rem);
-      max-width: 100%;
-      width: auto;
-      margin: 0;
-      align-self: center;
-    }
-
-    .iif-header-toolbar-panel {
-      position: relative;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.4rem 0.5rem;
-      padding: 0;
-      border-radius: 0;
-      border: none;
-      background: transparent;
-      box-shadow: none;
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      flex: 1 1 180px;
-      min-width: min(100%, 10rem);
-    }
-
-    .iif-header-toolbar-panel::before {
-      display: none;
-    }
-
-    .iif-header-toolbar-panel .site-header__auth-btns {
-      margin: 0 !important;
-    }
-
-    .iif-header-toolbar-panel .site-header__auth-btn {
-      border-radius: 999px;
-      font-size: 0.76rem;
-      font-weight: 600;
-      padding: 0.28rem 0.82rem;
-      border-width: 1px;
-      letter-spacing: 0.02em;
-      box-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .iif-header-toolbar-panel .site-header__auth-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .iif-header-toolbar-panel .site-header__auth-btn:active {
-      transform: translateY(0);
-    }
-
-    .iif-header-brand-account {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.45rem 0.6rem;
-      padding: 0;
-      border-radius: 0;
-      border: none;
-      background: transparent;
-      box-shadow: none;
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      flex: 0 1 auto;
-      margin-inline-start: auto;
-    }
-
-    .iif-header-brand-stack:has(#iif-header-toolbar-links[hidden]) .iif-header-brand-account {
-      border: none;
-    }
-
-    .iif-header-brand-account .site-header__auth-btns--top {
-      margin: 0;
-      margin-inline-end: var(--space-2);
-      padding-inline-end: var(--space-2);
-      border-inline-end: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .iif-header-brand-account .lang-picker-wrap {
-      margin: 0;
-      padding: 0.22rem 0.48rem;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 11px;
-    }
-
-    .iif-header-brand-account .lang-picker-label {
-      color: rgba(226, 232, 240, 0.88);
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-    }
-
-    .iif-header-brand-account .lang-picker-wrap select {
-      padding: 0.32rem 1.65rem 0.32rem 0.55rem;
-      border-radius: 9px;
-      border: 1px solid rgba(201, 162, 39, 0.28);
-      background-color: rgba(14, 16, 24, 0.92);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e2e8f0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.5rem center;
-      color: #e8eaf0;
-      font-size: 0.78rem;
-    }
-
-    [dir="rtl"] .iif-header-brand-account .lang-picker-wrap select {
-      background-position: left 0.5rem center;
-    }
-
-    .iif-header-brand-account .lang-picker-wrap select:hover,
-    .iif-header-brand-account .lang-picker-wrap select:focus {
-      border-color: rgba(212, 174, 42, 0.55);
-    }
-
-    .iif-header-brand-account .header-user-card {
-      margin: 0;
-      border-color: rgba(201, 162, 39, 0.2);
-      background: rgba(201, 162, 39, 0.05);
-      box-shadow: none;
-      filter: none;
-    }
-
-    .iif-header-brand-account .header-user-card:hover {
-      box-shadow: 0 2px 12px rgba(201, 162, 39, 0.12);
-      border-color: rgba(201, 162, 39, 0.32);
-    }
-
-    .site-header__brand .site-clock--in-brand {
-      align-items: flex-start;
-      margin-inline-start: 0;
-      padding-inline-start: var(--space-4);
-      border-inline-start: 1px solid rgba(201, 162, 39, 0.25);
-    }
-
-    .site-header__brand .iif-header-brand-top .site-clock--in-brand {
-      margin-inline-start: 0;
-      margin-inline-end: 0;
-      padding: 0.28rem 0.65rem;
-      padding-inline-start: 0.65rem;
-      min-width: 0;
-      align-items: flex-start;
-      text-align: start;
-      border-inline-start: none;
-      border-inline-end: none;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(0, 0, 0, 0.22);
-      box-shadow: none;
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-
-    .iif-header-primary-bar .site-clock__time {
-      font-size: 1.05rem;
-    }
-
-    .iif-header-primary-bar .site-clock__tz,
-    .iif-header-primary-bar .site-clock__date {
-      font-size: 0.68rem;
-    }
-
-    .site-header__clock-lang .lang-picker-wrap {
-      margin: 0;
-    }
-
-    .iif-section-links-toggle {
-      box-sizing: border-box;
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-      padding: 0.5rem 1.1rem;
-      font-size: 0.76rem;
-      font-weight: 650;
-      letter-spacing: 0.04em;
-      line-height: 1.4;
-      color: #faf6ee;
-      cursor: pointer;
-      border: 1px solid rgba(201, 162, 39, 0.45);
-      border-radius: 999px;
-      background:
-        linear-gradient(180deg, rgba(201, 162, 39, 0.2) 0%, transparent 42%),
-        linear-gradient(180deg, rgba(44, 48, 60, 0.98) 0%, rgba(14, 16, 24, 1) 100%);
-      box-shadow:
-        0 4px 18px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(0, 0, 0, 0.25) inset,
-        0 1px 0 rgba(255, 255, 255, 0.09) inset;
-      transition:
-        border-color 0.22s ease,
-        box-shadow 0.22s ease,
-        background 0.22s ease,
-        transform 0.2s ease,
-        color 0.2s ease;
-    }
-
-    .iif-section-links-toggle:hover {
-      border-color: rgba(236, 220, 160, 0.55);
-      color: #fff;
-      box-shadow:
-        0 6px 28px rgba(201, 162, 39, 0.12),
-        0 4px 18px rgba(0, 0, 0, 0.32),
-        0 1px 0 rgba(255, 255, 255, 0.11) inset;
-      transform: translateY(-1px);
-    }
-
-    .iif-section-links-toggle:active {
-      transform: translateY(0);
-    }
-
-    .iif-section-links-toggle:focus-visible {
-      outline: 2px solid rgba(236, 220, 160, 0.75);
-      outline-offset: 3px;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .iif-section-links-toggle,
-      .iif-header-toolbar-panel .site-header__auth-btn {
-        transition: none;
-      }
-
-      .iif-section-links-toggle:hover,
-      .iif-header-toolbar-panel .site-header__auth-btn:hover {
-        transform: none;
-      }
-    }
-
-    .site-header__auth-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .site-header__auth-btns.is-hidden {
-      display: none !important;
-    }
-
-    .site-header__auth-btn {
-      padding: 0.22rem 0.75rem;
-      font-size: 0.8rem;
-      border-radius: var(--radius-md);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 2px solid;
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), border-color var(--transition), color var(--transition);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-
-    .site-header__auth-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-    }
-
-    .site-header__auth-btn--login {
-      border-color: var(--color-accent-gold);
-      background: rgba(201, 162, 39, 0.12);
-      color: var(--color-accent-gold);
-    }
-
-    .site-header__auth-btn--login:hover {
-      background: rgba(212, 174, 42, 0.22);
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold-soft);
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15), 0 4px 12px var(--color-accent-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    }
-
-    .site-header__auth-btn--register {
-      background: linear-gradient(180deg, #e0c04a 0%, var(--color-accent-gold) 50%, #a8841a 100%);
-      color: #111;
-      border-color: #8b6914;
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-
-    .site-header__auth-btn--register:hover {
-      background: linear-gradient(180deg, #e8c850 0%, #d4ae2a 50%, #b8921c 100%);
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2), 0 6px 16px var(--color-accent-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    .header-user-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2) var(--space-3);
-      padding-inline-start: var(--space-4);
-      margin-inline-start: 0;
-      background: var(--color-surface-elevated);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-subtle);
-      border-inline-start: 1px solid rgba(201, 162, 39, 0.25);
-      text-align: center;
-    }
-
-    .header-user-card:not(.is-visible) .header-user-card__info {
-      display: none;
-    }
-
-    .header-user-card.is-visible .header-user-card__info {
-      display: flex;
-    }
-
-    .site-header__clock-lang .header-user-card {
-      flex-shrink: 0;
-    }
-
-    /* بطاقة العضو في الهيدر */
-    .header-user-card {
-      margin: 0 0.5rem;
-      padding: 0.25rem 0.75rem;
-      background: rgba(201, 162, 39, 0.1);
-      border: 1px solid rgba(201, 162, 39, 0.3);
-      border-radius: 25px;
-      transition: all 0.3s ease;
-    }
-
-    .header-user-card:hover {
-      background: rgba(201, 162, 39, 0.2);
-      border-color: rgba(201, 162, 39, 0.5);
-      box-shadow: 0 2px 8px rgba(201, 162, 39, 0.2);
-    }
-
-    .header-user-card.is-visible {
-      cursor: pointer;
-    }
-
-    .header-user-card.is-visible:focus-visible {
-      outline: 2px solid var(--color-accent-gold, #c9a227);
-      outline-offset: 2px;
-    }
-
-    .header-user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .header-user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid var(--color-accent-gold);
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .header-user-avatar:hover {
-      transform: scale(1.1);
-    }
-
-    .header-user-details {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .header-user-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 120px;
-    }
-
-    .header-user-title {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 120px;
-    }
-
-    @media (max-width: 768px) {
-      .header-user-card {
-        margin: 0 0.25rem;
-        padding: 0.2rem 0.5rem;
-      }
-
-      .header-user-avatar {
-        width: 28px;
-        height: 28px;
-      }
-
-      .header-user-name {
-        font-size: 0.8rem;
-        max-width: 100px;
-      }
-
-      .header-user-title {
-        font-size: 0.7rem;
-        max-width: 100px;
-      }
-    }
-
-    .header-user-card__photo-wrap {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      overflow: hidden;
-      background: var(--color-surface);
-      flex-shrink: 0;
-    }
-
-    .header-user-card__photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .header-user-card__info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      min-width: 0;
-      width: 100%;
-      align-items: center;
-    }
-
-    .header-user-card__name {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--color-text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .header-user-card__meta {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-    }
-
-    .site-nav {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem 0.45rem;
-      row-gap: 0.45rem;
-      font-size: 0.8rem;
-      flex-wrap: wrap;
-      overflow: visible;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .site-nav a {
-      color: var(--color-text-muted);
-      text-decoration: none;
-      padding: 0.22rem 0.7rem;
-      border-radius: var(--radius-md);
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      transition: color var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-      font-weight: 600;
-      line-height: 1.25;
-    }
-
-    .site-nav a:hover {
-      color: var(--color-accent-gold-soft);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-color: rgba(201, 162, 39, 0.35);
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12), 0 4px 12px rgba(201, 162, 39, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    .site-nav a:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    .site-nav .btn {
-      padding: 0.26rem 0.9rem;
-      font-size: 0.8rem;
-      line-height: 1.25;
-    }
-
-    /* خدماتنا — قائمة منسدلة حتى يتوسّع الهيدر */
-    .site-nav__services-wrap {
-      position: relative;
-      display: inline-block;
-      overflow: visible;
-    }
-
-    .site-nav__more-wrap {
-      position: relative;
-      display: inline-block;
-      overflow: visible;
-    }
-
-    .site-nav__services-trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      color: var(--color-text-muted);
-      text-decoration: none;
-      padding: 0.22rem 0.7rem;
-      border-radius: var(--radius-md);
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      font-size: 0.8rem;
-      font-weight: 600;
-      line-height: 1.25;
-      cursor: pointer;
-      font-family: inherit;
-      transition: color var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition);
-    }
-
-    .site-nav__services-trigger:hover,
-    .site-nav__services-trigger:focus {
-      color: var(--color-accent-gold);
-      outline: none;
-    }
-
-    .site-nav__dropdown {
-      --iif-dd-x: 0px;
-      position: absolute;
-      top: 100%;
-      inset-inline-start: 0;
-      inset-inline-end: auto;
-      min-width: min(220px, calc(100vw - 1.5rem));
-      max-width: min(22rem, calc(100vw - 1.25rem));
-      max-height: min(72vh, 28rem);
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      box-sizing: border-box;
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-card);
-      padding: var(--space-3) 0;
-      margin-top: var(--space-2);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translate(var(--iif-dd-x), -8px);
-      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-    }
-
-    .site-nav__dropdown[aria-hidden="false"] {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(var(--iif-dd-x), 0);
-    }
-
-    .site-nav__dropdown a,
-    .site-nav__dropdown button {
-      display: block;
-      width: 100%;
-      padding: var(--space-3) var(--space-5);
-      text-decoration: none;
-      color: var(--color-text-main);
-      font-size: 0.9rem;
-      transition: background-color var(--transition), color var(--transition);
-      border: none;
-      background: none;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .site-nav__dropdown a:hover,
-    .site-nav__dropdown a:focus,
-    .site-nav__dropdown button:hover,
-    .site-nav__dropdown button:focus {
-      background: var(--color-glass);
-      color: var(--color-accent-gold);
-      outline: none;
-    }
-
-    .site-nav__dropdown-divider {
-      height: 1px;
-      margin: var(--space-2) var(--space-5);
-      background: var(--color-border-subtle);
-      opacity: 0.75;
-      list-style: none;
-      border: 0;
-      padding: 0;
-    }
-
-    .site-nav__dropdown-label {
-      display: block;
-      padding: var(--space-2) var(--space-5) 0;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-      pointer-events: none;
-    }
-
-    [dir="rtl"] .site-nav__dropdown a,
-    [dir="rtl"] .site-nav__dropdown button {
-      text-align: right;
-    }
-
-    [dir="rtl"] .site-nav__dropdown-label {
-      text-align: right;
-    }
-
-    /* بطاقات الخدمات — روابط إلى الأقسام التفصيلية */
-    a.card.service-card-anchor {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      cursor: pointer;
-    }
-
-    a.card.service-card-anchor:hover,
-    a.card.service-card-anchor:focus-visible {
-      border-color: rgba(201, 162, 39, 0.45);
-      box-shadow: var(--shadow-card-hover);
-      outline: none;
-    }
-
-    /* من نحن — قائمة منسدلة */
-    .site-nav__about-wrap {
-      position: relative;
-      display: inline-block;
-      overflow: visible;
-    }
-
-    .site-nav__about-trigger {
-      background: none;
-      border: none;
-      color: var(--color-text-main);
-      cursor: pointer;
-      padding: 0;
-      font-size: inherit;
-      font-family: inherit;
-      text-decoration: none;
-      transition: color var(--transition);
-    }
-
-    .site-nav__about-trigger:hover,
-    .site-nav__about-trigger:focus {
-      color: var(--color-accent-gold);
-      outline: none;
-    }
-
-    .site-nav__about-dropdown {
-      --iif-dd-x: 0px;
-      position: absolute;
-      top: 100%;
-      inset-inline-start: 0;
-      inset-inline-end: auto;
-      min-width: min(220px, calc(100vw - 1.5rem));
-      max-width: min(22rem, calc(100vw - 1.25rem));
-      max-height: min(72vh, 28rem);
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      box-sizing: border-box;
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-card);
-      padding: var(--space-3) 0;
-      margin-top: var(--space-2);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transform: translate(var(--iif-dd-x), -8px);
-      transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-    }
-
-    .site-nav__about-dropdown[aria-hidden="false"] {
-      opacity: 1;
-      visibility: visible;
-      transform: translate(var(--iif-dd-x), 0);
-    }
-
-    .site-nav__about-dropdown a,
-    .site-nav__about-dropdown button {
-      display: block;
-      width: 100%;
-      padding: var(--space-3) var(--space-5);
-      text-decoration: none;
-      color: var(--color-text-main);
-      font-size: 0.9rem;
-      transition: background-color var(--transition), color var(--transition);
-      border: none;
-      background: none;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .site-nav__about-dropdown a:hover,
-    .site-nav__about-dropdown a:focus,
-    .site-nav__about-dropdown button:hover,
-    .site-nav__about-dropdown button:focus {
-      background: var(--color-glass);
-      color: var(--color-accent-gold);
-      outline: none;
-    }
-
-    .site-nav__dropdown .lang-en,
-    .site-nav__dropdown .lang-ar {
-      display: inline;
-    }
-
-    /* كن ممثلاً لنا — وميض مستمر بلون لطيف فاخر */
-    .nav-link--rep-glow {
-      animation: rep-glow-pulse 2.2s ease-in-out infinite;
-    }
-
-    .nav-link--rep-glow:hover {
-      animation-duration: 1.5s;
-    }
-
-    @keyframes rep-glow-pulse {
-
-      0%,
-      100% {
-        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15), 0 0 12px rgba(201, 162, 39, 0.25), 0 0 24px rgba(232, 212, 138, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        border-color: rgba(201, 162, 39, 0.4);
-        color: var(--color-accent-gold-soft);
-      }
-
-      50% {
-        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12), 0 0 20px rgba(201, 162, 39, 0.45), 0 0 40px rgba(232, 212, 138, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        border-color: rgba(232, 212, 138, 0.6);
-        color: #f0e6c8;
-      }
-    }
-
-    .site-nav__dropdown a.nav-link--rep-glow {
-      margin-inline: var(--space-3);
-      width: auto;
-      box-sizing: border-box;
-      border-radius: var(--radius-sm);
-      animation: rep-glow-pulse-dropdown 2.8s ease-in-out infinite;
-    }
-
-    .site-nav__dropdown a.nav-link--rep-glow:hover {
-      animation-duration: 2s;
-    }
-
-    @keyframes rep-glow-pulse-dropdown {
-
-      0%,
-      100% {
-        box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.32), 0 0 8px rgba(201, 162, 39, 0.12);
-        color: var(--color-accent-gold-soft);
-      }
-
-      50% {
-        box-shadow: inset 0 0 0 1px rgba(212, 174, 42, 0.45), 0 0 14px rgba(201, 162, 39, 0.2);
-        color: #f2ebd4;
-      }
-    }
-
-    .lang-switch {
-      display: flex;
-      gap: 0.25rem;
-      margin-left: var(--space-2);
-    }
-
-    .lang-switch button {
-      background: transparent;
-      border: 1px solid var(--color-border-subtle);
-      color: var(--color-text-muted);
-      padding: 0.35rem 0.6rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-
-    .lang-switch button:hover,
-    .lang-switch button[aria-pressed="true"] {
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold);
-      background: var(--color-accent-gold-glow);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-      gap: var(--space-12);
-      align-items: center;
-      padding: var(--space-20) 0 var(--space-16);
-    }
-
-    .hero__eyebrow {
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--color-accent-gold);
-      margin-bottom: var(--space-4);
-      opacity: 0.95;
-    }
-
-    .hero__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-    }
-
-    .hero__stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-6);
-    }
-
-    .hero-stat__value {
-      display: block;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--color-accent-gold);
-      letter-spacing: -0.02em;
-      animation: countUp 2s ease-out;
-    }
-
-    @keyframes countUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .hero-stat__label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .hero__visual {
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(201, 162, 39, 0.18);
-      background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(201, 162, 39, 0.08) 0%, transparent 60%), var(--color-surface);
-      transform: translateZ(0);
-      will-change: transform;
-      transition: transform 0.3s ease;
-      min-height: 320px;
-      box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-8);
-      transition: box-shadow var(--transition), border-color var(--transition);
-    }
-
-    .hero__visual:hover {
-      border-color: rgba(201, 162, 39, 0.28);
-      box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transform: scale(1.02) translateZ(0);
-    }
-
-    /* GPU acceleration for better performance */
-    .hero,
-    .btn,
-    .card {
-      transform: translateZ(0);
-      will-change: transform;
-    }
-
-    .hero__visual .hero-emblem {
-      width: 200px;
-      height: 240px;
-      flex-shrink: 0;
-      filter: drop-shadow(0 8px 32px var(--color-accent-gold-glow));
-    }
-
-    .hero__visual .hero-emblem svg,
-    .hero__visual .hero-emblem--crest .hero-crest-svg,
-    .hero__visual .hero-emblem__img {
-      width: 100%;
-      height: 100%;
-      max-width: 280px;
-      max-height: 340px;
-      display: block;
-      object-fit: contain;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
-      font-size: clamp(1.85rem, 4vw, 2.6rem);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: var(--space-5);
-      color: var(--color-text-main);
-    }
-
-    .hero p {
-      font-size: 1rem;
-      line-height: 1.75;
-      max-width: 52ch;
-      margin-bottom: var(--space-6);
-    }
-
-    .section {
-      padding: var(--space-16) 0;
-      border-top: 1px solid var(--color-border-subtle);
-    }
-
-    .section:first-of-type {
-      border-top: none;
-    }
-
-    .section__title {
-      margin-bottom: var(--space-10);
-      font-size: clamp(1.6rem, 2.5vw, 2rem);
-      font-weight: 700;
-      color: var(--color-text-main);
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      position: relative;
-      padding-left: var(--space-5);
-    }
-
-    .section__title::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.15em;
-      bottom: 0.15em;
-      width: 4px;
-      border-radius: 2px;
-      background: linear-gradient(180deg, var(--color-accent-gold), var(--color-accent-gold-soft));
-    }
-
-    [dir="rtl"] .section__title {
-      padding-left: 0;
-      padding-right: var(--space-5);
-    }
-
-    [dir="rtl"] .section__title::before {
-      left: auto;
-      right: 0;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-6);
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-6);
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--space-4);
-    }
-
-    .card {
-      background: linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border-subtle);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-card-hover);
-      border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .card h3 {
-      margin-bottom: var(--space-3);
-      font-weight: 600;
-    }
-
-    .card h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: var(--space-2);
-    }
-
-    /* من نحن — فريقنا (ديناميكي) */
-    .about-team {
-      margin-top: var(--space-12);
-    }
-
-    .about-team__title {
-      font-size: 1.25rem;
-      margin-bottom: var(--space-6);
-      color: var(--color-text-main);
-    }
-
-    .about-team-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: var(--space-8);
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .about-team-card {
-      background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border-subtle);
-      overflow: hidden;
-      box-shadow: var(--shadow-card);
-      transition: box-shadow var(--transition);
-    }
-
-    .about-team-card:hover {
-      box-shadow: var(--shadow-card-hover);
-    }
-
-    .about-team-card__photo-wrap {
-      width: 100%;
-      aspect-ratio: 3/4;
-      background: var(--color-surface-elevated);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .about-team-card__photo {
-      width: 100%;
-      height: 100%;
-      max-width: 260px;
-      max-height: 100%;
-      object-fit: contain;
-      object-position: center center;
-      display: block;
-    }
-
-    .about-team-card__body {
-      padding: var(--space-5);
-    }
-
-    .about-team-card__role-above {
-      font-size: 0.9rem;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: 0.2rem;
-      font-weight: 600;
-      text-align: justify;
-      text-justify: inter-character;
-      width: 100%;
-    }
-
-    .about-team-card__name {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      color: var(--color-text-main);
-      max-width: 100%;
-      word-wrap: break-word;
-      line-height: 1.3;
-    }
-
-    .about-team-card__title {
-      font-size: 0.85rem;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: var(--space-3);
-      font-weight: 600;
-      text-align: justify;
-      text-justify: inter-character;
-      width: 100%;
-    }
-
-    .about-team-card__bio {
-      font-size: 0.9rem;
-      line-height: 1.65;
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-
-    /* صفحة الأعضاء — عرض الأعضاء مع الصورة والنبذة وكيو آر العضوية */
-    .members-section {
-      margin-top: var(--space-12);
-    }
-
-    .members-section__title {
-      font-size: 1.25rem;
-      margin-bottom: var(--space-2);
-      color: var(--color-text-main);
-    }
-
-    .members-section__intro {
-      font-size: 0.95rem;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-6);
-    }
-
-    .members-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-6);
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .members-card {
-      background: linear-gradient(165deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border-subtle);
-      overflow: hidden;
-      box-shadow: var(--shadow-card);
-      transition: box-shadow var(--transition);
-      padding: var(--space-5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .members-card:hover {
-      box-shadow: var(--shadow-card-hover);
-    }
-
-    .members-card__photo-wrap {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      overflow: hidden;
-      background: var(--color-surface-elevated);
-      flex-shrink: 0;
-      margin-bottom: var(--space-4);
-    }
-
-    .members-card__photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .members-card__name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-      color: var(--color-text-main);
-    }
-
-    .members-card__tier {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: var(--space-2);
-    }
-
-    .members-card__tier-emblem {
-      width: 20px;
-      height: 20px;
-      background: url('assets/emblem.jpg') center/contain no-repeat;
-      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center/contain no-repeat;
-      opacity: 0.9;
-      flex-shrink: 0;
-    }
-
-    .members-card__tier--shared {
-      font-size: 0.92rem;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .members-card__tier--shared .members-card__tier-emblem {
-      width: 22px;
-      height: 22px;
-      opacity: 0.92;
-    }
-
-    .members-card__tier--premium_2143 {
-      font-size: 0.95rem;
-      color: var(--color-accent-gold);
-    }
-
-    .members-card__tier--premium_2143 .members-card__tier-emblem {
-      width: 24px;
-      height: 24px;
-      opacity: 0.95;
-      filter: drop-shadow(0 1px 4px rgba(201, 162, 39, 0.35));
-    }
-
-    .members-card__tier--premium_3143 {
-      font-size: 1rem;
-      color: var(--color-accent-gold);
-      letter-spacing: 0.03em;
-    }
-
-    .members-card__tier--premium_3143 .members-card__tier-emblem {
-      width: 28px;
-      height: 28px;
-      opacity: 1;
-      filter: drop-shadow(0 2px 8px rgba(201, 162, 39, 0.45));
-    }
-
-    .members-card__tier--premium_4143 {
-      font-size: 1.05rem;
-      color: #e8d48a;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-shadow: 0 0 12px rgba(201, 162, 39, 0.25);
-    }
-
-    .members-card__tier--premium_4143 .members-card__tier-emblem {
-      width: 32px;
-      height: 32px;
-      opacity: 1;
-      filter: drop-shadow(0 3px 12px rgba(201, 162, 39, 0.5));
-    }
-
-    .members-card__bio {
-      font-size: 0.9rem;
-      line-height: 1.6;
-      color: var(--color-text-muted);
-      margin: var(--space-3) 0;
-    }
-
-    .members-card__qr-wrap {
-      margin-top: auto;
-      padding-top: var(--space-4);
-    }
-
-    .members-card__qr-wrap canvas {
-      display: block;
-      margin: 0 auto;
-      border-radius: 4px;
-    }
-
-    .members-card__qr-label {
-      font-size: 0.75rem;
-      color: var(--color-accent-gold-soft);
-      margin-top: 0.35rem;
-    }
-
-    #dashboard-fund-members-list li {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-    }
-
-    #dashboard-fund-members-list li .content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .members-dash-qr {
-      flex-shrink: 0;
-    }
-
-    .members-dash-qr canvas {
-      display: block;
-      border-radius: 4px;
-    }
-
-    .members-card__link-page {
-      display: inline-block;
-      margin-top: var(--space-3);
-      font-size: 0.9rem;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .members-card__link-page:hover {
-      text-decoration: underline;
-    }
-
-    /* صفحة العضو الداخلية */
-    .member-page-wrap {
-      display: none;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: var(--space-6);
-    }
-
-    .member-page-wrap.is-visible {
-      display: block;
-    }
-
-    .member-page__back {
-      margin-bottom: var(--space-6);
-    }
-
-    .member-page__header {
-      text-align: center;
-      margin-bottom: var(--space-8);
-    }
-
-    .member-page__photo-wrap {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin: 0 auto var(--space-4);
-      background: var(--color-surface-elevated);
-    }
-
-    .member-page__photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .member-page__name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      color: var(--color-text-main);
-    }
-
-    .member-page__tier {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: var(--space-4);
-      text-align: center;
-    }
-
-    .member-page__tier::before {
-      content: '';
-      width: 28px;
-      height: 28px;
-      background: url('assets/emblem.jpg') center/contain no-repeat;
-      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center/contain no-repeat;
-      opacity: 0.9;
-      flex-shrink: 0;
-    }
-
-    .member-page__tier--shared {
-      font-size: 1rem;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .member-page__tier--shared::before {
-      width: 30px;
-      height: 30px;
-      opacity: 0.92;
-    }
-
-    .member-page__tier--premium_2143 {
-      font-size: 1.05rem;
-      color: var(--color-accent-gold);
-    }
-
-    .member-page__tier--premium_2143::before {
-      width: 32px;
-      height: 32px;
-      opacity: 0.95;
-      filter: drop-shadow(0 2px 8px rgba(201, 162, 39, 0.35));
-    }
-
-    .member-page__tier--premium_3143 {
-      font-size: 1.15rem;
-      color: var(--color-accent-gold);
-      letter-spacing: 0.04em;
-    }
-
-    .member-page__tier--premium_3143::before {
-      width: 40px;
-      height: 40px;
-      opacity: 1;
-      filter: drop-shadow(0 3px 12px rgba(201, 162, 39, 0.45));
-    }
-
-    .member-page__tier--premium_4143 {
-      font-size: 1.25rem;
-      color: #e8d48a;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-shadow: 0 0 16px rgba(201, 162, 39, 0.3);
-    }
-
-    .member-page__tier--premium_4143::before {
-      width: 48px;
-      height: 48px;
-      opacity: 1;
-      filter: drop-shadow(0 4px 16px rgba(201, 162, 39, 0.5));
-    }
-
-    .member-page__bio {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-6);
-    }
-
-    .member-page__tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      align-items: center;
-      margin-bottom: var(--space-6);
-      padding: var(--space-4);
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: var(--radius-md);
-    }
-
-    .member-page__works {
-      font-size: 1.05rem;
-      line-height: 1.8;
-      color: var(--color-text-main);
-      white-space: pre-wrap;
-    }
-
-    .member-page-translate-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .member-page-translate-overlay.is-open {
-      display: flex;
-    }
-
-    .member-page-translate-modal {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      max-width: 560px;
-      width: 100%;
-      max-height: 85vh;
-      overflow: auto;
-      padding: var(--space-6);
-    }
-
-    .steps {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .steps li {
-      display: flex;
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
-      padding-bottom: var(--space-6);
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .steps li:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-
-    .steps__num {
-      flex-shrink: 0;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-gold-soft));
-      color: #0d0d0d;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 12px var(--color-accent-gold-glow);
-    }
-
-    .tiers {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-6);
-    }
-
-    .tier {
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-      padding: var(--space-8);
-      text-align: center;
-      background: linear-gradient(180deg, var(--color-surface-elevated) 0%, var(--color-surface) 100%);
-      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-    }
-
-    .tier:hover {
-      border-color: rgba(255, 255, 255, 0.1);
-      box-shadow: var(--shadow-card-hover);
-    }
-
-    .tier--featured {
-      border-color: rgba(201, 162, 39, 0.5);
-      box-shadow: 0 0 0 1px var(--color-accent-gold-glow), var(--shadow-card);
-    }
-
-    .tier__name {
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--color-accent-gold);
-      margin-bottom: var(--space-4);
-    }
-
-    .tier ul {
-      text-align: left;
-      padding-left: 1.25rem;
-      margin: 0 0 var(--space-4);
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    .partners-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-4);
-      justify-content: center;
-    }
-
-    .partner-tag {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-full);
-      background: var(--color-glass);
-      border: 1px solid var(--color-border-subtle);
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-text-muted);
-      transition: color var(--transition), border-color var(--transition), background var(--transition);
-    }
-
-    .partner-tag:hover {
-      color: var(--color-text-main);
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .join-us-card .join-us-contact {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--color-text-muted);
-      margin: var(--space-4) 0 var(--space-2);
-    }
-
-    .join-us-card .join-us-emails {
-      margin: 0;
-      font-size: 1rem;
-    }
-
-    .join-us-card .join-us-emails a {
-      color: var(--color-accent-gold-soft);
-      text-decoration: none;
-    }
-
-    .join-us-card .join-us-emails a:hover {
-      text-decoration: underline;
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-10);
-      align-items: start;
-    }
-
-    .contact-info p {
-      margin-bottom: var(--space-2);
-    }
-
-    .contact-form label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      margin-bottom: var(--space-4);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
-    .contact-form textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    /* Auth modal (Login / Register) — متوافق مع الكمبيوتر واللاب توب والموبايل والتابلت والأجهزة القديمة والجديدة */
-    .auth-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-    }
-
-    .auth-overlay.is-open {
-      display: flex;
-    }
-
-    .auth-overlay {
-      padding: var(--space-4);
-      padding-top: max(var(--space-4), env(safe-area-inset-top));
-      padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
-      padding-left: max(var(--space-4), env(safe-area-inset-left));
-      padding-right: max(var(--space-4), env(safe-area-inset-right));
-    }
-
-    .video-call-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 10002;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .video-call-overlay.is-open {
-      display: flex !important;
-    }
-
-    .video-call-modal {
-      width: 100%;
-      max-width: 960px;
-      height: 85vh;
-      max-height: 720px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .video-call-modal__head {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      padding: var(--space-3) var(--space-4);
-      border-bottom: 1px solid var(--color-border-subtle);
-      background: rgba(0, 0, 0, 0.2);
-    }
-
-    .video-call-modal__brand {
-      flex-shrink: 0;
-    }
-
-    .video-call-modal__logo {
-      display: block;
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 6px rgba(201, 162, 39, 0.3));
-    }
-
-    .video-call-modal__titles {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .video-call-modal__title {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--color-text-main);
-    }
-
-    .video-call-modal__link {
-      font-size: 0.85rem;
-      color: var(--color-accent-gold-soft);
-      margin-inline-start: auto;
-    }
-
-    .video-call-modal__link:hover {
-      text-decoration: underline;
-    }
-
-    .video-call-modal__body {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .video-call-modal__body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    .auth-modal {
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: var(--radius-lg);
-      max-width: 440px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-      color: #111;
-      margin: auto;
-    }
-
-    @media (max-width: 480px),
-    (max-height: 420px) {
-      .auth-overlay {
-        padding: 0.5rem;
-        padding-top: max(0.5rem, env(safe-area-inset-top));
-        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-        padding-left: max(0.5rem, env(safe-area-inset-left));
-        padding-right: max(0.5rem, env(safe-area-inset-right));
-        align-items: flex-start;
-      }
-
-      .auth-modal {
-        max-height: 95vh;
-        border-radius: var(--radius-md);
-      }
-
-      .auth-modal .form-group input,
-      .auth-modal .form-group select,
-      .auth-modal .auth-password-input-wrap input {
-        font-size: 16px !important;
-        min-height: 44px;
-      }
-
-      .auth-modal .auth-password-toggle,
-      .auth-modal .auth-password-input-wrap .auth-password-toggle {
-        min-width: 44px;
-        min-height: 44px;
-        padding: 0.5rem;
-      }
-
-      .ticker-item .ticker-logo {
-        width: 12px;
-        height: 12px;
-        margin-left: 0.25rem;
-        border-radius: 1px;
-      }
-
-      .ticker-item span {
-        font-size: 0.7rem;
-        margin-left: 0.25rem;
-      }
-    }
-
-    .auth-modal__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-6) var(--space-6) 0;
-    }
-
-    .auth-modal__title {
-      margin: 0;
-      font-size: 1.25rem;
-      color: #111;
-    }
-
-    .auth-modal__close {
-      background: none;
-      border: none;
-      color: #333;
-      cursor: pointer;
-      padding: 0.5rem;
-      min-width: 44px;
-      min-height: 44px;
-      font-size: 1.5rem;
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .auth-modal__close:hover {
-      color: #111;
-    }
-
-    .auth-modal__close:focus {
-      outline: 2px solid var(--color-accent-gold);
-      outline-offset: 2px;
-    }
-
-    .auth-tabs {
-      display: flex;
-      padding: 0 var(--space-6);
-      margin-top: var(--space-4);
-      gap: 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-    }
-
-    .auth-tabs button {
-      padding: var(--space-3) var(--space-4);
-      min-height: 44px;
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: #444;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: -1px;
-    }
-
-    .auth-tabs button:hover {
-      color: #111;
-    }
-
-    .auth-tabs button:focus {
-      outline: none;
-    }
-
-    .auth-tabs button:focus-visible {
-      outline: 2px solid var(--color-accent-gold);
-      outline-offset: 2px;
-    }
-
-    .auth-tabs button.is-active {
-      color: var(--color-accent-gold);
-      border-bottom-color: var(--color-accent-gold);
-    }
-
-    .auth-welcome {
-      padding: var(--space-8) var(--space-6);
-      text-align: center;
-    }
-
-    .auth-welcome__text {
-      font-size: 1.15rem;
-      color: var(--color-accent-gold);
-      font-weight: 600;
-      margin: 0 0 var(--space-4);
-      line-height: 1.5;
-    }
-
-    .auth-welcome[hidden] {
-      display: none !important;
-    }
-
-    .auth-panel {
-      display: none;
-      padding: var(--space-6);
-    }
-
-    .auth-panel.is-active {
-      display: block;
-    }
-
-    .auth-modal.show-welcome .auth-tabs,
-    .auth-modal.show-welcome .auth-panel {
-      display: none !important;
-    }
-
-    .auth-modal.show-welcome .auth-welcome {
-      display: block !important;
-    }
-
-    /* داخل نافذة التسجيل/الدخول: تسميات وحقول سوداء */
-    .auth-modal .form-group label {
-      color: #111;
-    }
-
-    .auth-modal .form-group input,
-    .auth-modal .form-group select {
-      background: #f8f8f8;
-      border-color: rgba(0, 0, 0, 0.15);
-      color: #111;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .auth-modal .form-group select option {
-      background: #fff;
-      color: #111;
-    }
-
-    .auth-modal .phone-with-code__prefix {
-      color: #444;
-    }
-
-    .auth-modal .phone-with-code input {
-      color: #111;
-    }
-
-    .form-group {
-      margin-bottom: var(--space-4);
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: border-color var(--transition), box-shadow var(--transition);
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: rgba(201, 162, 39, 0.5);
-      box-shadow: 0 0 0 3px var(--color-accent-gold-glow);
-    }
-
-    /* إلزامي واختياري وملاحظة خطأ — نجمة حمراء وتعطيل الإرسال */
-    .field-required-star {
-      color: #dc2626;
-      font-weight: 700;
-      margin-inline-start: 0.15rem;
-    }
-
-    /* User Dashboard Styles */
-    .user-dashboard-container {
-      padding: var(--space-4);
-    }
-
-    .user-profile-info {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: var(--space-6);
-      align-items: start;
-    }
-
-    .profile-photo-section {
-      text-align: center;
-    }
-
-    .profile-photo {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: var(--color-glass);
-      border: 3px solid var(--color-border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto var(--space-4);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .placeholder-avatar {
-      font-size: 4rem;
-      opacity: 0.5;
-    }
-
-    .profile-details {
-      display: grid;
-      gap: var(--space-4);
-    }
-
-    .privacy-settings {
-      background: var(--color-glass);
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-subtle);
-    }
-
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-      margin-top: var(--space-2);
-    }
-
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      cursor: pointer;
-      font-weight: 400;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-      margin: 0;
-      width: auto;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: var(--space-3);
-      justify-content: flex-end;
-      margin-top: var(--space-6);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-border-subtle);
-    }
-
-    @media (max-width: 768px) {
-      .user-profile-info {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
-      }
-
-      .profile-photo {
-        width: 120px;
-        height: 120px;
-      }
-
-      .placeholder-avatar {
-        font-size: 3rem;
-      }
-
-      .form-actions {
-        flex-direction: column;
-      }
-
-      .form-actions .btn {
-        width: 100%;
-      }
-    }
-
-    .field-valid-check {
-      color: #16a34a;
-      font-weight: 700;
-      margin-inline-start: 0.25rem;
-    }
-
-    .field-optional-hint {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      font-weight: normal;
-    }
-
-    .form-group.has-error input,
-    .form-group.has-error select,
-    .form-group.has-error textarea,
-    p.has-error input,
-    p.has-error select,
-    p.has-error textarea {
-      border-color: #dc2626;
-      background: rgba(220, 38, 38, 0.06);
-    }
-
-    .form-group.has-error .field-required-star,
-    p.has-error .field-required-star {
-      color: #dc2626;
-    }
-
-    .form-group.has-error .field-error-msg,
-    p.has-error .field-error-msg {
-      font-size: 0.8rem;
-      color: #dc2626;
-      margin-top: 0.25rem;
-    }
-
-    form.form-validate .btn[type="submit"]:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .form-group select option {
-      background: #fff;
-      color: #111;
-    }
-
-    .phone-with-code {
-      display: flex;
-      align-items: center;
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .phone-with-code__prefix {
-      padding: 0.6rem 0.8rem;
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      border-right: 1px solid var(--color-border-subtle);
-      min-width: 3rem;
-    }
-
-    .phone-with-code input {
-      flex: 1;
-      min-width: 0;
-      border: none;
-      background: transparent;
-      padding: 0.6rem 0.8rem;
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
-    .phone-with-code input:focus {
-      outline: none;
-    }
-
-    .phone-with-code select {
-      padding: 0.6rem 0.5rem;
-      border: none;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-text-main);
-      font-size: 0.9rem;
-      min-width: 5rem;
-      max-width: 8rem;
-      border-right: 1px solid var(--color-border-subtle);
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .auth-modal .phone-with-code select {
-      background: #f0f0f0;
-      color: #111;
-    }
-
-    .auth-modal .btn {
-      width: 100%;
-      margin-top: var(--space-2);
-      min-height: 44px;
-      touch-action: manipulation;
-    }
-
-    .auth-modal .btn:focus {
-      outline: none;
-    }
-
-    .auth-modal .btn:focus-visible {
-      outline: 2px solid var(--color-accent-gold);
-      outline-offset: 2px;
-    }
-
-    .auth-modal .auth-password-hint {
-      color: #555 !important;
-    }
-
-    .auth-password-input-wrap:focus-within {
-      outline: 2px solid var(--color-primary, #c9a227);
-      outline-offset: 1px;
-      border-radius: var(--radius);
-    }
-
-    .auth-password-strength--weak {
-      color: #c00;
-    }
-
-    .auth-password-strength--ok {
-      color: #c90;
-    }
-
-    .auth-password-strength--strong {
-      color: #080;
-    }
-
-    .auth-password-strength--match {
-      color: #080;
-    }
-
-    .auth-password-strength--mismatch {
-      color: #c00;
-    }
-
-    .auth-providers {
-      margin-bottom: var(--space-4);
-    }
-
-    .auth-providers__title {
-      font-size: 0.85rem;
-      color: #555;
-      margin: 0 0 var(--space-2);
-      text-align: center;
-    }
-
-    .auth-providers__list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      justify-content: center;
-    }
-
-    .auth-provider-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-      padding: var(--space-3) var(--space-4);
-      min-height: 44px;
-      border-radius: var(--radius);
-      touch-action: manipulation;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      background: #f8f8f8;
-      color: #111;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      min-width: 120px;
-    }
-
-    .auth-provider-btn:hover {
-      background: #eee;
-      border-color: rgba(0, 0, 0, 0.25);
-    }
-
-    .auth-provider-btn:focus {
-      outline: none;
-    }
-
-    .auth-provider-btn:focus-visible {
-      outline: 2px solid var(--color-accent-gold);
-      outline-offset: 2px;
-    }
-
-    @media (hover: none) {
-      .auth-provider-btn:hover {
-        background: #f8f8f8;
-      }
-
-      .auth-modal .btn:hover {
-        background: inherit;
-      }
-    }
-
-    .auth-provider-btn {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .auth-modal .btn {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .auth-password-toggle {
-      cursor: pointer;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      pointer-events: auto;
-    }
-
-    .auth-provider-btn--google {
-      border-color: #dadce0;
-    }
-
-    .auth-provider-btn--google:hover {
-      background: #f1f3f4;
-    }
-
-    .auth-provider-btn--facebook {
-      border-color: #1877f2;
-      color: #1877f2;
-    }
-
-    .auth-provider-btn--facebook:hover {
-      background: #e7f0fe;
-    }
-
-    .auth-provider-btn--email {
-      border-color: #0d9488;
-      color: #0d9488;
-    }
-
-    .auth-provider-btn--email:hover {
-      background: #ccfbf1;
-    }
-
-    .auth-provider-btn--device {
-      border-color: #7c3aed;
-      color: #7c3aed;
-    }
-
-    .auth-provider-btn--device:hover {
-      background: #ede9fe;
-    }
-
-    .auth-provider-btn--biometric {
-      border-color: #059669;
-      color: #059669;
-    }
-
-    .auth-provider-btn--biometric:hover {
-      background: #d1fae5;
-    }
-
-    .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin: var(--space-4) 0;
-      color: #666;
-      font-size: 0.8rem;
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(0, 0, 0, 0.15);
-    }
-
-    .auth-email-verify-panel,
-    .auth-device-panel {
-      display: none;
-      margin-top: var(--space-3);
-      padding: var(--space-3);
-      background: #f5f5f5;
-      border-radius: var(--radius);
-    }
-
-    .auth-email-verify-panel.is-active,
-    .auth-device-panel.is-active {
-      display: block;
-    }
-
-    .auth-email-verify-panel .form-group {
-      margin-bottom: var(--space-2);
-    }
-
-    .auth-device-panel p {
-      margin: 0 0 var(--space-2);
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .auth-checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .auth-checkbox-label input {
-      width: auto;
-    }
-
-    /* Membership required modal (EN/AR) */
-    .membership-required-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.6);
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .membership-required-overlay.is-open {
-      display: flex;
-    }
-
-    .membership-required-modal {
-      background: #fff;
-      color: #111;
-      border-radius: var(--radius-md);
-      max-width: 520px;
-      width: 100%;
-      max-height: 90vh;
-      overflow: auto;
-      padding: var(--space-6);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-
-    .membership-required-modal h3 {
-      margin: 0 0 var(--space-4);
-      font-size: 1.2rem;
-    }
-
-    .membership-required-modal p {
-      margin: 0 0 var(--space-3);
-      line-height: 1.6;
-      font-size: 0.95rem;
-    }
-
-    .membership-required-modal .btn {
-      margin-top: var(--space-4);
-    }
-
-    /* بطاقة عضوية رقمية داخل المنصة (ليست شهادة حكومية مرفوعة) */
-    .certificate-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10001;
-      background: linear-gradient(145deg, #0a0e18 0%, #131a28 100%);
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-6);
-      overflow: auto;
-    }
-
-    .certificate-overlay.is-open {
-      display: flex;
-    }
-
-    .certificate-card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-      border: 2px solid var(--color-accent-gold);
-      border-radius: var(--radius-lg);
-      max-width: 560px;
-      width: 100%;
-      padding: var(--space-10);
-      box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.2), 0 24px 48px rgba(0, 0, 0, 0.4);
-      position: relative;
-    }
-
-    .certificate-card::before {
-      content: '';
-      position: absolute;
-      inset: 8px;
-      border: 1px solid rgba(201, 162, 39, 0.25);
-      border-radius: calc(var(--radius-lg) - 4px);
-      pointer-events: none;
-    }
-
-    .certificate-card .cert-emblem {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto var(--space-6);
-      display: block;
-      opacity: 0.95;
-    }
-
-    .certificate-card .cert-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--color-accent-gold);
-      margin-bottom: var(--space-2);
-      text-align: center;
-    }
-
-    .certificate-card .cert-subtitle {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-8);
-      text-align: center;
-    }
-
-    .certificate-card .cert-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--color-text-main);
-      margin-bottom: var(--space-2);
-      text-align: center;
-    }
-
-    .certificate-card .cert-definition {
-      font-size: 1rem;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: var(--space-2);
-      text-align: center;
-      font-style: italic;
-      max-width: 100%;
-      word-wrap: break-word;
-    }
-
-    .cert-definition-block {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .cert-definition-block .cert-definition-hint {
-      font-size: 0.85rem;
-      color: var(--color-accent-gold-soft);
-      margin-top: var(--space-1);
-      margin-bottom: var(--space-2);
-      opacity: 0.95;
-    }
-
-    .cert-definition-block input[type="text"],
-    .cert-definition-block textarea {
-      width: 100%;
-      min-height: 2.75rem;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .cert-definition-block textarea {
-      resize: vertical;
-      min-height: 3.5rem;
-    }
-
-    .certificate-card .cert-tier {
-      font-size: 1.05rem;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: var(--space-2);
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .certificate-card.cert-tier--cooperating .cert-emblem {
-      width: 56px;
-      height: 56px;
-      opacity: 0.9;
-    }
-
-    .certificate-card.cert-tier--shared .cert-emblem {
-      width: 62px;
-      height: 62px;
-      opacity: 0.92;
-    }
-
-    .certificate-card.cert-tier--shared .cert-tier {
-      font-size: 1.1rem;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .certificate-card.cert-tier--premium_2143 .cert-emblem {
-      width: 72px;
-      height: 72px;
-      opacity: 0.95;
-      filter: drop-shadow(0 2px 8px rgba(201, 162, 39, 0.35));
-    }
-
-    .certificate-card.cert-tier--premium_2143 .cert-tier {
-      font-size: 1.15rem;
-      color: var(--color-accent-gold);
-      letter-spacing: 0.06em;
-    }
-
-    .certificate-card.cert-tier--premium_3143 .cert-emblem {
-      width: 88px;
-      height: 88px;
-      opacity: 1;
-      filter: drop-shadow(0 4px 16px rgba(201, 162, 39, 0.45));
-    }
-
-    .certificate-card.cert-tier--premium_3143 .cert-tier {
-      font-size: 1.25rem;
-      color: var(--color-accent-gold);
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
-    }
-
-    .certificate-card.cert-tier--premium_4143 .cert-emblem {
-      width: 104px;
-      height: 104px;
-      opacity: 1;
-      filter: drop-shadow(0 6px 24px rgba(201, 162, 39, 0.5));
-    }
-
-    .certificate-card.cert-tier--premium_4143 .cert-tier {
-      font-size: 1.35rem;
-      color: #e8d48a;
-      letter-spacing: 0.1em;
-      font-weight: 700;
-      text-shadow: 0 0 24px rgba(201, 162, 39, 0.4);
-    }
-
-    .certificate-card .cert-date {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-8);
-      text-align: center;
-    }
-
-    .certificate-card .cert-qr-wrap {
-      text-align: center;
-      margin: var(--space-6) 0;
-    }
-
-    .certificate-card .cert-qr-wrap canvas {
-      display: block;
-      margin: 0 auto;
-      border-radius: 8px;
-      background: #fff;
-      padding: 8px;
-    }
-
-    .certificate-card .cert-qr-label {
-      font-size: 0.75rem;
-      color: var(--color-accent-gold-soft);
-      margin-top: var(--space-2);
-    }
-
-    .certificate-card .cert-member-images img {
-      object-fit: contain;
-      border-radius: 6px;
-    }
-
-    .certificate-card .cert-member-images .cert-mem-photo {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .certificate-card .cert-member-images .cert-mem-logo {
-      width: 72px;
-      height: 72px;
-      object-fit: contain;
-    }
-
-    .certificate-card .cert-member-images .cert-mem-flag {
-      height: 48px;
-      width: auto;
-      max-width: 80px;
-      object-fit: contain;
-    }
-
-    .certificate-card .cert-verify-badge {
-      margin-top: var(--space-4);
-      padding: var(--space-3);
-      background: rgba(28, 138, 87, 0.15);
-      border: 1px solid rgba(28, 138, 87, 0.4);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      color: var(--color-accent-emerald);
-      text-align: center;
-    }
-
-    /* نافذة الاتصال المرئي والمسموع — Jitsi Meet مضمّن (يمكن استبدال الرابط بسيرفركم لاحقاً) */
-    .video-call-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10002;
-      background: rgba(0, 0, 0, 0.9);
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-      box-sizing: border-box;
-    }
-
-    .video-call-overlay.is-open {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .video-call-modal {
-      width: 100%;
-      max-width: 1200px;
-      height: 90vh;
-      max-height: 900px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
-    }
-
-    .video-call-modal__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-3) var(--space-4);
-      background: rgba(0, 0, 0, 0.3);
-      border-bottom: 1px solid var(--color-border-subtle);
-      flex-shrink: 0;
-    }
-
-    .video-call-modal__head h3 {
-      margin: 0;
-      font-size: 1.1rem;
-      color: var(--color-text-main);
-    }
-
-    .video-call-modal__head .btn {
-      flex-shrink: 0;
-    }
-
-    .video-call-iframe-wrap {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-    }
-
-    .video-call-iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Image adjust overlay (digital membership card uploads) */
-    .img-adjust-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10002;
-      background: rgba(0, 0, 0, 0.72);
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .img-adjust-overlay.is-open {
-      display: flex;
-    }
-
-    .img-adjust-modal {
-      background: #0c1220;
-      color: var(--color-text-main);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-lg);
-      width: 100%;
-      max-width: 720px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      padding: var(--space-6);
-    }
-
-    .img-adjust-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-    }
-
-    .img-adjust-head h3 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
-
-    .img-adjust-sub {
-      margin: 0.25rem 0 0;
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
-
-    .img-adjust-grid {
-      display: grid;
-      grid-template-columns: 1fr 240px;
-      gap: var(--space-5);
-      align-items: start;
-    }
-
-    .img-adjust-stage {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-md);
-      padding: var(--space-4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 320px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .img-adjust-stage.is-circle::after {
-      content: '';
-      position: absolute;
-      inset: 18px;
-      border-radius: 999px;
-      box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.38);
-      border: 1px solid rgba(201, 162, 39, 0.55);
-      pointer-events: none;
-    }
-
-    .img-adjust-stage:not(.is-circle)::after {
-      content: '';
-      position: absolute;
-      inset: 18px;
-      border-radius: 14px;
-      box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.38);
-      border: 1px solid rgba(201, 162, 39, 0.55);
-      pointer-events: none;
-    }
-
-    .img-adjust-canvas {
-      width: 100%;
-      height: auto;
-      max-width: 420px;
-      border-radius: 12px;
-    }
-
-    .img-adjust-controls label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    .img-adjust-controls input[type="range"] {
-      width: 100%;
-    }
-
-    .img-adjust-controls .row {
-      margin-bottom: var(--space-4);
-    }
-
-    .img-adjust-actions {
-      display: flex;
-      gap: var(--space-2);
-      justify-content: flex-end;
-      flex-wrap: wrap;
-      margin-top: var(--space-4);
-    }
-
-    .cert-img-actions {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-      margin-top: var(--space-2);
-    }
-
-    .cert-img-actions .btn {
-      padding: 0.35rem 0.6rem;
-    }
-
-    /* Camera capture overlay (digital membership card uploads) */
-    .cam-capture-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 10003;
-      background: rgba(0, 0, 0, 0.72);
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .cam-capture-overlay.is-open {
-      display: flex;
-    }
-
-    .cam-capture-modal {
-      background: #0c1220;
-      color: var(--color-text-main);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-lg);
-      width: 100%;
-      max-width: 720px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      padding: var(--space-6);
-    }
-
-    .cam-capture-video {
-      width: 100%;
-      max-height: 380px;
-      background: #000;
-      border-radius: var(--radius-md);
-    }
-
-    .cam-capture-actions {
-      display: flex;
-      gap: var(--space-2);
-      justify-content: flex-end;
-      flex-wrap: wrap;
-      margin-top: var(--space-4);
-    }
-
-    /* تقرير تحليل الدولة — نافذة منبثقة */
-    .dashboard-report-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-    }
-
-    .dashboard-report-overlay[style*="display: none"] {
-      display: none !important;
-    }
-
-    .dashboard-report-overlay:not([style*="display: none"]) {
-      display: flex;
-    }
-
-    .dashboard-report-modal {
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: var(--radius-lg);
-      max-width: 720px;
-      width: 100%;
-      max-height: 90vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-      color: #111;
-    }
-
-    .dashboard-report-modal__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-4) var(--space-6);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .dashboard-report-modal__head h3 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: #111;
-    }
-
-    .dashboard-report-modal__loading {
-      padding: var(--space-8) var(--space-6);
-      text-align: center;
-      color: #444;
-    }
-
-    .dashboard-report-modal__body {
-      overflow-y: auto;
-      padding: var(--space-6);
-    }
-
-    .dashboard-report-modal__body h4 {
-      margin: var(--space-4) 0 var(--space-2);
-      font-size: 1rem;
-      color: #222;
-    }
-
-    .dashboard-report-modal__body p,
-    .dashboard-report-modal__body ul {
-      margin: 0 0 var(--space-3);
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    .dashboard-report-modal__body ul {
-      padding-left: 1.25rem;
-    }
-
-    .dashboard-report-modal__body .report-meta {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: var(--space-4);
-    }
-
-    /* Membership request form (standalone section) */
-    .membership-request {
-      margin-top: var(--space-12);
-      padding: var(--space-8);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-    }
-
-    .membership-request h3 {
-      margin-bottom: var(--space-4);
-      font-size: 1.2rem;
-    }
-
-    .membership-request .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .membership-request .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Financing request (طالب التمويل) */
-    .financing-request {
-      margin-top: 0;
-      padding: var(--space-8);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-    }
-
-    .financing-request h3 {
-      margin-bottom: var(--space-4);
-      font-size: 1.2rem;
-    }
-
-    .financing-request .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .financing-request .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* بوابة دراسة الجدوى — رسالة ترحيبية لغير الأعضاء */
-    .feasibility-gate {
-      padding: var(--space-8);
-      background: linear-gradient(145deg, rgba(201, 162, 39, 0.08), rgba(255, 255, 255, 0.02));
-      border: 1px solid rgba(201, 162, 39, 0.3);
-      border-radius: var(--radius-lg);
-      text-align: center;
-      max-width: 560px;
-      margin: 0 auto var(--space-6);
-    }
-
-    .feasibility-gate h3 {
-      font-size: 1.2rem;
-      margin-bottom: var(--space-3);
-    }
-
-    .feasibility-gate p {
-      margin-bottom: var(--space-4);
-      color: var(--color-text-muted);
-      line-height: 1.6;
-    }
-
-    .feasibility-gate .btn {
-      margin-top: var(--space-2);
-    }
-
-    /* Feasibility Study (دراسة الجدوى) */
-    .feasibility-study-box {
-      padding: var(--space-8);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-    }
-
-    .feasibility-study-box h3 {
-      margin-bottom: var(--space-4);
-      font-size: 1.15rem;
-    }
-
-    .feasibility-study-box .form-group {
-      margin-bottom: var(--space-5);
-    }
-
-    .feasibility-study-box .form-group label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .feasibility-study-box textarea {
-      width: 100%;
-      min-height: 180px;
-      padding: 0.8rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      resize: vertical;
-    }
-
-    .feasibility-study-box .upload-zone {
-      margin-top: var(--space-4);
-    }
-
-    /* Investor registration (استقطاب المستثمرين) — راقية */
-    .investor-registration {
-      margin-top: var(--space-12);
-      padding: var(--space-10);
-      background: linear-gradient(165deg, rgba(201, 162, 39, 0.06) 0%, var(--color-surface) 50%);
-      border: 1px solid rgba(201, 162, 39, 0.35);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 0 0 1px var(--color-accent-gold-glow), var(--shadow-card);
-    }
-
-    .investor-registration__badge {
-      display: inline-block;
-      padding: 0.35rem 0.9rem;
-      margin-bottom: var(--space-4);
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--color-accent-gold);
-      border: 1px solid var(--color-accent-gold);
-      border-radius: 999px;
-    }
-
-    .investor-registration h3 {
-      margin-bottom: var(--space-2);
-      font-size: 1.35rem;
-      color: var(--color-text-main);
-    }
-
-    .investor-registration .intro {
-      margin-bottom: var(--space-6);
-      font-size: 0.95rem;
-      color: var(--color-text-muted);
-      line-height: 1.6;
-    }
-
-    .investor-registration .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .investor-registration .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    footer {
-      border-top: 1px solid var(--color-border-subtle);
-      padding: var(--space-10) var(--space-4);
-      text-align: center;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-text-muted);
-      background: linear-gradient(180deg, var(--color-bg) 0%, #020408 100%);
-    }
-
-    .lang-ar {
-      display: none !important;
-    }
-
-    [data-lang="ar"] .lang-en {
-      display: none !important;
-    }
-
-    [data-lang="ar"] .lang-ar {
-      display: block !important;
-    }
-
-    /* Language picker (50+ languages) — خلفية فاتحة وكتابة سوداء */
-    .lang-picker-wrap {
-      position: relative;
-      margin-left: var(--space-2);
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.35rem 0.5rem;
-      background: #f5f5f5;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .lang-picker-label {
-      font-size: 0.85rem;
-      color: #111;
-      white-space: nowrap;
-    }
-
-    .lang-picker-wrap select {
-      padding: 0.35rem 1.8rem 0.35rem 0.6rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      background: #fff;
-      color: #111;
-      font-size: 0.85rem;
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23111' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.5rem center;
-    }
-
-    .lang-picker-wrap select:hover {
-      border-color: var(--color-accent-gold);
-    }
-
-    .lang-picker-wrap select:focus {
-      outline: none;
-      border-color: var(--color-accent-gold);
-    }
-
-    .lang-picker-wrap select option {
-      background: #fff;
-      color: #111 !important;
-      padding: 0.5rem;
-      font-size: 0.95rem;
-    }
-
-    .iif-sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .iif-lang-combobox-wrap {
-      position: relative;
-      min-width: 10rem;
-      max-width: 16rem;
-      overflow: visible;
-      z-index: 1000;
-    }
-
-    .iif-lang-combobox-wrap.iif-lang-combobox--open {
-      z-index: 2147483000;
-    }
-
-    .iif-lang-combobox-row {
-      display: flex;
-      align-items: stretch;
-      gap: 0.25rem;
-    }
-
-    .iif-lang-combobox-display {
-      flex: 1 1 auto;
-      min-width: 0;
-      box-sizing: border-box;
-      padding: 0.35rem 0.6rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      background: #fff;
-      color: #111;
-      font-size: 0.85rem;
-      font-family: inherit;
-      text-align: start;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-    }
-
-    .iif-lang-combobox-display:hover {
-      border-color: rgba(201, 162, 39, 0.45);
-    }
-
-    .iif-lang-combobox-display:focus {
-      outline: none;
-      border-color: var(--color-accent-gold);
-      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
-    }
-
-    .iif-lang-combobox-toggle {
-      flex: 0 0 auto;
-      min-width: 2.1rem;
-      padding: 0 0.35rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      background: #fff;
-      color: #111;
-      font-size: 0.75rem;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .iif-lang-combobox-toggle:hover {
-      border-color: var(--color-accent-gold);
-      background: rgba(201, 162, 39, 0.12);
-    }
-
-    .iif-lang-combobox-panel {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: calc(100% + 3px);
-      z-index: 2147483001;
-      display: none;
-      flex-direction: column;
-      max-height: min(72vh, 26rem);
-      background: #fff;
-      color: #111;
-      border: 1px solid rgba(0, 0, 0, 0.18);
-      border-radius: var(--radius-sm);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-      overflow: hidden;
-    }
-
-    .iif-lang-combobox-panel:not([hidden]) {
-      display: flex;
-    }
-
-    .iif-lang-combobox-filter {
-      flex: 0 0 auto;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.4rem 0.55rem;
-      border: 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-      font-size: 0.82rem;
-      font-family: inherit;
-    }
-
-    .iif-lang-combobox-filter:focus {
-      outline: none;
-      background: rgba(201, 162, 39, 0.06);
-    }
-
-    .iif-lang-combobox-list {
-      position: static;
-      flex: 1 1 auto;
-      min-height: 0;
-      max-height: none;
-      overflow-y: auto;
-      margin: 0;
-      padding: 0.25rem 0;
-      list-style: none;
-      background: #fff;
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
-    }
-
-    .iif-lang-combobox-list[hidden] {
-      display: none !important;
-    }
-
-    .iif-lang-combobox-list li[role="option"] {
-      padding: 0.4rem 0.65rem;
-      font-size: 0.82rem;
-      color: #111;
-      cursor: pointer;
-    }
-
-    .iif-lang-combobox-list li[role="option"]:hover,
-    .iif-lang-combobox__opt--active {
-      background: rgba(201, 162, 39, 0.15);
-    }
-
-    /* Search in header — صف منفصل على الشاشات الضيقة */
-    .site-nav .header-search {
-      display: flex;
-      align-items: center;
-      position: relative;
-      flex: 1 1 12rem;
-      min-width: min(100%, 10rem);
-      max-width: 22rem;
-      margin-inline-start: var(--space-2);
-      margin-block-start: 0;
-    }
-
-    .header-search__form {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      display: block;
-      width: 100%;
-      min-width: 0;
-    }
-
-    .header-search input {
-      width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-      padding-block: 0.35rem;
-      padding-inline: 1.85rem 0.65rem;
-      border-radius: 999px;
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.92);
-      color: #0f172a;
-      font-size: 0.82rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .header-search input::placeholder {
-      color: #64748b;
-    }
-
-    .header-search input:focus {
-      outline: none;
-      border-color: var(--color-accent-gold);
-      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
-    }
-
-    .header-search::before {
-      content: '';
-      position: absolute;
-      inset-inline-start: 0.65rem;
-      width: 14px;
-      height: 14px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2364748b' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") center/contain no-repeat;
-      pointer-events: none;
-    }
-
-    /* ساعة رقمية — إضاءة لطيفة فاخرة */
-    .site-clock {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      padding: 0.5rem var(--space-4);
-      margin-inline-end: var(--space-2);
-      border-inline-end: 1px solid rgba(201, 162, 39, 0.2);
-      min-width: 7rem;
-      background: linear-gradient(135deg, rgba(201, 162, 39, 0.06) 0%, rgba(201, 162, 39, 0.02) 50%, transparent 100%);
-      border-radius: var(--radius-sm);
-      box-shadow: 0 0 24px rgba(201, 162, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .site-clock__time {
-      font-variant-numeric: tabular-nums;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: #f0e6c8;
-      text-shadow:
-        0 0 20px rgba(232, 212, 138, 0.6),
-        0 0 40px rgba(201, 162, 39, 0.25),
-        0 1px 2px rgba(0, 0, 0, 0.3);
-      line-height: 1.2;
-      filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.2));
-    }
-
-    .site-clock__tz {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #e8d48a;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-top: 0.25rem;
-      text-shadow:
-        0 0 14px rgba(232, 212, 138, 0.5),
-        0 0 28px rgba(201, 162, 39, 0.2);
-      filter: drop-shadow(0 0 6px rgba(201, 162, 39, 0.15));
-    }
-
-    .site-clock__date {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #e8d48a;
-      margin-top: 0.3rem;
-      letter-spacing: 0.04em;
-      text-shadow:
-        0 0 14px rgba(232, 212, 138, 0.5),
-        0 0 28px rgba(201, 162, 39, 0.2);
-      filter: drop-shadow(0 0 6px rgba(201, 162, 39, 0.15));
-    }
-
-    #iif-search-wrap {
-      position: absolute;
-      top: 100%;
-      inset-inline: 0;
-      margin-top: 0.25rem;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      max-height: 240px;
-      overflow-y: auto;
-      display: none;
-      z-index: 50;
-    }
-
-    #iif-search-wrap.has-results {
-      display: block;
-    }
-
-    .iif-search-result {
-      display: block;
-      padding: 0.5rem 0.75rem;
-      color: var(--color-text-muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .iif-search-result:last-child {
-      border-bottom: none;
-    }
-
-    .iif-search-result:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-accent-gold-soft);
-    }
-
-    /* Upload & project description section */
-    .upload-submit-box {
-      padding: var(--space-8);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-    }
-
-    .upload-submit-box h3 {
-      margin-bottom: var(--space-4);
-      font-size: 1.2rem;
-    }
-
-    .upload-zone {
-      border: 2px dashed var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      padding: var(--space-8);
-      text-align: center;
-      margin-bottom: var(--space-6);
-      background: rgba(255, 255, 255, 0.02);
-      transition: border-color 0.2s, background 0.2s;
-    }
-
-    .upload-zone:hover,
-    .upload-zone.dragover {
-      border-color: var(--color-accent-gold);
-      background: rgba(214, 175, 79, 0.06);
-    }
-
-    .upload-zone input[type="file"] {
-      display: block;
-      margin: 0 auto var(--space-3);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .upload-zone p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .upload-types {
-      margin-top: var(--space-2);
-      font-size: 0.85rem;
-      color: var(--color-accent-gold);
-    }
-
-    .upload-grid-four {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-6);
-      margin-bottom: var(--space-6);
-    }
-
-    .upload-grid-four .upload-type-card {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .upload-type-card {
-      padding: var(--space-5);
-    }
-
-    .upload-type-card h3 {
-      font-size: 1.05rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .upload-type-card .upload-zone {
-      padding: var(--space-4);
-      margin-bottom: var(--space-3);
-    }
-
-    .upload-form .btn-sm {
-      margin-top: 0;
-    }
-
-    .upload-zone--docs {
-      border-color: rgba(30, 58, 95, 0.5);
-    }
-
-    .upload-zone--images {
-      border-color: rgba(28, 138, 87, 0.4);
-    }
-
-    .upload-zone--video {
-      border-color: rgba(201, 162, 39, 0.4);
-    }
-
-    .upload-zone--live {
-      border-color: rgba(148, 163, 184, 0.4);
-    }
-
-    .live-capture-wrap {
-      margin-top: var(--space-3);
-    }
-
-    .live-capture-preview {
-      width: 100%;
-      min-height: 180px;
-      background: var(--color-surface-elevated);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: var(--space-3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .live-capture-placeholder {
-      margin: 0;
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-    }
-
-    .live-capture-btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-    }
-
-    .btn-sm {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-    }
-
-    /* نتائج محمية — منع النسخ للزوار؛ الإدارة لها صلاحية النسخ واللصق */
-    .protected-results {
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      pointer-events: auto;
-    }
-
-    body.is-admin .protected-results {
-      user-select: text;
-      -webkit-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-    }
-
-    /* صلاحية النسخ واللصق للموظفين — في صفحة الخطابات فقط */
-    body.is-staff .letters-area,
-    body.is-admin .letters-area {
-      user-select: text;
-      -webkit-user-select: text;
-      -moz-user-select: text;
-      -ms-user-select: text;
-    }
-
-    .protected-results .no-permission {
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      padding: var(--space-6);
-      text-align: center;
-      border: 1px dashed var(--color-border-subtle);
-      border-radius: var(--radius-md);
-    }
-
-    .budget-analysis-box,
-    .feasibility-analysis-box {
-      padding: var(--space-6);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-      margin-top: var(--space-4);
-    }
-
-    .budget-analysis-box h3,
-    .feasibility-analysis-box h3 {
-      font-size: 1.1rem;
-      margin-bottom: var(--space-4);
-    }
-
-    .budget-upload-zone {
-      padding: var(--space-6);
-      border: 2px dashed var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      margin-bottom: var(--space-4);
-      text-align: center;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .budget-upload-zone.has-file {
-      border-color: var(--color-accent-gold);
-      background: rgba(201, 162, 39, 0.08);
-    }
-
-    .budget-upload-zone input[type="file"] {
-      margin: var(--space-2) 0;
-    }
-
-    .budget-report-lang {
-      margin: var(--space-3) 0;
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-    }
-
-    .budget-report-lang label {
-      margin: 0;
-      font-size: 0.9rem;
-    }
-
-    .budget-report-lang select {
-      padding: 0.4rem 0.75rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: var(--color-surface);
-      color: var(--color-text-main);
-    }
-
-    /* صفحة التحليل — ممتدة لاستيعاب كامل التحليل، تنسيق تقرير اقتصادي */
-    #budget-results-wrap.budget-results-inline {
-      width: 100%;
-      max-width: 100%;
-      min-height: 200px;
-      padding: var(--space-5) 0;
-      overflow: visible;
-    }
-
-    #budget-results {
-      width: 100%;
-      max-width: 100%;
-      overflow: visible;
-    }
-
-    .budget-analysis-report {
-      width: 100%;
-      max-width: 100%;
-      margin: 0;
-      padding: var(--space-6) var(--space-5);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border-subtle);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-5);
-      align-content: start;
-    }
-
-    .budget-analysis-report h4 {
-      grid-column: 1 / -1;
-      font-size: 1.2rem;
-      margin: 0 0 var(--space-4);
-      padding-bottom: var(--space-3);
-      color: var(--color-accent-gold-soft);
-      border-bottom: 2px solid var(--color-accent-gold);
-      letter-spacing: 0.02em;
-    }
-
-    .budget-analysis-report .report-section {
-      margin: 0;
-      padding: var(--space-4);
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      min-height: 0;
-    }
-
-    .budget-analysis-report .report-section.report-header {
-      grid-column: 1 / -1;
-      padding: var(--space-5);
-      background: rgba(201, 162, 39, 0.06);
-      border-color: rgba(201, 162, 39, 0.2);
-    }
-
-    .budget-analysis-report .report-section h5 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 0 0 var(--space-2);
-      color: var(--color-accent-gold-soft);
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .budget-analysis-report .report-section p {
-      margin: 0.35rem 0;
-      line-height: 1.65;
-      font-size: 0.95rem;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .budget-analysis-report .report-section p:first-of-type {
-      margin-top: 0;
-    }
-
-    .budget-analysis-report .report-header {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .analysis-result-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      margin-top: var(--space-3);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .analysis-result-table th,
-    .analysis-result-table td {
-      padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .analysis-result-table th {
-      text-align: left;
-      color: var(--color-text-muted);
-      font-weight: 600;
-      background: rgba(0, 0, 0, 0.15);
-    }
-
-    .analysis-result-table td:last-child,
-    .analysis-result-table th:last-child {
-      text-align: right;
-    }
-
-    .analysis-result-table .result-total {
-      font-weight: 700;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .project-description-wrap {
-      margin-top: 0;
-      margin-bottom: var(--space-6);
-    }
-
-    .project-description-wrap label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .project-description-wrap textarea {
-      width: 100%;
-      min-height: 180px;
-      max-height: 320px;
-      padding: 0.8rem 1rem;
-      border-radius: var(--radius-md);
-      border: 2px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      resize: vertical;
-    }
-
-    .project-description-wrap textarea:focus {
-      outline: none;
-      border-color: var(--color-accent-gold);
-    }
-
-    .char-counter {
-      margin-top: var(--space-2);
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .char-counter.min-not-met {
-      color: #c94a4a;
-    }
-
-    .char-counter.min-met {
-      color: var(--color-accent-emerald);
-    }
-
-    /* Translation services — free for all visitors (no login) */
-    .translation-notice {
-      padding: var(--space-4) var(--space-5);
-      margin-bottom: var(--space-8);
-      background: rgba(201, 162, 39, 0.1);
-      border: 1px solid rgba(201, 162, 39, 0.25);
-      border-radius: var(--radius-md);
-      font-size: 0.95rem;
-      color: var(--color-text-main);
-    }
-
-    .translation-notice strong {
-      color: var(--color-accent-gold-soft);
-    }
-
-    .translation-google-style {
-      width: 100%;
-    }
-
-    .translation-box-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: var(--space-4);
-      margin-bottom: var(--space-4);
-      align-items: stretch;
-    }
-
-    .translation-swap-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-2);
-      padding: 0 var(--space-2);
-    }
-
-    .translation-swap-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      padding: 0;
-      border: 2px solid rgba(201, 162, 39, 0.5);
-      border-radius: var(--radius-md);
-      background: rgba(201, 162, 39, 0.1);
-      color: var(--color-accent-gold);
-      cursor: pointer;
-      transition: background var(--transition), border-color var(--transition), transform var(--transition);
-      font-size: 1.4rem;
-      line-height: 1;
-    }
-
-    .translation-swap-btn:hover {
-      background: rgba(201, 162, 39, 0.2);
-      border-color: var(--color-accent-gold);
-    }
-
-    .translation-swap-btn:active {
-      transform: scale(0.96);
-    }
-
-    .translation-lang-options-box {
-      padding: var(--space-3);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.03);
-      margin-bottom: var(--space-2);
-    }
-
-    .translation-lang-options-box .translation-box-label {
-      margin-bottom: var(--space-1);
-    }
-
-    @media (max-width: 768px) {
-      .translation-box-row {
-        grid-template-columns: 1fr;
-      }
-
-      .translation-swap-wrap {
-        order: 0;
-        padding: var(--space-2) 0;
-        flex-direction: row;
-      }
-    }
-
-    .translation-box-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .translation-box-label {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-
-    .translation-lang-select {
-      width: 100%;
-      max-width: 220px;
-      padding: 0.5rem 0.75rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-text-main);
-      font-size: 0.95rem;
-    }
-
-    .translation-text-box {
-      min-height: 220px;
-      width: 100%;
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-size: 1rem;
-      line-height: 1.6;
-      resize: vertical;
-    }
-
-    .translation-text-box::placeholder {
-      color: var(--color-text-muted);
-    }
-
-    .translation-input-options,
-    .translation-result-options {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--space-2);
-      margin-top: var(--space-2);
-    }
-
-    .translation-input-hint,
-    .translation-result-hint {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .translation-voice-icon,
-    .translation-listen-icon {
-      margin-right: 0.25rem;
-    }
-
-    .translation-counters {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .translation-actions {
-      margin-top: var(--space-3);
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-      align-items: center;
-    }
-
-    .checkbox-label {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-
-    .checkbox-label input {
-      margin: 0;
-    }
-
-    @media (max-width: 768px) {
-      .translation-box-row {
-        grid-template-columns: 1fr;
-      }
-
-      .translation-swap-wrap {
-        order: 0;
-      }
-    }
-
-    .translation-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-8);
-    }
-
-    .translation-result {
-      margin-top: var(--space-4);
-      padding: var(--space-4);
-      min-height: 80px;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: var(--color-text-muted);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .translation-result.has-result {
-      color: var(--color-text-main);
-    }
-
-    [dir="rtl"] .translation-standards {
-      border-left: none;
-      border-right: 4px solid var(--color-accent-gold);
-    }
-
-    [dir="rtl"] .compliance-legal-notice {
-      border-left: none;
-      border-right: 4px solid var(--color-accent-gold);
-    }
-
-    @media (max-width: 768px) {
-      .translation-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .ticker-item .ticker-logo {
-        width: 14px;
-        height: 14px;
-        margin-left: 0.3rem;
-        border-radius: 2px;
-      }
-
-      .ticker-item span {
-        font-size: 0.75rem;
-        margin-left: 0.3rem;
-      }
-    }
-
-    /* News & markets ticker */
-    .ticker-wrap {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid var(--color-border-subtle);
-      background: linear-gradient(90deg, var(--color-surface) 0%, transparent 100%);
-      padding: 0.5rem 0 0.5rem 6rem;
-      backdrop-filter: blur(8px);
-      min-height: 2.5rem;
-    }
-
-    .ticker-wrap .ticker-label {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 2;
-      padding: 0 1rem 0 1rem;
-      display: flex;
-      align-items: center;
-      background: linear-gradient(90deg, var(--color-bg) 70%, transparent);
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--color-accent-gold);
-    }
-
-    .ticker-track {
-      display: flex;
-      width: max-content;
-      animation: ticker-marquee 120s linear infinite;
-      will-change: transform;
-      backface-visibility: hidden;
-    }
-
-    .ticker-track:hover {
-      animation-play-state: paused;
-    }
-
-    .ticker-track__copy {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .ticker-item {
-      display: inline-flex;
-      align-items: center;
-      flex-shrink: 0;
-      padding: 0 1rem;
-      text-decoration: none;
-      color: var(--color-text-main);
-      font-size: 0.9rem;
-      white-space: nowrap;
-      transition: color 0.2s;
-    }
-
-    .ticker-item:hover {
-      color: var(--color-accent-gold-soft);
-    }
-
-    .ticker-item .ticker-logo {
-      width: 16px;
-      height: 16px;
-      aspect-ratio: 1;
-      margin-left: 0.4rem;
-      border-radius: 2px;
-      object-fit: contain;
-      flex-shrink: 0;
-      vertical-align: middle;
-    }
-
-    .ticker-item span {
-      margin-left: 0.35rem;
-      opacity: 0.8;
-      font-size: 0.8rem;
-      vertical-align: middle;
-    }
-
-    .ticker-item .lang-en,
-    .ticker-item .lang-ar {
-      font-size: inherit;
-      opacity: 1;
-      margin-left: 0;
-    }
-
-    [data-lang="ar"] .site-header__tickers .ticker-item .lang-ar {
-      display: inline !important;
-    }
-
-    /* حلقة لا نهائية: مساران بنفس المحتوى؛ -50% = عرض نسخة واحدة */
-    @keyframes ticker-marquee {
-      0% {
-        transform: translate3d(0, 0, 0);
-      }
-
-      100% {
-        transform: translate3d(-50%, 0, 0);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .site-header__tickers .ticker-wrap,
-      .ticker-wrap {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .ticker-track {
-        animation: none !important;
-        transform: none !important;
-      }
-
-      .ticker-track__copy {
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 0.25rem 0.75rem;
-        max-width: none;
-        width: max-content;
-      }
-
-      .site-logo:hover .site-logo__emblem {
-        transform: none;
-      }
-    }
-
-    [dir="rtl"] .ticker-wrap {
-      padding: 0.5rem 6rem 0.5rem 0;
-    }
-
-    [dir="rtl"] .ticker-wrap .ticker-label {
-      left: auto;
-      right: 0;
-      background: linear-gradient(270deg, var(--color-bg) 70%, transparent);
-    }
-
-    /* Headlines widget (from RSS via Netlify function) */
-    .headlines-wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--space-3) var(--space-4);
-      background: rgba(8, 27, 51, 0.5);
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .headlines-wrap h3 {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--color-accent-gold);
-      margin-bottom: var(--space-3);
-    }
-
-    .headlines-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2) var(--space-6);
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .headlines-list a {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .headlines-list a:hover {
-      color: var(--color-accent-gold-soft);
-    }
-
-    .headlines-list .source {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-left: 0.25rem;
-    }
-
-    .headlines-loading,
-    .headlines-error {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .headlines-wrap {
-      overflow: visible;
-    }
-
-    .headlines-wrap select {
-      display: inline-block !important;
-      visibility: visible !important;
-      min-width: 140px;
-      padding: 0.4rem 0.6rem;
-      font-size: 0.9rem;
-      color: var(--color-text);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      appearance: auto;
-      -webkit-appearance: menulist;
-    }
-
-    .headlines-wrap select option {
-      background: var(--color-primary-soft);
-      color: var(--color-text);
-    }
-
-    .headlines-wrap label[for^="headlines-cat"] {
-      display: inline-block !important;
-      visibility: visible !important;
-    }
-
-    .headlines-cat-row {
-      display: block !important;
-      visibility: visible !important;
-    }
-
-    .headlines-arab-country-row select,
-    .headlines-asian-country-row select {
-      display: inline-block !important;
-      min-width: 160px;
-      padding: 0.4rem 0.6rem;
-      font-size: 0.9rem;
-      color: var(--color-text);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-    }
-
-    .headlines-arab-country-row label,
-    .headlines-asian-country-row label {
-      display: inline-block !important;
-      margin-right: 0.5rem;
-    }
-
-    /* Dashboard overlay — واجهة دولية منظّمة، هادئة، متناسقة مع الهوية (المطبوعات/الشعارات تبقى كما هي في أقسامها) */
-    .dashboard-overlay {
-      --dash-line: rgba(201, 162, 39, 0.22);
-      --dash-line-strong: rgba(201, 162, 39, 0.38);
-      --dash-surface: rgba(255, 255, 255, 0.028);
-      --dash-border: rgba(255, 255, 255, 0.065);
-      --dash-text-muted: rgba(226, 232, 240, 0.72);
-      --dash-header-height: 3.75rem;
-      --dash-scroll-gap: 12px;
-      --dash-scroll-inset: calc(var(--dash-header-height) + var(--dash-scroll-gap));
-      position: fixed;
-      inset: 0;
-      z-index: 2147483000;
-      display: none;
-      width: 100%;
-      width: 100vw;
-      max-width: none;
-      margin: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      height: 100vh;
-      height: 100dvh;
-      max-height: none;
-      background: linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%);
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 0;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-      box-sizing: border-box;
-      scroll-padding-top: var(--dash-scroll-inset);
-    }
-
-    .dashboard-overlay.is-open {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: flex-start;
-    }
-
-    .dashboard-overlay.is-open:focus {
-      outline: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .dashboard-overlay {
-        scroll-behavior: auto;
-      }
-    }
-
-    /* اسم الصنف بدون "modal" لتفادي أي تطابق عرضي مع أنماط النوافذ المنبثقة */
-    .dashboard-page-shell {
-      width: 100%;
-      max-width: none;
-      max-height: none;
-      margin: 0;
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-      padding: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      box-sizing: border-box;
-    }
-
-    #dashboard-overlay.is-open .dashboard-main {
-      max-width: none !important;
-      width: 100% !important;
-    }
-
-    .dashboard-header-bar {
-      position: sticky;
-      top: 0;
-      z-index: 60;
-      margin: 0;
-      padding: 0;
-      background: rgba(4, 7, 12, 0.92);
-      backdrop-filter: blur(14px) saturate(1.05);
-      -webkit-backdrop-filter: blur(14px) saturate(1.05);
-      border-bottom: 1px solid rgba(201, 162, 39, 0.14);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    /* شريط اللوحة — عرض كامل (لا عمود 1200px في المنتصف) */
-    #dashboard-overlay .dashboard-header-bar .site-header__inner {
-      max-width: none;
-      width: 100%;
-      margin: 0;
-      padding: 0.55rem clamp(var(--space-4), 3vw, var(--space-8));
-      min-height: 3.25rem;
-      box-sizing: border-box;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem 1rem;
-    }
-
-    #dashboard-overlay .dashboard-header-bar .site-header__brand {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      flex: 0 1 auto;
-    }
-
-    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard .lang-picker-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: rgba(226, 232, 240, 0.88);
-      white-space: nowrap;
-    }
-
-    #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard select {
-      max-width: min(52vw, 220px);
-      font-size: 0.8rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--radius-sm, 6px);
-    }
-
-    @media (max-width: 480px) {
-      #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard .lang-picker-label {
-        display: none;
-      }
-
-      #dashboard-overlay .dashboard-header-bar .lang-picker-wrap--dashboard select {
-        max-width: min(72vw, 280px);
-      }
-    }
-
-    .dashboard-header-bar .site-name {
-      font-size: clamp(0.95rem, 1.5vw, 1.05rem);
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      background: linear-gradient(90deg, var(--color-accent-gold-soft), #f0e6c8, var(--color-accent-gold-soft));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    /* عرض كامل داخل اللوحة — لا يُقيَّد بـ 1200px (كان يُطبَّق عبر selector عام main { … }) */
-    .dashboard-main {
-      max-width: none;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 clamp(var(--space-4), 4vw, var(--space-8)) var(--space-16);
-      position: relative;
-      z-index: 1;
-    }
-
-    .dashboard-hero {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: var(--space-4);
-      margin-bottom: var(--space-5);
-      margin-top: var(--space-3);
-      padding: var(--space-5) var(--space-6);
-      border-radius: var(--radius-md);
-      background: var(--dash-surface);
-      border: 1px solid var(--dash-border);
-      box-shadow: none;
-    }
-
-    .dashboard-hero__titles h2 {
-      margin: 0 0 0.4rem;
-      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1.25;
-    }
-
-    .dashboard-hero__badge {
-      display: inline-block;
-      margin-top: 0.35rem;
-      font-size: 0.76rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--color-accent-gold-soft);
-      padding: 0.28rem 0.65rem;
-      border-radius: var(--radius-full);
-      background: rgba(201, 162, 39, 0.11);
-      border: 1px solid rgba(201, 162, 39, 0.28);
-    }
-
-    .dashboard-hero__actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-    }
-
-    .dashboard-toc {
-      position: sticky;
-      top: var(--dash-header-height, 3.75rem);
-      z-index: 55;
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-      padding: var(--space-4) var(--space-4) var(--space-5);
-      margin: 0 0 var(--space-6);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: rgba(6, 9, 14, 0.65);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .dashboard-toc__head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .dashboard-toc__head .dashboard-toc__label {
-      width: auto;
-      flex: 1 1 auto;
-      min-width: 0;
-      margin: 0 0 0.15rem;
-    }
-
-    .dashboard-toc__toggle {
-      flex-shrink: 0;
-      font-size: 0.72rem !important;
-      padding: 0.32rem 0.75rem !important;
-      border-color: var(--dash-line-strong);
-      color: var(--dash-text-muted);
-    }
-
-    .dashboard-toc__toggle:hover,
-    .dashboard-toc__toggle:focus-visible {
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold-soft);
-    }
-
-    .dashboard-toc.is-collapsed .dashboard-toc-toggle__hide {
-      display: none !important;
-    }
-
-    .dashboard-toc.is-collapsed .dashboard-toc-toggle__show {
-      display: inline !important;
-    }
-
-    .dashboard-toc:not(.is-collapsed) .dashboard-toc-toggle__show {
-      display: none !important;
-    }
-
-    .dashboard-toc:not(.is-collapsed) .dashboard-toc-toggle__hide {
-      display: inline !important;
-    }
-
-    .dashboard-toc.is-collapsed .dashboard-toc__zones {
-      display: none;
-    }
-
-    .dashboard-toc__row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      align-items: center;
-    }
-
-    .dashboard-toc__row--secondary a {
-      font-size: 0.72rem;
-      padding: 0.3rem 0.65rem;
-      opacity: 0.95;
-    }
-
-    .dashboard-toc__label {
-      width: 100%;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--color-text-muted);
-      margin: 0 0 0.15rem;
-      opacity: 0.85;
-    }
-
-    .dashboard-toc__label--sub {
-      margin-top: var(--space-2);
-      font-size: 0.62rem;
-      opacity: 0.75;
-    }
-
-    .dashboard-toc a {
-      display: inline-flex;
-      align-items: center;
-      font-size: 0.74rem;
-      font-weight: 600;
-      padding: 0.36rem 0.8rem;
-      border-radius: 999px;
-      border: 1px solid var(--dash-border);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--dash-text-muted);
-      text-decoration: none;
-      transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    }
-
-    .dashboard-toc a:hover,
-    .dashboard-toc a:focus-visible {
-      color: var(--color-accent-gold-soft);
-      border-color: var(--dash-line-strong);
-      background: rgba(201, 162, 39, 0.07);
-      outline: none;
-    }
-
-    .dashboard-toc a.is-active {
-      color: #f0e4c4;
-      border-color: var(--dash-line-strong);
-      background: rgba(201, 162, 39, 0.11);
-    }
-
-    .dashboard-toc__zone {
-      margin-bottom: var(--space-2);
-    }
-
-    .dashboard-toc-zone-label {
-      display: block;
-      width: 100%;
-      font-size: 0.62rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin: var(--space-2) 0 0.25rem;
-      opacity: 0.92;
-    }
-
-    [data-toc-zone="ops"] .dashboard-toc-zone-label {
-      color: rgba(226, 232, 240, 0.78);
-    }
-
-    [data-toc-zone="hr"] .dashboard-toc-zone-label {
-      color: rgba(226, 232, 240, 0.78);
-    }
-
-    [data-toc-zone="admin"] .dashboard-toc-zone-label {
-      color: rgba(226, 232, 240, 0.78);
-    }
-
-    /* شريط جانبي موحّد — بعيد عن «ألوان متعددة»؛ الهيكلة من جدول المحتويات فقط */
-    #dashboard-section-overview {
-      border-inline-start: 2px solid var(--dash-line);
-      padding-inline-start: var(--space-4);
-    }
-
-    #dashboard-user-profile input:not([readonly]),
-    #dashboard-user-profile textarea,
-    #dashboard-user-profile select {
-      pointer-events: auto;
-    }
-
-    #dashboard-overlay .dashboard-letters,
-    #dashboard-letterhead-sheet {
-      border-inline-start: 2px solid var(--dash-line);
-      padding-inline-start: calc(var(--space-5) + 2px);
-    }
-
-    .dashboard-archive-stats {
-      font-size: 0.82rem;
-      color: var(--color-text-muted);
-      margin: 0 0 var(--space-3);
-    }
-
-    .dashboard-archive-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: var(--space-4);
-    }
-
-    .dashboard-excl-tab.is-active {
-      border-color: rgba(201, 162, 39, 0.55) !important;
-      background: rgba(201, 162, 39, 0.14) !important;
-      color: var(--color-accent-gold-soft) !important;
-    }
-
-    ul.dashboard-archive-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .dashboard-archive-item {
-      margin-bottom: var(--space-4);
-      padding: var(--space-3);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.03);
-    }
-
-    .dashboard-archive-item__head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .dashboard-archive-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.55rem;
-      border-radius: var(--radius-full);
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      color: rgba(147, 197, 253, 0.95);
-    }
-
-    .dashboard-archive-time {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-    }
-
-    .dashboard-archive-item__body {
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 0.5rem;
-    }
-
-    .dashboard-archive-title {
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-
-    .dashboard-archive-actor {
-      font-size: 0.78rem;
-      color: var(--color-text-muted);
-      margin-top: 0.35rem;
-    }
-
-    .dashboard-archive-details summary {
-      cursor: pointer;
-      font-size: 0.82rem;
-      color: var(--color-accent-gold-soft);
-      margin-bottom: 0.35rem;
-    }
-
-    .dashboard-archive-pre {
-      margin: 0;
-      padding: var(--space-3);
-      max-height: 14rem;
-      overflow: auto;
-      font-size: 0.72rem;
-      line-height: 1.45;
-      white-space: pre-wrap;
-      word-break: break-word;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--color-border-subtle);
-    }
-
-    .dashboard-archive-empty {
-      color: var(--color-text-muted);
-      padding: var(--space-3);
-      list-style: none;
-    }
-
-    .dashboard-section {
-      scroll-margin-top: var(--dash-scroll-inset, calc(var(--dash-header-height, 3.75rem) + var(--dash-scroll-gap, 12px)));
-    }
-
-    #dashboard-overlay main [id],
-    #dashboard-overlay main .section,
-    #dashboard-overlay main section[id],
-    #dashboard-overlay .dashboard-section,
-    #dashboard-overlay .dashboard-letters[id],
-    #dashboard-overlay #dashboard-letterhead-sheet {
-      scroll-margin-top: var(--dash-scroll-inset, calc(var(--dash-header-height, 3.75rem) + var(--dash-scroll-gap, 12px)));
-    }
-
-    .dashboard-subheading {
-      font-size: 1rem;
-      margin-bottom: var(--space-3);
-    }
-
-    .dashboard-subheading--block {
-      margin: var(--space-6) 0 var(--space-3);
-    }
-
-    .dashboard-subheading--minor {
-      font-size: 0.95rem;
-    }
-
-    .dashboard-subheading--minor-sep {
-      margin-top: var(--space-4);
-      margin-bottom: 0;
-    }
-
-    .dashboard-subheading--minor-flush {
-      margin-top: 0;
-    }
-
-    .dashboard-subheading--minor.dashboard-subheading--block {
-      margin: var(--space-6) 0 var(--space-3);
-    }
-
-    .suggestions-tabs {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-
-    .archive-search-row {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-      margin-bottom: var(--space-4);
-      align-items: center;
-    }
-
-    .archive-search-row #archive-search-input {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .archive-search-row input[type="date"].letterhead-input-luxury {
-      width: 140px;
-    }
-
-    #fund-member-links-wrap .form-hint {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .member-links-add-row {
-      display: flex;
-      gap: var(--space-2);
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: var(--space-3);
-    }
-
-    #fund-member-link-label {
-      width: 160px;
-    }
-
-    #fund-member-link-url {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .dashboard-page-shell h2 {
-      margin-bottom: var(--space-6);
-      font-size: 1.25rem;
-    }
-
-    .dashboard-form {
-      margin-bottom: var(--space-8);
-      padding-bottom: var(--space-6);
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .dashboard-form .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .dashboard-form .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .dashboard-form textarea {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .dashboard-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .dashboard-list li {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--space-4);
-      padding: var(--space-3) var(--space-4);
-      margin-bottom: var(--space-2);
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--dash-border);
-    }
-
-    .dashboard-list li .content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .dashboard-list li .content strong {
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-
-    .dashboard-list li .content small {
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-    }
-
-    .dashboard-list li .actions {
-      display: flex;
-      gap: var(--space-2);
-      flex-shrink: 0;
-    }
-
-    .dashboard-list li .actions button {
-      padding: 0.4rem 0.75rem;
-      font-size: 0.8rem;
-      border-radius: 999px;
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-text-muted);
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    .dashboard-list li .actions button:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--color-text-main);
-    }
-
-    .dashboard-list li .actions button.btn-delete:hover {
-      background: rgba(200, 80, 80, 0.3);
-      color: #e8a0a0;
-    }
-
-    .dashboard-visitor-counter {
-      margin-bottom: var(--space-5);
-      padding: var(--space-4);
-      background: var(--dash-surface);
-      border: 1px solid var(--dash-border);
-      border-radius: var(--radius-md);
-      font-size: 0.88rem;
-    }
-
-    .visitor-counter-label {
-      display: block;
-      color: var(--color-text-muted);
-      font-size: 0.8rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .visitor-counter-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--color-accent-gold);
-    }
-
-    .visitor-counter-note {
-      font-size: 0.75rem;
-      color: var(--color-text-muted);
-      margin: 0.25rem 0 0;
-    }
-
-    /* بطاقة رئيس المجلس / المالك — نفس أسلوب اللوحة الهادئ، هوية ذهبية دون فوضى */
-    .chairman-dashboard-card {
-      margin-bottom: var(--space-4);
-      padding: var(--space-5);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: var(--dash-surface);
-    }
-
-    .chairman-dashboard-card__head {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-    }
-
-    .chairman-dashboard-card .chairman-image-container {
-      width: 56px;
-      height: 56px;
-      flex-shrink: 0;
-      background: linear-gradient(145deg, rgba(201, 162, 39, 0.28), rgba(232, 201, 104, 0.12));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--dash-line);
-      overflow: hidden;
-    }
-
-    .chairman-dashboard-card .chairman-image-placeholder {
-      font-size: 0.62rem;
-      letter-spacing: 0.14em;
-      font-weight: 800;
-      color: rgba(248, 250, 252, 0.94);
-    }
-
-    .chairman-dashboard-card__titles h3 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--color-accent-gold-soft);
-      line-height: 1.3;
-    }
-
-    .chairman-dashboard-card__titles p {
-      margin: 0.35rem 0 0;
-      font-size: 0.875rem;
-      color: var(--dash-text-muted);
-      line-height: 1.45;
-    }
-
-    .chairman-dashboard-card__grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: var(--space-3);
-    }
-
-    .chairman-dashboard-card__panel {
-      background: rgba(255, 255, 255, 0.03);
-      padding: var(--space-3);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--dash-border);
-    }
-
-    .chairman-dashboard-card__panel h4 {
-      margin: 0 0 var(--space-2);
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .chairman-panel-body {
-      font-size: 0.84rem;
-      line-height: 1.6;
-      color: rgba(248, 250, 252, 0.9);
-    }
-
-    .chairman-panel-body p {
-      margin: 0;
-    }
-
-    .chairman-panel-body p+p {
-      margin-top: 0.5rem;
-    }
-
-    .chairman-dashboard-card__link {
-      color: var(--color-accent-gold-soft);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.15s ease, color 0.15s ease;
-    }
-
-    .chairman-dashboard-card__link:hover {
-      border-bottom-color: var(--dash-line-strong);
-    }
-
-    .chairman-status-text {
-      color: rgba(52, 211, 153, 0.92);
-      font-weight: 600;
-    }
-
-    .chairman-dashboard-card__foot {
-      margin-top: var(--space-4);
-      padding-top: var(--space-3);
-      border-top: 1px solid var(--dash-border);
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--dash-text-muted);
-    }
-
-    .chairman-dashboard-card__foot p {
-      margin: 0;
-    }
-
-    .chairman-dashboard-card__actions {
-      margin-top: var(--space-3);
-      display: flex;
-      gap: var(--space-2);
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .chairman-dashboard-card .btn-chairman-primary.btn--primary {
-      background: rgba(201, 162, 39, 0.14);
-      color: var(--color-accent-gold-soft);
-      border: 1px solid var(--dash-line-strong);
-      padding: 0.4rem 0.85rem;
-      font-size: 0.8rem;
-      box-shadow: none;
-    }
-
-    .chairman-dashboard-card .btn-chairman-primary.btn--primary:hover {
-      background: rgba(201, 162, 39, 0.22);
-      filter: none;
-    }
-
-    .chairman-dashboard-card .btn-chairman-secondary.btn--ghost {
-      border: 1px solid var(--dash-border);
-      color: var(--dash-text-muted);
-      background: transparent;
-      padding: 0.4rem 0.85rem;
-      font-size: 0.8rem;
-    }
-
-    .chairman-dashboard-card .btn-chairman-secondary.btn--ghost:hover {
-      border-color: var(--dash-line);
-      color: var(--color-accent-gold-soft);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    /* نظرة عامة — ترحيل الدور، محتواي، أزرار الرأس */
-    #dashboard-role-welcome.card {
-      display: none;
-      margin-bottom: var(--space-4);
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: rgba(201, 162, 39, 0.06);
-    }
-
-    #dashboard-role-welcome-text {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    #dashboard-my-content.card {
-      margin-bottom: var(--space-4);
-      padding: var(--space-5);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: var(--dash-surface);
-    }
-
-    #dashboard-my-content>.dashboard-letters__title {
-      margin-top: 0;
-    }
-
-    #dashboard-my-content .dashboard-letters__intro {
-      font-size: 0.9rem;
-    }
-
-    #dashboard-my-content .dashboard-form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-    }
-
-    #dashboard-my-content .dashboard-form-row+.dashboard-form-row {
-      margin-top: var(--space-3);
-    }
-
-    #dashboard-my-content .dashboard-form-row+.dashboard-form-row.dashboard-form-row--tight {
-      margin-top: var(--space-2);
-    }
-
-    #dashboard-my-content .dashboard-form-row+.dashboard-form-row.dashboard-form-row--photos {
-      margin-top: var(--space-4);
-      align-items: flex-start;
-      gap: var(--space-4);
-    }
-
-    #dashboard-my-content .dashboard-form-row .form-group {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    #dashboard-my-content .dashboard-form-row--bio .form-group {
-      min-width: 220px;
-    }
-
-    #dashboard-my-content input[type="text"],
-    #dashboard-my-content input[type="password"],
-    #dashboard-my-content textarea {
-      width: 100%;
-      padding: 0.5rem 0.65rem;
-      border-radius: 8px;
-      border: 1px solid var(--dash-border);
-      background: rgba(255, 255, 255, 0.05);
-      color: inherit;
-      font-family: inherit;
-    }
-
-    #dashboard-my-content .dash-preview-wrap {
-      margin-top: 0.5rem;
-    }
-
-    #dashboard-my-content .dash-preview-img {
-      border-radius: 8px;
-      border: 1px solid var(--dash-border);
-      display: none;
-      object-fit: cover;
-    }
-
-    #dashboard-my-content .dash-preview-img--md {
-      max-width: 120px;
-      max-height: 120px;
-    }
-
-    #dashboard-my-content .dash-preview-img--sm {
-      max-width: 100px;
-      max-height: 100px;
-    }
-
-    #dashboard-my-password-section {
-      margin-top: var(--space-5);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--dash-border);
-    }
-
-    #dashboard-my-password-section>.dashboard-letters__title {
-      margin-top: 0;
-      font-size: 1rem;
-    }
-
-    #dashboard-my-password-section .dashboard-note {
-      font-size: 0.85rem;
-      color: var(--dash-text-muted);
-      margin-bottom: var(--space-3);
-    }
-
-    #dashboard-my-password-section .dashboard-form-row--max480 {
-      max-width: 480px;
-    }
-
-    #dashboard-my-password-section .dashboard-form-row--max520 {
-      max-width: 520px;
-    }
-
-    #dashboard-my-password-section .dashboard-form-row--pw-actions {
-      margin-top: var(--space-3);
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      align-items: center;
-    }
-
-    #dashboard-my-content .dashboard-save-row {
-      margin-top: var(--space-4);
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      align-items: center;
-    }
-
-    #dashboard-my-content .dashboard-inline-status,
-    #dashboard-my-password-section .dashboard-inline-status {
-      font-size: 0.85rem;
-      color: var(--color-accent-gold-soft);
-    }
-
-    .site-header__auth-btn--dashboard-close {
-      background: linear-gradient(180deg, #e8c968, #c9a227);
-      color: #0d0d0d;
-      font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .dashboard-hero__cta {
-      text-decoration: none;
-    }
-
-    #dashboard-card-geo.card,
-    #dashboard-card-db-backup.card {
-      margin-bottom: var(--space-4);
-      padding: var(--space-5);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: var(--dash-surface);
-    }
-
-    .dashboard-tool-card__title {
-      margin: 0 0 var(--space-2);
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .dashboard-tool-card__intro {
-      font-size: 0.85rem;
-      color: var(--dash-text-muted);
-      margin-bottom: var(--space-3);
-      line-height: 1.55;
-    }
-
-    .dashboard-tool-card__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-    }
-
-    .dashboard-tool-card__note {
-      font-size: 0.8rem;
-      color: var(--color-accent-gold-soft);
-      margin-top: var(--space-2);
-      margin-bottom: 0;
-    }
-
-    #db-status.dashboard-tool-card__status {
-      font-size: 0.8rem;
-      color: var(--color-accent-gold-soft);
-      margin-top: var(--space-2);
-      margin-bottom: 0;
-    }
-
-    .dashboard-tool-card__link {
-      text-decoration: none;
-    }
-
-    #dashboard-admin-passwords-wrap {
-      margin-top: var(--space-4);
-      padding-top: var(--space-3);
-      border-top: 1px solid var(--dash-border);
-    }
-
-    .nav-dashboard-link {
-      display: none;
-    }
-
-    .nav-dashboard-link.is-visible {
-      display: inline-flex;
-    }
-
-    .nav-logout-link {
-      display: none;
-    }
-
-    .nav-logout-link.is-visible {
-      display: inline-flex;
-    }
-
-    .dashboard-letters {
-      margin-top: var(--space-7);
-      padding: var(--space-6) var(--space-5);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--dash-border);
-      background: var(--dash-surface);
-      box-shadow: none;
-      position: relative;
-    }
-
-    .dashboard-uploads-tabs {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-
-    .dashboard-gov-tabs {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-4);
-      flex-wrap: wrap;
-    }
-
-    .dashboard-gov-tab {
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: transparent;
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-
-    .dashboard-gov-tab:hover {
-      color: var(--color-accent-gold-soft);
-      border-color: rgba(201, 162, 39, 0.4);
-    }
-
-    .dashboard-gov-tab.is-active {
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold);
-      background: var(--color-glass);
-    }
-
-    .dashboard-gov-panels {
-      margin-top: var(--space-4);
-    }
-
-    .dashboard-gov-panel {
-      display: none;
-    }
-
-    .dashboard-gov-panel.is-active {
-      display: block;
-    }
-
-    .gov-dir-fetch-status {
-      font-size: 0.85rem;
-      margin-left: 0.5rem;
-    }
-
-    .dashboard-upload-tab {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-muted);
-      cursor: pointer;
-    }
-
-    .dashboard-upload-tab.is-active {
-      border-color: var(--color-accent-gold);
-      color: var(--color-accent-gold-soft);
-      background: rgba(201, 162, 39, 0.1);
-    }
-
-    .dashboard-letters__title {
-      font-size: clamp(1rem, 1.35vw, 1.12rem);
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      margin: 0 0 var(--space-3);
-      padding-bottom: var(--space-2);
-      border-bottom: 1px solid var(--dash-border);
-      color: rgba(248, 250, 252, 0.96);
-    }
-
-    .dashboard-letters__intro {
-      font-size: 0.875rem;
-      line-height: 1.6;
-      color: var(--dash-text-muted);
-      margin-bottom: var(--space-5);
-      max-width: 68ch;
-    }
-
-    #dashboard-overlay .dashboard-letters h4 {
-      font-size: 0.88rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      color: var(--dash-text-muted);
-      margin: var(--space-5) 0 var(--space-2);
-    }
-
-    .dashboard-card--tools {
-      margin-bottom: var(--space-4);
-      padding: var(--space-4) var(--space-5);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.02);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .dashboard-card--tools:hover {
-      border-color: rgba(201, 162, 39, 0.2);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
-    }
-
-    @media (max-width: 640px) {
-      .dashboard-toc {
-        top: var(--dash-header-height, 3.75rem);
-      }
-
-      .dashboard-toc a {
-        font-size: 0.72rem;
-        padding: 0.32rem 0.65rem;
-      }
-
-      .dashboard-hero {
-        padding: var(--space-4);
-      }
-    }
-
-    .letter-editor .letter-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: var(--space-4);
-      margin-bottom: var(--space-4);
-    }
-
-    .letter-editor .form-group {
-      margin-bottom: 0;
-    }
-
-    .letter-editor .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-bottom: 0.25rem;
-    }
-
-    .letter-editor .form-group input {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border-radius: 3px;
-      border: 1px solid rgba(30, 58, 95, 0.2);
-      background: #fefefe;
-      color: #111;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 1.05rem;
-    }
-
-    .letter-pages {
-      margin-bottom: var(--space-4);
-    }
-
-    .letter-page-wrap {
-      margin-bottom: var(--space-4);
-    }
-
-    .letter-page-label {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-2);
-    }
-
-    .letter-body {
-      width: 100%;
-      min-height: 120px;
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-      resize: vertical;
-    }
-
-    .letter-qr-block {
-      margin: var(--space-6) 0;
-      padding: var(--space-4);
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: var(--radius-sm);
-    }
-
-    .letter-qr-display {
-      margin: var(--space-3) 0;
-      min-height: 100px;
-    }
-
-    .letter-qr-display canvas,
-    .letter-qr-display img {
-      display: block;
-    }
-
-    .letter-qr-hint {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      margin: 0.25rem 0 0;
-    }
-
-    /* صفحة هيدر ليتر — حسب النموذج: هيدر (شعار + خط أزرق + تواصل)، جسم، فوتر (كيو آر + تواصل + لوجوهات محيطة + SIRET) */
-    .letterhead-sheet {
-      width: 210mm;
-      height: 297mm;
-      margin: var(--space-6) 0;
-      padding: 0;
-      background: white;
-      border: 1px solid #ddd;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      position: relative;
-    }
-
-    @media print {
-      .letterhead-sheet {
-        width: 210mm;
-        height: 297mm;
-        margin: 0;
-        border: none;
-        box-shadow: none;
-        border-radius: 0;
-        page-break-after: always;
-      }
-
-      body {
-        margin: 0;
-        padding: 0;
-      }
-    }
-
-    .letterhead-sheet::before {
-      content: '';
-      position: absolute;
-      right: 10%;
-      bottom: 15%;
-      width: 180px;
-      height: 180px;
-      background: url('assets/emblem.jpg') center center no-repeat;
-      background: image-set(url('assets/emblem.webp') type('image/webp'), url('assets/emblem.jpg') type('image/jpeg')) center center no-repeat;
-      background-size: contain;
-      opacity: 0.07;
-      pointer-events: none;
-    }
-
-    .letterhead-sheet__head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--space-4);
-      padding: var(--space-4) var(--space-6);
-      border-bottom: 2px solid #1e3a5f;
-      position: relative;
-      z-index: 1;
-    }
-
-    .letterhead-sheet__head-left {
-      flex-shrink: 0;
-    }
-
-    .letterhead-sheet__head .letterhead-logo {
-      max-width: 90px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-    }
-
-
-    .letterhead-sheet__head-right {
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .letterhead-sheet__head-right .letterhead-website {
-      font-size: 0.95rem;
-      color: #1e3a5f;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.15rem;
-    }
-
-    .letterhead-sheet__head-right .letterhead-email {
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .letterhead-sheet__meta {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: var(--space-4);
-      padding: 0 var(--space-6) var(--space-3);
-      position: relative;
-      z-index: 1;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .letterhead-meta-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .letterhead-meta-row.letterhead-sader-num {
-      flex-direction: row;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .letterhead-meta-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #1e3a5f;
-    }
-
-    .letterhead-sader-value {
-      font-weight: 700;
-      color: #c00;
-      font-size: 1.1rem;
-    }
-
-    .letterhead-sheet__body {
-      min-height: 400px;
-      padding: var(--space-6) var(--space-6);
-      position: relative;
-      z-index: 1;
-    }
-
-    .letterhead-sheet__body textarea {
-      width: 100%;
-      min-height: 360px;
-      border: none;
-      resize: vertical;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 1.15rem;
-      line-height: 1.85;
-      color: #111;
-      background: transparent;
-      padding: 0;
-    }
-
-    .letterhead-sheet__body textarea::placeholder {
-      color: #999;
-    }
-
-    .letterhead-sheet__footer {
-      border-top: 2px solid #1e3a5f;
-      padding: var(--space-4) var(--space-6);
-      position: relative;
-      z-index: 1;
-      background: #fafafa;
-    }
-
-    .letterhead-sheet__footer-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-      margin-bottom: var(--space-3);
-    }
-
-    .letterhead-sheet__footer-qr {
-      flex-shrink: 0;
-    }
-
-    .letterhead-sheet__footer-qr .qr-wrap {
-      position: relative;
-      display: inline-block;
-    }
-
-    .letterhead-sheet__footer-qr .qr-wrap canvas {
-      display: block;
-      border-radius: 4px;
-    }
-
-    .letterhead-sheet__footer-qr .qr-wrap .qr-logo-overlay {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 26%;
-      height: 26%;
-      max-width: 36px;
-      max-height: 36px;
-      background: #fff;
-      border-radius: 3px;
-      padding: 2px;
-      object-fit: contain;
-    }
-
-    .letterhead-sheet__footer-contact-block {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem 1.5rem;
-      max-width: 420px;
-    }
-
-    .letterhead-sheet__footer-siret {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: #333;
-    }
-
-    .letterhead-sheet__footer-siret .siret-badge {
-      background: #c9a227;
-      color: #1a1a1a;
-      padding: 0.2rem 0.5rem;
-      border-radius: 3px;
-      font-weight: 700;
-    }
-
-    .letterhead-sheet__footer-logos {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-      margin-top: var(--space-3);
-      padding-top: var(--space-2);
-    }
-
-    .letterhead-sheet__footer-logos .footer-logo-item {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-    }
-
-    .letterhead-sheet__footer-logos .logo-slot {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .letterhead-sheet__footer-logos .logo-svg {
-      width: 44px;
-      height: 44px;
-      display: block;
-      border-radius: 4px;
-    }
-
-    .letterhead-sheet__footer-contact-block .contact-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: #1a1a1a;
-    }
-
-    .letterhead-sheet__footer-contact-block .contact-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #1e3a5f;
-      margin-bottom: 0.15rem;
-    }
-
-    .letterhead-sheet__footer-contact-block .contact-icon-wrap {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: #c9a227;
-      color: #1a1a1a;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .letterhead-input-luxury,
-    .letterhead-sheet__body textarea,
-    .letter-editor .letter-body {
-      font-family: Georgia, 'Times New Roman', serif !important;
-      font-size: 1.1rem !important;
-      line-height: 1.8 !important;
-      color: #111 !important;
-      padding: 0.6rem 0.75rem !important;
-      border: 1px solid rgba(30, 58, 95, 0.15) !important;
-      border-radius: 3px !important;
-      background: #fefefe !important;
-    }
-
-    .letterhead-input-luxury::placeholder,
-    .letterhead-sheet__body textarea::placeholder {
-      color: #888;
-    }
-
-    .letterhead-send-channels {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-4);
-      margin-top: var(--space-4);
-    }
-
-    .inbox-outbox-tab.is-active {
-      background: rgba(201, 162, 39, 0.2);
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold);
-    }
-
-    .suggestions-tab.is-active {
-      background: rgba(201, 162, 39, 0.2);
-      color: var(--color-accent-gold-soft);
-      border-color: var(--color-accent-gold);
-    }
-
-    .letter-box-panel {
-      margin-top: var(--space-2);
-    }
-
-    .archive-date-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .archive-date-label input {
-      margin: 0;
-    }
-
-    @media (max-width: 700px) {
-      .letterhead-send-channels {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .letterhead-send-channel {
-      padding: var(--space-4);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(201, 162, 39, 0.25);
-      border-radius: var(--radius-md);
-    }
-
-    .letterhead-send-channel h5 {
-      font-size: 0.95rem;
-      margin: 0 0 var(--space-3);
-      color: var(--color-accent-gold-soft);
-    }
-
-    .letterhead-send-channel .channel-list {
-      list-style: none;
-      margin: 0 0 var(--space-2);
-      padding: 0;
-      max-height: 100px;
-      overflow-y: auto;
-      font-size: 0.85rem;
-    }
-
-    .letterhead-send-channel .channel-list li {
-      padding: 0.2rem 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .letterhead-send-channel .channel-list li .remove-addr {
-      font-size: 0.75rem;
-      opacity: 0.8;
-    }
-
-    .letterhead-sheet-actions {
-      margin-top: var(--space-4);
-      padding: 0 var(--space-6);
-      position: relative;
-      z-index: 1;
-    }
-
-    .letterhead-qr-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-6);
-      margin: var(--space-6) 0;
-      align-items: start;
-    }
-
-    @media (max-width: 600px) {
-      .letterhead-qr-section {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .letterhead-qr-card {
-      padding: var(--space-4);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      text-align: center;
-    }
-
-    .letterhead-qr-card h4 {
-      font-size: 0.95rem;
-      margin: 0 0 var(--space-3);
-      color: var(--color-accent-gold-soft);
-    }
-
-    .letterhead-qr-card .qr-wrap {
-      position: relative;
-      display: inline-block;
-      margin: 0 auto;
-    }
-
-    .letterhead-qr-card .qr-wrap canvas {
-      display: block;
-      border-radius: 6px;
-    }
-
-    .letterhead-qr-card .qr-wrap .qr-logo-overlay {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 28%;
-      height: 28%;
-      max-width: 44px;
-      max-height: 44px;
-      background: #fff;
-      border-radius: 4px;
-      padding: 3px;
-      box-sizing: border-box;
-      object-fit: contain;
-    }
-
-    .letterhead-send-verify {
-      margin-top: var(--space-4);
-      padding: var(--space-4);
-      background: rgba(201, 162, 39, 0.08);
-      border: 1px solid rgba(201, 162, 39, 0.3);
-      border-radius: var(--radius-md);
-    }
-
-    .letterhead-send-verify h4 {
-      font-size: 0.95rem;
-      margin: 0 0 var(--space-3);
-    }
-
-    .letterhead-pending-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .letterhead-pending-list li {
-      padding: var(--space-3);
-      margin-bottom: var(--space-2);
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: var(--radius-sm);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-    }
-
-    .letterhead-pending-list li .assign-row {
-      display: flex;
-      gap: var(--space-2);
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .staff-permissions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: var(--space-2);
-      margin: var(--space-3) 0;
-    }
-
-    .staff-permissions-grid label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: normal;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .staff-permissions-grid input[type="checkbox"] {
-      margin: 0;
-    }
-
-    .staff-permissions-grid .staff-perm-group-title {
-      grid-column: 1 / -1;
-      font-weight: 700;
-      font-size: 0.88rem;
-      color: var(--color-accent-gold-soft);
-      margin: var(--space-3) 0 var(--space-1);
-      padding-top: var(--space-2);
-      border-top: 1px solid var(--color-border-subtle);
-    }
-
-    .staff-permissions-grid .staff-perm-group-title:first-child {
-      border-top: 0;
-      padding-top: 0;
-      margin-top: 0;
-    }
-
-    .staff-assign-panel {
-      margin-bottom: var(--space-4);
-      padding: var(--space-4);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(201, 162, 39, 0.35);
-      background: rgba(201, 162, 39, 0.06);
-    }
-
-    .staff-assign-panel label {
-      font-weight: 600;
-      margin-bottom: var(--space-2);
-      display: block;
-    }
-
-    .staff-assign-panel select#staff-permissions-assign-picker {
-      width: 100%;
-      max-width: 520px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .staff-perm-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      align-items: center;
-      margin: var(--space-2) 0 var(--space-3);
-    }
-
-    .staff-perm-toolbar select#staff-perm-preset-select {
-      min-width: 200px;
-      padding: 0.35rem 0.5rem;
-      font-size: 0.85rem;
-    }
-
-    .staff-custom-perm-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.35rem 0;
-      font-size: 0.9rem;
-    }
-
-    .staff-custom-perm-list li .remove-custom-perm {
-      font-size: 0.8rem;
-      opacity: 0.9;
-    }
-
-    .staff-list-photo-wrap {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: var(--color-surface-elevated);
-    }
-
-    .staff-list-photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .staff-list-body {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .staff-list-bio {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      margin: 0.35rem 0 0;
-      line-height: 1.4;
-    }
-
-    #dashboard-staff-roles-list li .content {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-3);
-    }
-
-    .staff-eval-form-wrap {
-      padding: var(--space-4);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      margin-bottom: var(--space-6);
-    }
-
-    .staff-eval-criteria {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: var(--space-3);
-      margin: var(--space-4) 0;
-    }
-
-    .staff-eval-criteria .criterion-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .staff-eval-criteria .criterion-row label {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-    }
-
-    .staff-eval-criteria .criterion-row select {
-      padding: 0.4rem 0.5rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: var(--color-surface);
-      color: var(--color-text-main);
-    }
-
-    .staff-eval-inbox {
-      margin-top: var(--space-4);
-    }
-
-    .staff-eval-list-item {
-      padding: var(--space-3);
-      margin-bottom: var(--space-2);
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: var(--radius-sm);
-      border-left: 3px solid var(--color-accent-gold);
-    }
-
-    [dir="rtl"] .staff-eval-list-item {
-      border-left: none;
-      border-right: 3px solid var(--color-accent-gold);
-    }
-
-    .staff-eval-list-item .eval-summary {
-      font-size: 0.9rem;
-    }
-
-    .staff-eval-list-item .eval-detail {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      margin-top: 0.35rem;
-    }
-
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-
-      .letter-print-area,
-      .letter-print-area * {
-        visibility: visible;
-      }
-
-      .letter-print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        max-width: 100%;
-        padding: 1.5rem;
-        background: #fff;
-        color: #111;
-      }
-
-      .letter-print-area .letterhead-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
-
-      .letter-print-area .letter-meta-print {
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-      }
-
-      .letter-print-area .letter-body-print {
-        white-space: pre-wrap;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-      }
-
-      .letter-print-area .letter-qr-print {
-        margin-top: 1rem;
-      }
-    }
-
-    .consultation-card {
-      position: relative;
-    }
-
-    .consultation-badge {
-      display: inline-block;
-      padding: 0.25rem 0.6rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      background: var(--color-accent-gold);
-      color: #1b1b1b;
-      border-radius: 999px;
-      margin-bottom: var(--space-3);
-    }
-
-    .consultation-card--urgent {
-      border-color: rgba(214, 175, 79, 0.4);
-      box-shadow: 0 0 0 1px rgba(214, 175, 79, 0.2);
-    }
-
-    .urgent-online-section {
-      background: linear-gradient(180deg, rgba(8, 27, 51, 0.4) 0%, transparent 100%);
-    }
-
-    .urgent-online-features {
-      margin-bottom: var(--space-12);
-    }
-
-    .urgent-feature-card {
-      text-align: center;
-    }
-
-    .urgent-feature-icon {
-      font-size: 2rem;
-      margin-bottom: var(--space-3);
-    }
-
-    .urgent-online-form-wrap {
-      max-width: 560px;
-      padding: var(--space-8);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-    }
-
-    .urgent-online-form .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .urgent-online-form .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .urgent-online-form .form-group {
-      margin-bottom: var(--space-4);
-    }
-
-    .urgent-online-form label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .urgent-online-form input,
-    .urgent-online-form select,
-    .urgent-online-form textarea {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
-    .urgent-online-form textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .urgent-online-form-note {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-top: var(--space-4);
-    }
-
-    .urgent-online-success {
-      margin-top: var(--space-6);
-      padding: var(--space-4);
-      background: rgba(28, 138, 87, 0.15);
-      border: 1px solid rgba(28, 138, 87, 0.4);
-      border-radius: var(--radius-sm);
-      color: var(--color-accent-emerald);
-    }
-
-    .urgent-online-success p {
-      margin: 0.4rem 0 0;
-    }
-
-    .urgent-online-success p:first-child {
-      margin-top: 0;
-    }
-
-    .urgent-online-success .urgent-online-success__next {
-      color: var(--color-text-muted);
-      font-size: 0.9rem;
-    }
-
-    .payment-method-box {
-      max-width: 560px;
-      margin-bottom: var(--space-10);
-      padding: var(--space-6);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      position: relative;
-      border-left: 4px solid var(--color-accent-gold);
-    }
-
-    [dir="rtl"] .payment-method-box {
-      border-left: none;
-      border-right: 4px solid var(--color-accent-gold);
-    }
-
-    .payment-method-box .payment-secure-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--color-accent-emerald);
-      margin-bottom: var(--space-3);
-    }
-
-    .payment-method-box .payment-secure-badge::before {
-      content: '';
-      width: 14px;
-      height: 14px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c8a57' stroke-width='2'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E") center/contain no-repeat;
-    }
-
-    .payment-method-box .payment-regulatory {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-top: var(--space-3);
-      padding-top: var(--space-3);
-      border-top: 1px solid var(--color-border-subtle);
-    }
-
-    .payment-method-dl {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.25rem 1.5rem;
-      margin: 0;
-      font-size: 0.95rem;
-    }
-
-    .payment-method-dl dt {
-      color: var(--color-text-muted);
-    }
-
-    .payment-method-dl dd {
-      margin: 0;
-      font-weight: 600;
-      color: var(--color-accent-gold);
-      word-break: break-all;
-    }
-
-    .urgent-feature-card .btn {
-      margin-top: var(--space-4);
-    }
-
-    .investor-payment-box {
-      margin-top: var(--space-6);
-      margin-bottom: var(--space-8);
-    }
-
-    .payment-remember-wrap {
-      margin-top: var(--space-4);
-      padding-top: var(--space-3);
-      border-top: 1px solid var(--color-border-subtle);
-    }
-
-    .payment-remember-label {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      cursor: pointer;
-    }
-
-    .payment-remember-label input {
-      accent-color: var(--color-accent-gold);
-    }
-
-    .payment-saved-hint {
-      font-size: 0.85rem;
-      color: var(--color-accent-emerald);
-      margin-top: var(--space-2);
-      margin-bottom: 0;
-    }
-
-    .terms-section .terms-content {
-      max-width: 800px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      padding: var(--space-8);
-      border-radius: var(--radius-lg);
-    }
-
-    .terms-list {
-      margin: var(--space-4) 0;
-      padding-left: 1.5rem;
-      color: var(--color-text-muted);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    .terms-footer {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin-top: var(--space-6);
-    }
-
-    .terms-accept-wrap {
-      margin-top: var(--space-4);
-    }
-
-    .terms-accept-label {
-      display: block;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .terms-accept-label input {
-      margin-inline-end: 0.5rem;
-      accent-color: var(--color-accent-gold);
-    }
-
-    .terms-accept-label a {
-      color: var(--color-accent-gold-soft);
-      text-decoration: underline;
-    }
-
-    .location-verify-note {
-      font-size: 0.8rem;
-      color: var(--color-text-muted);
-      margin-top: var(--space-2);
-    }
-
-    .careers-box {
-      max-width: 640px;
-      padding: var(--space-8);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-    }
-
-    .careers-box h3 {
-      font-size: 1.1rem;
-      margin-bottom: var(--space-6);
-    }
-
-    .careers-form .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-      margin-bottom: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .careers-form .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .careers-form .form-group {
-      margin-bottom: var(--space-4);
-    }
-
-    .careers-form .form-group label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .careers-form input,
-    .careers-form textarea {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
-
-    .careers-form textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .careers-note {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      margin: var(--space-4) 0;
-    }
-
-    .careers-note a {
-      color: var(--color-accent-gold-soft);
-    }
-
-    .careers-success {
-      margin-top: var(--space-6);
-      padding: var(--space-4);
-      background: rgba(28, 138, 87, 0.15);
-      border: 1px solid rgba(28, 138, 87, 0.4);
-      border-radius: var(--radius-sm);
-      color: var(--color-accent-emerald);
-    }
-
-    .kyc-block {
-      margin: var(--space-8) 0;
-      padding: var(--space-6);
-      background: rgba(8, 27, 51, 0.4);
-      border: 1px solid rgba(214, 175, 79, 0.25);
-      border-radius: var(--radius-md);
-    }
-
-    .kyc-block__title {
-      font-size: 1rem;
-      margin-bottom: var(--space-2);
-      color: var(--color-accent-gold-soft);
-    }
-
-    .kyc-block__intro {
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-4);
-    }
-
-    .kyc-block .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-      margin-bottom: var(--space-4);
-    }
-
-    @media (max-width: 600px) {
-      .kyc-block .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .kyc-block .form-group {
-      margin-bottom: var(--space-4);
-    }
-
-    .kyc-block .form-group label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .kyc-block input,
-    .kyc-block select,
-    .kyc-block textarea {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-subtle);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--color-text-main);
-      font-size: 0.95rem;
-    }
-
-    .kyc-block textarea {
-      min-height: 80px;
-      resize: vertical;
-      font-family: inherit;
-    }
-
-    .direct-contact-box {
-      max-width: 480px;
-      margin-bottom: var(--space-10);
-      padding: var(--space-6);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      border-left: 4px solid var(--color-accent-gold);
-    }
-
-    [dir="rtl"] .direct-contact-box {
-      border-left: none;
-      border-right: 4px solid var(--color-accent-gold);
-    }
-
-    .direct-contact-dl {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.25rem 1.5rem;
-      margin: 0;
-      font-size: 1rem;
-    }
-
-    .direct-contact-dl dt {
-      color: var(--color-text-muted);
-    }
-
-    .direct-contact-dl dd {
-      margin: 0;
-    }
-
-    .direct-contact-dl a {
-      color: var(--color-accent-gold);
-      text-decoration: none;
-    }
-
-    .direct-contact-dl a:hover {
-      text-decoration: underline;
-    }
-
-    .cx-tool-card {
-      position: relative;
-    }
-
-    .suggested-for-you {
-      margin-top: var(--space-4);
-      padding: var(--space-3);
-      background: rgba(214, 175, 79, 0.08);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .suggested-for-you strong {
-      color: var(--color-accent-gold);
-      font-size: 0.85rem;
-    }
-
-    .notification-prefs {
-      margin-top: var(--space-4);
-    }
-
-    .notif-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .notif-toggle input {
-      accent-color: var(--color-accent-gold);
-    }
-
-    .notif-note {
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-      margin: 0;
-    }
-
-    .crm-contact-dl {
-      margin: var(--space-4) 0 0;
-      padding: 0;
-      font-size: 0.95rem;
-    }
-
-    .crm-contact-dl dt {
-      color: var(--color-text-muted);
-      margin-bottom: 0.25rem;
-    }
-
-    .crm-contact-dl dd {
-      margin: 0 0 0.5rem;
-    }
-
-    .crm-contact-dl a {
-      color: var(--color-accent-gold);
-      text-decoration: none;
-    }
-
-    .crm-contact-dl a:hover {
-      text-decoration: underline;
-    }
-
-    .verification-tool-card {
-      position: relative;
-    }
-
-    .verification-note {
-      font-size: 0.85rem;
-      color: var(--color-text-muted);
-      margin: var(--space-3) 0 0;
-    }
-
-    .verification-tool-card a {
-      color: var(--color-accent-gold);
-      text-decoration: none;
-    }
-
-    .verification-tool-card a:hover {
-      text-decoration: underline;
-    }
-
-    .ip-check-box {
-      margin-top: var(--space-4);
-      padding: var(--space-3);
-      background: rgba(214, 175, 79, 0.06);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .ip-check-box strong {
-      color: var(--color-accent-gold);
-    }
-
-    .section--collapsible .section-collapse-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-    }
-
-    .section--collapsible .section__title {
-      margin-bottom: 0;
-    }
-
-    .section-collapse-content[hidden] {
-      display: none !important;
-    }
-
-    .btn--sm {
-      padding: 0.45rem 0.9rem;
-      font-size: 0.82rem;
-      border-width: 2px;
-    }
-
-    .send-summary-wrap {
-      margin-top: var(--space-10);
-      padding: var(--space-8);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      max-width: 640px;
-    }
-
-    .send-summary-wrap .form-group {
-      margin-bottom: var(--space-4);
-    }
-
-    .send-summary-wrap label {
-      display: block;
-      margin-bottom: var(--space-2);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-    }
-
-    .summary-preview {
-      margin-top: var(--space-6);
-      padding: var(--space-4);
-      background: rgba(28, 138, 87, 0.1);
-      border: 1px solid rgba(28, 138, 87, 0.3);
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      color: var(--color-text-muted);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .summary-preview[hidden] {
-      display: none !important;
-    }
-
-    .calc-wrap {
-      max-width: 320px;
-      padding: var(--space-6);
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-card);
-    }
-
-    .calc-display {
-      width: 100%;
-      padding: var(--space-4) var(--space-3);
-      margin-bottom: var(--space-4);
-      font-size: 1.75rem;
-      font-weight: 600;
-      text-align: right;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      color: var(--color-accent-gold-soft);
-      font-variant-numeric: tabular-nums;
-      min-height: 2.5rem;
-      word-break: break-all;
-    }
-
-    .calc-btns {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-2);
-    }
-
-    .calc-btn {
-      padding: var(--space-4);
-      font-size: 1.1rem;
-      font-weight: 600;
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--color-text-main);
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .calc-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(214, 175, 79, 0.3);
-    }
-
-    .calc-btn--op {
-      color: var(--color-accent-gold-soft);
-    }
-
-    .calc-btn--eq {
-      background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-gold-soft));
-      color: #1b1b1b;
-    }
-
-    .calc-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.75);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-    }
-
-    .calc-overlay.is-open {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    .calc-overlay .calc-modal {
-      background: var(--color-surface-elevated);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-md);
-      padding: var(--space-8);
-      max-width: 360px;
-      width: 100%;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    @media (max-width: 900px) {
-      .site-header__inner {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .iif-header-primary-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.55rem;
-      }
-
-      .iif-header-primary-bar .site-logo {
-        margin-inline-end: 0;
-      }
-
-      .site-header__clock-lang {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        flex-basis: 100%;
-        flex: 1 1 100%;
-      }
-
-      .iif-header-brand-stack {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .iif-header-brand-account {
-        margin-inline-start: 0;
-        justify-content: flex-start;
-      }
-
-      .iif-header-brand-top .site-clock--in-brand {
-        flex: 1 1 auto;
-      }
-
-      .iif-header-brand-top .iif-section-links-toggle {
-        flex: 1 1 auto;
-        min-width: 0;
-        width: 100%;
-        max-width: none;
-      }
-
-      .iif-header-toolbar-panel {
-        flex: 1 1 100%;
-        min-width: 0;
-      }
-
-      .site-nav {
-        flex-basis: 100%;
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-        border-block-start: 1px solid rgba(201, 162, 39, 0.14);
-        padding-block-start: 0.55rem;
-        margin-block-start: 0.35rem;
-      }
-
-      .site-header__clock-lang .site-header__auth-btn {
-        min-height: 44px;
-        align-items: center;
-        justify-content: center;
-        touch-action: manipulation;
-      }
-
-      .site-nav .header-search {
-        flex: 1 1 100%;
-        max-width: none;
-        margin-inline-start: 0;
-        margin-block-start: var(--space-3);
-        order: 10;
-      }
-
-      main#main-content {
-        padding-inline: var(--space-4);
-      }
-
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .hero__visual {
-        order: -1;
-      }
-
-      .grid-2,
-      .grid-3,
-      .grid-4 {
-        grid-template-columns: 1fr;
-      }
-
-      .tiers {
-        grid-template-columns: 1fr;
-      }
-
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* صفحة الخدمة — صفحة كاملة مستقلة: إخفاء الهيدر وشريط الحساب، فقط شريط الرجوع + المحتوى */
-    body.body-service-page-open {
-      overflow: hidden;
-    }
-
-    body.body-service-page-open .site-header {
-      display: none !important;
-    }
-
-    body.body-service-page-open .skip-link {
-      visibility: hidden;
-    }
-
-    [id].is-service-page-open {
-      position: fixed;
-      inset: 0;
-      z-index: 9998;
-      overflow: auto;
-      background: #03060c;
-      padding-top: var(--service-back-bar-height);
-      padding-left: var(--space-4);
-      padding-right: var(--space-4);
-      padding-bottom: var(--space-16);
-      -webkit-overflow-scrolling: touch;
-      animation: servicePageIn 0.25s ease-out;
-      box-sizing: border-box;
-    }
-
-    [id].is-service-page-open .section__title {
-      padding-top: 0;
-    }
-
-    @keyframes servicePageIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    .service-page-back-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 9999;
-      height: var(--service-back-bar-height);
-      min-height: var(--service-back-bar-height);
-      display: flex;
-      align-items: center;
-      padding: 0 var(--space-4);
-      background: rgba(3, 6, 12, 0.98);
-      border-bottom: 1px solid var(--color-border-subtle);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      box-sizing: border-box;
-    }
-
-    .service-page-back-bar .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: 0.5rem 1rem;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
-      border: 2px solid rgba(255, 255, 255, 0.25);
-      border-radius: var(--radius-md);
-      color: var(--color-text-main);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
-    }
-
-    .service-page-back-bar .btn-back:hover {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    }
-
-    .service-page-back-bar .btn-back:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
-    }
-
-    /* العودة للأعلى — ثابت، يليق بالهوية، مع safe-area */
-    .iif-back-to-top {
-      position: fixed;
-      inset-inline-end: max(1rem, env(safe-area-inset-right, 0px));
-      bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-      z-index: 9990;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      min-height: 2.85rem;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-full);
-      border: 1px solid rgba(201, 162, 39, 0.42);
-      background: linear-gradient(165deg, rgba(19, 26, 40, 0.97) 0%, rgba(8, 11, 18, 0.99) 100%);
-      color: var(--color-accent-gold-soft);
-      font-size: 0.82rem;
-      font-weight: 600;
-      font-family: inherit;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(0.6rem);
-      transition: opacity 0.28s ease, visibility 0.28s ease, transform 0.28s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .iif-back-to-top.is-visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .iif-back-to-top:hover {
-      border-color: rgba(201, 162, 39, 0.65);
-      color: #f5e6b3;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
-
-    .iif-back-to-top:focus-visible {
-      outline: 2px solid var(--color-accent-gold);
-      outline-offset: 3px;
-    }
-
-    .iif-back-to-top__icon {
-      display: inline-flex;
-      font-size: 1rem;
-      line-height: 1;
-      opacity: 0.95;
-    }
-
-    body.body-service-page-open .iif-back-to-top {
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .iif-back-to-top {
-        transition: none;
-      }
-    }
-
-    /* لوحة الإدارة: ملء الشاشة + إخفاء هيكل الموقع (iframe admin، ?iif_admin_embed=1، أو فتح اللوحة من الموقع) */
-    html.iif-dashboard-open,
-    html.iif-admin-embed {
-      height: 100%;
-    }
-
-    html.iif-dashboard-open body,
-    html.iif-admin-embed body {
-      overflow: hidden !important;
-      background: #070a10 !important;
-    }
-
-    /*
-      إخفاء هيكل الموقع:
-      - body > header.site-header = هيدر الموقع فقط (ليس شريط اللوحة داخل #dashboard-overlay)
-      - يُضاف iif-dashboard-open من JS عند فتح اللوحة
-      - احتياط: :has() و ~ يعملان حتى لو تأخّر أو فشل صنف html
-    */
-    body:has(#dashboard-overlay.is-open)>header.site-header,
-    html.iif-dashboard-open body>header.site-header,
-    html.iif-admin-embed body>header.site-header {
-      display: none !important;
-    }
-
-    /*
-      إخفاء المحتوى العام عند فتح اللوحة:
-      — لا تعتمد على ~ #main-content لأن JS ينقل #dashboard-overlay لآخر body فيصبح #main-content *قبل* اللوحة فلا يطابق المحدد الأخوي.
-    */
-    body:has(#dashboard-overlay.is-open) #main-content,
-    html.iif-dashboard-open #main-content,
-    /*
-      وضع embed: لا تُخفِ #main-content حتى تُفتح اللوحة أو نافذة الدخول — يمنع شاشة سوداء إذا تأخّر JS.
-      (يُكمّلها iifHidePublicSiteChrome بعدم فرض display:none على main قبل فتح إحدى النافذتين)
-    */
-    html.iif-admin-embed:has(#dashboard-overlay.is-open) #main-content,
-    html.iif-admin-embed:has(#auth-overlay.is-open) #main-content {
-      display: none !important;
-    }
-
-    body:has(#dashboard-overlay.is-open)>footer,
-    html.iif-dashboard-open body>footer,
-    html.iif-admin-embed body>footer {
-      display: none !important;
-    }
-
-    body:has(#dashboard-overlay.is-open) .skip-link,
-    body:has(#dashboard-overlay.is-open) #iif-back-to-top,
-    body:has(#dashboard-overlay.is-open) #service-page-back-bar,
-    html.iif-dashboard-open .skip-link,
-    html.iif-dashboard-open #iif-back-to-top,
-    html.iif-dashboard-open #service-page-back-bar,
-    html.iif-admin-embed .skip-link,
-    html.iif-admin-embed #iif-back-to-top,
-    html.iif-admin-embed #service-page-back-bar {
-      display: none !important;
-    }
-
-    /* إخفاء شريط تحذير HTTPS فوق اللوحة بملء الصفحة */
-    html.iif-admin-embed #https-warning {
-      display: none !important;
-    }
-
-    html.iif-dashboard-open #https-warning {
-      display: none !important;
-    }
-
-    /*
-      وضع ?iif_admin_embed=1: لا نعرض هيرو «رؤية ملكية» أثناء انتظار فتح الدخول/اللوحة —
-      طبقة ثابتة تُزال عند فتح #auth-overlay أو #dashboard-overlay
-    */
-    #iif-embed-entry-screen {
-      position: fixed;
-      inset: 0;
-      /* أقل من .auth-overlay (100) ولوحة التحكم حتى تظهر نافذة الدخول/اللوحة فوقها */
-      z-index: 50;
-      background: linear-gradient(165deg, #03050a 0%, #0b1018 45%, #070a10 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-      box-sizing: border-box;
-      font-family: var(--font-sans, system-ui, sans-serif);
-      color: #e2e8f0;
-      pointer-events: none;
-    }
-
-    #iif-embed-entry-screen h1 {
-      font-size: clamp(1.05rem, 3vw, 1.35rem);
-      font-weight: 650;
-      margin: 0 0 0.5rem;
-      color: #c9a227;
-      letter-spacing: 0.02em;
-    }
-
-    #iif-embed-entry-screen p {
-      margin: 0.35rem 0 0;
-      font-size: 0.92rem;
-      line-height: 1.55;
-      color: #94a3b8;
-      max-width: 26rem;
-    }
-
-    #iif-embed-entry-screen .iif-embed-entry-note {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #64748b;
-    }
-  </style>
-</head>
-
-<body>
-  <script>
-    (function () {
-      try {
-        var qsEarly = new URLSearchParams(window.location.search);
-        if (qsEarly.get('iif_admin_portal') === '1') {
-          document.documentElement.classList.add('iif-admin-portal');
-          window.IIF_ADMIN_PORTAL = true;
-          try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eStickyEarly) { }
-          try { document.title = 'صندوق الاستثمار الدولي · بوابة الإدارة / Admin Portal'; } catch (eTitlePortal) { }
-        }
-        if (qsEarly.get('open_dashboard') === '1' || qsEarly.get('iif_open_dashboard') === '1') {
-          try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eStickyDash) { }
-          try { sessionStorage.setItem('iif_pending_open_dashboard', '1'); } catch (ePenEarly) { }
-        }
-        if (qsEarly.get('iif_admin_portal') !== '1' && qsEarly.get('open_dashboard') !== '1' && qsEarly.get('iif_open_dashboard') !== '1' && qsEarly.get('iif_admin_embed') !== '1') {
-          var hClear = (window.location.hash || '').replace(/^#/, '').split('?')[0];
-          var hashKeepsPortal = hClear === 'dashboard' || hClear === 'dashboard-overlay' || hClear === 'dashboard-my-content';
-          var loggedInEarly = false;
-          try { loggedInEarly = localStorage.getItem('iif-logged-in') === '1'; } catch (eLi) { }
-          if (!hashKeepsPortal && !loggedInEarly) {
-            try {
-              sessionStorage.removeItem('iif_admin_portal_mode');
-              sessionStorage.removeItem('iif_pending_open_dashboard');
-            } catch (eClrPub) { }
-          }
-        }
-        /* أي روابط قديمة مثل ?iif_admin_embed=1 ⇒ وحّدها إلى الرابط المعتمد #dashboard */
-        if (
-          window.top === window.self &&
-          new URLSearchParams(window.location.search).get('iif_admin_embed') === '1' &&
-          new URLSearchParams(window.location.search).get('iif_allow_direct') !== '1'
-        ) {
-          try {
-            var adminUrl = new URL(window.location.href);
-            adminUrl.searchParams.delete('iif_admin_embed');
-            adminUrl.searchParams.delete('iif_allow_direct');
-            adminUrl.hash = '#dashboard';
-            window.location.replace(adminUrl.toString());
-            return;
-          } catch (eRedirectAdmin) { }
-        }
-        if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1') {
-          document.documentElement.classList.add('iif-admin-embed');
-          window.IIF_ADMIN_EMBED = true;
-          /* نفس الملف index.html — ليس صفحة أخرى؛ يُفتح منها لوحة التحكم أو الدخول */
-          try {
-            document.title = 'صندوق الاستثمار الدولي · لوحة الإدارة — لوحة التحكم';
-          } catch (eTitle) { }
-        }
-      } catch (e) { }
-      /* إخفاء هيكل الموقع بأنماط مضمّنة — لا يعتمد على ترتيب تحميل CSS (مهم على Vercel/الكاش) */
-      function iifHidePublicSiteChrome() {
-        try {
-          var sp = new URLSearchParams(window.location.search);
-          var portalParam = sp.get('iif_admin_portal') === '1';
-          var ov = document.getElementById('dashboard-overlay');
-          var dashOpen = ov && ov.classList && ov.classList.contains('is-open');
-          var authOv = document.getElementById('auth-overlay');
-          var authOpen = authOv && authOv.classList && authOv.classList.contains('is-open');
-          var embedParam = sp.get('iif_admin_embed') === '1';
-          /* عند إغلاق اللوحة: إزالة إخفاء كامل-الخلفية (يعمل حتى بدون دعم CSS :has) */
-          if (!dashOpen) {
-            document.querySelectorAll('[data-iif-dash-bg-suppress]').forEach(function (node) {
-              node.removeAttribute('data-iif-dash-bg-suppress');
-              try { node.style.removeProperty('display'); } catch (e0) { }
-            });
-          }
-          var adminEmbedClass = false;
-          var adminPortalClass = false;
-          try {
-            adminEmbedClass = document.documentElement.classList.contains('iif-admin-embed');
-            adminPortalClass = document.documentElement.classList.contains('iif-admin-portal');
-          } catch (eCl) { }
-          var winPortal = window.IIF_ADMIN_PORTAL === true;
-          var winEmbed = window.IIF_ADMIN_EMBED === true;
-          var allowMainInPortal = false;
-          try { allowMainInPortal = window.IIF_ALLOW_MAIN_IN_PORTAL === true; } catch (eAm) { }
-          if (!portalParam && sp.get('iif_admin_embed') !== '1' && !dashOpen && !adminEmbedClass && !adminPortalClass && !winPortal && !winEmbed) return;
-          var h = document.querySelector('body > header.site-header');
-          var m = document.getElementById('main-content');
-          var f = document.querySelector('body > footer');
-          /*
-            بوابة الإدارة: عادة نخفي الهيدر والمحتوى والفوتر.
-            عند فتح «ملفي الشخصي» (#user-dashboard) نضبط IIF_ALLOW_MAIN_IN_PORTAL — وإلا يبقى display:none على #main-content
-            فيُعاد فرض الإخفاء بعد كل استدعاء لهذه الدالة فيمنع التركيز والكتابة في الحقول.
-          */
-          if (allowMainInPortal && !dashOpen && !authOpen) {
-            if (h) h.style.removeProperty('display');
-            if (m) m.style.removeProperty('display');
-            if (f) f.style.removeProperty('display');
-          } else {
-            if (h) h.style.setProperty('display', 'none', 'important');
-            /* بوابة الإدارة/وضع الإدارة المضمّن: أخفِ المحتوى العام دائماً لتفادي ظهور الصفحة العامة */
-            if (m) m.style.setProperty('display', 'none', 'important');
-            if (f) f.style.setProperty('display', 'none', 'important');
-          }
-          var sl = document.querySelector('a.skip-link');
-          if (sl) sl.style.setProperty('display', 'none', 'important');
-          var btop = document.getElementById('iif-back-to-top');
-          if (btop) btop.style.setProperty('display', 'none', 'important');
-          var spb = document.getElementById('service-page-back-bar');
-          if (spb) spb.style.setProperty('display', 'none', 'important');
-          var hw = document.getElementById('https-warning');
-          if (hw) hw.style.setProperty('display', 'none', 'important');
-          /* لوحة مفتوحة: إخفاء كل عناصر body ما عدا اللوحة (لا يبقى عمود/هيدر خلف اللوحة) */
-          if (dashOpen && document.body) {
-            for (var i = 0; i < document.body.children.length; i++) {
-              var node = document.body.children[i];
-              if (!node || node.id === 'dashboard-overlay') continue;
-              if (node.tagName === 'SCRIPT') continue;
-              node.setAttribute('data-iif-dash-bg-suppress', '1');
-              node.style.setProperty('display', 'none', 'important');
-            }
-          }
-          /* إزالة طبقة «جاري التحميل» عند فتح الدخول أو اللوحة */
-          if (embedParam && (authOpen || dashOpen)) {
-            try {
-              if (typeof iifRemoveEmbedEntryScreen === 'function') iifRemoveEmbedEntryScreen();
-            } catch (eRem) { }
-          }
-        } catch (e2) { }
-      }
-      function iifRestorePublicSiteChrome() {
-        try {
-          document.querySelectorAll('[data-iif-dash-bg-suppress]').forEach(function (node) {
-            node.removeAttribute('data-iif-dash-bg-suppress');
-            try { node.style.removeProperty('display'); } catch (e0) { }
-          });
-          var h = document.querySelector('body > header.site-header');
-          if (h) h.style.removeProperty('display');
-          var m = document.getElementById('main-content');
-          if (m) m.style.removeProperty('display');
-          var f = document.querySelector('body > footer');
-          if (f) f.style.removeProperty('display');
-          var sl = document.querySelector('a.skip-link');
-          if (sl) sl.style.removeProperty('display');
-          var btop = document.getElementById('iif-back-to-top');
-          if (btop) btop.style.removeProperty('display');
-          var spb = document.getElementById('service-page-back-bar');
-          if (spb) spb.style.removeProperty('display');
-          var hw = document.getElementById('https-warning');
-          if (hw) {
-            var sec = typeof window.IIF_connectionIsSecure === 'function' ? window.IIF_connectionIsSecure() : (typeof location !== 'undefined' && location.protocol === 'https:');
-            if (sec) hw.style.setProperty('display', 'none', 'important');
-            else { hw.style.removeProperty('display'); hw.style.display = 'block'; }
-          }
-        } catch (e3) { }
-      }
-      window.IIF_hidePublicSiteChrome = iifHidePublicSiteChrome;
-      window.IIF_restorePublicSiteChrome = iifRestorePublicSiteChrome;
-
-      function iifRemoveEmbedEntryScreen() {
-        try {
-          var el = document.getElementById('iif-embed-entry-screen');
-          if (el && el.parentNode) el.parentNode.removeChild(el);
-        } catch (eR) { }
-      }
-      window.IIF_removeEmbedEntryScreen = iifRemoveEmbedEntryScreen;
-
-      function iifForcePortalLoginOverlay() {
-        try {
-          if (new URLSearchParams(window.location.search).get('iif_admin_portal') !== '1') return false;
-          var auth = document.getElementById('auth-overlay');
-          if (!auth) return false;
-          auth.classList.add('is-open');
-          auth.setAttribute('aria-hidden', 'false');
-          try { document.body.style.overflow = 'hidden'; } catch (eOv) { }
-          var loginTab = document.querySelector('.auth-tab[data-tab="login"]');
-          if (loginTab && typeof loginTab.click === 'function') loginTab.click();
-          var loginPanel = document.getElementById('auth-panel-login');
-          if (loginPanel) loginPanel.classList.add('is-active');
-          var regPanel = document.getElementById('auth-panel-register');
-          if (regPanel) regPanel.classList.remove('is-active');
-          return true;
-        } catch (ePortalOpen) { return false; }
-      }
-      window.IIF_forcePortalLoginOverlay = iifForcePortalLoginOverlay;
-
-      function iifInjectEmbedEntryScreen() {
-        try {
-          if (new URLSearchParams(window.location.search).get('iif_admin_embed') !== '1') return;
-          if (document.getElementById('iif-embed-entry-screen')) return;
-          var el = document.createElement('div');
-          el.id = 'iif-embed-entry-screen';
-          el.setAttribute('role', 'status');
-          el.setAttribute('aria-live', 'polite');
-          el.innerHTML =
-            '<h1 dir="rtl">لوحة التحكم — جاري التحميل</h1>' +
-            '<p dir="rtl">ليس هذا الهيرو العام («رؤية ملكية»). يتم فتح نافذة تسجيل الدخول أو اللوحة.</p>' +
-            '<p dir="ltr" lang="en">Dashboard mode — opening login or control panel (not the public hero).</p>' +
-            '<p class="iif-embed-entry-note" dir="rtl">إن تعلّق العرض، انتظر ثانٍ أو حدّث الصفحة (Ctrl+F5).</p>';
-          if (document.body) document.body.appendChild(el);
-        } catch (eInj) { }
-      }
-
-      if (new URLSearchParams(window.location.search).get('iif_admin_embed') === '1') {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', iifInjectEmbedEntryScreen);
-        } else {
-          iifInjectEmbedEntryScreen();
-        }
-      }
-
-      if (new URLSearchParams(window.location.search).get('iif_admin_portal') === '1') {
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', function () {
-            iifForcePortalLoginOverlay();
-          });
-        } else {
-          iifForcePortalLoginOverlay();
-        }
-        setTimeout(iifForcePortalLoginOverlay, 120);
-        setTimeout(iifForcePortalLoginOverlay, 400);
-        setTimeout(iifForcePortalLoginOverlay, 900);
-        setTimeout(iifForcePortalLoginOverlay, 1600);
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', iifHidePublicSiteChrome);
-      } else {
-        iifHidePublicSiteChrome();
-      }
-      setTimeout(iifHidePublicSiteChrome, 50);
-      setTimeout(iifHidePublicSiteChrome, 400);
-      setTimeout(iifHidePublicSiteChrome, 900);
-      window.addEventListener('load', iifHidePublicSiteChrome);
-    })();
-  </script>
-  <div class="service-page-back-bar" id="service-page-back-bar" style="display: none;" role="navigation"
-    aria-label="Back to site">
-    <button type="button" class="btn-back" id="service-page-back-btn">
-      <span aria-hidden="true">←</span>
-      <span class="lang-en">Back to site</span>
-      <span class="lang-ar">رجوع للموقع</span>
-    </button>
-  </div>
-  <div id="https-warning" role="alert"
-    style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#b91c1c; color:#fff; padding:0.6rem 1rem; text-align:center; font-size:0.9rem; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-    <span class="lang-en">For your security, use HTTPS. This connection is not encrypted.</span><span
-      class="lang-ar">لأمانك استخدم HTTPS. هذا الاتصال غير مشفّر.</span> <button type="button"
-      id="https-warning-dismiss"
-      style="margin-left:0.5rem; padding:0.2rem 0.5rem; background:rgba(255,255,255,0.2); border:none; color:#fff; border-radius:4px; cursor:pointer;"><span
-        class="lang-en">Dismiss</span><span class="lang-ar">إغلاق</span></button>
-  </div>
-
-  <a href="#main-content" class="skip-link"><span class="lang-en">Skip to main content</span><span
-      class="lang-ar">انتقال إلى المحتوى الرئيسي</span></a>
-
-  <div id="iif-first-load-shell" class="iif-first-load-shell" role="progressbar" aria-label="Loading" aria-busy="true"></div>
-
-  <button type="button" id="iif-back-to-top" class="iif-back-to-top" hidden aria-hidden="true">
-    <span class="iif-back-to-top__icon" aria-hidden="true">↑</span>
-    <span class="lang-en">Back to top</span>
-    <span class="lang-ar">العودة للأعلى</span>
-  </button>
-
-  <header class="site-header" id="iif-public-site-header">
-    <div class="site-header__inner">
-      <div class="site-header__brand">
-        <div class="iif-header-primary-bar">
-        <a href="#" class="site-logo">
-          <span class="site-logo__emblem site-logo__emblem--crest" aria-hidden="true">
-            <picture>
-              <source type="image/webp" srcset="assets/emblem.webp" />
-              <img src="assets/emblem.jpg" alt="صندوق الاستثمار الدولي — International Investment Fund — شعار الصندوق الرسمي"
-                class="site-logo__img" width="56" height="56" loading="eager" fetchpriority="high" decoding="async" />
-            </picture>
-          </span>
-          <span class="site-logo__text">
-            <span class="site-logo__title" data-i18n="logoTitle">International Investment Fund</span>
-            <span class="site-logo__subtitle" data-i18n="logoSubtitle">Financing for Global Prosperity · All Nations
-              Globally</span>
-          </span>
-        </a>
-        <div class="site-header__clock-lang">
-          <div class="iif-header-brand-stack">
-          <div class="iif-header-brand-top">
-          <div class="site-clock site-clock--in-brand" aria-live="polite" id="site-clock-wrap"
-            aria-label="Your local time — your device timezone">
-            <span class="site-clock__time" id="site-clock-time">—</span>
-            <span class="site-clock__tz" id="site-clock-tz"></span>
-            <span class="site-clock__date" id="site-clock-date"></span>
-          </div>
-          <button type="button" id="iif-toggle-section-links" class="iif-section-links-toggle" aria-expanded="true"
-            aria-controls="iif-header-toolbar-links">
-            <span data-i18n="navHideSectionLinks" data-iif-toggle-label="hide">Collapse header</span>
-            <span data-i18n="navShowSectionLinks" data-iif-toggle-label="show" hidden>Expand header</span>
-          </button>
-          </div>
-          <div id="iif-header-toolbar-links" class="iif-header-collapsible-target iif-header-toolbar-panel">
-          <!-- موجز للمستويات الرفيعة — وثيقة مؤسسية للاطلاع الرسمي -->
-          <div class="site-header__auth-btns"
-            style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <a href="start-here.html" class="site-header__auth-btn site-header__auth-btn--login"
-              style="text-decoration: none; display: inline-block; background: rgba(248, 250, 252, 0.06); border-color: rgba(201, 162, 39, 0.45); font-size: 0.82rem;"
-              title="Executive Brief — موجز للمستويات الرفيعة">
-              <span class="lang-en">Executive Brief</span>
-              <span class="lang-ar">موجز للمستويات الرفيعة</span>
-            </a>
-            <a href="transparency.html" class="site-header__auth-btn site-header__auth-btn--login"
-              style="text-decoration: none; display: inline-block; background: rgba(248, 250, 252, 0.04); border-color: rgba(148, 163, 184, 0.35); font-size: 0.82rem;"
-              title="Sovereign-tier standards — معايير المستوى السيادي">
-              <span class="lang-en">Sovereign standards</span>
-              <span class="lang-ar">معايير سيادية</span>
-            </a>
-          </div>
-          <!-- Government Search: بوابة الدول + الاستعلام الجغرافي (روابط عميقة) -->
-          <div class="site-header__auth-btns"
-            style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="position: relative; display: inline-block;">
-              <button
-                type="button"
-                id="gov-menu-btn"
-                class="site-header__auth-btn site-header__auth-btn--login"
-                style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(29, 155, 240, 0.15); border-color: #1d9bf0;"
-                aria-haspopup="menu"
-                aria-expanded="false"
-                title="بوابة الدول والفلترة"
-              >
-                <span class="lang-en">Government portal</span>
-                <span class="lang-ar">بوابة الدول والفلترة</span>
-                <span aria-hidden="true" style="opacity:.8">▾</span>
-              </button>
-              <div
-                id="gov-menu"
-                role="menu"
-                aria-label="بوابة الدول والفلترة"
-                style="display:none; position:absolute; inset-inline-start: 0; top: calc(100% + 8px); min-width: 260px; z-index: 50;
-                  border:1px solid rgba(201,162,39,.35); background: rgba(12,14,18,.96); border-radius: 14px; padding: 8px;"
-              >
-                <a
-                  role="menuitem"
-                  href="../government-search/SIMPLE-GOVERNMENT-PLATFORM.html#gov-countries"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="site-header__auth-btn site-header__auth-btn--login"
-                  style="width: 100%; justify-content: flex-start; text-decoration:none; display:flex; margin: 4px 0; background: rgba(29, 155, 240, 0.12); border-color: rgba(29, 155, 240, 0.55);"
-                  title="مؤشرات الفهرس — الدول والجهات"
-                >
-                  <span class="lang-en">Countries overview</span>
-                  <span class="lang-ar">نظرة الدول والجهات</span>
-                </a>
-                <a
-                  role="menuitem"
-                  href="../government-search/SIMPLE-GOVERNMENT-PLATFORM.html#gov-geographic"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="site-header__auth-btn site-header__auth-btn--login"
-                  style="width: 100%; justify-content: flex-start; text-decoration:none; display:flex; margin: 4px 0; background: rgba(201, 162, 39, 0.10); border-color: rgba(201, 162, 39, 0.55);"
-                  title="البحث والفلترة — الدولة والخدمة"
-                >
-                  <span class="lang-en">Search &amp; filters</span>
-                  <span class="lang-ar">الاستعلام والفلترة</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          </div>
-
-          <div class="iif-header-brand-account">
-          <div class="site-header__auth-btns site-header__auth-btns--top" id="header-auth-btns" aria-label="Account">
-            <button type="button" class="site-header__auth-btn site-header__auth-btn--login" id="auth-header-login">
-              <span class="lang-en">Sign in</span>
-              <span class="lang-ar">تسجيل الدخول</span>
-            </button>
-            <button type="button" class="site-header__auth-btn site-header__auth-btn--register"
-              id="auth-header-register">
-              <span class="lang-en">Create account</span>
-              <span class="lang-ar">إنشاء حساب</span>
-            </button>
-          </div>
-          <!-- QR تذييل الخطاب فقط — لا تُكرَّر معرفات بطاقة المستخدم -->
-          <div class="letterhead-header-qr-host" hidden aria-hidden="true" style="display: none;">
-            <div class="letterhead-qr-verification">
-              <div class="qr-wrap" id="letterhead-footer-qr-wrap"></div>
-            </div>
-          </div>
-          <div class="lang-picker-wrap" aria-label="Language">
-            <span class="lang-picker-label lang-en">Language</span>
-            <span class="lang-picker-label lang-ar">اللغة</span>
-            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap">
-              <div class="iif-lang-combobox-row">
-                <button type="button" id="iif-lang-picker-display" class="iif-lang-combobox-display" role="combobox"
-                  aria-haspopup="listbox" aria-expanded="false" aria-controls="iif-lang-picker-list"
-                  title="Language"></button>
-                <button type="button" class="iif-lang-combobox-toggle" id="iif-lang-picker-toggle"
-                  aria-expanded="false" aria-controls="iif-lang-picker-panel"
-                  title="عرض كل اللغات / Show all languages">▾</button>
-              </div>
-              <div class="iif-lang-combobox-panel" id="iif-lang-picker-panel" hidden>
-                <input type="text" id="iif-lang-picker-filter" class="iif-lang-combobox-filter" inputmode="search"
-                  spellcheck="false" autocomplete="off" aria-label="Filter languages / تصفية اللغات"
-                  title="Filter / تصفية" />
-                <ul class="iif-lang-combobox-list" id="iif-lang-picker-list" role="listbox"></ul>
-              </div>
-              <select id="iif-lang-picker" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
-            </div>
-          </div>
-          <script>
-            (function () {
-              const btn = document.getElementById('gov-menu-btn');
-              const menu = document.getElementById('gov-menu');
-              if (!btn || !menu) return;
-              const close = () => { menu.style.display = 'none'; btn.setAttribute('aria-expanded', 'false'); };
-              const open = () => { menu.style.display = 'block'; btn.setAttribute('aria-expanded', 'true'); };
-              btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const isOpen = menu.style.display === 'block';
-                if (isOpen) close(); else open();
-              });
-              document.addEventListener('click', close);
-              document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-            })();
-          </script>
-          <div class="header-user-card" id="header-user-card" role="button" tabindex="-1"
-            aria-label="My profile — open my information / ملفي الشخصي — فتح معلوماتي">
-            <div class="header-user-card__photo-wrap">
-              <img class="header-user-card__photo" id="header-user-photo"
-                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle fill='%232d3a4f' cx='24' cy='24' r='24'/%3E%3Cpath fill='%23c9a227' d='M24 24a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0 8c-6 0-12 3-12 8v4h24v-4c0-5-6-8-12-8z'/%3E%3C/svg%3E"
-                alt="" width="48" height="48" />
-            </div>
-            <div class="header-user-card__info">
-              <span class="header-user-card__name" id="header-user-name"></span>
-              <span class="header-user-card__meta" id="header-user-meta"></span>
-            </div>
-          </div>
-          </div>
-          </div>
-        </div>
-        </div>
-      </div>
-      <nav class="site-nav iif-header-collapsible-target" id="iif-header-main-nav">
-        <div class="site-nav__about-wrap" id="about-dropdown-wrap" style="position: relative; display: inline-block;">
-          <button type="button" class="site-nav__about-trigger" id="about-dropdown-trigger" aria-expanded="false"
-            aria-haspopup="true" aria-controls="about-dropdown"
-            style="background: none; border: none; color: var(--color-text-main); cursor: pointer; padding: 0; font-size: inherit;">
-            <span class="lang-en">About</span><span class="lang-ar">من نحن</span>
-          </button>
-          <div class="site-nav__dropdown" id="about-dropdown" role="menu" aria-label="About menu" aria-hidden="true">
-            <a href="#business-council" role="menuitem"><span class="lang-en">Business Council</span><span
-                class="lang-ar">مجلس الأعمال</span></a>
-            <a href="#leadership" role="menuitem"><span class="lang-en">Leadership</span><span
-                class="lang-ar">القيادة</span></a>
-            <a href="#history" role="menuitem"><span class="lang-en">History</span><span
-                class="lang-ar">التاريخ</span></a>
-            <a href="#about-team" role="menuitem"><span class="lang-en">Our Team</span><span
-                class="lang-ar">فريقنا</span></a>
-            <a href="#about" role="menuitem"><span class="lang-en">About the Fund</span><span class="lang-ar">عن
-                الصندوق</span></a>
-            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
-            <a href="#members" role="menuitem"><span class="lang-en">Members</span><span
-                class="lang-ar">الأعضاء</span></a>
-          </div>
-        </div>
-        <div class="site-nav__services-wrap" id="services-dropdown-wrap">
-          <button type="button" class="site-nav__services-trigger" id="services-dropdown-trigger" aria-expanded="false"
-            aria-haspopup="true" aria-controls="services-dropdown">
-            <span class="lang-en">Services</span><span class="lang-ar">خدماتنا</span>
-          </button>
-          <div class="site-nav__dropdown" id="services-dropdown" role="menu" aria-label="Services menu"
-            aria-hidden="true">
-            <a href="#services" role="menuitem"><span class="lang-en">Services overview</span><span class="lang-ar">نظرة
-                عامة على الخدمات</span></a>
-            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
-            <span class="site-nav__dropdown-label"><span class="lang-en">Requests &amp; forms</span><span
-                class="lang-ar">طلبات ونماذج</span></span>
-            <a href="#financial-consultation" role="menuitem"><span class="lang-en">Financial consultation</span><span
-                class="lang-ar">استشارة مالية</span></a>
-            <a href="#urgent-consultation-online" role="menuitem"><span class="lang-en">Urgent consultation
-                online</span><span class="lang-ar">استشارة عاجلة أون لاين</span></a>
-            <a href="#financing-request" role="menuitem"><span class="lang-en">Financing request</span><span
-                class="lang-ar">طلب تمويل</span></a>
-            <a href="#feasibility-study" role="menuitem"><span class="lang-en">Request a feasibility study for your
-                project</span><span class="lang-ar">اطلب دراسة جدوى لمشروعك</span></a>
-            <a href="#budget-analysis" role="menuitem"><span class="lang-en">Analyze your budget</span><span
-                class="lang-ar">حلل ميزانيتك</span></a>
-            <a href="#translation" role="menuitem" data-i18n="navTranslation"><span
-                class="lang-en">Translation</span><span class="lang-ar">الترجمة</span></a>
-            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
-            <span class="site-nav__dropdown-label"><span class="lang-en">Programs &amp; info</span><span
-                class="lang-ar">برامج ومعلومات</span></span>
-            <a href="#page-research-center" class="nav-to-section" role="menuitem"
-              data-scroll-to="page-research-center"><span class="lang-en">Research center</span><span
-                class="lang-ar">مركز الأبحاث</span></a>
-            <a href="#sectors" role="menuitem"><span class="lang-en">Sectors</span><span
-                class="lang-ar">القطاعات</span></a>
-            <a href="#mission" role="menuitem"><span class="lang-en">Mission</span><span
-                class="lang-ar">المهمة</span></a>
-            <a href="#hizkama" role="menuitem"><span class="lang-en">Corporate governance</span><span
-                class="lang-ar">الحوكمة</span></a>
-            <a href="#activities" role="menuitem"><span class="lang-en">Invest with the Fund</span><span
-                class="lang-ar">ساهم مع الصندوق</span></a>
-            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
-            <button type="button" id="services-calc-open" role="menuitem"
-              style="background:none;border:none;color:inherit;text-align:left;width:100%;padding:var(--space-2) var(--space-3);font-size:inherit;cursor:pointer;"><span
-                class="lang-en">Calculator</span><span class="lang-ar">حاسبة</span></button>
-          </div>
-        </div>
-        <a href="#contact" class="btn btn--primary" data-i18n="navContact">Contact</a>
-        <div class="site-nav__more-wrap" id="more-dropdown-wrap">
-          <button type="button" class="site-nav__services-trigger" id="more-dropdown-trigger" aria-expanded="false"
-            aria-haspopup="true" aria-controls="more-dropdown">
-            <span class="lang-en">More</span><span class="lang-ar">المزيد</span>
-          </button>
-          <div class="site-nav__dropdown" id="more-dropdown" role="menu" aria-hidden="true">
-            <a href="#terms" role="menuitem"><span class="lang-en">Terms</span><span class="lang-ar">الشروط والأحكام</span></a>
-            <a href="privacy.html" role="menuitem"><span class="lang-en">Privacy</span><span class="lang-ar">الخصوصية</span></a>
-            <a href="about-institution.html" role="menuitem"><span class="lang-en">About the Fund</span><span
-                class="lang-ar">عن الصندوق</span></a>
-            <hr class="site-nav__dropdown-divider" aria-hidden="true" />
-            <a href="#page-representative" class="nav-to-section nav-link--rep-glow" role="menuitem"
-              data-scroll-to="page-representative"><span class="lang-en">Become representative</span><span
-                class="lang-ar">كن ممثلاً لنا</span></a>
-            <a href="#compliance" role="menuitem" data-i18n="footerCompliance">Compliance &amp; licenses</a>
-            <a href="#customer-experience" role="menuitem"><span class="lang-en">Experience</span><span
-                class="lang-ar">تجربة العملاء</span></a>
-            <a href="#careers" role="menuitem"><span class="lang-en">Careers</span><span class="lang-ar">التوظيف</span></a>
-          </div>
-        </div>
-        <button type="button" class="btn btn--ghost" id="calc-open" aria-label="Calculator" style="display:none;"><span
-            class="lang-en">Calculator</span><span class="lang-ar">حاسبة</span></button>
-        <a href="#" class="btn btn--ghost nav-dashboard-link" id="nav-dashboard" aria-label="Dashboard"
-          style="display:none; text-decoration:none;">
-          <span class="lang-en">Dashboard</span>
-          <span class="lang-ar">لوحة التحكم</span>
-        </a>
-        <a href="#user-dashboard" class="btn btn--ghost nav-user-dashboard-link" id="nav-user-dashboard"
-          aria-label="User Dashboard" style="display:none; text-decoration:none;">
-          <span class="lang-en">My Profile</span>
-          <span class="lang-ar">ملفي الشخصي</span>
-        </a>
-        <button type="button" class="btn btn--ghost nav-logout-link" id="nav-logout" aria-label="Sign out"
-          style="display:none;">
-          <span class="lang-en">Sign out</span>
-          <span class="lang-ar">تسجيل الخروج</span>
-        </button>
-        <div class="header-search" id="iif-search-wrap-outer">
-          <form class="header-search__form" role="search" autocomplete="off" onsubmit="return false;"
-            aria-label="Site search">
-            <input
-              type="text"
-              id="iif-search"
-              name="q"
-              role="searchbox"
-              inputmode="search"
-              enterkeyhint="search"
-              autocomplete="one-time-code"
-              autocapitalize="none"
-              spellcheck="false"
-              data-form-type="other"
-              data-lpignore="true"
-              data-1p-ignore="true"
-              data-bwignore
-              readonly
-              data-iif-search-readonly-until-focus="1"
-              data-i18n="searchPlaceholder"
-              placeholder="Search site…"
-              aria-label="Search"
-              aria-autocomplete="none"
-            />
-          </form>
-          <div id="iif-search-wrap"></div>
-        </div>
-      </nav>
-    </div>
-    <div class="site-header__tickers">
-      <div class="ticker-toolbar" role="toolbar" aria-label="Ticker options">
-        <button type="button" class="btn btn--ghost btn-sm btn--ticker-pause" id="iif-ticker-motion-toggle" aria-pressed="false" data-i18n="tickerMotionPause">Pause tickers</button>
-        <label><span data-i18n="tickerFilterAsia">Asia focus</span>
-          <select id="iif-ticker-country-asian" title="Asian markets region" aria-label="Asian markets region">
-            <option value="" data-i18n="tickerCountryAll">All</option>
-            <option value="CN">CN</option>
-            <option value="JP">JP</option>
-            <option value="IN">IN</option>
-            <option value="KR">KR</option>
-            <option value="SG">SG</option>
-            <option value="TH">TH</option>
-            <option value="VN">VN</option>
-            <option value="MY">MY</option>
-            <option value="ID">ID</option>
-            <option value="PH">PH</option>
-            <option value="PK">PK</option>
-            <option value="BD">BD</option>
-            <option value="LK">LK</option>
-            <option value="HK">HK</option>
-            <option value="TW">TW</option>
-          </select>
-        </label>
-        <label><span data-i18n="tickerFilterArab">Arab region</span>
-          <select id="iif-ticker-country-arab" title="Arab markets region" aria-label="Arab markets region">
-            <option value="" data-i18n="tickerCountryAll">All</option>
-            <option value="SA">SA</option>
-            <option value="AE">AE</option>
-            <option value="EG">EG</option>
-            <option value="QA">QA</option>
-            <option value="KW">KW</option>
-            <option value="BH">BH</option>
-            <option value="OM">OM</option>
-            <option value="JO">JO</option>
-            <option value="MA">MA</option>
-            <option value="LB">LB</option>
-            <option value="IQ">IQ</option>
-          </select>
-        </label>
-      </div>
-      <!-- News & markets ticker -->
-      <div class="ticker-wrap">
-        <span class="ticker-label lang-en">Global Markets</span>
-        <span class="ticker-label lang-ar">الأسواق العالمية</span>
-        <div class="ticker-track" id="ticker-track">
-          <div class="ticker-track__copy">
-            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
-              <span class="lang-en">Reuters Markets</span>
-              <span class="lang-ar">رويترز أسواق</span>
-            </a>
-            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
-                class="ticker-logo">
-              <span class="lang-en">Bloomberg</span>
-              <span class="lang-ar">بلومبرغ</span>
-            </a>
-            <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
-                class="ticker-logo">
-              <span class="lang-en">Financial Times</span>
-              <span class="lang-ar">فاينانشال تايمز</span>
-            </a>
-            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
-              <span class="lang-en">CNBC World</span>
-              <span class="lang-ar">سي إن بي سي العالم</span>
-            </a>
-            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
-              <span class="lang-en">WSJ Market Data</span>
-              <span class="lang-ar">وول ستريت جورنال بيانات السوق</span>
-            </a>
-            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
-              class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
-              <span class="lang-en">ECB</span>
-              <span class="lang-ar">البنك المركزي الأوروبي</span>
-            </a>
-            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
-                class="ticker-logo">
-              <span class="lang-en">Federal Reserve</span>
-              <span class="lang-ar">الاحتياطي الفيدرالي</span>
-            </a>
-            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
-              <span class="lang-en">IMF</span>
-              <span class="lang-ar">صندوق النقد الدولي</span>
-            </a>
-            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
-                class="ticker-logo">
-              <span class="lang-en">World Bank</span>
-              <span class="lang-ar">البنك الدولي</span>
-            </a>
-            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
-                class="ticker-logo">
-              <span class="lang-en">Arab News Economy</span>
-              <span class="lang-ar">عرب نيوز الاقتصاد</span>
-            </a>
-            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
-              <span class="lang-en">SPA Economy</span>
-              <span class="lang-ar">وكالة الأنباء السعودية الاقتصاد</span>
-            </a>
-            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
-                class="ticker-logo">
-              <span class="lang-en">TradingView</span>
-              <span class="lang-ar">تريدينغ فيو</span>
-            </a>
-          </div>
-          <div class="ticker-track__copy" aria-hidden="true">
-            <a href="https://www.reuters.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=reuters.com&sz=32" alt="Reuters" class="ticker-logo">
-              <span class="lang-en">Reuters Markets</span>
-              <span class="lang-ar">رويترز أسواق</span>
-            </a>
-            <a href="https://www.bloomberg.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bloomberg.com&sz=32" alt="Bloomberg"
-                class="ticker-logo">
-              <span class="lang-en">Bloomberg</span>
-              <span class="lang-ar">بلومبرغ</span>
-            </a>
-            <a href="https://www.ft.com/markets" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ft.com&sz=32" alt="Financial Times"
-                class="ticker-logo">
-              <span class="lang-en">Financial Times</span>
-              <span class="lang-ar">فاينانشال تايمز</span>
-            </a>
-            <a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=cnbc.com&sz=32" alt="CNBC" class="ticker-logo">
-              <span class="lang-en">CNBC World</span>
-              <span class="lang-ar">سي إن بي سي العالم</span>
-            </a>
-            <a href="https://www.wsj.com/market-data" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=wsj.com&sz=32" alt="WSJ" class="ticker-logo">
-              <span class="lang-en">WSJ Market Data</span>
-              <span class="lang-ar">وول ستريت جورنال بيانات السوق</span>
-            </a>
-            <a href="https://www.ecb.europa.eu/home/html/index.en.html" target="_blank" rel="noopener"
-              class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=ecb.europa.eu&sz=32" alt="ECB" class="ticker-logo">
-              <span class="lang-en">ECB</span>
-              <span class="lang-ar">البنك المركزي الأوروبي</span>
-            </a>
-            <a href="https://www.federalreserve.gov/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=federalreserve.gov&sz=32" alt="Federal Reserve"
-                class="ticker-logo">
-              <span class="lang-en">Federal Reserve</span>
-              <span class="lang-ar">الاحتياطي الفيدرالي</span>
-            </a>
-            <a href="https://www.imf.org/en/Home" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=imf.org&sz=32" alt="IMF" class="ticker-logo">
-              <span class="lang-en">IMF</span>
-              <span class="lang-ar">صندوق النقد الدولي</span>
-            </a>
-            <a href="https://www.worldbank.org/en/home" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=worldbank.org&sz=32" alt="World Bank"
-                class="ticker-logo">
-              <span class="lang-en">World Bank</span>
-              <span class="lang-ar">البنك الدولي</span>
-            </a>
-            <a href="https://www.arabnews.com/tags/economy" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabnews.com&sz=32" alt="Arab News"
-                class="ticker-logo">
-              <span class="lang-en">Arab News Economy</span>
-              <span class="lang-ar">عرب نيوز الاقتصاد</span>
-            </a>
-            <a href="https://www.spa.gov.sa/2233404" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=spa.gov.sa&sz=32" alt="SPA" class="ticker-logo">
-              <span class="lang-en">SPA Economy</span>
-              <span class="lang-ar">وكالة الأنباء السعودية الاقتصاد</span>
-            </a>
-            <a href="https://www.tradingview.com/markets/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=tradingview.com&sz=32" alt="TradingView"
-                class="ticker-logo">
-              <span class="lang-en">TradingView</span>
-              <span class="lang-ar">تريدينغ فيو</span>
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- Ticker: Asian markets -->
-      <div class="ticker-wrap" id="ticker-asian-wrap">
-        <span class="ticker-label lang-en">Asian Markets</span>
-        <span class="ticker-label lang-ar">الأسواق الآسيوية</span>
-        <div class="ticker-track" id="ticker-asian-track">
-          <div class="ticker-track__copy" id="ticker-asian-copy">
-            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
-                class="ticker-logo">
-              <span class="lang-en">Nikkei Asia</span>
-              <span class="lang-ar">نيكاي آسيا</span>
-            </a>
-            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
-                class="ticker-logo">
-              <span class="lang-en">China Daily</span>
-              <span class="lang-ar">تشاينا ديلي</span>
-            </a>
-            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
-                class="ticker-logo">
-              <span class="lang-en">Straits Times</span>
-              <span class="lang-ar">الستريتس تايمز</span>
-            </a>
-            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
-                class="ticker-logo">
-              <span class="lang-en">Korea Herald</span>
-              <span class="lang-ar">كوريا هيرالد</span>
-            </a>
-            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
-                class="ticker-logo">
-              <span class="lang-en">Bangkok Post</span>
-              <span class="lang-ar">بانكوك بوست</span>
-            </a>
-            <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
-                class="ticker-logo">
-              <span class="lang-en">The Hindu</span>
-              <span class="lang-ar">الهندو</span>
-            </a>
-            <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
-              <span class="lang-en">Dawn</span>
-              <span class="lang-ar">فجر</span>
-            </a>
-          </div>
-          <div class="ticker-track__copy" aria-hidden="true" id="ticker-asian-copy2">
-            <a href="https://asia.nikkei.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asia.nikkei.com&sz=32" alt="Nikkei Asia"
-                class="ticker-logo">
-              <span class="lang-en">Nikkei Asia</span>
-              <span class="lang-ar">نيكاي آسيا</span>
-            </a>
-            <a href="https://www.chinadaily.com.cn/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=chinadaily.com.cn&sz=32" alt="China Daily"
-                class="ticker-logo">
-              <span class="lang-en">China Daily</span>
-              <span class="lang-ar">تشاينا ديلي</span>
-            </a>
-            <a href="https://www.straitstimes.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=straitstimes.com&sz=32" alt="Straits Times"
-                class="ticker-logo">
-              <span class="lang-en">Straits Times</span>
-              <span class="lang-ar">الستريتس تايمز</span>
-            </a>
-            <a href="https://www.koreaherald.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=koreaherald.com&sz=32" alt="Korea Herald"
-                class="ticker-logo">
-              <span class="lang-en">Korea Herald</span>
-              <span class="lang-ar">كوريا هيرالد</span>
-            </a>
-            <a href="https://www.bangkokpost.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=bangkokpost.com&sz=32" alt="Bangkok Post"
-                class="ticker-logo">
-              <span class="lang-en">Bangkok Post</span>
-              <span class="lang-ar">بانكوك بوست</span>
-            </a>
-            <a href="https://www.thehindu.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=thehindu.com&sz=32" alt="The Hindu"
-                class="ticker-logo">
-              <span class="lang-en">The Hindu</span>
-              <span class="lang-ar">الهندو</span>
-            </a>
-            <a href="https://www.dawn.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=dawn.com&sz=32" alt="Dawn" class="ticker-logo">
-              <span class="lang-en">Dawn</span>
-              <span class="lang-ar">فجر</span>
-            </a>
-          </div>
-        </div>
-      </div>
-      <!-- Ticker: Arab markets -->
-      <div class="ticker-wrap" id="ticker-arab-wrap">
-        <span class="ticker-label lang-en">Arab Markets</span>
-        <span class="ticker-label lang-ar">الأسواق العربية</span>
-        <div class="ticker-track" id="ticker-arab-track">
-          <div class="ticker-track__copy" id="ticker-arab-copy">
-            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
-                class="ticker-logo">
-              <span class="lang-en">Al Jazeera Economy</span>
-              <span class="lang-ar">الجزيرة الاقتصاد</span>
-            </a>
-            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
-                class="ticker-logo">
-              <span class="lang-en">Asharq Business</span>
-              <span class="lang-ar">الشرق للأعمال</span>
-            </a>
-            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
-                class="ticker-logo">
-              <span class="lang-en">Al Arabiya Finance</span>
-              <span class="lang-ar">العربية المالية</span>
-            </a>
-            <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
-                class="ticker-logo">
-              <span class="lang-en">Mubasher</span>
-              <span class="lang-ar">مباشر</span>
-            </a>
-            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
-                class="ticker-logo">
-              <span class="lang-en">Arabian Business</span>
-              <span class="lang-ar">الأعمال العربية</span>
-            </a>
-            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
-                class="ticker-logo">
-              <span class="lang-en">Egypt Today Economy</span>
-              <span class="lang-ar">مصر اليوم الاقتصاد</span>
-            </a>
-            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
-                class="ticker-logo">
-              <span class="lang-en">Al Ittihad Business</span>
-              <span class="lang-ar">الاتحاد الأعمال</span>
-            </a>
-          </div>
-          <div class="ticker-track__copy" aria-hidden="true" id="ticker-arab-copy2">
-            <a href="https://www.aljazeera.com/economy/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=aljazeera.com&sz=32" alt="Al Jazeera"
-                class="ticker-logo">
-              <span class="lang-en">Al Jazeera Economy</span>
-              <span class="lang-ar">الجزيرة الاقتصاد</span>
-            </a>
-            <a href="https://asharqbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=asharqbusiness.com&sz=32" alt="Asharq Business"
-                class="ticker-logo">
-              <span class="lang-en">Asharq Business</span>
-              <span class="lang-ar">الشرق للأعمال</span>
-            </a>
-            <a href="https://www.alarabiya.com/finance" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alarabiya.com&sz=32" alt="Al Arabiya"
-                class="ticker-logo">
-              <span class="lang-en">Al Arabiya Finance</span>
-              <span class="lang-ar">العربية المالية</span>
-            </a>
-            <a href="https://www.mubasher.info/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=mubasher.info&sz=32" alt="Mubasher"
-                class="ticker-logo">
-              <span class="lang-en">Mubasher</span>
-              <span class="lang-ar">مباشر</span>
-            </a>
-            <a href="https://www.arabianbusiness.com/" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=arabianbusiness.com&sz=32" alt="Arabian Business"
-                class="ticker-logo">
-              <span class="lang-en">Arabian Business</span>
-              <span class="lang-ar">الأعمال العربية</span>
-            </a>
-            <a href="https://www.egypttoday.com/Category/2/Economy" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=egypttoday.com&sz=32" alt="Egypt Today"
-                class="ticker-logo">
-              <span class="lang-en">Egypt Today Economy</span>
-              <span class="lang-ar">مصر اليوم الاقتصاد</span>
-            </a>
-            <a href="https://www.alittihad.ae/business" target="_blank" rel="noopener" class="ticker-item">
-              <img width="16" height="16" loading="lazy" decoding="async" src="https://www.google.com/s2/favicons?domain=alittihad.ae&sz=32" alt="Al Ittihad"
-                class="ticker-logo">
-              <span class="lang-en">Al Ittihad Business</span>
-              <span class="lang-ar">الاتحاد الأعمال</span>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- الاتصال المرئي والمسموع — هوية صندوق الاستثمار الدولي (شعار، اسم، طابع) -->
-  <div class="video-call-overlay" id="video-call-overlay" aria-hidden="true" style="display: none;">
-    <div class="video-call-modal">
-      <div class="video-call-modal__head">
-        <span class="video-call-modal__brand" aria-hidden="true">
-          <picture>
-            <source type="image/webp" srcset="assets/emblem.webp" />
-            <img src="assets/emblem.jpg" alt="" class="video-call-modal__logo" width="36" height="36" decoding="async" />
-          </picture>
-        </span>
-        <div class="video-call-modal__titles">
-          <h2 class="video-call-modal__title lang-en">International Investment Fund — Video &amp; audio call</h2>
-          <h2 class="video-call-modal__title lang-ar">صندوق الاستثمار الدولي — اتصال مرئي ومسموع</h2>
-        </div>
-        <a href="#" class="video-call-modal__link lang-en" id="video-call-share-link" target="_blank"
-          rel="noopener">Open in new tab / Share link</a>
-        <a href="#" class="video-call-modal__link lang-ar" id="video-call-share-link-ar" target="_blank" rel="noopener"
-          style="display:none;">فتح في نافذة جديدة / مشاركة الرابط</a>
-        <button type="button" class="auth-modal__close" id="video-call-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="video-call-modal__body">
-        <div id="video-call-jitsi-container" style="width:100%;height:100%;min-height:400px;"></div>
-        <iframe id="video-call-iframe" title="Video call" allow="camera; microphone; fullscreen; display-capture"
-          allowfullscreen style="display:none;"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- Auth Modal: Login & Register -->
-  <div class="auth-overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title"
-    aria-hidden="true">
-    <div class="auth-modal">
-      <div class="auth-modal__head">
-        <h2 id="auth-modal-title" class="auth-modal__title lang-en">Account</h2>
-        <h2 class="auth-modal__title lang-ar">الحساب</h2>
-        <button type="button" class="auth-modal__close" id="auth-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="auth-tabs">
-        <button type="button" class="auth-tab is-active" data-tab="login">
-          <span class="lang-en">Login</span>
-          <span class="lang-ar">تسجيل الدخول</span>
-        </button>
-        <button type="button" class="auth-tab" data-tab="register">
-          <span class="lang-en">Register</span>
-          <span class="lang-ar">التسجيل</span>
-        </button>
-      </div>
-
-      <div class="auth-welcome" id="auth-welcome" hidden aria-live="polite">
-        <p class="auth-welcome__text" id="auth-welcome-text"></p>
-      </div>
-
-      <p class="auth-compat-hint" style="font-size:0.75rem; color:#666; margin:0 0 var(--space-2); text-align:center;">
-        <span class="lang-en">Secure sign-in. Works on computers, laptops, tablets and phones.</span><span
-          class="lang-ar">دخول آمن. يعمل على الحاسوب واللاب توب والتابلت والجوال.</span>
-      </p>
-      <p class="auth-form-hint" style="font-size:0.8rem; color:var(--color-text-muted); margin:0 0 var(--space-3);">
-        <span class="lang-en">Fields marked with <span class="field-required-star">*</span> are required. Optional
-          fields are indicated.</span><span class="lang-ar">الحقول ذات النجمة <span class="field-required-star">*</span>
-          إلزامية. الحقول الاختيارية مذكورة بذلك.</span>
-      </p>
-      <div id="auth-panel-login" class="auth-panel is-active">
-        <div class="auth-providers">
-          <p class="auth-providers__title"><span class="lang-en">Sign in with</span><span class="lang-ar">الدخول
-              باستخدام</span></p>
-          <div class="auth-providers__list">
-            <button type="button" class="auth-provider-btn auth-provider-btn--google" id="auth-login-google"
-              aria-label="Google">
-              <span class="lang-en">Google</span><span class="lang-ar">جوجل</span>
-            </button>
-            <button type="button" class="auth-provider-btn auth-provider-btn--facebook" id="auth-login-facebook"
-              aria-label="Facebook">
-              <span class="lang-en">Facebook</span><span class="lang-ar">فيسبوك</span>
-            </button>
-            <button type="button" class="auth-provider-btn auth-provider-btn--email" id="auth-login-email-link"
-              aria-label="Email verification">
-              <span class="lang-en">Email verification</span><span class="lang-ar">التأكيد بالبريد</span>
-            </button>
-            <button type="button" class="auth-provider-btn auth-provider-btn--device" id="auth-login-device"
-              aria-label="This device" style="display:none;">
-              <span class="lang-en">This device</span><span class="lang-ar">هذا الجهاز</span>
-            </button>
-            <button type="button" class="auth-provider-btn auth-provider-btn--biometric" id="auth-login-biometric"
-              aria-label="Fingerprint or Face" style="display:none;">
-              <span class="lang-en">Fingerprint / Face</span><span class="lang-ar">البصمة / الوجه</span>
-            </button>
-          </div>
-        </div>
-        <div id="auth-email-verify-panel" class="auth-email-verify-panel">
-          <h3 class="auth-recovery-title" id="auth-email-verify-recovery-title"
-            style="display:none; margin: 0 0 var(--space-3); font-size: 1rem;">
-            <span class="lang-en">Account recovery</span>
-            <span class="lang-ar">استعادة الحساب</span>
-          </h3>
-          <div class="form-group">
-            <label for="verify-email"><span class="lang-en">Email</span><span class="lang-ar">البريد
-                الإلكتروني</span></label>
-            <input type="email" id="verify-email" placeholder="" />
-          </div>
-          <button type="button" class="btn btn--primary" id="auth-send-code"><span class="lang-en">Send verification
-              code</span><span class="lang-ar">إرسال رمز التأكيد</span></button>
-          <div class="form-group" id="verify-code-wrap" style="display:none; margin-top: var(--space-3);">
-            <label for="verify-code"><span class="lang-en">Enter code</span><span class="lang-ar">أدخل
-                الرمز</span></label>
-            <input type="text" id="verify-code" inputmode="numeric" maxlength="6" placeholder="123456" />
-            <button type="button" class="btn btn--primary" id="auth-confirm-code"
-              style="margin-top: var(--space-2);"><span class="lang-en">Verify</span><span
-                class="lang-ar">تأكيد</span></button>
-          </div>
-          <p class="auth-panel-back" style="margin: var(--space-3) 0 0; font-size: 0.85rem;">
-            <button type="button" class="btn btn--ghost btn-sm" id="auth-verify-back-to-login">
-              <span class="lang-en">Back to login</span>
-              <span class="lang-ar">رجوع لتسجيل الدخول</span>
-            </button>
-          </p>
-        </div>
-        <div id="auth-device-panel" class="auth-device-panel">
-          <p class="lang-en">Sign in using this trusted device. No password needed.</p>
-          <p class="lang-ar">الدخول باستخدام هذا الجهاز الموثوق. لا حاجة لكلمة المرور.</p>
-          <button type="button" class="btn btn--primary" id="auth-device-confirm"><span class="lang-en">Sign in with
-              this device</span><span class="lang-ar">الدخول من هذا الجهاز</span></button>
-        </div>
-        <div class="auth-divider"><span class="lang-en">Or</span><span class="lang-ar">أو</span></div>
-        <form class="auth-form" id="form-login" method="post" action="#">
-          <div class="form-group">
-            <label for="login-email"><span class="lang-en">Email</span><span class="lang-ar">البريد
-                الإلكتروني</span></label>
-            <input type="email" id="login-email" name="email" required autocomplete="email" />
-          </div>
-          <div class="form-group">
-            <label for="login-password"><span class="lang-en">Password</span><span class="lang-ar">كلمة
-                المرور</span></label>
-            <span class="auth-password-input-wrap"
-              style="display: flex; align-items: center; border: 1px solid #ccc; border-radius: var(--radius); background: #fff;">
-              <input type="password" id="login-password" name="password" required autocomplete="current-password"
-                style="border: 0; flex: 1; min-width: 0;" />
-              <button type="button" class="auth-password-toggle" id="login-password-toggle" aria-label="Show password"
-                title="Show / إظهار"
-                style="background: none; border: none; padding: 0.35rem 0.5rem; cursor: pointer; color: #666; touch-action: manipulation; min-width: 44px; min-height: 44px;">إظهار</button>
-            </span>
-          </div>
-          <div class="form-group">
-            <label class="auth-checkbox-label">
-              <input type="checkbox" id="login-trust-device" checked />
-              <span class="lang-en">Trust this device for quick sign-in later</span>
-              <span class="lang-ar">الاعتماد على هذا الجهاز للدخول لاحقاً</span>
-            </label>
-          </div>
-          <button type="submit" class="btn btn--primary"><span class="lang-en">Sign in</span><span
-              class="lang-ar">دخول</span></button>
-          <div class="auth-recovery-hint" id="login-recovery-hint"
-            style="display:none; margin-top: var(--space-4); padding: var(--space-3); background: rgba(201, 162, 39, 0.08); border-radius: var(--radius); border: 1px solid rgba(201, 162, 39, 0.25);">
-            <p class="auth-recovery-hint__text" style="margin: 0 0 var(--space-2); font-size: 0.9rem;">
-              <span class="lang-en">This email is registered. Forgot password?</span>
-              <span class="lang-ar">هذا البريد مسجّل. نسيت كلمة المرور؟</span>
-            </p>
-            <button type="button" class="btn btn--ghost btn-sm" id="auth-recover-account">
-              <span class="lang-en">Recover account</span>
-              <span class="lang-ar">استعادة الحساب</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div id="auth-panel-register" class="auth-panel">
-        <form class="auth-form" id="form-register" method="post" action="#">
-          <div class="form-group">
-            <label for="reg-name"><span class="lang-en">Full name</span><span class="lang-ar">الاسم
-                الكامل</span></label>
-            <input type="text" id="reg-name" name="full_name" required />
-          </div>
-          <div class="form-group">
-            <label for="reg-email"><span class="lang-en">Email</span><span class="lang-ar">البريد
-                الإلكتروني</span></label>
-            <input type="email" id="reg-email" name="email" required autocomplete="email" />
-          </div>
-          <div class="form-group">
-            <label for="reg-password"><span class="lang-en">Password</span><span class="lang-ar">كلمة
-                المرور</span></label>
-            <p class="auth-password-hint" style="font-size: 0.8rem; color: #333; margin: 0 0 0.35rem;">
-              <span class="lang-en">At least 8 characters: lowercase, uppercase, number and symbol.</span>
-              <span class="lang-ar">لا تقل عن 8 أحرف: حرف صغير وكبير ورقم وعلامة.</span>
-            </p>
-            <div class="auth-password-row" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-              <span class="auth-password-input-wrap"
-                style="flex: 1; min-width: 0; display: flex; align-items: center; border: 1px solid #ccc; border-radius: var(--radius); background: #fff;">
-                <input type="password" id="reg-password" name="password" required minlength="8"
-                  autocomplete="new-password" style="border: 0; flex: 1; min-width: 0;" />
-                <button type="button" class="auth-password-toggle" id="reg-password-toggle" aria-label="Show password"
-                  title="Show / إظهار"
-                  style="background: none; border: none; padding: 0.35rem 0.5rem; cursor: pointer; color: #666; touch-action: manipulation; min-width: 44px; min-height: 44px;">إظهار</button>
-              </span>
-              <button type="button" class="btn btn--primary btn-sm" id="reg-suggest-password"
-                title="Suggest strong password" style="white-space: nowrap;">
-                <span class="lang-en">Suggest strong password</span>
-                <span class="lang-ar">اقتراح كلمة مرور قوية</span>
-              </button>
-            </div>
-            <p class="auth-password-strength" id="reg-password-strength"
-              style="font-size: 0.85rem; margin: 0.35rem 0 0; min-height: 1.4em; font-weight: 500;"></p>
-          </div>
-          <div class="form-group">
-            <label for="reg-password2"><span class="lang-en">Confirm password</span><span class="lang-ar">تأكيد كلمة
-                المرور</span></label>
-            <span class="auth-password-input-wrap"
-              style="display: flex; align-items: center; border: 1px solid #ccc; border-radius: var(--radius); background: #fff;">
-              <input type="password" id="reg-password2" name="password_confirm" required minlength="8"
-                autocomplete="new-password" style="border: 0; flex: 1; min-width: 0;" />
-              <button type="button" class="auth-password-toggle" id="reg-password2-toggle" aria-label="Show password"
-                title="Show / إظهار"
-                style="background: none; border: none; padding: 0.35rem 0.5rem; cursor: pointer; color: #666; touch-action: manipulation; min-width: 44px; min-height: 44px;">إظهار</button>
-            </span>
-            <p class="auth-password-strength" id="reg-password2-match"
-              style="font-size: 0.8rem; margin: 0.25rem 0 0; min-height: 1.2em;"></p>
-          </div>
-          <div class="form-group">
-            <label for="reg-entity"><span class="lang-en">Entity type</span><span class="lang-ar">نوع
-                الكيان</span></label>
-            <select id="reg-entity" name="entity_type" required>
-              <option value="">— Select / اختر —</option>
-              <option value="state">State / Government / دولة / حكومة</option>
-              <option value="government_org">Government organizations / منظمات حكومية</option>
-              <option value="civil_society">Civil society organizations / منظمات أهلية</option>
-              <option value="associations">Associations (all types) / جمعيات بأنواعها</option>
-              <option value="company">Companies / شركات</option>
-              <option value="institution">Institutions / مؤسسات</option>
-              <option value="person">Individuals / أفراد</option>
-            </select>
-          </div>
-          <div class="form-group form-group--ministry" id="reg-ministry-wrap" style="display: none;">
-            <label for="reg-ministry"><span class="lang-en">Ministry</span><span class="lang-ar">الوزارة</span></label>
-            <select id="reg-ministry" name="ministry">
-              <option value="">— Select / اختر —</option>
-              <option value="finance">Ministry of Finance / وزارة المالية</option>
-              <option value="economy">Ministry of Economy / وزارة الاقتصاد</option>
-              <option value="foreign">Ministry of Foreign Affairs / وزارة الخارجية</option>
-              <option value="investment">Ministry of Investment / وزارة الاستثمار</option>
-              <option value="industry">Ministry of Industry / وزارة الصناعة</option>
-              <option value="energy">Ministry of Energy / وزارة الطاقة</option>
-              <option value="health">Ministry of Health / وزارة الصحة</option>
-              <option value="education">Ministry of Education / وزارة التعليم</option>
-              <option value="other">Other / أخرى</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="reg-country"><span class="lang-en">Country</span><span class="lang-ar">الدولة</span></label>
-            <select id="reg-country" name="country" required>
-              <option value="">— Select country / اختر الدولة —</option>
-              <option value="SA">Saudi Arabia</option>
-              <option value="AE">United Arab Emirates</option>
-              <option value="BH">Bahrain</option>
-              <option value="KW">Kuwait</option>
-              <option value="OM">Oman</option>
-              <option value="QA">Qatar</option>
-              <option value="EG">Egypt</option>
-              <option value="JO">Jordan</option>
-              <option value="MA">Morocco</option>
-              <option value="TR">Turkey</option>
-              <option value="PK">Pakistan</option>
-              <option value="ID">Indonesia</option>
-              <option value="FR">France</option>
-              <option value="US">United States</option>
-              <option value="GB">United Kingdom</option>
-              <option value="DE">Germany</option>
-              <option value="CN">China</option>
-              <option value="IN">India</option>
-              <option value="OTHER">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="reg-phone"><span class="lang-en">Phone (optional)</span><span class="lang-ar">الهاتف / الجوال
-                (اختياري)</span></label>
-            <p class="auth-phone-hint" style="font-size: 0.8rem; color: #555; margin: 0 0 0.35rem;"><span
-                class="lang-en">Select country above to set dial code.</span><span class="lang-ar">اختر الدولة أعلاه
-                ليظهر مفتاح الدولة تلقائياً.</span></p>
-            <div class="phone-with-code" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <span class="auth-phone-code-label" style="font-size: 0.85rem; color: #555;"><span class="lang-en">Dial
-                  code:</span><span class="lang-ar">مفتاح الدولة:</span></span>
-              <select id="reg-phone-code" aria-label="Country dial code" title="Country code / مفتاح الدولة"
-                style="min-width: 140px; padding: 0.5rem;">
-                <option value="">— <span class="lang-en">Code</span><span class="lang-ar">المفتاح</span> —</option>
-              </select>
-              <input type="tel" id="reg-phone" name="phone" placeholder="" inputmode="numeric"
-                autocomplete="tel-national" style="flex: 1; min-width: 120px;" />
-              <input type="hidden" name="phone_full" id="reg-phone-full" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="reg-dob"><span class="lang-en">Date of birth (day, month, year)</span><span
-                class="lang-ar">تاريخ الميلاد (اليوم، الشهر، السنة)</span></label>
-            <input type="date" id="reg-dob" name="dob" required />
-          </div>
-          <div class="form-group terms-accept-wrap">
-            <label class="terms-accept-label">
-              <input type="checkbox" id="reg-terms-accept" name="terms_accept" required />
-              <span class="lang-en">I accept the <a href="#terms" target="_blank" rel="noopener">Terms &amp;
-                  Conditions</a> and grant the Fund full authority in compliance with applicable laws. I am solely
-                responsible for the accuracy of my information.</span>
-              <span class="lang-ar">أوافق على <a href="#terms" target="_blank" rel="noopener">الشروط والأحكام</a> وأمنح
-                الصندوق كامل الصلاحيات وفقاً للقوانين المعمول بها. أنا المسؤول الوحيد عن صحة معلوماتي.</span>
-            </label>
-            <div style="margin-top: 0.5rem; text-align: center;">
-              <button type="button" onclick="window.open('#terms', '_blank')" class="btn btn--secondary"
-                style="padding: 0.5rem 1rem; font-size: 0.85rem;">
-                <span class="lang-en">View Terms & Conditions</span>
-                <span class="lang-ar">اطلع على الشروط والأحكام</span>
-              </button>
-            </div>
-          </div>
-          <p class="form-hint lang-en" style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.5rem;">
-            Registration is free. Use of features (upload, translation, download) requires Cooperating Member
-            subscription — 143 USD/year or 29 USD/month; subscriber bears transfer fees.</p>
-          <p class="form-hint lang-ar" style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.5rem;">
-            التسجيل مجاني. استخدام المميزات (رفع، ترجمة، تنزيل) مشروط باشتراك عضو متعاون — 143 دولار سنوياً أو 29 دولار
-            شهرياً؛ المشترك يتحمل رسوم التحويل.</p>
-          <button type="submit" class="btn btn--primary"><span class="lang-en">Create account</span><span
-              class="lang-ar">إنشاء حساب</span></button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Membership required modal (language-aware message) -->
-  <div class="membership-required-overlay" id="membership-required-overlay" aria-hidden="true">
-    <div class="membership-required-modal" role="dialog" aria-labelledby="membership-modal-title">
-      <h3 id="membership-modal-title" class="lang-en">Membership required</h3>
-      <h3 id="membership-modal-title-ar" class="lang-ar" style="display:none;">العضوية مطلوبة</h3>
-      <p class="membership-modal-body lang-en">To use this feature you must be a <strong>Cooperating Member</strong>
-        (143 USD/year or 29 USD/month) for site features and file uploads only, or a <strong>Premium Member</strong> for
-        premium pages and full services: Silver 2,143 USD, Gold 3,143 USD, or Platinum 4,143 USD. Subscribe or pay via
-        bank transfer below.</p>
-      <p class="membership-modal-body lang-ar" style="display:none;">لاستخدام هذه الميزة يجب أن تكون <strong>عضوًا
-          متعاونًا</strong> (143 دولارًا سنويًا أو 29 دولارًا شهريًا) لاستخدام ميزات الموقع ورفع الملفات فقط، أو
-        <strong>عضوًا مميزًا</strong> لميز الصفحات وباقي الخدمات: فضية 2,143 دولار، ذهبية 3,143 دولار، أو بلاتينية 4,143
-        دولار. اشترك أو ادفع عبر التحويل البنكي أدناه.
-      </p>
-      <button type="button" class="btn btn--primary" id="membership-modal-goto-payment"><span class="lang-en">Subscribe
-          / Pay</span><span class="lang-ar">اشتراك / دفع</span></button>
-      <button type="button" class="btn btn--ghost" id="membership-modal-close" style="margin-left:0.5rem;"><span
-          class="lang-en">Close</span><span class="lang-ar">إغلاق</span></button>
-    </div>
-  </div>
-
-  <!-- بطاقة عضوية رقمية داخل المنصة — كيو آر للتحقق وعرض ثم الانتقال لصفحة العضو -->
-  <div class="certificate-overlay" id="certificate-overlay" aria-hidden="true">
-    <div class="certificate-card" id="certificate-card">
-      <picture>
-        <source type="image/webp" srcset="assets/emblem.webp" />
-        <img src="assets/emblem.jpg" alt="" class="cert-emblem" id="certificate-emblem"
-          decoding="async" onerror="this.style.display='none'" />
-      </picture>
-      <h2 class="cert-title lang-en" id="certificate-title-en">Digital membership card</h2>
-      <h2 class="cert-title lang-ar" id="certificate-title-ar" style="display:none;">بطاقة العضوية الرقمية</h2>
-      <p class="cert-subtitle lang-en" id="certificate-subtitle-en">International Investment Fund — FII</p>
-      <p class="cert-subtitle lang-ar" id="certificate-subtitle-ar" style="display:none;">صندوق الاستثمار الدولي — FII
-      </p>
-      <div class="cert-member-images" id="certificate-member-images"
-        style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); min-height: 60px;">
-      </div>
-      <p class="cert-name" id="certificate-name"></p>
-      <p class="cert-definition lang-en" id="certificate-definition-en"></p>
-      <p class="cert-definition lang-ar" id="certificate-definition-ar"></p>
-      <p class="cert-tier" id="certificate-tier"></p>
-      <p class="cert-date" id="certificate-date"></p>
-      <p class="cert-date-range lang-en" id="certificate-date-range-en" style="font-size:0.9rem; margin-top:0.25rem;">
-      </p>
-      <p class="cert-date-range lang-ar" id="certificate-date-range-ar"
-        style="font-size:0.9rem; margin-top:0.25rem; display:none;"></p>
-      <p class="cert-rights lang-en"
-        style="font-size:0.85rem; margin-top:var(--space-3); max-width:520px; margin-left:auto; margin-right:auto; color:var(--color-text-muted);">
-        The honored member has the right to present their own projects and to mediate presenting other projects to the
-        International Investment Fund; the International Investment Fund management has the right to accept or reject.
-      </p>
-      <p class="cert-rights lang-ar"
-        style="font-size:0.85rem; margin-top:var(--space-3); max-width:520px; margin-left:auto; margin-right:auto; color:var(--color-text-muted); display:none;">
-        يحق للعضو الموقّع عرض مشاريعه الخاصة والوساطة لعرض مشاريع أخرى على صندوق الاستثمار الدولي؛ ولإدارة صندوق
-        الاستثمار الدولي حق القبول أو الرفض.</p>
-      <div class="cert-qr-wrap" id="certificate-qr-wrap"></div>
-      <p class="cert-qr-label lang-en">Scan to verify digital membership card / امسح للتحقق من البطاقة الرقمية</p>
-      <p class="cert-qr-label lang-ar" style="display:none;">امسح للتحقق من بطاقة العضوية الرقمية</p>
-      <div class="cert-verify-badge" id="certificate-verify-badge" style="display:none;">
-        <span class="lang-en">Digital membership verified</span><span class="lang-ar">تم التحقق من بطاقة العضوية الرقمية</span>
-      </div>
-      <div class="cert-actions"
-        style="margin-top: var(--space-4); display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center;">
-        <button type="button" class="btn btn--primary btn-sm" id="certificate-download-btn"><span
-            class="lang-en">Download digital card</span><span class="lang-ar">تحميل البطاقة الرقمية</span></button>
-        <a href="#" class="btn btn--ghost btn-sm" id="certificate-email-link" target="_blank" rel="noopener"><span
-            class="lang-en">Send copy to my email</span><span class="lang-ar">إرسال نسخة إلى بريدي</span></a>
-      </div>
-      <button type="button" class="btn btn--ghost btn-sm" id="certificate-close-btn"
-        style="display:none; margin-top: var(--space-4);"><span class="lang-en">Close</span><span
-          class="lang-ar">إغلاق</span></button>
-    </div>
-  </div>
-
-  <!-- Image adjust overlay (for digital membership card uploads) -->
-  <div class="img-adjust-overlay" id="img-adjust-overlay" aria-hidden="true">
-    <div class="img-adjust-modal" role="dialog" aria-labelledby="img-adjust-title">
-      <div class="img-adjust-head">
-        <div>
-          <h3 id="img-adjust-title" class="lang-en">Adjust image in frame</h3>
-          <h3 id="img-adjust-title-ar" class="lang-ar" style="display:none;">وزن الصورة داخل الإطار</h3>
-          <p class="img-adjust-sub lang-en">Drag to move. Use zoom. Then save.</p>
-          <p class="img-adjust-sub lang-ar" style="display:none;">اسحب للتحريك، واستخدم التكبير/التصغير ثم احفظ.</p>
-        </div>
-        <button type="button" class="auth-modal__close" id="img-adjust-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="img-adjust-grid">
-        <div class="img-adjust-stage" id="img-adjust-stage">
-          <canvas class="img-adjust-canvas" id="img-adjust-canvas" width="420" height="420"></canvas>
-        </div>
-        <div class="img-adjust-controls">
-          <div class="row">
-            <label class="lang-en" for="img-adjust-zoom">Zoom</label>
-            <label class="lang-ar" for="img-adjust-zoom" style="display:none;">تكبير/تصغير</label>
-            <input type="range" id="img-adjust-zoom" min="0.8" max="3" step="0.01" value="1" />
-          </div>
-          <div class="row">
-            <label class="lang-en"><input type="checkbox" id="img-adjust-contain" /> Contain (no crop)</label>
-            <label class="lang-ar" style="display:none;"><input type="checkbox" id="img-adjust-contain-ar" disabled
-                style="display:none;" /> احتواء (بدون قص)</label>
-          </div>
-          <div class="row">
-            <input type="checkbox" id="img-adjust-retouch" />
-            <label class="lang-en" for="img-adjust-retouch">Auto retouch &amp; color (clear, natural)</label>
-            <label class="lang-ar" for="img-adjust-retouch" style="display:none;">معالجة تلقائية من الرتوش والألوان
-              (واضحة وطبيعية 100%)</label>
-          </div>
-          <p class="img-adjust-hint lang-en"
-            style="font-size:0.8rem; color:var(--color-text-muted); margin:0.25rem 0 0;">Optional: improves contrast and
-            colors so the image looks clear and natural.</p>
-          <p class="img-adjust-hint lang-ar"
-            style="display:none; font-size:0.8rem; color:var(--color-text-muted); margin:0.25rem 0 0;">اختياري: يحسّن
-            التباين والألوان لتبدو الصورة واضحة وطبيعية مئة بالمئة.</p>
-          <div class="row">
-            <button type="button" class="btn btn--ghost btn-sm" id="img-adjust-reset"><span
-                class="lang-en">Reset</span><span class="lang-ar">إعادة</span></button>
-          </div>
-          <div class="img-adjust-actions">
-            <button type="button" class="btn btn--ghost" id="img-adjust-cancel"><span class="lang-en">Cancel</span><span
-                class="lang-ar">إلغاء</span></button>
-            <button type="button" class="btn btn--primary" id="img-adjust-save"><span class="lang-en">Save</span><span
-                class="lang-ar">حفظ</span></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Camera capture overlay (for digital membership card uploads) -->
-  <div class="cam-capture-overlay" id="cam-capture-overlay" aria-hidden="true">
-    <div class="cam-capture-modal" role="dialog" aria-labelledby="cam-capture-title">
-      <div class="img-adjust-head">
-        <div>
-          <h3 id="cam-capture-title" class="lang-en">Capture from camera</h3>
-          <h3 id="cam-capture-title-ar" class="lang-ar" style="display:none;">التقاط بالكاميرا</h3>
-          <p class="img-adjust-sub lang-en">Allow camera access, then capture.</p>
-          <p class="img-adjust-sub lang-ar" style="display:none;">اسمح بالوصول للكاميرا ثم التقط.</p>
-        </div>
-        <button type="button" class="auth-modal__close" id="cam-capture-close" aria-label="Close">&times;</button>
-      </div>
-      <video class="cam-capture-video" id="cam-capture-video" autoplay playsinline muted></video>
-      <canvas id="cam-capture-canvas" width="900" height="900" style="display:none;"></canvas>
-      <div class="cam-capture-actions">
-        <button type="button" class="btn btn--ghost" id="cam-capture-cancel"><span class="lang-en">Cancel</span><span
-            class="lang-ar">إلغاء</span></button>
-        <button type="button" class="btn btn--primary" id="cam-capture-shot"><span class="lang-en">Capture</span><span
-            class="lang-ar">التقاط</span></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- تحقق النشر: افتح موقعك (مثل iif-fund-dr-talal.vercel.app أو نطاق Netlify) ثم Ctrl+U لعرض المصدر وابحث عن كلمة «تحقق-النشر» هنا — لا تبحث عن هذا في جوجل -->
-  <!-- تحقق-النشر-iif-dashboard-fullpage -->
-  <!-- Dashboard: manage investment projects (visible when logged in) -->
-  <!-- مهم: main.dashboard-main يُغلق بـ </main> ثم dashboard-page-shell ثم dashboard-overlay — إغلاق بـ </div> فقط يفسد DOM ويُظهر اللوحة كعمود. -->
-  <!-- أنماط مضمّنة على اللوحة: تعمل حتى لو كان CSS قديماً أو الكاش — العرض يُحدَّد بـ display من الصفحة (.dashboard-overlay / .is-open) وليس هنا -->
-  <div class="dashboard-overlay" id="dashboard-overlay" aria-hidden="true" role="region"
-    aria-label="لوحة تحكم صندوق الاستثمار الدولي · International Investment Fund dashboard"
-    data-iif-dashboard-root="true" data-iif-build="v8-fix-main-close"
-    style="position:fixed;left:0;top:0;right:0;bottom:0;width:100vw;min-width:100vw;max-width:none;min-height:100vh;min-height:100dvh;margin:0;padding:0;border-radius:0;box-shadow:none;box-sizing:border-box;z-index:2147483647;transform:none;background:linear-gradient(165deg,#03050a 0%,#0b1018 38%,#070a10 100%);">
-    <div class="dashboard-page-shell" id="dashboard-page-shell"
-      style="width:100%;min-width:100%;max-width:none;margin:0;box-sizing:border-box;">
-      <header class="dashboard-header-bar site-header">
-        <div class="site-header__inner">
-          <div class="site-header__brand">
-            <strong class="site-name" id="dashboard-overlay-title">
-              <span class="lang-en">International Investment Fund — Dashboard</span>
-              <span class="lang-ar">لوحة تحكم صندوق الاستثمار الدولي</span>
-            </strong>
-          </div>
-          <div class="lang-picker-wrap lang-picker-wrap--dashboard" aria-label="Language">
-            <span class="lang-picker-label" data-i18n="navLanguage">Language</span>
-            <div class="iif-lang-combobox-wrap" id="iif-lang-combobox-wrap-dashboard">
-              <div class="iif-lang-combobox-row">
-                <button type="button" id="iif-lang-picker-dashboard-display" class="iif-lang-combobox-display" role="combobox"
-                  aria-haspopup="listbox" aria-expanded="false" aria-controls="iif-lang-picker-dashboard-list"
-                  title="Language"></button>
-                <button type="button" class="iif-lang-combobox-toggle" id="iif-lang-picker-dashboard-toggle"
-                  aria-expanded="false" aria-controls="iif-lang-picker-dashboard-panel"
-                  title="عرض كل اللغات / Show all languages">▾</button>
-              </div>
-              <div class="iif-lang-combobox-panel" id="iif-lang-picker-dashboard-panel" hidden>
-                <input type="text" id="iif-lang-picker-dashboard-filter" class="iif-lang-combobox-filter" inputmode="search"
-                  spellcheck="false" autocomplete="off" aria-label="Filter languages / تصفية اللغات"
-                  title="Filter / تصفية" />
-                <ul class="iif-lang-combobox-list" id="iif-lang-picker-dashboard-list" role="listbox"></ul>
-              </div>
-              <select id="iif-lang-picker-dashboard" class="iif-sr-only" title="Language" aria-hidden="true" tabindex="-1"></select>
-            </div>
-          </div>
-          <div class="site-header__auth-btns">
-            <button type="button" class="site-header__auth-btn site-header__auth-btn--dashboard-close"
-              id="dashboard-close">
-              <span class="lang-en">Close Dashboard</span>
-              <span class="lang-ar">إغلاق لوحة التحكم</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main class="dashboard-main">
-        <div class="dashboard-hero">
-          <div class="dashboard-hero__titles">
-            <h2 class="lang-en">Dashboard — Invest with the Fund</h2>
-            <h2 class="lang-ar">لوحة التحكم — ساهم مع الصندوق</h2>
-            <p class="dashboard-hero__badge lang-en" role="status">Fully automated — lists refresh on open</p>
-            <p class="dashboard-hero__badge lang-ar" role="status">لوحة مؤتمتة — تحديث عند الفتح</p>
-          </div>
-          <div class="dashboard-hero__actions">
-            <a href="#membership" class="btn btn--primary dashboard-hero__cta" id="dashboard-btn-new-member">
-              <span class="lang-en">New member — Request membership</span>
-              <span class="lang-ar">عضو جديد — طلب العضوية</span>
-            </a>
-            <button type="button" class="auth-modal__close" data-dashboard-close-aux="true"
-              aria-label="Close">&times;</button>
-          </div>
-        </div>
-
-        <nav class="dashboard-toc" aria-label="Dashboard sections" id="dashboard-toc-nav">
-          <div class="dashboard-toc__head">
-            <span class="dashboard-toc__label lang-en">Structure — jump to section</span>
-            <span class="dashboard-toc__label lang-ar">الهيكلة — انتقال سريع</span>
-            <button type="button" class="btn btn--sm btn--ghost dashboard-toc__toggle" id="dashboard-toc-toggle"
-              aria-expanded="true" aria-controls="dashboard-toc-zones">
-              <span class="lang-en dashboard-toc-toggle__show">Show section links</span>
-              <span class="lang-en dashboard-toc-toggle__hide">Hide section links</span>
-              <span class="lang-ar dashboard-toc-toggle__show">إظهار روابط الأقسام</span>
-              <span class="lang-ar dashboard-toc-toggle__hide">إخفاء روابط الأقسام</span>
-            </button>
-          </div>
-          <div id="dashboard-toc-zones" class="dashboard-toc__zones">
-          <div class="dashboard-toc__zone" data-toc-zone="ops">
-            <span class="dashboard-toc-zone-label lang-en">Operations &amp; content</span>
-            <span class="dashboard-toc-zone-label lang-ar">العمليات والمحتوى</span>
-            <div class="dashboard-toc__row">
-              <a href="#dashboard-my-content" data-toc-target="dashboard-my-content"><span class="lang-en">My
-                  content</span><span class="lang-ar">محتواي</span></a>
-              <a href="#dashboard-user-profile" data-toc-target="dashboard-user-profile"><span class="lang-en">My
-                  profile</span><span class="lang-ar">ملفي الشخصي</span></a>
-              <a href="#dashboard-section-overview" data-toc-target="dashboard-section-overview"><span
-                  class="lang-en">Overview</span><span class="lang-ar">نظرة عامة</span></a>
-              <a href="#dashboard-section-projects" data-toc-target="dashboard-section-projects"><span
-                  class="lang-en">Projects</span><span class="lang-ar">المشاريع</span></a>
-              <a href="#dashboard-letterhead-sheet" data-toc-target="dashboard-letterhead-sheet"><span
-                  class="lang-en">Letterhead</span><span class="lang-ar">هيدر ليتر</span></a>
-              <a href="#dashboard-letters" data-toc-target="dashboard-letters"><span class="lang-en">Letters &amp;
-                  QR</span><span class="lang-ar">الخطابات</span></a>
-              <a href="#dashboard-team" data-toc-target="dashboard-team"><span class="lang-en">Team</span><span
-                  class="lang-ar">الفريق</span></a>
-              <a href="#dashboard-uploads" data-toc-target="dashboard-uploads"><span class="lang-en">Uploads</span><span
-                  class="lang-ar">الرفوعات</span></a>
-              <a href="#dashboard-gov-directory" data-toc-target="dashboard-gov-directory"><span class="lang-en">Gov.
-                  directory</span><span class="lang-ar">الدليل الحكومي</span></a>
-              <a href="#dashboard-business-systems" data-toc-target="dashboard-business-systems"><span
-                  class="lang-en">Business</span><span class="lang-ar">أنظمة الأعمال</span></a>
-              <a href="#dashboard-project-analysis" data-toc-target="dashboard-project-analysis"><span
-                  class="lang-en">Analysis</span><span class="lang-ar">تحليل المشاريع</span></a>
-            </div>
-          </div>
-          <div class="dashboard-toc__zone" data-toc-zone="hr">
-            <span class="dashboard-toc-zone-label lang-en">HR &amp; people</span>
-            <span class="dashboard-toc-zone-label lang-ar">الموارد البشرية والأشخاص</span>
-            <div class="dashboard-toc__row">
-              <a href="#dashboard-staff-roles" data-toc-target="dashboard-staff-roles"><span class="lang-en">Staff &amp;
-                  roles</span><span class="lang-ar">الموظفون والأدوار</span></a>
-              <a href="#dashboard-staff-evaluation" data-toc-target="dashboard-staff-evaluation"><span
-                  class="lang-en">Evaluations</span><span class="lang-ar">تقييم الموظفين</span></a>
-              <a href="#dashboard-fund-members" data-toc-target="dashboard-fund-members"><span class="lang-en">Fund
-                  members</span><span class="lang-ar">أعضاء الصندوق</span></a>
-              <a href="#dashboard-accept-representatives" data-toc-target="dashboard-accept-representatives"><span
-                  class="lang-en">Representatives</span><span class="lang-ar">الممثلون</span></a>
-              <a href="#dashboard-add-members-direct" data-toc-target="dashboard-add-members-direct"><span
-                  class="lang-en">Add members</span><span class="lang-ar">إضافة أعضاء</span></a>
-              <a href="#dashboard-membership-reminders" data-toc-target="dashboard-membership-reminders"><span
-                  class="lang-en">Reminders</span><span class="lang-ar">التذكيرات</span></a>
-            </div>
-          </div>
-          <div class="dashboard-toc__zone" data-toc-zone="admin">
-            <span class="dashboard-toc-zone-label lang-en">Administration &amp; governance</span>
-            <span class="dashboard-toc-zone-label lang-ar">الإدارة والحوكمة</span>
-            <div class="dashboard-toc__row">
-              <a href="#dashboard-section-data" data-toc-target="dashboard-section-data"><span class="lang-en">Data
-                  &amp; backup</span><span class="lang-ar">البيانات والنسخ</span></a>
-              <a href="#dashboard-permissions" data-toc-target="dashboard-permissions"><span
-                  class="lang-en">Permissions</span><span class="lang-ar">الصلاحيات</span></a>
-              <a href="#dashboard-user-registry" data-toc-target="dashboard-user-registry"><span class="lang-en">Users
-                  &amp; membership</span><span class="lang-ar">المسجّلون والعضوية</span></a>
-              <a href="#dashboard-exclusion-archive" data-toc-target="dashboard-exclusion-archive"><span
-                  class="lang-en">Exclusion archive</span><span class="lang-ar">أرشيف الاستبعادات</span></a>
-              <a href="#dashboard-submissions" data-toc-target="dashboard-submissions"><span
-                  class="lang-en">Submissions</span><span class="lang-ar">الطلبات</span></a>
-              <a href="#dashboard-suggestions" data-toc-target="dashboard-suggestions"><span
-                  class="lang-en">Suggestions</span><span class="lang-ar">الاقتراحات</span></a>
-            </div>
-          </div>
-          </div>
-        </nav>
-
-        <div class="dashboard-section" id="dashboard-section-overview">
-          <!-- ترحيب حسب دور المستخدم (مسجّل / عضو / موظف) — يُدار من applyDashboardAccessRules -->
-          <div id="dashboard-role-welcome" class="card">
-            <p id="dashboard-role-welcome-text"></p>
-          </div>
-          <!-- الملف الشخصي الكامل داخل اللوحة — يعمل مع بوابة الإدارة دون إظهار #main-content -->
-          <div id="dashboard-user-profile" class="dashboard-user-profile-wrap">
-            <div class="card" style="margin-bottom: var(--space-4);">
-              <h3 class="dashboard-letters__title lang-en">My profile — contact &amp; privacy</h3>
-              <h3 class="dashboard-letters__title lang-ar">ملفي الشخصي — التواصل والخصوصية</h3>
-              <p class="dashboard-letters__intro lang-en">Same data as «My Profile» on the public page. Edits here avoid portal overlay issues.</p>
-              <p class="dashboard-letters__intro lang-ar">نفس بيانات «ملفي الشخصي» في الصفحة العامة؛ التعديل هنا داخل اللوحة يتجنب تعارض وضع البوابة.</p>
-              <div class="dash-profile-edit-bar" style="display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;margin-bottom:var(--space-4);">
-                <button type="button" class="btn btn--primary" id="dash-profile-edit-toggle-btn">
-                  <span class="lang-en">Edit information</span><span class="lang-ar">تعديل المعلومات</span>
-                </button>
-                <span class="dash-profile-locked-hint lang-en" style="font-size:0.88rem;opacity:0.82;max-width:36rem;">Enable editing to change your details, then tap Save.</span>
-                <span class="dash-profile-locked-hint lang-ar" style="font-size:0.88rem;opacity:0.82;max-width:36rem;">فعّل التعديل لتغيير البيانات، ثم اضغط حفظ.</span>
-              </div>
-              <div class="user-profile-info" style="display:grid;grid-template-columns:minmax(140px,200px) 1fr;gap:var(--space-6);align-items:start;">
-                <div class="profile-photo-section" style="text-align:center;">
-                  <div class="profile-photo" id="dash-profile-photo" style="width:120px;height:120px;margin:0 auto var(--space-3);">
-                    <div class="placeholder-avatar" style="font-size:3rem;opacity:.5;">👤</div>
-                  </div>
-                  <button type="button" class="btn btn--primary btn-sm" id="dash-profile-change-photo-btn">
-                    <span class="lang-en">Change Photo</span><span class="lang-ar">تغيير الصورة</span>
-                  </button>
-                  <input type="file" id="dash-profile-photo-file" accept="image/*" tabindex="-1" title="" aria-hidden="true"
-                    style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;overflow:hidden;" />
-                </div>
-                <div class="profile-details" style="display:grid;gap:var(--space-3);">
-                  <div class="form-group">
-                    <label><span class="lang-en">Full Name</span><span class="lang-ar">الاسم الكامل</span></label>
-                    <input type="text" id="dash-profile-full-name" class="form-control" maxlength="200" autocomplete="name" readonly />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Email</span><span class="lang-ar">البريد الإلكتروني</span></label>
-                    <input type="email" id="dash-profile-email" class="form-control" readonly autocomplete="email" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Phone</span><span class="lang-ar">رقم الهاتف</span></label>
-                    <input type="tel" id="dash-profile-phone" class="form-control" autocomplete="tel" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Company/Organization</span><span class="lang-ar">الشركة/المنظمة</span></label>
-                    <input type="text" id="dash-profile-company" class="form-control" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Position</span><span class="lang-ar">المنصب</span></label>
-                    <input type="text" id="dash-profile-position" class="form-control" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="card" style="margin-bottom: var(--space-4);">
-              <h4 class="dashboard-letters__title lang-en" style="font-size:1rem;">Contact privacy</h4>
-              <h4 class="dashboard-letters__title lang-ar" style="font-size:1rem;">خصوصية التواصل</h4>
-              <div class="form-group">
-                <label><span class="lang-en">Contact visibility</span><span class="lang-ar">رؤية معلومات التواصل</span></label>
-                <select id="dash-profile-contact-visibility" class="form-control">
-                  <option value="all">Show all / إظهار الكل</option>
-                  <option value="partial">Email &amp; phone only / البريد والهاتف فقط</option>
-                  <option value="platform">Platform only / عبر المنصة فقط</option>
-                  <option value="none">Hide all / إخفاء الكل</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Allow messages from</span><span class="lang-ar">السماح بالرسائل من</span></label>
-                <div class="checkbox-group" style="display:flex;flex-direction:column;gap:0.35rem;">
-                  <label class="checkbox-label" style="display:flex;align-items:center;gap:0.5rem;">
-                    <input type="checkbox" id="dash-profile-allow-admin" />
-                    <span class="lang-en">Administrators</span><span class="lang-ar">الإدارة</span>
-                  </label>
-                  <label class="checkbox-label" style="display:flex;align-items:center;gap:0.5rem;">
-                    <input type="checkbox" id="dash-profile-allow-members" />
-                    <span class="lang-en">Members</span><span class="lang-ar">الأعضاء</span>
-                  </label>
-                  <label class="checkbox-label" style="display:flex;align-items:center;gap:0.5rem;">
-                    <input type="checkbox" id="dash-profile-allow-public" />
-                    <span class="lang-en">Public</span><span class="lang-ar">العامة</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="card" style="margin-bottom: var(--space-4);">
-              <h4 class="dashboard-letters__title lang-en" style="font-size:1rem;">More</h4>
-              <h4 class="dashboard-letters__title lang-ar" style="font-size:1rem;">المزيد</h4>
-              <div class="form-group">
-                <label><span class="lang-en">Bio</span><span class="lang-ar">نبذة</span></label>
-                <textarea id="dash-profile-bio" class="form-control" rows="3" maxlength="2000"></textarea>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Website / LinkedIn</span><span class="lang-ar">موقع / لينكدإن</span></label>
-                <input type="url" id="dash-profile-website" class="form-control" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Location</span><span class="lang-ar">الموقع</span></label>
-                <input type="text" id="dash-profile-location" class="form-control" />
-              </div>
-              <div class="form-actions" style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4);">
-                <button type="button" class="btn btn--primary" id="dash-profile-save-btn">
-                  <span class="lang-en">Save</span><span class="lang-ar">حفظ</span>
-                </button>
-                <button type="button" class="btn btn--ghost" id="dash-profile-cancel-btn">
-                  <span class="lang-en">Cancel</span><span class="lang-ar">إلغاء</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <!-- محتوى المستخدم الشخصي — تعديل وحفظ (عضو / مسجّل / موظف) -->
-          <div id="dashboard-my-content" class="card">
-            <h3 class="dashboard-letters__title lang-en">My content — save profile &amp; images</h3>
-            <h3 class="dashboard-letters__title lang-ar">محتواي — حفظ المعلومات والصور</h3>
-            <p class="dashboard-letters__intro lang-en">Edit your public membership display name, bio, text shown on your
-              digital membership card, and photos. Saved to this browser and to your fund member card (if your email is listed).</p>
-            <p class="dashboard-letters__intro lang-ar">عدّل اسم العرض، النبذة، النص الظاهر على بطاقة العضوية الرقمية، والصور.
-              يُحفظ في المتصفح وفي بطاقة عضو الصندوق إن وُجد بريدك.</p>
-            <div class="form-row dashboard-form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Display name (EN)</span><span class="lang-ar">الاسم المعروض
-                    (إنجليزي)</span></label>
-                <input type="text" id="dash-my-name-en" maxlength="120" class="dashboard-form input" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Display name (AR)</span><span class="lang-ar">الاسم المعروض
-                    (عربي)</span></label>
-                <input type="text" id="dash-my-name-ar" maxlength="120" class="dashboard-form input" />
-              </div>
-            </div>
-            <div class="form-row dashboard-form-row dashboard-form-row--bio">
-              <div class="form-group">
-                <label><span class="lang-en">Bio (EN)</span><span class="lang-ar">نبذة (إنجليزي)</span></label>
-                <textarea id="dash-my-bio-en" rows="3" maxlength="800"></textarea>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Bio (AR)</span><span class="lang-ar">نبذة (عربي)</span></label>
-                <textarea id="dash-my-bio-ar" rows="3" maxlength="800"></textarea>
-              </div>
-            </div>
-            <div class="form-row dashboard-form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Card text (EN)</span><span class="lang-ar">نص البطاقة الرقمية
-                    (إنجليزي)</span></label>
-                <input type="text" id="dash-my-def-en" maxlength="200" />
-              </div>
-            </div>
-            <div class="form-row dashboard-form-row dashboard-form-row--tight">
-              <div class="form-group">
-                <label><span class="lang-en">Card text (AR)</span><span class="lang-ar">نص البطاقة الرقمية
-                    (عربي)</span></label>
-                <input type="text" id="dash-my-def-ar" maxlength="200" />
-              </div>
-            </div>
-            <div class="form-row dashboard-form-row dashboard-form-row--photos">
-              <div class="form-group">
-                <label><span class="lang-en">Profile photo (for digital card)</span><span class="lang-ar">صورة الملف للبطاقة
-                    الرقمية</span></label>
-                <input type="file" id="dash-my-photo-file" accept="image/jpeg,image/png,image/gif,image/webp" />
-                <input type="hidden" id="dash-my-photo-data" value="" />
-                <div class="dash-preview-wrap"><img id="dash-my-photo-preview" alt=""
-                    class="dash-preview-img dash-preview-img--md" /></div>
-              </div>
-              <div class="form-group" id="dash-my-logo-row" style="display:none;">
-                <label><span class="lang-en">Company logo</span><span class="lang-ar">شعار الشركة</span></label>
-                <input type="file" id="dash-my-logo-file" accept="image/jpeg,image/png,image/gif,image/webp" />
-                <input type="hidden" id="dash-my-logo-data" value="" />
-                <div class="dash-preview-wrap"><img id="dash-my-logo-preview" alt=""
-                    class="dash-preview-img dash-preview-img--sm" /></div>
-              </div>
-              <div class="form-group" id="dash-my-flag-row" style="display:none;">
-                <label><span class="lang-en">Flag / emblem</span><span class="lang-ar">العلم / الشعار</span></label>
-                <input type="file" id="dash-my-flag-file" accept="image/jpeg,image/png,image/gif,image/webp" />
-                <input type="hidden" id="dash-my-flag-data" value="" />
-                <div class="dash-preview-wrap"><img id="dash-my-flag-preview" alt=""
-                    class="dash-preview-img dash-preview-img--sm" /></div>
-              </div>
-            </div>
-            <div class="dashboard-save-row">
-              <button type="button" class="btn btn--primary" id="dash-my-save-btn"><span class="lang-en">Save my
-                  content</span><span class="lang-ar">حفظ محتواي</span></button>
-              <span id="dash-my-save-status" class="dashboard-inline-status"></span>
-            </div>
-            <div id="dashboard-my-password-section">
-              <h4 class="dashboard-letters__title lang-en">Account password</h4>
-              <h4 class="dashboard-letters__title lang-ar">كلمة مرور الحساب</h4>
-              <p class="lang-en dashboard-note">Change the password you use to sign in (same email). Requires current
-                password if one was already set.</p>
-              <p class="lang-ar dashboard-note">غيّر كلمة المرور لنفس البريد عند الدخول. إن وُجدت كلمة مرور سابقة يُطلب
-                إدخالها.</p>
-              <div class="form-row dashboard-form-row dashboard-form-row--max480">
-                <div class="form-group">
-                  <label for="dash-my-pw-current"><span class="lang-en">Current password</span><span
-                      class="lang-ar">كلمة المرور الحالية</span></label>
-                  <input type="password" id="dash-my-pw-current" autocomplete="current-password" />
-                </div>
-              </div>
-              <div class="form-row dashboard-form-row dashboard-form-row--max520">
-                <div class="form-group">
-                  <label for="dash-my-pw-new"><span class="lang-en">New password</span><span class="lang-ar">كلمة المرور
-                      الجديدة</span></label>
-                  <input type="password" id="dash-my-pw-new" autocomplete="new-password" />
-                </div>
-                <div class="form-group">
-                  <label for="dash-my-pw-new2"><span class="lang-en">Confirm new</span><span class="lang-ar">تأكيد
-                      الجديدة</span></label>
-                  <input type="password" id="dash-my-pw-new2" autocomplete="new-password" />
-                </div>
-              </div>
-              <div class="dashboard-form-row--pw-actions">
-                <button type="button" class="btn btn--ghost" id="dash-my-pw-save-btn"><span class="lang-en">Update
-                    password</span><span class="lang-ar">تحديث كلمة المرور</span></button>
-                <span id="dash-my-pw-status" class="dashboard-inline-status"></span>
-              </div>
-            </div>
-          </div>
-          <!-- عداد الزوار — مخفي، يظهر فقط في لوحة التحكم للإدارة فقط -->
-          <div class="dashboard-visitor-counter" id="dashboard-visitor-counter" aria-label="Visitor count">
-            <span class="visitor-counter-label lang-en">Visits (admin only)</span>
-            <span class="visitor-counter-label lang-ar">عدد الزيارات — للإدارة فقط</span>
-            <span class="visitor-counter-value" id="visitor-count-value">0</span>
-            <p class="visitor-counter-note lang-en">Page loads tracked. With backend: global visitor count.</p>
-            <p class="visitor-counter-note lang-ar">تحميلات الصفحة. مع الخادم: إجمالي الزوار الحقيقي.</p>
-          </div>
-
-          <!-- معلومات رئيس مجلس الإدارة — معلومات المالك الكاملة -->
-          <div class="card chairman-dashboard-card">
-            <div class="chairman-dashboard-card__head">
-              <div class="chairman-image-container">
-                <span class="chairman-image-placeholder" aria-hidden="true">FII</span>
-              </div>
-              <div class="chairman-dashboard-card__titles">
-                <h3 class="lang-en">Chairman of the Board &amp; Fund Owner</h3>
-                <h3 class="lang-ar">رئيس مجلس الإدارة والمالك</h3>
-                <p class="lang-en">International Investment Fund — Full Authority</p>
-                <p class="lang-ar">صندوق الاستثمار الدولي — صلاحيات كاملة</p>
-              </div>
-            </div>
-
-            <div class="chairman-dashboard-card__grid">
-              <div class="chairman-dashboard-card__panel">
-                <h4 class="lang-en">Personal Information</h4>
-                <h4 class="lang-ar">معلومات شخصية</h4>
-                <div class="chairman-panel-body">
-                  <p><strong class="lang-en">Name:</strong> <span class="lang-ar">الاسم:</span><br>
-                    <span class="lang-en">Dr. Talal Kenani</span>
-                    <span class="lang-ar">د. طلال الكناني</span>
-                  </p>
-                  <p><strong class="lang-en">Email:</strong> <span class="lang-ar">البريد:</span><br>
-                    <a href="mailto:talalkenani@gmail.com"
-                      class="chairman-dashboard-card__link">talalkenani@gmail.com</a>
-                  </p>
-                  <p><strong class="lang-en">Mobile:</strong> <span class="lang-ar">جوال:</span><br>
-                    <a href="tel:+966567566616" class="chairman-dashboard-card__link">+966567566616</a>
-                  </p>
-                </div>
-              </div>
-
-              <div class="chairman-dashboard-card__panel">
-                <h4 class="lang-en">Authority &amp; Services</h4>
-                <h4 class="lang-ar">الصلاحيات والخدمات</h4>
-                <div class="chairman-panel-body">
-                  <p><strong class="lang-en">Services:</strong> <span class="lang-ar">الخدمات:</span><br>
-                    <span class="lang-en">12 Admin Services</span>
-                    <span class="lang-ar">12 خدمة إدارية</span>
-                  </p>
-                  <p><strong class="lang-en">Access Level:</strong> <span class="lang-ar">مستوى الوصول:</span><br>
-                    <span class="lang-en">Full Authority</span>
-                    <span class="lang-ar">صلاحيات كاملة</span>
-                  </p>
-                  <p><strong class="lang-en">Status:</strong> <span class="lang-ar">الحالة:</span><br>
-                    <span class="chairman-status-text lang-en">Active &amp; Verified</span>
-                    <span class="chairman-status-text lang-ar">نشط وموثق</span>
-                  </p>
-                </div>
-              </div>
-
-              <div class="chairman-dashboard-card__panel">
-                <h4 class="lang-en">Quick Actions</h4>
-                <h4 class="lang-ar">إجراءات سريعة</h4>
-                <div class="chairman-panel-body">
-                  <p><strong class="lang-en">Projects:</strong> <span class="lang-ar">المشاريع:</span><br>
-                    <span class="lang-en">3 Active Projects</span>
-                    <span class="lang-ar">3 مشاريع نشطة</span>
-                  </p>
-                  <p><strong class="lang-en">Documents:</strong> <span class="lang-ar">المستندات:</span><br>
-                    <span class="lang-en">3 Official Documents</span>
-                    <span class="lang-ar">3 مستندات رسمية</span>
-                  </p>
-                  <p><strong class="lang-en">Last Login:</strong> <span class="lang-ar">آخر دخول:</span><br>
-                    <span id="owner-last-login-en" class="lang-en">Just now</span>
-                    <span id="owner-last-login-ar" class="lang-ar">الآن</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="chairman-dashboard-card__foot">
-              <p class="lang-en">Secure dashboard — chairman access only</p>
-              <p class="lang-ar">لوحة تحكم آمنة — وصول رئيس مجلس الإدارة فقط</p>
-              <div class="chairman-dashboard-card__actions">
-                <button type="button" class="btn btn--primary btn-sm btn-chairman-primary" onclick="editChairmanInfo()">
-                  <span class="lang-en">Edit info</span>
-                  <span class="lang-ar">تعديل المعلومات</span>
-                </button>
-                <button type="button" class="btn btn--ghost btn-sm btn-chairman-secondary"
-                  onclick="addChairmanProject()">
-                  <span class="lang-en">Add project</span>
-                  <span class="lang-ar">إضافة مشروع</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="dashboard-section" id="dashboard-section-data">
-          <!-- حفظ/تحميل من قاعدة البيانات (IndexedDB) -->
-          <div class="card dashboard-card--tools" id="dashboard-card-geo">
-            <h4 class="lang-en dashboard-tool-card__title">Geographic Database Integration</h4>
-            <h4 class="lang-ar dashboard-tool-card__title">القاعدة الجغرافية الحكومية</h4>
-            <p class="lang-en dashboard-tool-card__intro">
-              Access comprehensive government geographic database with 22+ government entities, ministries, and services
-              with real data and official links.</p>
-            <p class="lang-ar dashboard-tool-card__intro">
-              الوصول إلى القاعدة الجغرافية الحكومية الشاملة مع 22+ جهة حكومية ووزارات وخدمات ببيانات حقيقية وروابط
-              رسمية.
-            </p>
-            <div class="dashboard-tool-card__actions">
-              <a href="../government-search/SIMPLE-GOVERNMENT-PLATFORM.html#gov-geographic" target="_blank"
-                rel="noopener noreferrer" class="btn btn--primary dashboard-tool-card__link"
-                title="الفهرس الحكومي — قسم الاستعلام والفلترة">
-                <span class="lang-en">Open Government Index</span>
-                <span class="lang-ar">فتح الفهرس الحكومي المرجعي</span>
-              </a>
-            </div>
-            <p class="dashboard-tool-card__note lang-en">Integrated with IIF Fund for strategic investment analysis</p>
-            <p class="dashboard-tool-card__note lang-ar">متكامل مع الصندوق الاستثماري للتحليل الاستثماري الاستراتيجي</p>
-          </div>
-          <div class="card dashboard-card--tools" id="dashboard-card-db-backup">
-            <h4 class="lang-en dashboard-tool-card__title">Database backup</h4>
-            <h4 class="lang-ar dashboard-tool-card__title">حفظ في قاعدة البيانات</h4>
-            <p class="lang-en dashboard-tool-card__intro">
-              Save or load all site data (users, digital membership cards, members, representative applications, etc.) to/from the
-              browser database (IndexedDB).</p>
-            <p class="lang-ar dashboard-tool-card__intro">
-              حفظ أو تحميل كل بيانات الموقع (المستخدمون، بطاقات العضوية الرقمية، الأعضاء، طلبات الممثلين، إلخ) من/إلى قاعدة البيانات
-              في
-              المتصفح (IndexedDB).</p>
-            <div class="dashboard-tool-card__actions">
-              <button type="button" class="btn btn--primary" id="db-save-btn">
-                <span class="lang-en">Save to database</span>
-                <span class="lang-ar">حفظ في قاعدة البيانات</span>
-              </button>
-              <button type="button" class="btn btn--ghost" id="db-load-btn">
-                <span class="lang-en">Load from database</span>
-                <span class="lang-ar">تحميل من قاعدة البيانات</span>
-              </button>
-            </div>
-            <p id="db-status" class="dashboard-tool-card__status"></p>
-          </div>
-        </div>
-
-        <div class="dashboard-section" id="dashboard-section-projects">
-          <form id="dashboard-form" class="dashboard-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Project Title (EN)</span><span class="lang-ar">عنوان المشروع
-                    (إنجليزي)</span></label>
-                <input type="text" id="dash-title-en" required maxlength="120" placeholder="e.g. Mandate" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Project Title (AR)</span><span class="lang-ar">عنوان المشروع
-                    (عربي)</span></label>
-                <input type="text" id="dash-title-ar" required maxlength="120" placeholder="مثال: الولاية" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Project Description (EN)</span><span class="lang-ar">وصف المشروع
-                    (إنجليزي)</span></label>
-                <textarea id="dash-desc-en" maxlength="500" placeholder="Short description…"></textarea>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Project Description (AR)</span><span class="lang-ar">وصف المشروع
-                    (عربي)</span></label>
-                <textarea id="dash-desc-ar" maxlength="500" placeholder="وصف مختصر…"></textarea>
-              </div>
-            </div>
-            <button type="submit" class="btn btn--primary" id="dash-add-btn">
-              <span class="lang-en">Add investment project</span>
-              <span class="lang-ar">إضافة مشروع استثماري</span>
-            </button>
-          </form>
-          <h3 class="lang-en dashboard-subheading">Current investment projects — edit
-            description or delete</h3>
-          <h3 class="lang-ar dashboard-subheading">المشاريع الاستثمارية الحالية — تعديل
-            الوصف أو الحذف</h3>
-          <ul class="dashboard-list" id="dashboard-list"></ul>
-        </div>
-
-        <!-- صفحة هيدر ليتر — تصميم فاخر: شعار خلفية، تواصل، كيو آر الموقع والتصديق، إرسال للإدارة (الموظفون: صلاحية النسخ واللصق هنا فقط) -->
-        <div class="dashboard-letters letters-area" id="dashboard-letterhead-sheet">
-          <h3 class="dashboard-letters__title lang-en">Letterhead page — luxury design, contact, QR codes, send for
-            verification</h3>
-          <h3 class="dashboard-letters__title lang-ar">صفحة هيدر ليتر — تصميم فاخر، تواصل، كيو آر الموقع والتصديق، إرسال
-            للإدارة</h3>
-          <p class="dashboard-letters__intro lang-en">Fund paper with logo watermark. Large writing area. Website QR and
-            letter-verification QR (logo in center). Send to admin for verification; admin can reassign to staff or
-            email;
-            staff can send to any email.</p>
-          <p class="dashboard-letters__intro lang-ar">ورق الصندوق مع شعار خلفية. مساحة كتابة كبيرة. كيو آر الموقع وكيو
-            آر
-            تصديق الخطابات (الشعار في القلب). إرسال للإدارة للتصديق؛ الإدارة تعيد التعيين لموظف أو بريد؛ الموظف يرسل لأي
-            بريد يضيفه.</p>
-          <div class="letterhead-sheet">
-            <div class="letterhead-sheet__head">
-              <div class="letterhead-sheet__head-left">
-                <picture>
-                  <source type="image/webp" srcset="assets/emblem.webp" />
-                  <img src="assets/emblem.jpg" alt="صندوق الاستثمار الدولي" class="letterhead-logo" decoding="async" />
-                </picture>
-              </div>
-              <div class="letterhead-sheet__head-right">
-              </div>
-            </div>
-            <div class="letterhead-sheet__meta" style="text-align: right; direction: rtl;">
-              <!-- الموضوع في الأعلى بعرض كامل -->
-              <div class="letterhead-meta-row" style="margin-bottom: var(--space-4);">
-                <label class="letterhead-meta-label"><span class="lang-en">Subject</span><span
-                    class="lang-ar">الموضوع</span></label>
-                <input type="text" id="letterhead-subject" class="letterhead-input-luxury" style="width: 100%;"
-                  placeholder="الموضوع / Subject">
-              </div>
-              <!-- التاريخ والرقم الصادر في سطر واحد -->
-              <div class="letterhead-meta-row"
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-                <div>
-                  <label class="letterhead-meta-label"><span class="lang-en">Date</span><span
-                      class="lang-ar">التاريخ</span></label>
-                  <input type="date" id="letterhead-date" class="letterhead-input-luxury">
-                </div>
-                <div>
-                  <label class="letterhead-meta-label"><span class="lang-en">Outgoing No.</span><span
-                      class="lang-ar">الرقم الصادر</span></label>
-                  <input type="text" id="letterhead-outgoing-no" class="letterhead-input-luxury"
-                    placeholder="الرقم الصادر / Outgoing No.">
-                </div>
-              </div>
-            </div>
-            <div class="letterhead-sheet__body">
-              <textarea id="letterhead-sheet-body" class="letterhead-input-luxury"
-                placeholder="اكتب هنا… / Write here…"></textarea>
-            </div>
-            <div class="letterhead-sheet-actions">
-              <button type="button" class="btn btn--primary btn-sm" id="letterhead-translate-btn"><span
-                  class="lang-en">Translate</span><span class="lang-ar">ترجمة</span></button>
-              <button type="button" class="btn btn--primary btn-sm" id="letterhead-copy-btn"><span class="lang-en">Copy
-                  text</span><span class="lang-ar">نسخ النص</span></button>
-              <button type="button" class="btn btn--ghost btn-sm" id="letterhead-clear-btn"><span
-                  class="lang-en">Clear</span><span class="lang-ar">مسح</span></button>
-              <button type="button" class="btn btn--ghost btn-sm" id="letterhead-edit-contact-btn"><span
-                  class="lang-en">Edit contact / footer</span><span class="lang-ar">تعديل التواصل
-                  والفوتر</span></button>
-              <button type="button" class="btn btn--primary btn-sm" id="letterhead-register-sader-btn"><span
-                  class="lang-en">Register as outgoing (assign no.)</span><span class="lang-ar">تسجيل كصادر (رقم
-                  صادر)</span></button>
-            </div>
-            <div class="letterhead-sheet__footer-divider"
-              style="width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #002D62, transparent); margin: 2rem 0;">
-            </div>
-            <div class="letterhead-sheet__footer">
-              <!-- سطر واحد يحتوي على كل المعلومات -->
-              <div
-                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 1rem 0;">
-
-                <!-- الموقع والبريد الإلكتروني -->
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                  <span class="letterhead-website" id="letterhead-website-text"
-                    style="font-size: 0.9rem; color: #1e3a5f; font-weight: 600;">www.iiffund.com</span>
-                  <span class="letterhead-email" id="letterhead-email-text"
-                    style="font-size: 0.9rem; color: #1e3a5f; font-weight: 600;">info@iiffund.com</span>
-                </div>
-
-                <!-- الهاتف والعنوان -->
-                <div style="display: flex; align-items: center; gap: 1.5rem;">
-                  <div style="display: flex; align-items: center; gap: 0.3rem;">
-                    <span class="contact-icon-wrap" aria-hidden="true">📞</span>
-                    <span id="letterhead-phone-text" style="font-size: 0.85rem; color: #1e3a5f;">+966 56 756 6616</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 0.3rem;">
-                    <span class="contact-icon-wrap" aria-hidden="true">📍</span>
-                    <span id="letterhead-address-text" style="font-size: 0.85rem; color: #1e3a5f;">13B AV DE LA MOTTE
-                      PICQUET 75007 PARIS 7</span>
-                  </div>
-                </div>
-
-                <!-- SIRET ID فقط -->
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                  <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <span class="siret-badge"
-                      style="background-color: #f7d046; color: #1e3a5f; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">ID</span>
-                    <span id="letterhead-siret-text" style="font-size: 0.85rem; color: #1e3a5f;">SIRET 923 563 688
-                      00012</span>
-                  </div>
-                </div>
-
-                <!-- اللوجوهات في نفس السطر -->
-                <div class="letterhead-sheet__footer-logos" style="display: flex; align-items: center; gap: 0.8rem;"
-                  aria-label="Partnership and certification logos">
-                  <span class="footer-logo-item" title="European Union"><svg class="logo-svg" viewBox="0 0 40 40"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <circle fill="#003399" cx="20" cy="20" r="19" />
-                      <g fill="#FFCC00">
-                        <circle cx="20" cy="6.5" r="1.8" />
-                        <circle cx="27.4" cy="9.9" r="1.8" />
-                        <circle cx="31.5" cy="18" r="1.8" />
-                        <circle cx="27.4" cy="26.1" r="1.8" />
-                        <circle cx="20" cy="33.5" r="1.8" />
-                        <circle cx="12.6" cy="26.1" r="1.8" />
-                        <circle cx="8.5" cy="18" r="1.8" />
-                        <circle cx="12.6" cy="9.9" r="1.8" />
-                        <circle cx="24.2" cy="12.2" r="1.8" />
-                        <circle cx="28.8" cy="22" r="1.8" />
-                        <circle cx="24.2" cy="27.8" r="1.8" />
-                      </g>
-                    </svg></span>
-                  <span class="footer-logo-item" title="Emblem"><svg class="logo-svg" viewBox="0 0 40 40"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <circle fill="#c9a227" cx="20" cy="20" r="18" />
-                      <circle fill="none" stroke="#1a1a1a" stroke-width="1.5" cx="20" cy="20" r="12" />
-                      <path fill="#1a1a1a" d="M20 10v6l5 3-5 3v6l-5-3 5-3v-6l5-3-5-3z" />
-                    </svg></span>
-                  <span class="footer-logo-item" title="République Française"><svg class="logo-svg" viewBox="0 0 40 40"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <rect fill="#002395" width="13.33" height="40" x="0" />
-                      <rect fill="#fff" width="13.33" height="40" x="13.33" />
-                      <rect fill="#ED2939" width="13.34" height="40" x="26.66" />
-                    </svg></span>
-                  <span class="footer-logo-item" title="European Parliament"><svg class="logo-svg" viewBox="0 0 40 40"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <circle fill="#003399" cx="20" cy="20" r="18" />
-                      <path fill="#FFCC00" d="M20 8l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" />
-                    </svg></span>
-                  <span class="footer-logo-item" title="WIPO"><svg class="logo-svg" viewBox="0 0 40 40"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <circle fill="#fff" stroke="#003399" stroke-width="2" cx="20" cy="20" r="17" />
-                      <path fill="#003399" d="M14 20h4v-6h4v6h4v-10h-4v-2h-8v2h-4z" />
-                      <path fill="#003399" d="M14 26h12v2H14z" />
-                    </svg></span>
-                </div>
-              </div>
-            </div>
-            <!-- كيو آر كود الموقع + كيو آر كود تصديق الخطابات (الشعار في القلب) -->
-            <div class="letterhead-qr-section" style="padding: 0 var(--space-8) var(--space-6);">
-              <div class="letterhead-qr-card">
-                <h4 class="lang-en">QR code for the website</h4>
-                <h4 class="lang-ar">كيو آر كود للموقع</h4>
-                <div class="qr-wrap" id="letterhead-qr-website-wrap"></div>
-              </div>
-              <div class="letterhead-qr-card">
-                <h4 class="lang-en">QR code for letter verification</h4>
-                <h4 class="lang-ar">كيو آر كود لتصديق الخطابات</h4>
-                <div class="qr-wrap" id="letterhead-qr-verify-wrap"></div>
-                <p class="letter-qr-hint" style="margin-top:var(--space-2);"><span class="lang-en">Generate from admin
-                    after sending for verification.</span><span class="lang-ar">يُنشأ من الإدارة بعد الإرسال
-                    للتصديق.</span></p>
-              </div>
-            </div>
-            <!-- إرسال للإدارة للتصديق + إرسال الموظف لأي بريد -->
-            <div class="letterhead-send-verify" style="margin: 0 var(--space-8) var(--space-6);">
-              <h4 class="lang-en">Send to admin for verification</h4>
-              <h4 class="lang-ar">إرسال للإدارة للتصديق</h4>
-              <p class="lang-en" style="font-size:0.9rem; margin-bottom: var(--space-3);">Submit this letter to generate
-                a
-                verification QR (with issue date). Admin can reassign to same employee, another staff, or another email.
-                Employee can send to any email they add.</p>
-              <p class="lang-ar" style="font-size:0.9rem; margin-bottom: var(--space-3);">إرسال هذا الخطاب لتوليد كيو آر
-                التصديق (بتاريخ الإصدار). الإدارة تعيد التعيين لنفس الموظف أو موظف آخر أو بريد آخر. الموظف يرسل لأي
-                إيميل
-                يضيفه.</p>
-              <button type="button" class="btn btn--primary btn-sm" id="letterhead-send-verify-btn"><span
-                  class="lang-en">Send to admin for verification</span><span class="lang-ar">إرسال للإدارة
-                  للتصديق</span></button>
-              <h5 class="dashboard-subheading dashboard-subheading--minor dashboard-subheading--block"><span
-                  class="lang-en">Send to
-                  multiple recipients — by channel</span><span class="lang-ar">إرسال لجهات متعددة — حسب الفئة</span>
-              </h5>
-              <div class="letterhead-send-channels">
-                <div class="letterhead-send-channel">
-                  <h5><span class="lang-en">Employees</span><span class="lang-ar">الموظفون</span></h5>
-                  <p class="lang-en" style="font-size:0.8rem; margin-bottom: var(--space-2);">From staff list — send
-                    collectively</p>
-                  <p class="lang-ar" style="font-size:0.8rem; margin-bottom: var(--space-2);">من قائمة الموظفين — إرسال
-                    جماعي</p>
-                  <ul class="channel-list" id="letterhead-channel-employees"></ul>
-                  <button type="button" class="btn btn--ghost btn-sm letterhead-send-channel-btn"
-                    data-channel="employees"><span class="lang-en">Open email to all employees</span><span
-                      class="lang-ar">فتح البريد لجميع الموظفين</span></button>
-                </div>
-                <div class="letterhead-send-channel">
-                  <h5><span class="lang-en">Members</span><span class="lang-ar">الأعضاء</span></h5>
-                  <p class="lang-en" style="font-size:0.8rem; margin-bottom: var(--space-2);">Add emails — send to
-                    members
-                  </p>
-                  <p class="lang-ar" style="font-size:0.8rem; margin-bottom: var(--space-2);">إضافة بريدات — إرسال
-                    للأعضاء
-                  </p>
-                  <input type="text" class="letterhead-input-luxury" id="letterhead-add-member" placeholder="email@…"
-                    style="width:100%; margin-bottom:0.5rem; font-size:0.9rem;" />
-                  <button type="button" class="btn btn--ghost btn-sm" id="letterhead-add-member-btn"><span
-                      class="lang-en">Add</span><span class="lang-ar">إضافة</span></button>
-                  <ul class="channel-list" id="letterhead-channel-members"></ul>
-                  <button type="button" class="btn btn--ghost btn-sm letterhead-send-channel-btn" data-channel="members"
-                    style="margin-top:0.5rem;"><span class="lang-en">Open email to all members</span><span
-                      class="lang-ar">فتح البريد لجميع الأعضاء</span></button>
-                </div>
-                <div class="letterhead-send-channel">
-                  <h5><span class="lang-en">Registered</span><span class="lang-ar">المسجلون</span></h5>
-                  <p class="lang-en" style="font-size:0.8rem; margin-bottom: var(--space-2);">Add emails — send to
-                    registered</p>
-                  <p class="lang-ar" style="font-size:0.8rem; margin-bottom: var(--space-2);">إضافة بريدات — إرسال
-                    للمسجلين</p>
-                  <input type="text" class="letterhead-input-luxury" id="letterhead-add-registered"
-                    placeholder="email@…" style="width:100%; margin-bottom:0.5rem; font-size:0.9rem;" />
-                  <button type="button" class="btn btn--ghost btn-sm" id="letterhead-add-registered-btn"><span
-                      class="lang-en">Add</span><span class="lang-ar">إضافة</span></button>
-                  <ul class="channel-list" id="letterhead-channel-registered"></ul>
-                  <button type="button" class="btn btn--ghost btn-sm letterhead-send-channel-btn"
-                    data-channel="registered" style="margin-top:0.5rem;"><span class="lang-en">Open email to all
-                      registered</span><span class="lang-ar">فتح البريد لجميع المسجلين</span></button>
-                </div>
-              </div>
-            </div>
-            <!-- قائمة المعلقة للتصديق — للإدارة: توليد كيو آر وتحديد المستلم -->
-            <div id="letterhead-pending-block" style="margin: 0 var(--space-8) var(--space-6);">
-              <h4 class="lang-en">Pending for verification (admin)</h4>
-              <h4 class="lang-ar">معلقة للتصديق (الإدارة)</h4>
-              <ul class="letterhead-pending-list" id="letterhead-pending-list"></ul>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- عمل الخطابات — خطاب رسمي مصادق بـ QR (الموظفون: صلاحية النسخ واللصق هنا فقط) -->
-        <div class="dashboard-letters letters-area" id="dashboard-letters">
-          <h3 class="dashboard-letters__title lang-en">Official letters (letterhead + QR authentication)</h3>
-          <h3 class="dashboard-letters__title lang-ar">عمل الخطابات — خطاب رسمي مصادق</h3>
-          <p class="dashboard-letters__intro lang-en">Create letters on Fund letterhead. Generate a QR code to
-            authenticate the document so the recipient can verify it is from the Fund.</p>
-          <p class="dashboard-letters__intro lang-ar">إنشاء خطابات على ورق الصندوق الرسمي. إنشاء رمز QR لمصادقة المستند
-            حتى يتأكد المتلقي أنه صادر من الصندوق.</p>
-          <div class="letter-editor">
-            <div class="letter-meta">
-              <div class="form-group letter-sader-display">
-                <span class="letterhead-meta-label"><span class="lang-en">Outgoing no.</span><span class="lang-ar">الرقم
-                    (صادر)</span></span>
-                <input type="text" id="letter-sader-display" class="letterhead-input-luxury"
-                  placeholder="الرقم الصادر / Outgoing No." readonly />
-              </div>
-              <div class="form-group">
-                <label for="letter-date"><span class="lang-en">Date</span><span class="lang-ar">التاريخ</span></label>
-                <input type="date" id="letter-date" />
-              </div>
-              <div class="form-group">
-                <label for="letter-country"><span class="lang-en">Country (optional)</span><span class="lang-ar">الدولة
-                    (اختياري)</span></label>
-                <input type="text" id="letter-country" maxlength="100" placeholder="" />
-              </div>
-              <div class="form-group">
-                <label for="letter-to"><span class="lang-en">To / Recipient</span><span class="lang-ar">إلى /
-                    المستلم</span></label>
-                <input type="text" id="letter-to" maxlength="200" placeholder="" />
-              </div>
-              <div class="form-group">
-                <label for="letter-subject"><span class="lang-en">Subject</span><span
-                    class="lang-ar">الموضوع</span></label>
-                <input type="text" id="letter-subject" maxlength="300" placeholder="" />
-              </div>
-            </div>
-            <div class="letter-pages" id="letter-pages">
-              <div class="letter-page-wrap">
-                <label class="letter-page-label"><span class="lang-en">Page 1 — Letter body</span><span
-                    class="lang-ar">الصفحة 1 — نص الخطاب</span></label>
-                <textarea id="letter-body-1" class="letter-body" rows="8" placeholder=""></textarea>
-              </div>
-            </div>
-            <button type="button" class="btn btn--ghost" id="letter-add-page">
-              <span class="lang-en">Add page</span><span class="lang-ar">إضافة صفحة</span>
-            </button>
-            <div class="letter-qr-block">
-              <button type="button" class="btn btn--ghost" id="letter-translate-btn"><span class="lang-en">Translate
-                  letter</span><span class="lang-ar">ترجمة الخطاب</span></button>
-              <button type="button" class="btn btn--primary" id="letter-generate-qr">
-                <span class="lang-en">Generate authentication QR</span><span class="lang-ar">إنشاء رمز QR
-                  للمصادقة</span>
-              </button>
-              <div class="letter-qr-display" id="letter-qrcode" aria-label="QR code for verification"></div>
-              <p class="letter-qr-hint lang-en">Recipient scans to verify the letter is from the Fund. Code is unique
-                per
-                letter.</p>
-              <p class="letter-qr-hint lang-ar">المتلقي يمسح الرمز للتحقق من أن الخطاب صادر من الصندوق. الرمز فريد لكل
-                خطاب.</p>
-            </div>
-            <button type="button" class="btn btn--primary" id="letter-print">
-              <span class="lang-en">Print / Export letter</span><span class="lang-ar">طباعة / استخراج الخطاب</span>
-            </button>
-            <button type="button" class="btn btn--primary" id="letter-approve-send"><span class="lang-en">Approve &amp;
-                send (assign outgoing no.)</span><span class="lang-ar">اعتماد وإرسال (تسجيل رقم صادر)</span></button>
-          </div>
-          <!-- صندوق الوارد / صندوق الصادر / أرشيف الصادر -->
-          <div class="inbox-outbox-archive"
-            style="margin-top: var(--space-8); padding: var(--space-4); background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
-            <h4 style="margin-bottom: var(--space-4);"><span class="lang-en">Inbox &amp; Outbox</span><span
-                class="lang-ar">صندوق الوارد والصادر</span></h4>
-            <div class="inbox-outbox-tabs"
-              style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4); flex-wrap: wrap;">
-              <button type="button" class="btn btn--ghost inbox-outbox-tab is-active" data-box="inbox"><span
-                  class="lang-en">Inbox (وارد)</span><span class="lang-ar">الوارد</span></button>
-              <button type="button" class="btn btn--ghost inbox-outbox-tab" data-box="outbox"><span
-                  class="lang-en">Outbox
-                  (صادر)</span><span class="lang-ar">الصادر</span></button>
-              <button type="button" class="btn btn--ghost inbox-outbox-tab" data-box="archive"><span
-                  class="lang-en">Archive (صادر)</span><span class="lang-ar">أرشيف الصادر</span></button>
-            </div>
-            <div id="inbox-box" class="letter-box-panel">
-              <p class="lang-en" style="font-size:0.9rem; margin-bottom: var(--space-3);">Received letters. Add manually
-                or from verification flow.</p>
-              <p class="lang-ar" style="font-size:0.9rem; margin-bottom: var(--space-3);">الخطابات الواردة. إضافة يدوياً
-                أو من التصديق.</p>
-              <ul class="dashboard-list" id="inbox-list"></ul>
-              <button type="button" class="btn btn--ghost btn-sm" id="inbox-add-btn"><span class="lang-en">Add to
-                  inbox</span><span class="lang-ar">إضافة للوارد</span></button>
-            </div>
-            <div id="outbox-box" class="letter-box-panel" style="display:none;">
-              <p class="lang-en" style="font-size:0.9rem; margin-bottom: var(--space-3);">Recently sent letters (with
-                outgoing number).</p>
-              <p class="lang-ar" style="font-size:0.9rem; margin-bottom: var(--space-3);">آخر الخطابات الصادرة (برقم
-                صادر).</p>
-              <button type="button" class="btn btn--primary btn-sm" id="archive-selected-btn"
-                style="margin-bottom: var(--space-3);">
-                <span class="lang-en">Archive Selected</span>
-                <span class="lang-ar">أرشف المحدد</span>
-              </button>
-              <ul class="dashboard-list" id="outbox-list"></ul>
-            </div>
-            <div id="archive-box" class="letter-box-panel" style="display:none;">
-              <h5 class="dashboard-subheading dashboard-subheading--minor"><span class="lang-en">Search
-                  archive</span><span class="lang-ar">البحث في أرشيف الصادر</span></h5>
-              <div class="archive-search-row">
-                <input type="text" id="archive-search-input" class="letterhead-input-luxury" placeholder="" />
-                <label class="archive-date-label"><span class="lang-en">From</span><span class="lang-ar">من</span>
-                  <input type="date" id="archive-date-from" class="letterhead-input-luxury" /></label>
-                <label class="archive-date-label"><span class="lang-en">To</span><span class="lang-ar">إلى</span> <input
-                    type="date" id="archive-date-to" class="letterhead-input-luxury" /></label>
-                <button type="button" class="btn btn--primary btn-sm" id="archive-search-btn"><span
-                    class="lang-en">Search</span><span class="lang-ar">بحث</span></button>
-                <span class="lang-en" style="font-size:0.8rem; color: var(--color-text-muted);">By text, or by date
-                  from–to</span>
-                <span class="lang-ar" style="font-size:0.8rem; color: var(--color-text-muted);">نص، أو بالتاريخ من —
-                  إلى</span>
-              </div>
-              <ul class="dashboard-list" id="archive-list"></ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- من نحن — إدارة فريق الصندوق (ديناميكي: إضافة أشخاص ونبذات) -->
-        <div class="dashboard-letters" id="dashboard-team">
-          <h3 class="dashboard-letters__title lang-en">Our Team — Add / edit team members</h3>
-          <h3 class="dashboard-letters__title lang-ar">من نحن — إضافة أو تعديل أعضاء الفريق</h3>
-          <p class="dashboard-letters__intro lang-en">Add new people with name, title, bio (EN/AR) and photo. They
-            appear
-            in the "About — Our Team" section.</p>
-          <p class="dashboard-letters__intro lang-ar">أضف أشخاصاً جدداً بالاسم والمسمى والنبذة (عربي/إنجليزي) والصورة.
-            يظهرون في قسم «من نحن — فريقنا».</p>
-          <form id="dashboard-team-form" class="dashboard-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Name (EN)</span><span class="lang-ar">الاسم (إنجليزي)</span></label>
-                <input type="text" id="team-name-en" required maxlength="120"
-                  placeholder="e.g. Dr. Talal Hassan Al-Zahrani" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Name (AR)</span><span class="lang-ar">الاسم (عربي)</span></label>
-                <input type="text" id="team-name-ar" required maxlength="120"
-                  placeholder="مثال: الدكتور طلال حسن الزهراني" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Title (EN)</span><span class="lang-ar">المسمى (إنجليزي)</span></label>
-                <input type="text" id="team-title-en" required maxlength="200"
-                  placeholder="e.g. Financial Advisor · Chairman" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Title (AR)</span><span class="lang-ar">المسمى (عربي)</span></label>
-                <input type="text" id="team-title-ar" required maxlength="200"
-                  placeholder="مثال: المستشار المالي · رئيس مجلس الإدارة" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Bio (EN)</span><span class="lang-ar">النبذة (إنجليزي)</span></label>
-                <textarea id="team-bio-en" maxlength="2000" rows="4" placeholder="Short biography…"></textarea>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Bio (AR)</span><span class="lang-ar">النبذة (عربي)</span></label>
-                <textarea id="team-bio-ar" maxlength="2000" rows="4" placeholder="نبذة مختصرة…"></textarea>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Photo — URL or upload (shown above)</span><span class="lang-ar">الصورة —
-                    رابط
-                    أو رفع</span></label>
-                <input type="url" id="team-image-url" maxlength="2000" placeholder="https://…" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Or upload image</span><span class="lang-ar">أو رفع صورة</span></label>
-                <input type="file" id="team-image-file" accept="image/*" />
-                <input type="file" id="team-image-capture" accept="image/*" capture="user" style="display:none;" />
-                <div class="cert-img-actions">
-                  <button type="button" class="btn btn--ghost btn-sm" data-camera-target="team"><span
-                      class="lang-en">Capture</span><span class="lang-ar">التقاط</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-upload-for="team-image-file"><span
-                      class="lang-en">From files</span><span class="lang-ar">من الملفات</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-adjust-target="team"><span
-                      class="lang-en">Adjust in frame</span><span class="lang-ar">وزنها داخل الإطار</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-delete-target="team"><span
-                      class="lang-en">Delete image</span><span class="lang-ar">حذف الصورة</span></button>
-                </div>
-              </div>
-            </div>
-            <p class="form-hint lang-en"
-              style="font-size:0.85rem; color: var(--color-text-muted); margin-top: 0.25rem;">
-              Bio (EN/AR) above is shown under the photo on the site.</p>
-            <p class="form-hint lang-ar"
-              style="font-size:0.85rem; color: var(--color-text-muted); margin-top: 0.25rem;">
-              النبذة (أعلى) تظهر تحت الصورة في الموقع.</p>
-            <input type="hidden" id="team-image-data" value="" />
-            <input type="hidden" id="team-edit-index" value="" />
-            <button type="submit" class="btn btn--primary" id="team-add-btn">
-              <span class="lang-en">Add team member</span><span class="lang-ar">إضافة عضو فريق</span>
-            </button>
-          </form>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--block">Current team — edit or
-            delete</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--block">الفريق الحالي — تعديل أو
-            حذف</h4>
-          <ul class="dashboard-list" id="dashboard-team-list"></ul>
-        </div>
-
-        <!-- الرفوعات المستلمة — للاطلاع من الإدارة فقط، والتوزيع على المختصين والإرسال -->
-        <div class="dashboard-letters" id="dashboard-uploads">
-          <h3 class="dashboard-letters__title lang-en">Received uploads — view & distribute to specialists</h3>
-          <h3 class="dashboard-letters__title lang-ar">الرفوعات المستلمة — الاطلاع والتوزيع على المختصين</h3>
-          <p class="dashboard-letters__intro lang-en">Documents, images, video, and live captures received. Only
-            administration can view. Assign to specialist (email) or remove.</p>
-          <p class="dashboard-letters__intro lang-ar">المستندات والصور والفيديو والتصوير المباشر المستلمة. الإدارة فقط
-            تطلع. تعيين للمختص (بريد) أو حذف.</p>
-          <div class="dashboard-uploads-tabs">
-            <button type="button" class="dashboard-upload-tab is-active" data-tab="docs"><span
-                class="lang-en">Documents</span><span class="lang-ar">مستندات</span></button>
-            <button type="button" class="dashboard-upload-tab" data-tab="images"><span
-                class="lang-en">Images</span><span class="lang-ar">صور</span></button>
-            <button type="button" class="dashboard-upload-tab" data-tab="video"><span class="lang-en">Video</span><span
-                class="lang-ar">فيديو</span></button>
-            <button type="button" class="dashboard-upload-tab" data-tab="live"><span class="lang-en">Live</span><span
-                class="lang-ar">مباشر</span></button>
-          </div>
-          <ul class="dashboard-list" id="dashboard-uploads-list"></ul>
-          <div class="form-group" style="margin-top: var(--space-4);">
-            <label><span class="lang-en">Assign selected to specialist (email)</span><span class="lang-ar">توزيع المحدد
-                على مختص (بريد)</span></label>
-            <div style="display:flex; gap: var(--space-2); flex-wrap: wrap;">
-              <input type="email" id="assign-specialist-email" placeholder="specialist@example.com"
-                style="flex:1; min-width: 200px;" />
-              <button type="button" class="btn btn--primary btn-sm" id="assign-specialist-btn"><span
-                  class="lang-en">Send
-                  to specialist</span><span class="lang-ar">إرسال للمختص</span></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- صلاحيات الاطلاع — تحليل الميزانيات ودراسات الجدوى -->
-        <div class="dashboard-letters" id="dashboard-permissions">
-          <h3 class="dashboard-letters__title lang-en">View permissions — Budget & feasibility results</h3>
-          <h3 class="dashboard-letters__title lang-ar">صلاحيات الاطلاع — نتائج الميزانيات ودراسات الجدوى</h3>
-          <p class="dashboard-letters__intro lang-en">Grant or revoke permission for users (by email) to view protected
-            budget and feasibility analysis results.</p>
-          <p class="dashboard-letters__intro lang-ar">منح أو إلغاء صلاحية المستخدمين (بالبريد) لعرض نتائج تحليل
-            الميزانيات
-            ودراسات الجدوى المحمية.</p>
-          <div class="form-row">
-            <div class="form-group">
-              <label><span class="lang-en">Email to grant access</span><span class="lang-ar">البريد لمنح
-                  الوصول</span></label>
-              <input type="email" id="perm-email" placeholder="user@example.com" />
-            </div>
-            <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="btn btn--primary btn-sm" id="perm-budget-btn"><span
-                  class="lang-en">Budget</span><span class="lang-ar">الميزانيات</span></button>
-              <button type="button" class="btn btn--primary btn-sm" id="perm-feasibility-btn"
-                style="margin-left: 0.5rem;"><span class="lang-en">Feasibility</span><span
-                  class="lang-ar">الجدوى</span></button>
-            </div>
-          </div>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">Permitted
-            (budget)</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">المصرح
-            لهم (الميزانيات)</h4>
-          <ul class="dashboard-list" id="dashboard-perm-budget-list"></ul>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">Permitted
-            (feasibility)</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">المصرح
-            لهم (الجدوى)</h4>
-          <ul class="dashboard-list" id="dashboard-perm-feasibility-list"></ul>
-        </div>
-
-        <!-- المسجّلون في الموقع (بدون عضوية مدفوعة) وطلبات العضوية — قبول / رفض / استبعاد -->
-        <div class="dashboard-letters" id="dashboard-user-registry">
-          <h3 class="dashboard-letters__title lang-en">Site users &amp; membership requests</h3>
-          <h3 class="dashboard-letters__title lang-ar">المسجّلون وطلبات العضوية</h3>
-          <p class="dashboard-letters__intro lang-en"><strong>Registered user</strong> = account on the site without
-            paid membership. <strong>Member</strong> = paid subscription (listed as fund member). Use <em>Exclude
-              registered</em> for someone who only signed up; use <em>Exclude member</em> for someone who paid and
-            appears in fund members.</p>
-          <p class="dashboard-letters__intro lang-ar"><strong>مسجّل</strong> = حساب في الموقع دون شراء عضوية مدفوعة.
-            <strong>عضو</strong> = دفع اشتراك العضوية ويظهر ضمن أعضاء الصندوق. <strong>استبعاد مسجّل</strong> يزيل حساب
-            الموقع فقط؛ <strong>استبعاد عضو</strong> يلغي العضوية المدفوعة من القائمة وسجل الاشتراك.</p>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">
-            Membership applications (form)</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">طلبات
-            العضوية (النموذج)</h4>
-          <ul class="dashboard-list" id="dashboard-membership-apps-list"></ul>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">
-            Registered site users (no paid membership)</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">مسجّلو
-            الموقع (بدون عضوية مدفوعة)</h4>
-          <ul class="dashboard-list" id="dashboard-site-users-list"></ul>
-          <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">Paid
-            members — exclude member</h4>
-          <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-sep">أعضاء
-            مدفوعون — استبعاد عضو</h4>
-          <ul class="dashboard-list" id="dashboard-exclude-members-list"></ul>
-          <div id="dashboard-admin-passwords-wrap">
-            <h4 class="lang-en dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-flush">Admin
-              — account passwords (this browser only)</h4>
-            <h4 class="lang-ar dashboard-subheading dashboard-subheading--minor dashboard-subheading--minor-flush">
-              للإدارة — كلمات مرور الحسابات (هذا المتصفح فقط)</h4>
-            <p class="lang-en" style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom: var(--space-2);">
-              View and change passwords for any email that has signed in or been registered. For demo/local use; do not
-              use for production.</p>
-            <p class="lang-ar" style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom: var(--space-2);">
-              عرض وتعديل كلمات المرور لكل بريد مسجّل. للتجربة والتخزين المحلي فقط.</p>
-            <ul class="dashboard-list" id="dashboard-admin-passwords-list"></ul>
-          </div>
-        </div>
-
-        <!-- أرشيف دائم: استبعاد أعضاء / مسجّلين / رفض طلبات — يبقى للاطلاع حتى بعد إزالة السجلات من القوائم النشطة -->
-        <div class="dashboard-letters" id="dashboard-exclusion-archive" data-dashboard-zone="admin">
-          <h3 class="dashboard-letters__title lang-en">Exclusion &amp; rejection archive</h3>
-          <h3 class="dashboard-letters__title lang-ar">أرشيف الاستبعادات والرفض</h3>
-          <p class="dashboard-letters__intro lang-en">Permanent log for oversight: paid members excluded, registered
-            users excluded or rejected, and membership form applications rejected. Snapshots are trimmed (e.g. large
-            images) but retain identity and context. Stored in this browser only.</p>
-          <p class="dashboard-letters__intro lang-ar">سجل دائم للاطلاع: استبعاد أعضاء مدفوعين، استبعاد أو رفض مسجّلين،
-            ورفض طلبات العضوية من النموذج. تُختصر الصور الكبيرة مع الإبقاء على الهوية والسياق. التخزين في هذا المتصفح
-            فقط.</p>
-          <p id="dashboard-exclusion-archive-stats" class="dashboard-archive-stats" aria-live="polite"></p>
-          <div class="dashboard-archive-tabs" id="dashboard-exclusion-archive-tabs" role="tablist"
-            aria-label="Archive segments">
-            <button type="button" class="btn btn--ghost dashboard-excl-tab is-active" data-excl-tab="all" role="tab"
-              aria-selected="true"><span class="lang-en">All</span><span class="lang-ar">الكل</span></button>
-            <button type="button" class="btn btn--ghost dashboard-excl-tab" data-excl-tab="fund" role="tab"
-              aria-selected="false"><span class="lang-en">Paid members</span><span class="lang-ar">أعضاء
-                مدفوعون</span></button>
-            <button type="button" class="btn btn--ghost dashboard-excl-tab" data-excl-tab="site" role="tab"
-              aria-selected="false"><span class="lang-en">Registered users</span><span
-                class="lang-ar">مسجّلون</span></button>
-            <button type="button" class="btn btn--ghost dashboard-excl-tab" data-excl-tab="apps" role="tab"
-              aria-selected="false"><span class="lang-en">Form applications</span><span class="lang-ar">طلبات
-                النموذج</span></button>
-          </div>
-          <ul class="dashboard-list dashboard-archive-list" id="dashboard-exclusion-archive-list"></ul>
-        </div>
-
-        <!-- الطلبات المستلمة مع موقع العميل — للتحقق من صدق التعامل -->
-        <div class="dashboard-letters" id="dashboard-submissions">
-          <h3 class="dashboard-letters__title lang-en">Received submissions — with location at time of contact</h3>
-          <h3 class="dashboard-letters__title lang-ar">الطلبات المستلمة — مع الموقع وقت التواصل</h3>
-          <p class="dashboard-letters__intro lang-en">Contact, urgent consultation, and investor registration requests.
-            Location (GPS/IP) is captured to verify authenticity of the interaction.</p>
-          <p class="dashboard-letters__intro lang-ar">طلبات التواصل والاستشارة العاجلة وتسجيل المستثمر. يُسجّل الموقع
-            (GPS/IP) للتحقق من صدق التعامل.</p>
-          <ul class="dashboard-list" id="dashboard-submissions-list"></ul>
-        </div>
-
-        <!-- اقتراح العملاء — خانة الاقتراحات وأرشيف الاقتراحات -->
-        <div class="dashboard-letters" id="dashboard-suggestions">
-          <h3 class="dashboard-letters__title lang-en">Customer suggestions — inbox &amp; archive</h3>
-          <h3 class="dashboard-letters__title lang-ar">اقتراح العملاء — خانة الاقتراحات وأرشيف الاقتراحات</h3>
-          <p class="dashboard-letters__intro lang-en">Suggestions submitted from the "Suggest to us" form. Full
-            suggester
-            data. Move to archive when processed.</p>
-          <p class="dashboard-letters__intro lang-ar">الاقتراحات الواردة من نموذج «اقترح علينا». بيانات المقترح كاملة.
-            نقل
-            للأرشيف بعد المعالجة.</p>
-          <div class="suggestions-tabs">
-            <button type="button" class="btn btn--ghost suggestions-tab is-active" data-tab="inbox"><span
-                class="lang-en">Inbox</span><span class="lang-ar">الوارد</span></button>
-            <button type="button" class="btn btn--ghost suggestions-tab" data-tab="archive"><span
-                class="lang-en">Archive</span><span class="lang-ar">أرشيف الاقتراحات</span></button>
-          </div>
-          <div id="suggestions-inbox-panel">
-            <h4 class="dashboard-subheading"><span class="lang-en">New suggestions</span><span
-                class="lang-ar">الاقتراحات الجديدة</span></h4>
-            <ul class="dashboard-list" id="suggestions-inbox-list"></ul>
-          </div>
-          <div id="suggestions-archive-panel" style="display:none;">
-            <h4 class="dashboard-subheading"><span class="lang-en">Suggestions archive — full
-                data</span><span class="lang-ar">أرشيف الاقتراحات — بيانات كاملة</span></h4>
-            <ul class="dashboard-list" id="suggestions-archive-list"></ul>
-          </div>
-        </div>
-
-        <!-- إضافة موظف من لوحة التحكم — الموظف لا يُعرّف إلا من هنا، مع صلاحيات: استخدام لوحة التحكم، الاطلاع، أخذ القرار، تصديق كيو آر -->
-        <div class="dashboard-letters" id="dashboard-staff-roles">
-          <h3 class="dashboard-letters__title lang-en">Add employee from dashboard — staff and permissions</h3>
-          <h3 class="dashboard-letters__title lang-ar">إضافة موظف / عضو / ممثل — والصلاحيات</h3>
-          <p class="dashboard-letters__intro lang-en">Only persons added here get roles. Set type: Staff (can get «use
-            dashboard»), Member, or Our representative. Then set permissions — dashboard is visible only to you (admin)
-            or
-            to staff you grant «Use dashboard».</p>
-          <p class="dashboard-letters__intro lang-ar">من يُضاف هنا فقط يحصل على دور. حدد النوع: موظف (يمكن منحه «استخدام
-            لوحة التحكم»)، عضو، أو ممثل لنا في بلده. ثم حدد الصلاحيات — لوحة التحكم تظهر لك أنت فقط أو للموظف الذي تمنحه
-            صلاحية «استخدام لوحة التحكم».</p>
-          <div class="staff-assign-panel" id="staff-assign-panel">
-            <p class="lang-en" style="margin:0 0 var(--space-2); font-size:0.95rem; color: var(--color-text-muted);">
-              <strong style="color: var(--color-accent-gold-soft);">1)</strong> Choose who receives permissions — an
-              existing person from the list, or a new person (then fill the form).</p>
-            <p class="lang-ar" style="margin:0 0 var(--space-2); font-size:0.95rem; color: var(--color-text-muted);">
-              <strong style="color: var(--color-accent-gold-soft);">١)</strong> اختر من يستلم الصلاحيات — موظفاً مسجّلاً
-              من القائمة، أو شخصاً جديداً ثم أكمل البيانات.</p>
-            <label for="staff-permissions-assign-picker"><span class="lang-en">Assign permissions to</span><span
-                class="lang-ar">منح الصلاحيات لـ</span></label>
-            <select id="staff-permissions-assign-picker" aria-label="Assign permissions to">
-              <option value="__new__">— New person / شخص جديد —</option>
-            </select>
-          </div>
-          <form id="staff-add-form" class="dashboard-form">
-            <input type="hidden" id="staff-edit-id" value="" />
-            <p class="lang-en" style="margin:0 0 var(--space-3); font-size:0.95rem; color: var(--color-text-muted);">
-              <strong style="color: var(--color-accent-gold-soft);">2)</strong> Enter their details, then tick exactly
-              what they may do — or use a quick preset.</p>
-            <p class="lang-ar" style="margin:0 0 var(--space-3); font-size:0.95rem; color: var(--color-text-muted);">
-              <strong style="color: var(--color-accent-gold-soft);">٢)</strong> أدخل البيانات، ثم فعّل فقط ما تريد أن
-              يفعله — أو استخدم قالباً سريعاً.</p>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">User type</span><span class="lang-ar">نوع المستخدم</span></label>
-                <select id="staff-role-type" required>
-                  <option value="staff">موظف — يمكن منحه إظهار لوحة التحكم / Staff (dashboard if granted)</option>
-                  <option value="member">عضو / Member</option>
-                  <option value="representative">ممثل لنا في بلده / Our representative</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Full name</span><span class="lang-ar">الاسم الكامل</span></label>
-                <input type="text" id="staff-name" required maxlength="120" placeholder="e.g. Ahmed Ali" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Email (login)</span><span class="lang-ar">البريد (للدخول)</span></label>
-                <input type="email" id="staff-email" required placeholder="user@example.com" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="staff-login-password"><span class="lang-en">Login password (optional)</span><span
-                    class="lang-ar">كلمة مرور الدخول (اختياري)</span></label>
-                <input type="password" id="staff-login-password" autocomplete="new-password" placeholder="" />
-                <small class="lang-en"
-                  style="display:block; color:var(--color-text-muted); margin-top:0.25rem; font-size:0.8rem;">Leave
-                  empty to keep unchanged. Strong: 8+ chars, upper, lower, digit, symbol.</small>
-                <small class="lang-ar"
-                  style="display:block; color:var(--color-text-muted); margin-top:0.25rem; font-size:0.8rem;">اتركه
-                  فارغاً للإبقاء على السابق. قوية: 8 أحرف، كبير وصغير ورقم ورمز.</small>
-              </div>
-              <div class="form-group">
-                <label for="staff-login-password2"><span class="lang-en">Confirm password</span><span
-                    class="lang-ar">تأكيد كلمة المرور</span></label>
-                <input type="password" id="staff-login-password2" autocomplete="new-password" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Job title / Role</span><span class="lang-ar">المسمى الوظيفي /
-                    الدور</span></label>
-                <input type="text" id="staff-role-title" maxlength="120" placeholder="e.g. Investment Analyst" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Duties (short description)</span><span class="lang-ar">المهام (وصف
-                    مختصر)</span></label>
-                <input type="text" id="staff-duties" maxlength="300"
-                  placeholder="e.g. Research, reports, client contact" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Photo — URL or upload</span><span class="lang-ar">الصورة — رابط أو
-                    رفع</span></label>
-                <input type="url" id="staff-photo-url" maxlength="2000" placeholder="https://…" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Or upload image</span><span class="lang-ar">أو رفع صورة</span></label>
-                <input type="file" id="staff-photo-file" accept="image/*" />
-                <input type="file" id="staff-photo-capture" accept="image/*" capture="user" style="display:none;" />
-                <div class="cert-img-actions">
-                  <button type="button" class="btn btn--ghost btn-sm" data-camera-target="staff"><span
-                      class="lang-en">Capture</span><span class="lang-ar">التقاط</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-upload-for="staff-photo-file"><span
-                      class="lang-en">From files</span><span class="lang-ar">من الملفات</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-adjust-target="staff"><span
-                      class="lang-en">Adjust in frame</span><span class="lang-ar">وزنها داخل الإطار</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-delete-target="staff"><span
-                      class="lang-en">Delete image</span><span class="lang-ar">حذف الصورة</span></button>
-                </div>
-              </div>
-            </div>
-            <input type="hidden" id="staff-photo-data" value="" />
-            <div class="form-group">
-              <label><span class="lang-en">Bio / short description (shown under photo)</span><span class="lang-ar">نبذة
-                  —
-                  تظهر تحت الصورة</span></label>
-              <textarea id="staff-bio" maxlength="800" rows="3"
-                placeholder="e.g. 10+ years in investment analysis…"></textarea>
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">Permissions — you decide each checkbox for this person</span><span
-                  class="lang-ar">الصلاحيات — أنت تحدد لكل موظف ما يفعله (ضع علامة على ما يناسبه)</span></label>
-              <div class="staff-perm-toolbar">
-                <label for="staff-perm-preset-select" style="margin:0;font-size:0.85rem;"><span class="lang-en">Quick
-                    preset</span><span class="lang-ar">قالب سريع</span></label>
-                <select id="staff-perm-preset-select" aria-label="Quick permission preset">
-                  <option value="">—</option>
-                </select>
-                <button type="button" class="btn btn--ghost btn-sm" id="staff-perm-check-all"><span
-                    class="lang-en">Select all</span><span class="lang-ar">تحديد الكل</span></button>
-                <button type="button" class="btn btn--ghost btn-sm" id="staff-perm-check-none"><span
-                    class="lang-en">Clear all</span><span class="lang-ar">إلغاء الكل</span></button>
-              </div>
-              <div class="staff-permissions-grid" id="staff-permissions-grid"></div>
-            </div>
-            <div class="form-group" style="margin-top: var(--space-4);">
-              <label><span class="lang-en">Add another permission (free text)</span><span class="lang-ar">إضافة صلاحية
-                  أخرى لموظف</span></label>
-              <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
-                <input type="text" id="staff-custom-perm-input" maxlength="120" placeholder="e.g. مراجعة العقود"
-                  style="flex: 1; min-width: 160px;" />
-                <button type="button" class="btn btn--ghost btn-sm" id="staff-add-custom-perm-btn"><span
-                    class="lang-en">Add</span><span class="lang-ar">إضافة</span></button>
-              </div>
-              <ul class="staff-custom-perm-list" id="staff-custom-perm-list"
-                style="list-style: none; margin: var(--space-2) 0 0; padding: 0;"></ul>
-            </div>
-            <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4);">
-              <button type="submit" class="btn btn--primary" id="staff-add-btn"><span class="lang-en">Add
-                  staff</span><span class="lang-ar">إضافة موظف</span></button>
-              <button type="button" class="btn btn--ghost" id="staff-cancel-edit-btn" style="display:none;"><span
-                  class="lang-en">Cancel edit</span><span class="lang-ar">إلغاء التعديل</span></button>
-            </div>
-          </form>
-          <h4 class="dashboard-subheading dashboard-subheading--block"><span class="lang-en">Current
-              staff</span><span class="lang-ar">الموظفون الحاليون</span></h4>
-          <ul class="dashboard-list" id="dashboard-staff-roles-list"></ul>
-        </div>
-
-        <!-- إدارة الأعضاء — عرض في صفحة الأعضاء مع الصورة والنبذة وكيو آر العضوية -->
-        <div class="dashboard-letters" id="dashboard-fund-members">
-          <h3 class="dashboard-letters__title lang-en">Fund members — display on Members page with photo, bio &amp;
-            membership QR</h3>
-          <h3 class="dashboard-letters__title lang-ar">إدارة الأعضاء — عرض في صفحة الأعضاء مع الصورة والنبذة وكيو آر
-            العضوية</h3>
-          <p class="dashboard-letters__intro lang-en">Add members. They appear in the public "Members" section with
-            photo,
-            bio, and a unique QR code for their membership in the Fund.</p>
-          <p class="dashboard-letters__intro lang-ar">إضافة أعضاء. يظهرون في قسم «الأعضاء» مع الصورة والنبذة وكيو آر كود
-            عضوية فريد في الصندوق.</p>
-          <form id="fund-members-form" class="dashboard-form">
-            <input type="hidden" id="fund-member-edit-id" value="" />
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Name (EN)</span><span class="lang-ar">الاسم (إنجليزي)</span></label>
-                <input type="text" id="fund-member-name-en" maxlength="120" placeholder="e.g. John Smith" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Name (AR)</span><span class="lang-ar">الاسم (عربي)</span></label>
-                <input type="text" id="fund-member-name-ar" maxlength="120" placeholder="مثال: أحمد علي" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Email</span><span class="lang-ar">البريد</span></label>
-                <input type="email" id="fund-member-email" maxlength="200" placeholder="member@example.com" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Membership tier</span><span class="lang-ar">نوع العضوية</span></label>
-                <select id="fund-member-tier">
-                  <option value="cooperating">Cooperating / عضو متعاون</option>
-                  <option value="shared">Shared Member / عضو مشترك</option>
-                  <option value="premium_2143">Premium Silver / فضية</option>
-                  <option value="premium_3143">Premium Gold / ذهبية</option>
-                  <option value="premium_4143">Premium Platinum / بلاتينية</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Photo — URL or upload</span><span class="lang-ar">الصورة — رابط أو
-                    رفع</span></label>
-                <input type="url" id="fund-member-photo-url" maxlength="2000" placeholder="https://…" />
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Or upload</span><span class="lang-ar">أو رفع</span></label>
-                <input type="file" id="fund-member-photo-file" accept="image/*" />
-                <input type="file" id="fund-member-photo-capture" accept="image/*" capture="user"
-                  style="display:none;" />
-                <div class="cert-img-actions">
-                  <button type="button" class="btn btn--ghost btn-sm" data-camera-target="member"><span
-                      class="lang-en">Capture</span><span class="lang-ar">التقاط</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-upload-for="fund-member-photo-file"><span
-                      class="lang-en">From files</span><span class="lang-ar">من الملفات</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-adjust-target="member"><span
-                      class="lang-en">Adjust in frame</span><span class="lang-ar">وزنها داخل الإطار</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm" data-delete-target="member"><span
-                      class="lang-en">Delete image</span><span class="lang-ar">حذف الصورة</span></button>
-                </div>
-              </div>
-            </div>
-            <input type="hidden" id="fund-member-photo-data" value="" />
-            <div class="form-row">
-              <div class="form-group">
-                <label><span class="lang-en">Bio (EN) — shown under photo</span><span class="lang-ar">النبذة
-                    (إنجليزي)</span></label>
-                <textarea id="fund-member-bio-en" maxlength="800" rows="3" placeholder="Short bio…"></textarea>
-              </div>
-              <div class="form-group">
-                <label><span class="lang-en">Bio (AR)</span><span class="lang-ar">النبذة (عربي)</span></label>
-                <textarea id="fund-member-bio-ar" maxlength="800" rows="3" placeholder="نبذة مختصرة…"></textarea>
-              </div>
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">All their works — page content (EN)</span><span class="lang-ar">جميع أعماله —
-                  محتوى الصفحة الداخلية (إنجليزي)</span></label>
-              <textarea id="fund-member-works-en" maxlength="8000" rows="6"
-                placeholder="Member writes about all their works, projects, companies…"></textarea>
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">All their works — page content (AR)</span><span class="lang-ar">جميع أعماله —
-                  محتوى الصفحة الداخلية (عربي)</span></label>
-              <textarea id="fund-member-works-ar" maxlength="8000" rows="6"
-                placeholder="العضو يتكلم عن جميع أعماله ومشاريعه وشركاته…"></textarea>
-            </div>
-            <div class="form-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="fund-member-show-links" />
-                <span class="lang-en">Member wishes to add their works / company links (optional)</span>
-                <span class="lang-ar">العضو يريد إضافة أعماله وروابط شركاته (اختياري)</span>
-              </label>
-            </div>
-            <div id="fund-member-links-wrap" style="display:none;">
-              <p class="form-hint lang-en">Only https:// or
-                http:// links are allowed. Safe and verified.</p>
-              <p class="form-hint lang-ar">يُقبل فقط روابط
-                https:// أو http:// — آمنة ومُتحقّق منها.</p>
-              <div class="member-links-list" id="fund-member-links-list"></div>
-              <div class="member-links-add-row">
-                <input type="text" id="fund-member-link-label" maxlength="120" placeholder="Company / work name" />
-                <input type="url" id="fund-member-link-url" maxlength="500" placeholder="https://…" />
-                <button type="button" class="btn btn--ghost btn-sm" id="fund-member-link-add"><span class="lang-en">Add
-                    link</span><span class="lang-ar">إضافة رابط</span></button>
-              </div>
-            </div>
-            <button type="submit" class="btn btn--primary" id="fund-member-add-btn"><span class="lang-en">Add
-                member</span><span class="lang-ar">إضافة عضو</span></button>
-            <button type="button" class="btn btn--ghost" id="fund-member-cancel-btn" style="display:none;"><span
-                class="lang-en">Cancel</span><span class="lang-ar">إلغاء</span></button>
-          </form>
-          <h4 class="dashboard-subheading dashboard-subheading--block"><span class="lang-en">Current
-              members</span><span class="lang-ar">الأعضاء الحاليون</span></h4>
-          <ul class="dashboard-list" id="dashboard-fund-members-list"></ul>
-        </div>
-
-        <!-- تذكيرات انتهاء العضوية — قبل 15 يوم كل 3 أيام، وبعد الانتهاء كل 3 أيام لمدة شهر -->
-        <div class="dashboard-letters" id="dashboard-membership-reminders">
-          <h3 class="dashboard-letters__title lang-en">Membership reminders — expiring &amp; ended</h3>
-          <h3 class="dashboard-letters__title lang-ar">تذكيرات العضوية — اقتراب الانتهاء وبعد الانتهاء</h3>
-          <p class="dashboard-letters__intro lang-en">Automated schedule: 15, 12, 9, 6, 3 days before end (renewal
-            reminder); then every 3 days for 1 month after end (subscription ended). Use mailto to send; mark as sent so
-            it repeats every 3 days only.</p>
-          <p class="dashboard-letters__intro lang-ar">جدول مؤتمت: قبل 15، 12، 9، 6، 3 أيام من النهاية (تذكير بالتجديد)؛
-            ثم
-            كل 3 أيام لمدة شهر بعد الانتهاء (انتهاء الاشتراك). استخدم الرابط لإرسال البريد ثم علّم كمُرسَل.</p>
-          <div id="membership-reminders-due-list"></div>
-        </div>
-
-        <!-- قبول ممثلاً لنا — طلبات التمثيل والقبول -->
-        <div class="dashboard-letters" id="dashboard-accept-representatives"
-          style="border: 2px solid var(--color-accent-blue); background: rgba(30, 58, 95, 0.15);">
-          <h3 class="dashboard-letters__title lang-en">Accept as our representative</h3>
-          <h3 class="dashboard-letters__title lang-ar">قبول ممثلاً لنا</h3>
-          <p class="dashboard-letters__intro lang-en">Applications after terms acceptance — click «Accept as our
-            representative» below each or «Accept all». Each request is linked to the emails below for follow-up.</p>
-          <p class="dashboard-letters__intro lang-ar">طلبات التمثيل بعد استيفاء الشروط — اختر «قبول ممثلاً لنا» أسفل كل
-            طلب أو «قبول الكل». كل طلب يُربط بجميع البريديات أدناه للمتابعة.</p>
-          <div class="form-group" style="margin: var(--space-3) 0; max-width: 480px;">
-            <label><span class="lang-ar">بريديات ربط طلبات التمثيل (فاصلة بين كل بريد)</span><span
-                class="lang-en">Emails
-                to link representative requests to (comma-separated)</span></label>
-            <textarea id="rep-link-emails" rows="2" placeholder="admin@fund.com, info@fund.com"
-              style="width:100%; padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); background: var(--color-surface); color: var(--color-text-main);"></textarea>
-            <button type="button" class="btn btn--ghost btn-sm" id="rep-save-link-emails"
-              style="margin-top: 0.5rem;"><span class="lang-ar">حفظ البريديات</span><span class="lang-en">Save
-                emails</span></button>
-          </div>
-          <div style="margin: var(--space-3) 0;">
-            <button type="button" class="btn btn--primary" id="rep-accept-all-btn"><span class="lang-en">Accept all as
-                our
-                representative</span><span class="lang-ar">قبول الكل ممثلاً لنا</span></button>
-          </div>
-          <ul class="dashboard-list" id="representative-applications-list"></ul>
-          <p id="rep-apps-empty" style="display:none; color: var(--color-text-muted); margin-top: var(--space-2);"><span
-              class="lang-ar">لا توجد طلبات معلقة.</span><span class="lang-en">No pending applications.</span></p>
-        </div>
-
-        <!-- إضافة أعضاء مباشرة (صلاحية add_member_free) -->
-        <div class="dashboard-letters" id="dashboard-add-members-direct">
-          <h3 class="dashboard-letters__title lang-en">Add members directly</h3>
-          <h3 class="dashboard-letters__title lang-ar">إضافة أعضاء مباشرة</h3>
-          <p class="dashboard-letters__intro lang-en">Enter member email and choose membership type; a digital membership card is
-            issued after adding.</p>
-          <p class="dashboard-letters__intro lang-ar">أدخل بريد العضو واختر نوع العضوية؛ تُصدَر بطاقة العضوية الرقمية بعد الإضافة.</p>
-          <div class="form-row">
-            <div class="form-group">
-              <label><span class="lang-en">Email</span><span class="lang-ar">البريد الإلكتروني</span></label>
-              <input type="email" id="direct-member-email" placeholder="member@example.com" maxlength="254" />
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">Name (optional)</span><span class="lang-ar">الاسم (اختياري)</span></label>
-              <input type="text" id="direct-member-name" maxlength="200" />
-            </div>
-          </div>
-          <p style="margin-bottom: var(--space-2); font-weight: 600;"><span class="lang-en">Membership type</span><span
-              class="lang-ar">نوع العضوية</span></p>
-          <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);">
-            <button type="button" class="btn btn--ghost btn-membership" data-type="cooperating_year"
-              data-duration="year"><span class="lang-en">Cooperating (Year) 143 USD</span><span class="lang-ar">تعاوني
-                سنوي 143 دولار</span></button>
-            <button type="button" class="btn btn--ghost btn-membership" data-type="cooperating_month"
-              data-duration="month"><span class="lang-en">Cooperating (Month) 29 USD</span><span class="lang-ar">تعاوني
-                شهري 29 دولار</span></button>
-            <button type="button" class="btn btn--ghost btn-membership" data-type="premium_2143"
-              data-duration="year"><span class="lang-en">Premium 2143 USD</span><span class="lang-ar">بريميوم
-                2143</span></button>
-            <button type="button" class="btn btn--ghost btn-membership" data-type="premium_3143"
-              data-duration="year"><span class="lang-en">Premium 3143 USD</span><span class="lang-ar">بريميوم
-                3143</span></button>
-            <button type="button" class="btn btn--ghost btn-membership" data-type="premium_4143"
-              data-duration="year"><span class="lang-en">Premium 4143 USD</span><span class="lang-ar">بريميوم
-                4143</span></button>
-          </div>
-          <p id="add-members-direct-msg" role="status" style="min-height: 1.2em; margin-bottom: var(--space-2);"></p>
-          <button type="button" class="btn btn--ghost" id="direct-issue-cert-only"><span class="lang-en">Issue digital card
-              only (existing member)</span><span class="lang-ar">إصدار البطاقة الرقمية فقط (عضو مسجّل)</span></button>
-        </div>
-
-        <!-- تقييم أداء الموظفين — مؤتمت، بأعلى معايير التقييم -->
-        <div class="dashboard-letters" id="dashboard-staff-evaluation">
-          <h3 class="dashboard-letters__title lang-en">Employee performance evaluation — automated, highest standards
-          </h3>
-          <h3 class="dashboard-letters__title lang-ar">تقييم أداء الموظفين — مؤتمت</h3>
-          <p class="dashboard-letters__intro lang-en">Evaluate staff against high criteria. Results appear in the
-            automated evaluation inbox below.</p>
-          <p class="dashboard-letters__intro lang-ar">تقييم الموظفين بأعلى معايير التقييم. تظهر النتائج في خانة تقييم
-            الموظفين المؤتمت أدناه.</p>
-          <div class="staff-eval-form-wrap">
-            <h4 class="dashboard-subheading"><span class="lang-en">Add evaluation</span><span class="lang-ar">إضافة
-                تقييم</span></h4>
-            <form id="staff-eval-form" class="dashboard-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label><span class="lang-en">Employee</span><span class="lang-ar">الموظف</span></label>
-                  <select id="staff-eval-employee" required></select>
-                </div>
-                <div class="form-group">
-                  <label><span class="lang-en">Evaluation date</span><span class="lang-ar">تاريخ التقييم</span></label>
-                  <input type="date" id="staff-eval-date" />
-                </div>
-              </div>
-              <div class="staff-eval-criteria" id="staff-eval-criteria"></div>
-              <div class="form-group" style="margin-top: var(--space-4);">
-                <label><span class="lang-en">Comment (optional)</span><span class="lang-ar">ملاحظة
-                    (اختياري)</span></label>
-                <textarea id="staff-eval-comment" rows="3" maxlength="500" placeholder=""></textarea>
-              </div>
-              <button type="submit" class="btn btn--primary" id="staff-eval-submit"><span class="lang-en">Submit
-                  evaluation</span><span class="lang-ar">إضافة التقييم</span></button>
-            </form>
-          </div>
-          <div class="staff-eval-inbox">
-            <h4 class="dashboard-subheading dashboard-subheading--block"><span class="lang-en">Automated
-                evaluation inbox — all evaluations</span><span class="lang-ar">خانة تقييم الموظفين المؤتمت</span></h4>
-            <ul class="dashboard-list" id="staff-eval-list"></ul>
-          </div>
-        </div>
-
-        <!-- دليل مكاتب الحكومات والسفارات — من لوحة التحكم فقط: حكومات، خارجيات، استثمار، قنصليات، ملحقات تجارية -->
-        <div class="dashboard-letters" id="dashboard-gov-directory">
-          <h3 class="dashboard-letters__title lang-en">Government &amp; Diplomatic Directory — worldwide</h3>
-          <h3 class="dashboard-letters__title lang-ar">دليل مكاتب الحكومات والسفارات — عالمياً</h3>
-          <p class="dashboard-letters__intro lang-en">Manage links to governments, foreign affairs, investment
-            ministries,
-            consulates, and commercial attachés. Add phones, emails, websites, officials, and who speaks daily online.
-            Dashboard only.</p>
-          <p class="dashboard-letters__intro lang-ar">إدارة روابط الحكومات ووزارات الخارجية والاستثمار والقنصليات
-            والملحقات التجارية. أرقام مباشرة، إيميلات، مواقع، أسماء المسؤولين، ومن يتحدث يومياً أونلاين. من لوحة التحكم
-            فقط.</p>
-          <div class="dashboard-gov-report-wrap"
-            style="margin-bottom: var(--space-6); padding: var(--space-4); background: var(--color-glass); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
-            <label class="lang-en" style="display:block; margin-bottom: var(--space-2); font-weight: 600;">Country for
-              full analysis report</label>
-            <label class="lang-ar" style="display:block; margin-bottom: var(--space-2); font-weight: 600;">الدولة لتقرير
-              التحليل المفصل</label>
-            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-              <input type="text" id="gov-report-country" placeholder="e.g. Saudi Arabia" maxlength="100"
-                style="flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-subtle); background: var(--color-surface); color: var(--color-text-main);" />
-              <button type="button" class="btn btn--primary" id="gov-report-generate-btn">
-                <span class="lang-en">Generate country analysis report</span>
-                <span class="lang-ar">تقرير تحليل الدولة (مفصل أونلاين)</span>
-              </button>
-            </div>
-            <p class="lang-en"
-              style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-2); margin-bottom: 0;">
-              Report includes: investment system, economic resources, repayment capacity, sovereign guarantee ability,
-              risks, transfer system, head of state and term, security, population, per capita income, industry.</p>
-            <p class="lang-ar"
-              style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-2); margin-bottom: 0;">
-              التقرير يشمل: أنظمة الاستثمار والموارد الاقتصادية، المقدرة على السداد، إصدار ضمان سيادي، مخاطر التعامل،
-              نظام
-              التحويلات المالية، الرئيس ومتى أتى للحكم، الوضع الأمني، عدد السكان، دخل الفرد، حجم المصانع والصناعة.</p>
-          </div>
-          <div class="dashboard-gov-tabs">
-            <button type="button" class="dashboard-gov-tab is-active" data-cat="governments"><span
-                class="lang-en">Governments</span><span class="lang-ar">الحكومات</span></button>
-            <button type="button" class="dashboard-gov-tab" data-cat="foreign"><span class="lang-en">Foreign
-                Affairs</span><span class="lang-ar">الخارجيات</span></button>
-            <button type="button" class="dashboard-gov-tab" data-cat="investment"><span class="lang-en">Investment
-                Ministries</span><span class="lang-ar">وزارات الاستثمار</span></button>
-            <button type="button" class="dashboard-gov-tab" data-cat="consulates"><span
-                class="lang-en">Consulates</span><span class="lang-ar">القنصليات</span></button>
-            <button type="button" class="dashboard-gov-tab" data-cat="commercial"><span class="lang-en">Commercial
-                Attachés</span><span class="lang-ar">الملحقات التجارية</span></button>
-          </div>
-          <div class="dashboard-gov-panels">
-            <div class="dashboard-gov-panel is-active" data-cat="governments">
-              <form class="dashboard-form dashboard-gov-form" id="gov-dir-form-governments">
-                <input type="hidden" id="gov-dir-edit-index-governments" value="" />
-                <div class="form-row">
-                  <div class="form-group">
-                    <label><span class="lang-en">Country</span><span class="lang-ar">الدولة</span></label>
-                    <input type="text" id="gov-dir-country-governments" required maxlength="100"
-                      placeholder="e.g. Saudi Arabia" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Office name (EN)</span><span class="lang-ar">اسم المكتب
-                        (إنجليزي)</span></label>
-                    <input type="text" id="gov-dir-name-en-governments" maxlength="200"
-                      placeholder="e.g. Prime Minister's Office" />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label><span class="lang-en">Office name (AR)</span><span class="lang-ar">اسم المكتب
-                        (عربي)</span></label>
-                    <input type="text" id="gov-dir-name-ar-governments" maxlength="200"
-                      placeholder="مثال: مكتب رئاسة الوزراء" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Direct phone(s)</span><span class="lang-ar">أرقام مباشرة</span></label>
-                    <input type="text" id="gov-dir-phone-governments" maxlength="300" placeholder="+966 11 123 4567" />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label><span class="lang-en">Email(s)</span><span class="lang-ar">إيميلات</span></label>
-                    <input type="text" id="gov-dir-email-governments" maxlength="500"
-                      placeholder="contact@government.gov" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Website(s)</span><span class="lang-ar">مواقع إلكترونية</span></label>
-                    <input type="text" id="gov-dir-website-governments" maxlength="500" placeholder="https://…" />
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group">
-                    <label><span class="lang-en">Officials (names)</span><span class="lang-ar">أسماء
-                        المسؤولين</span></label>
-                    <input type="text" id="gov-dir-officials-governments" maxlength="400" placeholder="Name, title…" />
-                  </div>
-                  <div class="form-group">
-                    <label><span class="lang-en">Who speaks daily online</span><span class="lang-ar">من يتحدث يومياً
-                        أونلاين</span></label>
-                    <input type="text" id="gov-dir-daily-online-governments" maxlength="300"
-                      placeholder="e.g. Minister of State" />
-                  </div>
-                </div>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="submit" class="btn btn--primary btn-sm" id="gov-dir-add-btn-governments"><span
-                      class="lang-en">Add</span><span class="lang-ar">إضافة</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm gov-dir-autofetch" data-cat="governments"
-                    title="Fill suggestions from web"><span class="lang-en">Auto-fetch from web</span><span
-                      class="lang-ar">جلب تلقائي من النت</span></button>
-                  <span class="gov-dir-fetch-status" id="gov-dir-status-governments" aria-live="polite"></span>
-                </div>
-              </form>
-              <ul class="dashboard-list" id="gov-dir-list-governments"></ul>
-            </div>
-            <div class="dashboard-gov-panel" data-cat="foreign">
-              <form class="dashboard-form dashboard-gov-form" id="gov-dir-form-foreign">
-                <input type="hidden" id="gov-dir-edit-index-foreign" value="" />
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Country</span><span
-                        class="lang-ar">الدولة</span></label><input type="text" id="gov-dir-country-foreign" required
-                      maxlength="100" placeholder="e.g. France" /></div>
-                  <div class="form-group"><label><span class="lang-en">Office name (EN)</span><span class="lang-ar">اسم
-                        المكتب</span></label><input type="text" id="gov-dir-name-en-foreign" maxlength="200"
-                      placeholder="Ministry of Foreign Affairs" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Office name (AR)</span><span class="lang-ar">اسم
-                        المكتب (عربي)</span></label><input type="text" id="gov-dir-name-ar-foreign" maxlength="200" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Direct phone(s)</span><span class="lang-ar">أرقام
-                        مباشرة</span></label><input type="text" id="gov-dir-phone-foreign" maxlength="300" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Email(s)</span><span
-                        class="lang-ar">إيميلات</span></label><input type="text" id="gov-dir-email-foreign"
-                      maxlength="500" /></div>
-                  <div class="form-group"><label><span class="lang-en">Website(s)</span><span
-                        class="lang-ar">مواقع</span></label><input type="text" id="gov-dir-website-foreign"
-                      maxlength="500" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Officials (names)</span><span
-                        class="lang-ar">أسماء
-                        المسؤولين</span></label><input type="text" id="gov-dir-officials-foreign" maxlength="400" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Who speaks daily online</span><span
-                        class="lang-ar">من يتحدث يومياً أونلاين</span></label><input type="text"
-                      id="gov-dir-daily-online-foreign" maxlength="300" /></div>
-                </div>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="submit" class="btn btn--primary btn-sm"><span class="lang-en">Add</span><span
-                      class="lang-ar">إضافة</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm gov-dir-autofetch" data-cat="foreign"><span
-                      class="lang-en">Auto-fetch from web</span><span class="lang-ar">جلب تلقائي من النت</span></button>
-                  <span class="gov-dir-fetch-status" id="gov-dir-status-foreign" aria-live="polite"></span>
-                </div>
-              </form>
-              <ul class="dashboard-list" id="gov-dir-list-foreign"></ul>
-            </div>
-            <div class="dashboard-gov-panel" data-cat="investment">
-              <form class="dashboard-form dashboard-gov-form" id="gov-dir-form-investment">
-                <input type="hidden" id="gov-dir-edit-index-investment" value="" />
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Country</span><span
-                        class="lang-ar">الدولة</span></label><input type="text" id="gov-dir-country-investment" required
-                      maxlength="100" placeholder="e.g. UAE" /></div>
-                  <div class="form-group"><label><span class="lang-en">Office name (EN)</span><span class="lang-ar">اسم
-                        المكتب</span></label><input type="text" id="gov-dir-name-en-investment" maxlength="200"
-                      placeholder="Ministry of Investment" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Office name (AR)</span><span class="lang-ar">اسم
-                        المكتب (عربي)</span></label><input type="text" id="gov-dir-name-ar-investment"
-                      maxlength="200" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Direct phone(s)</span><span class="lang-ar">أرقام
-                        مباشرة</span></label><input type="text" id="gov-dir-phone-investment" maxlength="300" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Email(s)</span><span
-                        class="lang-ar">إيميلات</span></label><input type="text" id="gov-dir-email-investment"
-                      maxlength="500" /></div>
-                  <div class="form-group"><label><span class="lang-en">Website(s)</span><span
-                        class="lang-ar">مواقع</span></label><input type="text" id="gov-dir-website-investment"
-                      maxlength="500" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Officials (names)</span><span
-                        class="lang-ar">أسماء
-                        المسؤولين</span></label><input type="text" id="gov-dir-officials-investment" maxlength="400" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Who speaks daily online</span><span
-                        class="lang-ar">من يتحدث يومياً أونلاين</span></label><input type="text"
-                      id="gov-dir-daily-online-investment" maxlength="300" /></div>
-                </div>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="submit" class="btn btn--primary btn-sm"><span class="lang-en">Add</span><span
-                      class="lang-ar">إضافة</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm gov-dir-autofetch" data-cat="investment"><span
-                      class="lang-en">Auto-fetch from web</span><span class="lang-ar">جلب تلقائي من النت</span></button>
-                  <span class="gov-dir-fetch-status" id="gov-dir-status-investment" aria-live="polite"></span>
-                </div>
-              </form>
-              <ul class="dashboard-list" id="gov-dir-list-investment"></ul>
-            </div>
-            <div class="dashboard-gov-panel" data-cat="consulates">
-              <form class="dashboard-form dashboard-gov-form" id="gov-dir-form-consulates">
-                <input type="hidden" id="gov-dir-edit-index-consulates" value="" />
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Country</span><span
-                        class="lang-ar">الدولة</span></label><input type="text" id="gov-dir-country-consulates" required
-                      maxlength="100" placeholder="e.g. Germany" /></div>
-                  <div class="form-group"><label><span class="lang-en">Office name (EN)</span><span class="lang-ar">اسم
-                        القنصلية</span></label><input type="text" id="gov-dir-name-en-consulates" maxlength="200"
-                      placeholder="Consulate General" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Office name (AR)</span><span class="lang-ar">اسم
-                        المكتب (عربي)</span></label><input type="text" id="gov-dir-name-ar-consulates"
-                      maxlength="200" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Direct phone(s)</span><span class="lang-ar">أرقام
-                        مباشرة</span></label><input type="text" id="gov-dir-phone-consulates" maxlength="300" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Email(s)</span><span
-                        class="lang-ar">إيميلات</span></label><input type="text" id="gov-dir-email-consulates"
-                      maxlength="500" /></div>
-                  <div class="form-group"><label><span class="lang-en">Website(s)</span><span
-                        class="lang-ar">مواقع</span></label><input type="text" id="gov-dir-website-consulates"
-                      maxlength="500" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Officials (names)</span><span
-                        class="lang-ar">أسماء
-                        المسؤولين</span></label><input type="text" id="gov-dir-officials-consulates" maxlength="400" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Who speaks daily online</span><span
-                        class="lang-ar">من يتحدث يومياً أونلاين</span></label><input type="text"
-                      id="gov-dir-daily-online-consulates" maxlength="300" /></div>
-                </div>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="submit" class="btn btn--primary btn-sm"><span class="lang-en">Add</span><span
-                      class="lang-ar">إضافة</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm gov-dir-autofetch" data-cat="consulates"><span
-                      class="lang-en">Auto-fetch from web</span><span class="lang-ar">جلب تلقائي من النت</span></button>
-                  <span class="gov-dir-fetch-status" id="gov-dir-status-consulates" aria-live="polite"></span>
-                </div>
-              </form>
-              <ul class="dashboard-list" id="gov-dir-list-consulates"></ul>
-            </div>
-            <div class="dashboard-gov-panel" data-cat="commercial">
-              <form class="dashboard-form dashboard-gov-form" id="gov-dir-form-commercial">
-                <input type="hidden" id="gov-dir-edit-index-commercial" value="" />
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Country</span><span
-                        class="lang-ar">الدولة</span></label><input type="text" id="gov-dir-country-commercial" required
-                      maxlength="100" placeholder="e.g. UK" /></div>
-                  <div class="form-group"><label><span class="lang-en">Office name (EN)</span><span class="lang-ar">اسم
-                        الملحقية</span></label><input type="text" id="gov-dir-name-en-commercial" maxlength="200"
-                      placeholder="Commercial Section" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Office name (AR)</span><span class="lang-ar">اسم
-                        المكتب (عربي)</span></label><input type="text" id="gov-dir-name-ar-commercial"
-                      maxlength="200" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Direct phone(s)</span><span class="lang-ar">أرقام
-                        مباشرة</span></label><input type="text" id="gov-dir-phone-commercial" maxlength="300" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Email(s)</span><span
-                        class="lang-ar">إيميلات</span></label><input type="text" id="gov-dir-email-commercial"
-                      maxlength="500" /></div>
-                  <div class="form-group"><label><span class="lang-en">Website(s)</span><span
-                        class="lang-ar">مواقع</span></label><input type="text" id="gov-dir-website-commercial"
-                      maxlength="500" /></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label><span class="lang-en">Officials (names)</span><span
-                        class="lang-ar">أسماء
-                        المسؤولين</span></label><input type="text" id="gov-dir-officials-commercial" maxlength="400" />
-                  </div>
-                  <div class="form-group"><label><span class="lang-en">Who speaks daily online</span><span
-                        class="lang-ar">من يتحدث يومياً أونلاين</span></label><input type="text"
-                      id="gov-dir-daily-online-commercial" maxlength="300" /></div>
-                </div>
-                <div style="display:flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;">
-                  <button type="submit" class="btn btn--primary btn-sm"><span class="lang-en">Add</span><span
-                      class="lang-ar">إضافة</span></button>
-                  <button type="button" class="btn btn--ghost btn-sm gov-dir-autofetch" data-cat="commercial"><span
-                      class="lang-en">Auto-fetch from web</span><span class="lang-ar">جلب تلقائي من النت</span></button>
-                  <span class="gov-dir-fetch-status" id="gov-dir-status-commercial" aria-live="polite"></span>
-                </div>
-              </form>
-              <ul class="dashboard-list" id="gov-dir-list-commercial"></ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- نافذة تقرير تحليل الدولة المفصل -->
-        <div class="dashboard-report-overlay" id="gov-report-overlay" aria-hidden="true" style="display: none;">
-          <div class="dashboard-report-modal">
-            <div class="dashboard-report-modal__head">
-              <h3 class="lang-en">Country analysis report</h3>
-              <h3 class="lang-ar">تقرير تحليل الدولة</h3>
-              <button type="button" class="auth-modal__close" id="gov-report-close" aria-label="Close">&times;</button>
-            </div>
-            <div class="dashboard-report-modal__loading" id="gov-report-loading">
-              <p class="lang-en">Building report from online sources…</p>
-              <p class="lang-ar">جاري بناء التقرير من مصادر أونلاين…</p>
-            </div>
-            <div class="dashboard-report-modal__body" id="gov-report-body" style="display: none;"></div>
-          </div>
-        </div>
-
-        <!-- نافذة الترجمة — للخطابات (صلاحية: كاتب الخطاب + الإدمن) -->
-        <div class="translate-modal-overlay" id="translate-modal-overlay"
-          style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; flex-direction: column;">
-          <div class="translate-modal"
-            style="background: var(--color-surface); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); max-width: 560px; width: 90%; max-height: 85vh; overflow: auto; padding: var(--space-6);">
-            <h4 style="margin-bottom: var(--space-4);"><span class="lang-en">Translate letter</span><span
-                class="lang-ar">ترجمة الخطاب</span></h4>
-            <div class="form-group" style="margin-bottom: var(--space-3);">
-              <label><span class="lang-en">Target language</span><span class="lang-ar">اللغة المستهدفة</span></label>
-              <select id="translate-target-lang">
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-                <option value="it">Italiano</option>
-                <option value="ru">Русский</option>
-                <option value="zh">中文</option>
-                <option value="tr">Türkçe</option>
-                <option value="ur">اردو</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: var(--space-3);">
-              <button type="button" class="btn btn--primary" id="translate-do-btn"><span
-                  class="lang-en">Translate</span><span class="lang-ar">ترجمة</span></button>
-              <span id="translate-status"
-                style="margin-left: 0.5rem; font-size: 0.85rem; color: var(--color-text-muted);"></span>
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">Translated text</span><span class="lang-ar">النص المترجم</span></label>
-              <textarea id="translate-result" rows="8" class="letterhead-input-luxury" readonly
-                style="background: rgba(255,255,255,0.05);"></textarea>
-              <button type="button" class="btn btn--primary btn-sm" id="translate-use-btn"
-                style="margin-top: 0.5rem;"><span class="lang-en">Use this text in letter</span><span
-                  class="lang-ar">استخدام هذا النص في الخطاب</span></button>
-            </div>
-            <button type="button" class="btn btn--ghost" id="translate-close-btn"><span
-                class="lang-en">Close</span><span class="lang-ar">إغلاق</span></button>
-          </div>
-        </div>
-
-        <!-- أنظمة الأعمال والاشتراطات حسب الدولة -->
-        <div class="dashboard-letters" id="dashboard-business-systems">
-          <h3 class="dashboard-letters__title lang-en">Business systems &amp; requirements by country</h3>
-          <h3 class="dashboard-letters__title lang-ar">أنظمة الأعمال والاشتراطات حسب الدولة</h3>
-          <p class="dashboard-letters__intro lang-en">Add or edit business regulations and requirements per country.
-            Shown
-            in the public "Business systems" section.</p>
-          <p class="dashboard-letters__intro lang-ar">إضافة أو تعديل أنظمة الأعمال والاشتراطات لكل دولة. تظهر في القسم
-            العام «أنظمة الأعمال».</p>
-          <div class="form-row">
-            <div class="form-group">
-              <label><span class="lang-en">Country</span><span class="lang-ar">الدولة</span></label>
-              <input type="text" id="business-country" placeholder="e.g. France" maxlength="80" />
-            </div>
-            <div class="form-group">
-              <label><span class="lang-en">Business systems &amp; requirements (summary)</span><span
-                  class="lang-ar">أنظمة
-                  الأعمال والاشتراطات (ملخص)</span></label>
-              <textarea id="business-requirements" rows="3" maxlength="2000" placeholder=""></textarea>
-            </div>
-            <div class="form-group" style="display:flex;align-items:flex-end;">
-              <button type="button" class="btn btn--primary btn-sm" id="business-add-btn"><span class="lang-en">Add /
-                  Update</span><span class="lang-ar">إضافة / تحديث</span></button>
-            </div>
-          </div>
-          <ul class="dashboard-list" id="dashboard-business-list"></ul>
-        </div>
-
-        <!-- تحليل المشاريع المستلمة — معلومات كاملة + جهة مسؤولة، أنظمة عمل، مالية، ضمان سيادي، أمن، مخاطر -->
-        <div class="dashboard-letters" id="dashboard-project-analysis">
-          <h3 class="dashboard-letters__title lang-en">Project analysis — received submissions</h3>
-          <h3 class="dashboard-letters__title lang-ar">تحليل المشاريع المستلمة</h3>
-          <p class="dashboard-letters__intro lang-en">For each received project (contact, investor, financing, upload):
-            view submitter info, country, and fill analysis (responsible authority, work regulations, financial center,
-            debt, sovereign guarantee, security, economic analysis, risks). Generate report and email.</p>
-          <p class="dashboard-letters__intro lang-ar">لكل مشروع مستلم (تواصل، مستثمر، تمويل، رفع): عرض معلومات مقدم
-            الطلب
-            والدولة وتعبئة التحليل (الجهة المسؤولة، أنظمة العمل، المركز المالي، المديونيات، ضمان سيادي، الوضع الأمني،
-            التحليل الاقتصادي، المخاطر). إنشاء تقرير وإرسال بالبريد.</p>
-          <ul class="dashboard-list" id="dashboard-project-analysis-list"></ul>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <!-- Calculator overlay — تظهر عند طلب المستخدم فقط -->
-  <div class="calc-overlay" id="calc-overlay" aria-hidden="true">
-    <div class="calc-modal">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-4);">
-        <h2 class="lang-en">Calculator</h2>
-        <h2 class="lang-ar">حاسبة</h2>
-        <button type="button" class="auth-modal__close" id="calc-close" aria-label="Close">&times;</button>
-      </div>
-      <p class="lang-en" style="margin-bottom: var(--space-4); font-size: 0.9rem; color: var(--color-text-muted);">
-        Simple calculator for quick computations.</p>
-      <p class="lang-ar" style="margin-bottom: var(--space-4); font-size: 0.9rem; color: var(--color-text-muted);">حاسبة
-        بسيطة للحسابات السريعة.</p>
-      <div class="calc-wrap">
-        <div class="calc-display" id="calc-display" aria-live="polite" aria-label="Calculator result">0</div>
-        <div class="calc-btns">
-          <button type="button" class="calc-btn calc-btn--op" data-calc="C" aria-label="Clear">C</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="±" aria-label="Toggle sign">±</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="%" aria-label="Percent">%</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="/" aria-label="Divide">/</button>
-          <button type="button" class="calc-btn" data-calc="7">7</button>
-          <button type="button" class="calc-btn" data-calc="8">8</button>
-          <button type="button" class="calc-btn" data-calc="9">9</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="*" aria-label="Multiply">×</button>
-          <button type="button" class="calc-btn" data-calc="4">4</button>
-          <button type="button" class="calc-btn" data-calc="5">5</button>
-          <button type="button" class="calc-btn" data-calc="6">6</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="-" aria-label="Subtract">−</button>
-          <button type="button" class="calc-btn" data-calc="1">1</button>
-          <button type="button" class="calc-btn" data-calc="2">2</button>
-          <button type="button" class="calc-btn" data-calc="3">3</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="+" aria-label="Add">+</button>
-          <button type="button" class="calc-btn" data-calc="0">0</button>
-          <button type="button" class="calc-btn" data-calc="." aria-label="Decimal point">.</button>
-          <button type="button" class="calc-btn calc-btn--eq" data-calc="=" aria-label="Equals">=</button>
-          <button type="button" class="calc-btn calc-btn--op" data-calc="+" aria-label="Add"
-            style="visibility:hidden;">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <script src="js/iif-static-host-banner.js" defer></script>
-  <script src="i18n-service-packs-all.js" defer></script>
-  <script src="i18n.js" defer></script>
-  <script src="js/iif-lang-combobox.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"
-    defer></script>
-  <script src="js/site-header-inner-newtab.js"></script>
-  <script src="js/iif-same-page-hash-nav.js"></script>
-  <script src="js/iif-header-links-toggle.js"></script>
-  <script src="js/iif-first-load-shell.js"></script>
-  <script nonce="iif2026">
     (function () {
       /* إعدادات مركزية — موقع دولي، أعضاء مهمون، لا مجال لمحاولات فاشلة */
       window.IIF_CONFIG = {
         siteRegion: 'international',
         defaultLang: 'en',
+        /**
+         * External booking (Calendly, Microsoft Bookings, etc.). When set to an http(s) URL, the hero
+         * «Schedule a session» button opens it in a new tab; otherwise it scrolls to #contact.
+         */
+        bookingUrl: null,
+        /**
+         * نموذج اتصل بنا: عنوان https يستقبل POST (FormData). يتجاوز meta iif-contact-form-endpoint إن عُيّن هنا.
+         * مثال Formspree: https://formspree.io/f/xxxxxxxx
+         */
+        contactFormEndpoint: null,
+        /**
+         * دردشة مباشرة (Tawk وغيره): رابط سكربت خارجي يُحمّل بشكل غير متزامن.
+         * مثال Tawk: الصق سكربت المزوّد في الصفحة أو ضع رابط ملف .js هنا إن كان متاحاً كـ URL.
+         * اتركه null حتى يتوفر فريق للرد — يبقى زر التواصل السريع يوجّه لـ #contact.
+         */
+        liveChatScriptUrl: null,
+        /** زر دائري سريع لـ #contact — عطّله إذا أردت إخفاءه بعد تفعيل الدردشة */
+        showQuickContactFab: true,
         /** إخفاء زر «لوحة التحكم» من الهيدر (لا يزال الدخول يتطلب تسجيل دخول + صلاحية) */
         hideDashboardNavButton: true,
         /**
@@ -11510,6 +42,23 @@
         /** إذا كان dashboardSecretHash معبّأ: السماح أيضاً بـ #dashboard للتوافق (false = تعطيل الرابط العام) */
         dashboardAllowLegacyHash: true,
         langStorageKey: 'iif-lang',
+        /**
+         * ترجمة الصفحة عبر Google للغات بلا قاموس كامل في i18n.js.
+         * بدون Google للغات ذات الحزم الواسعة: en, ar, fr, de, it, es, tr, fa, he, ur, ko, id, ms, zh, pt, ru, ja, hi (انظر importantLocales15).
+         * عطّلها (false) إذا منعت السياسة الاتصال بـ translate.google.com أو ملفات تعريف الارتباط.
+         */
+        machineTranslate: true,
+        /**
+         * أولوية توسيع الحزم اليدوية في i18n.js لاستقطاب المستثمرين (نفس رموز القائمة).
+         * fa, he, ur = RTL · ko, id, ms = LTR. غيّر الترتيب حسب السوق المستهدف.
+         */
+        investorLocalesPriority: ['fa', 'he', 'ur', 'ko', 'id', 'ms'],
+        /** اللغات الخمس عشر ذات الأولوية للتغطية اليدوية (نفس رموز i18n.js) */
+        importantLocales15: ['en', 'ar', 'zh', 'es', 'fr', 'de', 'pt', 'ru', 'ja', 'ko', 'it', 'tr', 'hi', 'fa', 'he'],
+        /**
+         * SEO متعدد اللغات: i18n.js يحقن وسوم link rel="alternate" hreflang لهذه القائمة مع ?lang=رمز
+         * (الرابط الأساسي canonical يبقى بلا معامل). اللغة الافتراضية defaultLang تُزال من شريط العنوان.
+         */
         storageKeys: {
           loggedIn: 'iif-logged-in',
           isAdmin: 'iif-is-admin',
@@ -11571,6 +120,24 @@
         }
       };
 
+      document.addEventListener('DOMContentLoaded', function () {
+        var cfg = window.IIF_CONFIG || {};
+        var raw = cfg.bookingUrl;
+        var url = (raw != null && String(raw).trim()) ? String(raw).trim() : '';
+        var a = document.getElementById('iif-booking-cta');
+        if (!a) return;
+        if (/^https?:\/\//i.test(url)) {
+          a.setAttribute('href', url);
+          a.setAttribute('target', '_blank');
+          a.setAttribute('rel', 'noopener noreferrer');
+        } else {
+          a.setAttribute('href', '#contact');
+          a.removeAttribute('target');
+          a.removeAttribute('rel');
+        }
+      });
+
+      /** داخل الـ IIFE فقط — تفوّض إلى الدوال المُصدَّرة على window بعد التحميل (تجنّب تعارض مع اسم عام غير قابل للاستبدال) */
       function openDashboardEnhanced() {
         var fn = window.IIF_openDashboard || window.openDashboard;
         if (typeof fn === 'function') return fn();
@@ -11613,6 +180,10 @@
         uploadStatusDismiss: 2500
       };
 
+      /**
+       * تمرير موثوق تحت الهيدر اللاصق: داخل #dashboard-overlay يُحسب الإزاحة من شريط اللوحة؛
+       * في الصفحة العامة من أول header.site-header ظاهر أو --header-height (scrollIntoView يتجاهل scroll-padding أحياناً).
+       */
       window.IIF_scrollIntoViewClearHeader = function (el, opts) {
         opts = opts || {};
         var behavior = opts.behavior === 'smooth' ? 'smooth' : 'auto';
@@ -11695,6 +266,7 @@
         } catch (e) { }
       };
 
+      /** مسار صريح للوحة: معاملات URL أو pending — الرئيسية بدونها لا تفتح اللوحة تلقائياً */
       function iifExplicitDashboardEntryIntent() {
         try {
           var sp = new URLSearchParams(window.location.search || '');
@@ -11775,8 +347,7 @@
               if (showErrors) {
                 var msg = document.createElement('span');
                 msg.className = 'field-error-msg';
-                var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-                msg.textContent = isAr ? 'مطلوب أو غير صحيح' : 'Required or invalid';
+                msg.textContent = typeof window.iifMessage === 'function' ? window.iifMessage('fieldRequiredInvalid') : (document.documentElement.getAttribute('data-lang') === 'ar' ? 'مطلوب أو غير صحيح' : 'Required or invalid');
                 group.appendChild(msg);
               }
             }
@@ -11859,7 +430,7 @@
       /* تخزين آمن — تشفير بيانات المستخدم في المتصفح (كما في المواقع العالمية)، يعمل على جميع الأجهزة والمتصفحات */
       (function initSecureStorage() {
         var SECURE_BLOB_KEY = 'iif-secure-v1';
-        var SENSITIVE_EXACT = ['iif-user-email', 'iif-user-name', 'iif-user-phone', 'iif-user-entity', 'iif-user-country', 'iif-user-dob', 'iif-is-admin', 'iif-device-bound-email', 'iif-membership-registry', 'iif-membership-certificates', 'iif-user-definition-en', 'iif-user-definition-ar', 'iif-terms-accepted', 'iif-membership-reminders-sent', 'iif-webauthn-credential', 'iif-user-credentials', 'iif-admin-password-plain', 'iif-exclusion-archive'];
+        var SENSITIVE_EXACT = ['iif-user-email', 'iif-user-name', 'iif-user-phone', 'iif-user-entity', 'iif-user-country', 'iif-user-dob', 'iif-is-admin', 'iif-device-bound-email', 'iif-membership-registry', 'iif-membership-certificates', 'iif-user-definition-en', 'iif-user-definition-ar', 'iif-terms-accepted', 'iif-membership-reminders-sent', 'iif-webauthn-credential', 'iif-user-credentials', 'iif-admin-password-plain', 'iif-exclusion-archive', 'iif-perm-service-forms'];
         var SENSITIVE_PREFIXES = ['iif-membership-start-', 'iif-membership-expiry-', 'iif-cert-photo-', 'iif-cert-logo-', 'iif-cert-flag-'];
         function isSensitiveKey(key) {
           if (!key || typeof key !== 'string') return false;
@@ -12062,13 +633,76 @@
         }
       }
       window.IIF_restartTickerMarquees = iifRestartTickerMarquees;
+      /** نص من i18n.js حسب اللغة الحالية؛ fallback عند غياب المفتاح أو قبل تحميل IIF_I18N */
+      function iifT(key, fallback) {
+        try {
+          if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+            var s = window.IIF_I18N.text(key);
+            if (s) return s;
+          }
+        } catch (eIifT) { }
+        return fallback != null ? String(fallback) : '';
+      }
+      /** بعد تغيير اللغة: إعادة نص قوة كلمة المرور، التطابق، وتسميات أزرار الإظهار/الإخفاء */
+      function refreshAuthPasswordI18n() {
+        try {
+          var regPwStrengthEl = document.getElementById('reg-password-strength');
+          var regPwInput = document.getElementById('reg-password');
+          if (regPwStrengthEl && regPwInput) {
+            if (regPwInput.value && typeof getPasswordStrengthLabel === 'function') {
+              var r = getPasswordStrengthLabel(regPwInput.value);
+              regPwStrengthEl.textContent = r.text;
+              regPwStrengthEl.className = 'auth-password-strength auth-password-strength--' + (r.level || '');
+            } else {
+              regPwStrengthEl.textContent = '';
+              regPwStrengthEl.className = 'auth-password-strength';
+            }
+          }
+          var regPw2MatchEl = document.getElementById('reg-password2-match');
+          var regPw2Input = document.getElementById('reg-password2');
+          if (regPw2MatchEl && regPw2Input) {
+            var p1 = regPwInput ? regPwInput.value : '';
+            var p2 = regPw2Input.value;
+            if (!p2) {
+              regPw2MatchEl.textContent = '';
+              regPw2MatchEl.className = 'auth-password-strength';
+            } else if (p1 === p2) {
+              regPw2MatchEl.textContent = typeof iifMessage === 'function' ? iifMessage('pwMatch') : '';
+              regPw2MatchEl.className = 'auth-password-strength auth-password-strength--match';
+            } else {
+              regPw2MatchEl.textContent = typeof iifMessage === 'function' ? iifMessage('pwNoMatch') : '';
+              regPw2MatchEl.className = 'auth-password-strength auth-password-strength--mismatch';
+            }
+          }
+          function syncPwToggle(btnId, inpId) {
+            var btn = document.getElementById(btnId);
+            var inp = document.getElementById(inpId);
+            if (!btn || !inp || typeof iifMessage !== 'function') return;
+            if (inp.type === 'password') {
+              btn.setAttribute('aria-label', iifMessage('pwToggleShowAria'));
+              btn.title = iifMessage('pwToggleShowTitle');
+              btn.textContent = iifMessage('pwToggleShow');
+            } else {
+              btn.setAttribute('aria-label', iifMessage('pwToggleHideAria'));
+              btn.title = iifMessage('pwToggleHideTitle');
+              btn.textContent = iifMessage('pwToggleHide');
+            }
+          }
+          syncPwToggle('reg-password-toggle', 'reg-password');
+          syncPwToggle('reg-password2-toggle', 'reg-password2');
+          syncPwToggle('login-password-toggle', 'login-password');
+        } catch (ePwLang) { }
+      }
       function applyLangToDocument(lang) {
         var l = (typeof lang === 'string' ? lang : '').trim().toLowerCase() || DEFAULT_LANG;
         var root = document.documentElement;
         if (root) {
           root.setAttribute('data-lang', l);
-          root.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
-          root.setAttribute('lang', l === 'ar' ? 'ar' : (l === 'en' ? 'en' : 'en'));
+          /* عند وجود IIF_I18N: السكربت i18n.js يضبط dir وlang من جدول اللغات (50+) — لا نعيد كتابتهما هنا */
+          if (!window.IIF_I18N) {
+            root.setAttribute('dir', l === 'ar' ? 'rtl' : 'ltr');
+            root.setAttribute('lang', l === 'ar' ? 'ar' : 'en');
+          }
         }
         try { localStorage.setItem(LANG_STORAGE_KEY, l); } catch (e) { }
         var isAr = (l === 'ar');
@@ -12084,6 +718,71 @@
             renderDashboardExclusionArchive();
           }
         } catch (eLangEx) { }
+        try {
+          if (typeof window.IIF_updateVerificationToggleLabel === 'function') window.IIF_updateVerificationToggleLabel();
+        } catch (eVerifLbl) { }
+        try {
+          var dashOvLang = document.getElementById('dashboard-overlay');
+          if (dashOvLang && dashOvLang.classList.contains('is-open') && typeof window.IIF_refreshDashboardLists === 'function') {
+            window.IIF_refreshDashboardLists();
+            if (typeof GOV_DIR_CATS !== 'undefined' && Array.isArray(GOV_DIR_CATS) && typeof renderGovDirList === 'function') {
+              GOV_DIR_CATS.forEach(function (gc) { renderGovDirList(gc); });
+            }
+            if (window.IIF_I18N && typeof window.IIF_I18N.apply === 'function') {
+              window.IIF_I18N.apply(l);
+            }
+          }
+        } catch (eDashLang) { }
+        try {
+          if (typeof refreshAuthPasswordI18n === 'function') refreshAuthPasswordI18n();
+        } catch (eAuthPwLang) { }
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ source: 'iif-site', type: 'iif-lang-changed', lang: l }, '*');
+          }
+        } catch (ePm) { }
+      }
+      function runAfterLanguageSwitchUI(v) {
+        var l = (typeof v === 'string' ? v : '').trim().toLowerCase() || DEFAULT_LANG;
+        if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
+        if (typeof updateDashboardNav === 'function') updateDashboardNav();
+        if (typeof updateRegPhoneCodeLabels === 'function') updateRegPhoneCodeLabels();
+        if (typeof window.IIF_siteClockTick === 'function') window.IIF_siteClockTick();
+        if (typeof window.IIF_backToTopSync === 'function') window.IIF_backToTopSync();
+        var ad = document.getElementById('about-dropdown');
+        var sd = document.getElementById('services-dropdown');
+        var md = document.getElementById('more-dropdown');
+        if (typeof window.IIF_clampNavDropdown === 'function') {
+          if (ad && ad.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(ad);
+          if (sd && sd.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(sd);
+          if (md && md.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(md);
+        }
+      }
+      function syncLanguageDependentChrome(v) {
+        var l = (typeof v === 'string' ? v : '').trim().toLowerCase() || DEFAULT_LANG;
+        applyLangToDocument(l);
+        runAfterLanguageSwitchUI(l);
+      }
+      window.addEventListener('iif-lang-change', function (ev) {
+        try {
+          var d = ev && ev.detail;
+          var l = d && d.lang;
+          l = (typeof l === 'string' ? l : '').trim().toLowerCase() || DEFAULT_LANG;
+          syncLanguageDependentChrome(l);
+        } catch (eIifLangEv) { }
+      });
+      function iifSyncLangQueryParam(lang) {
+        try {
+          if (typeof URL === 'undefined' || typeof history === 'undefined' || !history.replaceState) return;
+          var l = (typeof lang === 'string' ? lang : '').trim().toLowerCase() || DEFAULT_LANG;
+          var def = (window.IIF_CONFIG && window.IIF_CONFIG.defaultLang) ? String(window.IIF_CONFIG.defaultLang).trim().toLowerCase() : 'en';
+          var u = new URL(window.location.href);
+          if (l && l !== def) u.searchParams.set('lang', l);
+          else u.searchParams.delete('lang');
+          var next = u.pathname + u.search + u.hash;
+          var cur = window.location.pathname + window.location.search + window.location.hash;
+          if (next !== cur) history.replaceState({}, '', next);
+        } catch (eSyncUrl) { }
       }
       function initDashboardLangPickerSync() {
         var mainEl = document.getElementById('iif-lang-picker');
@@ -12141,7 +840,7 @@
               m.dispatchEvent(new Event('change', { bubbles: true }));
             } else if (window.IIF_I18N && typeof IIF_I18N.apply === 'function') {
               IIF_I18N.apply(v);
-              if (typeof applyLangToDocument === 'function') applyLangToDocument(v);
+              if (typeof iifSyncLangQueryParam === 'function') iifSyncLangQueryParam(v);
             }
           });
           window.addEventListener('iif-lang-change', function () {
@@ -12157,11 +856,18 @@
             try { window.IIF_fillLangSelectFromI18n(picker); } catch (eFill) { }
           }
           var lang = '';
-          try { lang = localStorage.getItem(LANG_STORAGE_KEY) || ''; } catch (e) { }
+          var params = new URLSearchParams(window.location.search || '');
+          var qLang = (params.get('lang') || '').trim().toLowerCase();
+          if (qLang && IIF_I18N.codes && IIF_I18N.codes.indexOf(qLang) >= 0) {
+            lang = qLang;
+          } else {
+            try { lang = (localStorage.getItem(LANG_STORAGE_KEY) || '').trim().toLowerCase(); } catch (e) { }
+          }
           if (!lang) lang = IIF_I18N.detect();
           lang = (typeof lang === 'string' ? lang : '').trim().toLowerCase() || DEFAULT_LANG;
+          if (!IIF_I18N.codes || IIF_I18N.codes.indexOf(lang) < 0) lang = DEFAULT_LANG;
           IIF_I18N.apply(lang);
-          applyLangToDocument(lang);
+          iifSyncLangQueryParam(lang);
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
               if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
@@ -12173,30 +879,22 @@
             picker.addEventListener('change', function () {
               var v = (this.value || '').trim().toLowerCase() || DEFAULT_LANG;
               IIF_I18N.apply(v);
-              applyLangToDocument(v);
+              iifSyncLangQueryParam(v);
               if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
               if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
-              if (typeof updateDashboardNav === 'function') updateDashboardNav();
-              if (typeof updateRegPhoneCodeLabels === 'function') updateRegPhoneCodeLabels();
-              if (typeof window.IIF_siteClockTick === 'function') window.IIF_siteClockTick();
-              if (typeof window.IIF_backToTopSync === 'function') window.IIF_backToTopSync();
-              var ad = document.getElementById('about-dropdown');
-              var sd = document.getElementById('services-dropdown');
-              var md = document.getElementById('more-dropdown');
-              if (typeof window.IIF_clampNavDropdown === 'function') {
-                if (ad && ad.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(ad);
-                if (sd && sd.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(sd);
-                if (md && md.getAttribute('aria-hidden') === 'false') window.IIF_clampNavDropdown(md);
-              }
             });
           }
           IIF_I18N.initSearch();
         } else {
           var saved = '';
-          try { saved = (localStorage.getItem(LANG_STORAGE_KEY) || '').trim().toLowerCase(); } catch (e) { }
+          var p2 = new URLSearchParams(window.location.search || '');
+          var q2 = (p2.get('lang') || '').trim().toLowerCase();
+          if (q2) saved = q2;
+          else { try { saved = (localStorage.getItem(LANG_STORAGE_KEY) || '').trim().toLowerCase(); } catch (e) { } }
           var langToUse = (saved || DEFAULT_LANG).toLowerCase();
           if (!picker || !picker.querySelector('option[value="' + langToUse + '"]')) langToUse = DEFAULT_LANG;
           applyLangToDocument(langToUse);
+          iifSyncLangQueryParam(langToUse);
           requestAnimationFrame(function () {
             requestAnimationFrame(function () {
               if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
@@ -12208,6 +906,7 @@
             picker.addEventListener('change', function () {
               var v = (this.value || '').trim().toLowerCase() || DEFAULT_LANG;
               applyLangToDocument(v);
+              iifSyncLangQueryParam(v);
               if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
               if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
               if (typeof updateDashboardNav === 'function') updateDashboardNav();
@@ -12226,6 +925,30 @@
           }
         }
         if (typeof updateDashboardNav === 'function') updateDashboardNav();
+        try {
+          var host = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname).toLowerCase() : '';
+          var isLocal = host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+          var isGhPages = host.endsWith('.github.io');
+          var searxMeta = document.querySelector && document.querySelector('meta[name="iif-searx-public-url"]');
+          var searxPublic = (searxMeta && searxMeta.getAttribute('content') || '').trim();
+          document.querySelectorAll('[data-local-only="1"]').forEach(function (el) {
+            if (isLocal) {
+              el.style.display = 'inline-flex';
+              return;
+            }
+            if (isGhPages && searxPublic && /^https?:\/\//i.test(searxPublic)) {
+              el.style.display = 'inline-flex';
+              el.setAttribute('href', searxPublic);
+              el.setAttribute('target', '_blank');
+              el.setAttribute('rel', 'noopener noreferrer');
+              return;
+            }
+            el.style.display = 'none';
+          });
+          document.querySelectorAll('[data-iif-google-search="1"]').forEach(function (gEl) {
+            gEl.style.display = isLocal || isGhPages ? 'inline-flex' : 'none';
+          });
+        } catch (eLocalOnly) { }
         try {
           initDashboardLangPickerSync();
         } catch (eDashLangPick) { }
@@ -12312,7 +1035,7 @@
             btn.removeAttribute('hidden');
             btn.setAttribute('aria-hidden', 'false');
             var ar = document.documentElement.getAttribute('data-lang') === 'ar';
-            var label = ar ? 'العودة لأعلى الصفحة' : 'Back to top of page';
+            var label = ar ? 'أعلى الصفحة' : 'Top of page';
             btn.setAttribute('aria-label', label);
             btn.setAttribute('title', label);
           } else {
@@ -12506,7 +1229,7 @@
       /* اعرف عميلك — قائمة جميع الدول لخيار دولة الإقامة */
       var KYC_COUNTRIES = 'AF=Afghanistan,AL=Albania,DZ=Algeria,AD=Andorra,AO=Angola,AG=Antigua and Barbuda,AR=Argentina,AM=Armenia,AU=Australia,AT=Austria,AZ=Azerbaijan,BS=Bahamas,BH=Bahrain,BD=Bangladesh,BB=Barbados,BY=Belarus,BE=Belgium,BZ=Belize,BJ=Benin,BT=Bhutan,BO=Bolivia,BA=Bosnia and Herzegovina,BW=Botswana,BR=Brazil,BN=Brunei,BG=Bulgaria,BF=Burkina Faso,BI=Burundi,KH=Cambodia,CM=Cameroon,CA=Canada,CV=Cape Verde,CF=Central African Republic,TD=Chad,CL=Chile,CN=China,CO=Colombia,KM=Comoros,CG=Congo,CR=Costa Rica,HR=Croatia,CU=Cuba,CY=Cyprus,CZ=Czech Republic,DK=Denmark,DJ=Djibouti,DM=Dominica,DO=Dominican Republic,EC=Ecuador,EG=Egypt,SV=El Salvador,GQ=Equatorial Guinea,ER=Eritrea,EE=Estonia,SZ=Eswatini,ET=Ethiopia,FJ=Fiji,FI=Finland,FR=France,GA=Gabon,GM=Gambia,GE=Georgia,DE=Germany,GH=Ghana,GR=Greece,GD=Grenada,GT=Guatemala,GN=Guinea,GW=Guinea-Bissau,GY=Guyana,HT=Haiti,HN=Honduras,HU=Hungary,IS=Iceland,IN=India,ID=Indonesia,IR=Iran,IQ=Iraq,IE=Ireland,IL=Israel,IT=Italy,JM=Jamaica,JP=Japan,JO=Jordan,KZ=Kazakhstan,KE=Kenya,KI=Kiribati,KP=North Korea,KR=South Korea,KW=Kuwait,KG=Kyrgyzstan,LA=Laos,LV=Latvia,LB=Lebanon,LS=Lesotho,LR=Liberia,LY=Libya,LI=Liechtenstein,LT=Lithuania,LU=Luxembourg,MG=Madagascar,MW=Malawi,MY=Malaysia,MV=Maldives,ML=Mali,MT=Malta,MH=Marshall Islands,MR=Mauritania,MU=Mauritius,MX=Mexico,FM=Micronesia,MD=Moldova,MC=Monaco,MN=Mongolia,ME=Montenegro,MA=Morocco,MZ=Mozambique,MM=Myanmar,NA=Namibia,NR=Nauru,NP=Nepal,NL=Netherlands,NZ=New Zealand,NI=Nicaragua,NE=Niger,NG=Nigeria,MK=North Macedonia,NO=Norway,OM=Oman,PK=Pakistan,PW=Palau,PS=Palestine,PA=Panama,PG=Papua New Guinea,PY=Paraguay,PE=Peru,PH=Philippines,PL=Poland,PT=Portugal,QA=Qatar,RO=Romania,RU=Russia,RW=Rwanda,KN=Saint Kitts and Nevis,LC=Saint Lucia,VC=Saint Vincent and the Grenadines,WS=Samoa,SM=San Marino,ST=Sao Tome and Principe,SA=Saudi Arabia,SN=Senegal,RS=Serbia,SC=Seychelles,SL=Sierra Leone,SG=Singapore,SK=Slovakia,SI=Slovenia,SB=Solomon Islands,SO=Somalia,ZA=South Africa,SS=South Sudan,ES=Spain,LK=Sri Lanka,SD=Sudan,SR=Suriname,SE=Sweden,CH=Switzerland,SY=Syria,TW=Taiwan,TJ=Tajikistan,TZ=Tanzania,TH=Thailand,TL=Timor-Leste,TG=Togo,TO=Tonga,TT=Trinidad and Tobago,TN=Tunisia,TR=Turkey,TM=Turkmenistan,TV=Tuvalu,UG=Uganda,UA=Ukraine,AE=United Arab Emirates,GB=United Kingdom,US=United States,UY=Uruguay,UZ=Uzbekistan,VU=Vanuatu,VA=Vatican City,VE=Venezuela,VN=Vietnam,YE=Yemen,ZM=Zambia,ZW=Zimbabwe,OTHER=Other'.split(',');
       (function fillKycCountries() {
-        var firstOpt = '<option value="">— Select / اختر —</option>';
+        var firstOpt = '<option value="" data-i18n="contactSelectPlaceholder">— Select —</option>';
         var opts = KYC_COUNTRIES.map(function (s) {
           var p = s.split('=');
           return '<option value="' + (p[0] || '').replace(/"/g, '&quot;') + '">' + (p[1] || '').replace(/</g, '&lt;') + '</option>';
@@ -12741,6 +1464,7 @@
         }
       })();
 
+      /* المزيد — روابط ثانوية في قائمة واحدة */
       (function initMoreDropdown() {
         var wrap = document.getElementById('more-dropdown-wrap');
         var trigger = document.getElementById('more-dropdown-trigger');
@@ -12781,6 +1505,7 @@
         }
       })();
 
+      /* إغلاق قوائم التنقل المنسدلة بمفتاح Escape وإعادة التركيز إلى الزر */
       (function initNavDropdownEscape() {
         var configs = [
           { wrap: 'about-dropdown-wrap', trigger: 'about-dropdown-trigger', menu: 'about-dropdown' },
@@ -12845,25 +1570,96 @@
         return typeof s === 'string' && re.test(s.trim());
       }
       function iifMessage(key) {
+        try {
+          if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+            var s0 = window.IIF_I18N.text(key);
+            if (s0 !== '') return s0;
+          }
+        } catch (eMsg) { }
         var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var m = (window.IIF_CONFIG && window.IIF_CONFIG.messages) ? IIF_CONFIG.messages : {};
         var k = key + (isAr ? 'Ar' : 'En');
-        return (m[k] != null && m[k] !== '') ? m[k] : (isAr ? 'يرجى التحقق من المدخلات.' : 'Please check your input.');
+        if (m[k] != null && m[k] !== '') return m[k];
+        try {
+          if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+            var fb = window.IIF_I18N.text('jsPleaseCheckInput');
+            if (fb !== '') return fb;
+          }
+        } catch (eFb) { }
+        return 'Please check your input.';
       }
-      function setLoggedIn(value) {
-        try { localStorage.setItem('iif-logged-in', value ? '1' : ''); } catch (e) { }
+      function iifMessageFmt(key, vars) {
+        var s = typeof iifMessage === 'function' ? iifMessage(key) : '';
+        if (!vars || !s) return s || '';
+        for (var vk in vars) {
+          if (Object.prototype.hasOwnProperty.call(vars, vk)) {
+            s = s.split('{' + vk + '}').join(String(vars[vk]));
+          }
+        }
+        return s;
+      }
+      try {
+        window.iifMessage = iifMessage;
+        window.iifMessageFmt = iifMessageFmt;
+      } catch (eWim) { }
+      function iifText(key, fallback) {
+        try {
+          if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+            var s = window.IIF_I18N.text(key);
+            if (s) return s;
+          }
+        } catch (eTxt) { }
+        return fallback != null ? String(fallback) : '';
+      }
+      function iifTextPair(key, fallbackEn, fallbackAr) {
+        var en = '';
+        var ar = '';
+        try {
+          if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+            en = window.IIF_I18N.text(key, 'en') || '';
+            ar = window.IIF_I18N.text(key, 'ar') || '';
+          }
+        } catch (ePair) { }
+        return {
+          en: en || (fallbackEn != null ? String(fallbackEn) : ''),
+          ar: ar || (fallbackAr != null ? String(fallbackAr) : '')
+        };
+      }
+      function iifBilingualSpans(key, fallbackEn, fallbackAr) {
+        var p = iifTextPair(key, fallbackEn, fallbackAr);
+        return '<span class="lang-en">' + escapeHtml(p.en) + '</span><span class="lang-ar">' + escapeHtml(p.ar) + '</span>';
+      }
+      function setLoggedIn(value, opts) {
+        opts = opts || {};
+        var v = value ? '1' : '';
+        var persist = opts.persist !== false; // default: persist in localStorage
+        try {
+          if (persist) localStorage.setItem('iif-logged-in', v);
+          else sessionStorage.setItem('iif-logged-in', v);
+        } catch (e) { }
+        try {
+          if (value) {
+            if (persist) sessionStorage.removeItem('iif-logged-in');
+            else localStorage.removeItem('iif-logged-in');
+          } else {
+            localStorage.removeItem('iif-logged-in');
+            sessionStorage.removeItem('iif-logged-in');
+          }
+        } catch (e2) { }
       }
       function isLoggedIn() {
         try {
-          var loggedIn = localStorage.getItem('iif-logged-in') === '1';
+          var loggedIn = localStorage.getItem('iif-logged-in') === '1' || sessionStorage.getItem('iif-logged-in') === '1';
           if (loggedIn) return true;
+          /* /admin-direct وغيره: قد يُضبط iif-is-admin مع البريد دون اكتمال مسار iif-logged-in */
           if (localStorage.getItem('iif-is-admin') === '1' && (localStorage.getItem('iif-user-email') || '').trim()) return true;
+          // تصحيح تلقائي: إذا كان البريد الإلكتروني للمالك موجوداً ولكن لم يتم تسجيل الدخول
           var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
           var ownerEmail = (window.IIF_CONFIG && window.IIF_CONFIG.ownerEmail) ? window.IIF_CONFIG.ownerEmail.toLowerCase() : 'talalkenani@gmail.com';
           if (email && typeof iifAuthEmailKey === 'function') {
             try {
               if (iifAuthEmailKey(email) === iifAuthEmailKey(ownerEmail)) {
-                setLoggedIn(true);
+                setLoggedIn(true, { persist: true });
                 var uiDelay = (window.IIF_TIMING && window.IIF_TIMING.ui) || 100;
                 setTimeout(function () {
                   if (typeof updateAuthUI === 'function') updateAuthUI();
@@ -12876,7 +1672,7 @@
           return false;
         } catch (e) {
           try {
-            return localStorage.getItem('iif-logged-in') === '1' || (localStorage.getItem('iif-is-admin') === '1' && !!(localStorage.getItem('iif-user-email') || '').trim());
+            return localStorage.getItem('iif-logged-in') === '1' || sessionStorage.getItem('iif-logged-in') === '1' || (localStorage.getItem('iif-is-admin') === '1' && !!(localStorage.getItem('iif-user-email') || '').trim());
           } catch (e2) {
             return false;
           }
@@ -13260,6 +2056,17 @@
       function getCertPhoto() {
         var keys = getAllCertImageKeys(CERT_PHOTO_KEY);
         for (var i = 0; i < keys.length; i++) { var v = localStorage.getItem(keys[i]) || ''; if (v) return v; }
+        try {
+          var em = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+          if (em) {
+            var raw = localStorage.getItem('iif-user-profile');
+            if (raw) {
+              var o = JSON.parse(raw);
+              var av = o[em] && o[em].avatarDataUrl;
+              if (typeof av === 'string' && av.trim().indexOf('data:image') === 0) return av.trim();
+            }
+          }
+        } catch (eAv) { }
         return '';
       }
       function getCertLogo() {
@@ -13279,18 +2086,28 @@
           if (e) { try { localStorage.setItem('iif-user-email', e); } catch (err) { } k = CERT_PHOTO_KEY + e; }
         }
         if (!k) {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'يجب تسجيل الدخول أولاً (البريد غير معروف).' : 'Please sign in first (email unknown).');
+          alert(iifMessage('signInFirstEmailUnknown'));
           return;
         }
         var keys = getAllCertImageKeys(CERT_PHOTO_KEY);
         try {
           for (var i = 0; i < keys.length; i++) localStorage.setItem(keys[i], dataUrl || '');
+          try {
+            var em2 = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+            if (em2) {
+              var rawP = localStorage.getItem('iif-user-profile');
+              var o2 = {};
+              try { o2 = rawP ? JSON.parse(rawP) : {}; } catch (eJ) { o2 = {}; }
+              if (!o2[em2]) o2[em2] = {};
+              if (dataUrl && String(dataUrl).indexOf('data:image') === 0) o2[em2].avatarDataUrl = dataUrl;
+              else delete o2[em2].avatarDataUrl;
+              localStorage.setItem('iif-user-profile', JSON.stringify(o2));
+            }
+          } catch (eMirror) { }
           if (typeof renderAboutTeam === 'function') renderAboutTeam();
           if (typeof renderPublicMembersList === 'function') renderPublicMembersList();
         } catch (e) {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'تعذر حفظ الصورة (مساحة التخزين ممتلئة أو الملف كبير جداً). جرّب صورة أصغر.' : 'Could not save photo (storage full or file too large). Try a smaller image.');
+          alert(iifMessage('photoSaveFailedStorage'));
         }
       }
       function setCertLogo(dataUrl) {
@@ -13302,8 +2119,7 @@
         if (!k) return;
         var keys = getAllCertImageKeys(CERT_LOGO_KEY);
         try { for (var i = 0; i < keys.length; i++) localStorage.setItem(keys[i], dataUrl || ''); } catch (e) {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'تعذر حفظ الشعار. جرّب صورة أصغر.' : 'Could not save logo. Try a smaller image.');
+          alert(iifMessage('logoSaveFailed'));
         }
       }
       function setCertFlag(dataUrl) {
@@ -13315,8 +2131,7 @@
         if (!k) return;
         var keys = getAllCertImageKeys(CERT_FLAG_KEY);
         try { for (var i = 0; i < keys.length; i++) localStorage.setItem(keys[i], dataUrl || ''); } catch (e) {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'تعذر حفظ العلم. جرّب صورة أصغر.' : 'Could not save flag. Try a smaller image.');
+          alert(iifMessage('flagSaveFailed'));
         }
       }
       var DEF_DEFINITION_EN = 'Internationally classified global financial expert';
@@ -13348,6 +2163,8 @@
           return '/api';
         } catch (e) { return '/api'; }
       })();
+      try { window.ensureHttpsUrl = ensureHttpsUrl; } catch (e) { }
+      try { window.IIF_FUNCS_PREFIX = IIF_FUNCS_PREFIX; } catch (e) { }
       var CONTENT_CHECK_ENDPOINT = IIF_FUNCS_PREFIX + '/check-content';
       var CONTENT_REJECT_MSG_EN = 'This content is classified as inappropriate on the site. Please replace it with something else for it to be accepted.';
       var CONTENT_REJECT_MSG_AR = 'هذا المحتوى مصنف في الموقع كمحتوى غير لائق. يرجى استبداله بغيره حتى يتم قبوله.';
@@ -13611,19 +2428,16 @@
         if (logoMsg) logoMsg.style.display = hasLogo ? '' : 'none';
         if (flagMsg) flagMsg.style.display = hasFlag ? '' : 'none';
         var photoHint = document.getElementById('cert-photo-replace-hint');
-        var photoHintAr = document.getElementById('cert-photo-replace-hint-ar');
         if (photoHint) photoHint.style.display = hasPhoto ? '' : 'none';
-        if (photoHintAr) photoHintAr.style.display = hasPhoto ? '' : 'none';
         /* لا تستدعِ updateDashboardNav هنا — هو من يستدعي refreshCertImagePreviews فيقود إلى تكدّس لا نهائي */
       }
       (function bindCertificateImageUploads() {
-        var isAr = function () { return document.documentElement.getAttribute('data-lang') === 'ar'; };
-        var loadingText = function () { return isAr() ? 'جاري الرفع…' : 'Uploading…'; };
-        var successPhoto = function () { return isAr() ? 'تم رفع الصورة بنجاح.' : 'Photo uploaded successfully.'; };
-        var successLogo = function () { return isAr() ? 'تم رفع الشعار بنجاح.' : 'Logo uploaded successfully.'; };
-        var successFlag = function () { return isAr() ? 'تم رفع العلم بنجاح.' : 'Flag uploaded successfully.'; };
-        var noEmailMsg = function () { return isAr() ? 'يجب تسجيل الدخول أولاً لرفع الصورة.' : 'Please sign in first to upload.'; };
-        var confirmReplaceMsg = function () { return isAr() ? 'هذه الصورة مرفوعة مسبقاً. هل تريد حذف السابق ورفعها مرة أخرى؟' : 'This image is already uploaded. Do you want to remove the previous one and upload again?'; };
+        var loadingText = function () { return iifT('dashUploadProgress', 'Uploading…'); };
+        var successPhoto = function () { return iifT('dashCertPhotoUploaded', 'Photo uploaded successfully.'); };
+        var successLogo = function () { return iifT('dashCertLogoUploaded', 'Logo uploaded successfully.'); };
+        var successFlag = function () { return iifT('dashCertFlagUploaded', 'Flag uploaded successfully.'); };
+        var noEmailMsg = function () { return iifT('dashCertSignInFirst', 'Please sign in first to upload.'); };
+        var confirmReplaceMsg = function () { return iifT('dashCertConfirmReplace', 'This image is already uploaded. Do you want to remove the previous one and upload again?'); };
         function hasExistingImageForUploadTarget(inputId) {
           if (inputId === 'cert-photo-input') return hasCertImageKind('photo');
           if (inputId === 'cert-logo-input') return hasCertImageKind('logo');
@@ -13644,11 +2458,11 @@
           var setUrlFn = (opts && typeof opts.setUrl === 'function') ? opts.setUrl : null;
           var src = typeof getUrlFn === 'function' ? getUrlFn() : (kind === 'photo' ? getCertPhoto() : kind === 'logo' ? getCertLogo() : getCertFlag());
           if (!src || typeof src !== 'string' || src.trim().length < 20) {
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'ارفع الصورة أولاً ثم استخدم الضبط داخل الإطار.' : 'Upload the image first, then adjust it in frame.');
+            alert(iifMessage('jsCertUploadAdjustFirst'));
             return;
           }
           if (src.trim().slice(0, 5) !== 'data:') {
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لأمان المتصفح: استخدم رفع ملف من جهازك ثم اضبط داخل الإطار.' : 'For browser security: upload from your device, then adjust in frame.');
+            alert(iifMessage('jsCertUploadBrowserSecurity'));
             return;
           }
           var cfg = (function () {
@@ -13734,7 +2548,7 @@
 
           var img = new Image();
           img.onload = function () { st.img = img; st.dx = 0; st.dy = 0; st.zoom = 1; renderPreview(); };
-          img.onerror = function () { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تعذر تحميل الصورة للضبط.' : 'Could not load image for adjusting.'); };
+          img.onerror = function () { alert(iifMessage('jsCertImageLoadFailedAdjust')); };
           img.src = src.trim();
 
           function onPointerDown(e) {
@@ -13775,7 +2589,7 @@
             else if (kind === 'logo') setCertLogo(out);
             else setCertFlag(out);
             if (!setUrlFn) { refreshCertImagePreviews(); if (typeof updateCertDiag === 'function') updateCertDiag(); }
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم حفظ الضبط.' : 'Adjustment saved.');
+            alert(iifMessage('jsCertAdjustmentSaved'));
             close();
           };
 
@@ -13792,15 +2606,14 @@
           var e2 = (window.IIF_MEMBERSHIP_AUTH && typeof IIF_MEMBERSHIP_AUTH.getLoggedEmail === 'function') ? (IIF_MEMBERSHIP_AUTH.getLoggedEmail() || '').trim().toLowerCase() : '';
           var used = (e1 || e2 || '').trim();
           var bytes = estimateLocalStorageBytes();
-          var isArLang = document.documentElement.getAttribute('data-lang') === 'ar';
-          el.textContent = isArLang
-            ? ('البريد: ' + (used || '—') + ' | التخزين التقريبي: ' + formatBytes(bytes))
-            : ('Email: ' + (used || '—') + ' | Storage (approx): ' + formatBytes(bytes));
+          el.textContent = iifT('dashCertDiagLine', 'Email: {email} | Storage (approx): {bytes}')
+            .replace(/\{email\}/g, used || '—')
+            .replace(/\{bytes\}/g, formatBytes(bytes));
         }
-        var statusUploading = function () { return isAr() ? 'جاري الرفع…' : 'Uploading…'; };
-        var statusChecking = function () { return isAr() ? 'جاري التحقق من المحتوى…' : 'Checking content…'; };
-        var statusProcessing = function () { return isAr() ? 'جاري المعالجة…' : 'Processing…'; };
-        var statusSuccess = function () { return isAr() ? 'تم الرفع بنجاح.' : 'Upload complete.'; };
+        var statusUploading = function () { return iifT('dashUploadProgress', 'Uploading…'); };
+        var statusChecking = function () { return iifT('dashCertStatusChecking', 'Checking content…'); };
+        var statusProcessing = function () { return iifT('dashCertStatusProcessing', 'Processing…'); };
+        var statusSuccess = function () { return iifT('dashCertUploadComplete', 'Upload complete.'); };
         function setCertUploadStatus(previewId, text, show) {
           var id = previewId.replace('-preview', '-status');
           var el = document.getElementById(id);
@@ -13813,19 +2626,21 @@
             var file = input.files && input.files[0];
             if (!file) return;
             var kindForConfirm = previewId === 'cert-photo-preview' ? 'photo' : previewId === 'cert-logo-preview' ? 'logo' : previewId === 'cert-flag-preview' ? 'flag' : '';
-            if (kindForConfirm && hasCertImageKind(kindForConfirm) && !confirm(confirmReplaceMsg())) {
+            /* لوحة الملف الشخصي: onChangeProfilePhotoClick يؤكد الاستبدال قبل فتح المنتقي */
+            var skipReplaceConfirm = key === 'dash-profile-photo-file';
+            if (kindForConfirm && hasCertImageKind(kindForConfirm) && !skipReplaceConfirm && !confirm(confirmReplaceMsg())) {
               input.value = '';
               return;
             }
             if (!file.type || SAFE_IMAGE_MIMES.indexOf(file.type) === -1) {
-              alert(isAr() ? 'نوع الملف غير مسموح. استخدم صورة (JPEG، PNG، GIF، WebP) فقط.' : 'File type not allowed. Use image (JPEG, PNG, GIF, WebP) only.');
+              alert(iifT('dashCertFileTypeImageOnly', 'File type not allowed. Use image (JPEG, PNG, GIF, WebP) only.'));
               input.value = '';
               return;
             }
             var certMax = getCertImageMaxSize();
             if (file.size > certMax) {
               var mb = Math.round(certMax / 1024 / 1024);
-              alert(isAr() ? 'الملف كبير جداً. الحد ' + mb + ' ميجا.' : 'File too large. Max ' + mb + ' MB.');
+              alert(iifT('dashCertFileTooLargeMb', 'File too large. Max {mb} MB.').replace(/\{mb\}/g, String(mb)));
               input.value = '';
               return;
             }
@@ -13838,7 +2653,7 @@
               if (!dataUrl || (!isSafeDataUrlForImage(dataUrl) && !isDataUrlImageForDisplay(dataUrl))) {
                 setCertUploadStatus(previewId, '', false);
                 if (previewEl) refreshCertImagePreviews();
-                alert(isAr() ? 'المحتوى غير مقبول.' : 'Content rejected for security.');
+                alert(iifT('dashCertContentRejected', 'Content rejected for security.'));
                 input.value = '';
                 return;
               }
@@ -13891,13 +2706,14 @@
             reader.onerror = function () {
               setCertUploadStatus(previewId, '', false);
               if (previewEl) refreshCertImagePreviews();
-              alert(isAr() ? 'فشل قراءة الملف.' : 'Failed to read file.');
+              alert(iifT('dashCertReadFailed', 'Failed to read file.'));
               input.value = '';
             };
             reader.readAsDataURL(file);
           });
         }
         handleFile('cert-photo-input', setCertPhoto, 'cert-photo-preview', successPhoto);
+        handleFile('dash-profile-photo-file', setCertPhoto, 'cert-photo-preview', successPhoto);
         handleFile('cert-logo-input', setCertLogo, 'cert-logo-preview', successLogo);
         handleFile('cert-flag-input', setCertFlag, 'cert-flag-preview', successFlag);
         handleFile('cert-photo-capture', setCertPhoto, 'cert-photo-preview', successPhoto);
@@ -14003,7 +2819,7 @@
                   .then(function (outUrl) {
                     if (dataEl) dataEl.value = outUrl || dataUrl;
                     if (urlEl) urlEl.value = '';
-                    alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم التقاط الصورة وحفظها.' : 'Image captured and saved.');
+                    alert(iifMessage('jsCertImageCapturedSaved'));
                     if (typeof openAdjuster === 'function') openAdjuster('photo', { getUrl: function () { return (dataEl && dataEl.value) || ''; }, setUrl: function (u) { if (dataEl) dataEl.value = u; if (urlEl) urlEl.value = ''; } });
                   });
                 return;
@@ -14078,7 +2894,7 @@
             var capId = kind === 'photo' ? 'cert-photo-capture' : kind === 'logo' ? 'cert-logo-capture' : 'cert-flag-capture';
             var cap = document.getElementById(capId);
             if (cap) cap.value = '';
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم حذف الصورة.' : 'Image deleted.');
+            alert(iifMessage('jsCertImageDeleted'));
           });
         });
         document.querySelectorAll('[data-delete-target]').forEach(function (btn) {
@@ -14096,7 +2912,7 @@
             var capId = target === 'team' ? 'team-image-capture' : target === 'staff' ? 'staff-photo-capture' : 'fund-member-photo-capture';
             var capEl = document.getElementById(capId);
             if (capEl) capEl.value = '';
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم حذف الصورة.' : 'Image deleted.');
+            alert(iifMessage('jsCertImageDeleted'));
           });
         });
         var clearBtn = document.getElementById('cert-clear-images-btn');
@@ -14109,7 +2925,7 @@
           } catch (e) { }
           refreshCertImagePreviews();
           updateCertDiag();
-          alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم مسح صور البطاقة الرقمية المحفوظة.' : 'Saved digital membership card images cleared.');
+          alert(iifMessage('jsCertSavedImagesCleared'));
         });
         var defEnInput = document.getElementById('cert-definition-en');
         var defArInput = document.getElementById('cert-definition-ar');
@@ -14172,23 +2988,21 @@
         var due = getDueReminders();
         var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         if (due.length === 0) {
-          container.innerHTML = '<p class="lang-en" style="color:var(--color-text-muted);">No reminders due at the moment.</p><p class="lang-ar" style="color:var(--color-text-muted); display:none;">لا توجد تذكيرات مستحقة حالياً.</p>';
-          container.querySelector('.lang-ar').style.display = isAr ? 'block' : 'none';
-          container.querySelector('.lang-en').style.display = isAr ? 'none' : 'block';
+          container.innerHTML = '<p style="color:var(--color-text-muted);">' + escapeHtml(iifText('dashRemindersEmpty', 'No reminders due at the moment.')) + '</p>';
           return;
         }
         var html = '<ul class="dashboard-list" style="list-style:none; padding:0;">';
         due.forEach(function (r) {
-          var subj = r.type === 'expiring' ? (isAr ? 'تذكير: انتهاء العضوية خلال ' + r.daysLeft + ' يوماً' : 'Reminder: membership expires in ' + r.daysLeft + ' days') : (isAr ? 'انتهاء اشتراكك في الصندوق الدولي' : 'Your IIF membership has ended');
+          var subj = r.type === 'expiring' ? iifMessageFmt('reminderSubjectExpiring', { days: r.daysLeft }) : iifMessage('reminderSubjectEnded');
           var body = isAr ? r.messageAr : r.messageEn;
           var safeEmail = typeof sanitizeEmailForMailto === 'function' ? sanitizeEmailForMailto(r.email) : (r.email || '').trim().toLowerCase().slice(0, 254);
           var mailto = safeEmail ? ('mailto:' + encodeURIComponent(safeEmail) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body)) : '#';
-          var daysLabel = r.type === 'expiring' ? (isAr ? (r.daysLeft + ' يوم متبقية') : (r.daysLeft + ' days left')) : (isAr ? (r.daysAgo + ' يوم بعد الانتهاء') : (r.daysAgo + ' days after end'));
+          var daysLabel = r.type === 'expiring' ? iifMessageFmt('reminderDaysLeft', { n: r.daysLeft }) : iifMessageFmt('reminderDaysAfterEnd', { n: r.daysAgo });
           html += '<li style="padding: var(--space-3); border-bottom: 1px solid var(--color-border-subtle); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2);">';
           html += '<span style="flex:1; min-width:0;">' + escapeHtml(r.email) + '</span>';
           html += '<span style="font-size:0.85rem; color: var(--color-accent-gold-soft);">' + escapeHtml(daysLabel) + '</span>';
-          html += '<a href="' + escapeHtml(mailto) + '" target="_blank" rel="noopener" class="btn btn--ghost btn-sm">' + (isAr ? 'إرسال بريد' : 'Send email') + '</a>';
-          html += '<button type="button" class="btn btn--ghost btn-sm reminder-mark-sent" data-email="' + escapeHtml(r.email) + '" data-key="' + escapeHtml(r.key) + '">' + (isAr ? 'تم الإرسال' : 'Mark sent') + '</button>';
+          html += '<a href="' + escapeHtml(mailto) + '" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn-sm">' + escapeHtml(iifMessage('reminderBtnSendEmail')) + '</a>';
+          html += '<button type="button" class="btn btn--ghost btn-sm reminder-mark-sent" data-email="' + escapeHtml(r.email) + '" data-key="' + escapeHtml(r.key) + '">' + escapeHtml(iifMessage('reminderBtnMarkSent')) + '</button>';
           html += '</li>';
         });
         html += '</ul>';
@@ -14219,14 +3033,6 @@
       function showMembershipRequiredModal() {
         var overlay = document.getElementById('membership-required-overlay');
         if (!overlay) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        var modal = overlay.querySelector('.membership-required-modal');
-        if (modal) {
-          var enEls = modal.querySelectorAll('.lang-en');
-          var arEls = modal.querySelectorAll('.lang-ar');
-          enEls.forEach(function (el) { el.style.display = isAr ? 'none' : ''; });
-          arEls.forEach(function (el) { el.style.display = isAr ? '' : 'none'; });
-        }
         overlay.classList.add('is-open');
         overlay.setAttribute('aria-hidden', 'false');
       }
@@ -14255,6 +3061,15 @@
         });
         if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeMembershipRequiredModal(); });
       })();
+      (function bindServiceGateAuthButtons() {
+        function goAuth() {
+          if (typeof openAuth === 'function') openAuth();
+        }
+        ['financing-gate-auth', 'feasibility-gate-auth', 'investor-gate-auth'].forEach(function (id) {
+          var b = document.getElementById(id);
+          if (b) b.addEventListener('click', goAuth);
+        });
+      })();
       /* بريد شيرمان (chairman) للعضاء فقط — انفو متاح للجميع */
       (function contactEmailMembersOnly() {
         var membersOnlyEmails = ['chairman@iiffund.com'];
@@ -14274,8 +3089,7 @@
           } catch (e) { return false; }
         }
         function showContactMembersOnlyMessage() {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          var msg = isAr ? 'مراسلته للعضاء فقط. سجل عضويتك.' : 'Correspondence is for members only. Register your membership.';
+          var msg = iifMessage('contactMembersOnlyMsg');
           alert(msg);
           if (typeof showMembershipRequiredModal === 'function') showMembershipRequiredModal();
         }
@@ -14292,13 +3106,17 @@
       var CERTIFICATES_KEY = 'iif-membership-certificates';
       function getCertificates() { try { var r = localStorage.getItem(CERTIFICATES_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; } }
       function saveCertificates(obj) { try { localStorage.setItem(CERTIFICATES_KEY, JSON.stringify(obj)); } catch (e) { } }
-      function getTierLabel(tier, lang) {
-        var isAr = lang === 'ar';
-        if (tier === 'cooperating') return isAr ? 'عضو متعاون' : 'Cooperating Member';
-        if (tier === 'shared') return isAr ? 'عضو مشترك' : 'Shared Member';
-        if (tier === 'premium_2143') return isAr ? 'عضوية فضية مميزة' : 'Premium Silver';
-        if (tier === 'premium_3143') return isAr ? 'عضوية ذهبية مميزة' : 'Premium Gold';
-        if (tier === 'premium_4143') return isAr ? 'عضوية بلاتينية مميزة' : 'Premium Platinum';
+      function getTierLabel(tier, langOpt) {
+        var map = { cooperating: 'tierCooperating', shared: 'tierShared', premium_2143: 'tierPremium2143', premium_3143: 'tierPremium3143', premium_4143: 'tierPremium4143' };
+        var i18nKey = map[tier];
+        if (i18nKey && window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+          var lg = '';
+          if (typeof langOpt === 'string' && langOpt.trim()) lg = langOpt.trim().toLowerCase();
+          else if (typeof document !== 'undefined' && document.documentElement) lg = (document.documentElement.getAttribute('data-lang') || 'en').trim().toLowerCase();
+          else lg = 'en';
+          var ts = window.IIF_I18N.text(i18nKey, lg);
+          if (ts) return ts;
+        }
         return tier || '';
       }
       function createCertificate() {
@@ -14328,41 +3146,43 @@
         var isVerification = !!options.isVerification;
         var overlay = document.getElementById('certificate-overlay');
         if (!overlay || !data) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        overlay.querySelectorAll('.certificate-card .lang-en').forEach(function (el) { el.style.display = isAr ? 'none' : ''; });
-        overlay.querySelectorAll('.certificate-card .lang-ar').forEach(function (el) { el.style.display = isAr ? '' : 'none'; });
+        var lang = document.documentElement.getAttribute('data-lang') || 'en';
+        var isAr = lang === 'ar';
+        var T = (window.IIF_I18N && window.IIF_I18N.T) ? (window.IIF_I18N.T[lang] || window.IIF_I18N.T.en) : null;
         currentCertificateData = data;
         var nameEl = document.getElementById('certificate-name');
         var tierEl = document.getElementById('certificate-tier');
         var dateEl = document.getElementById('certificate-date');
-        var dateRangeEn = document.getElementById('certificate-date-range-en');
-        var dateRangeAr = document.getElementById('certificate-date-range-ar');
+        var dateRangeEl = document.getElementById('certificate-date-range');
         var qrWrap = document.getElementById('certificate-qr-wrap');
         var verifyBadge = document.getElementById('certificate-verify-badge');
         var downloadBtn = document.getElementById('certificate-download-btn');
         var emailLink = document.getElementById('certificate-email-link');
         if (nameEl) nameEl.textContent = data.name || data.email || '';
-        var defEnEl = document.getElementById('certificate-definition-en');
-        var defArEl = document.getElementById('certificate-definition-ar');
+        var defEl = document.getElementById('certificate-definition');
         var hasDef = !!(data.definitionEn || data.definitionAr);
-        if (defEnEl) { defEnEl.textContent = data.definitionEn || ''; defEnEl.style.display = hasDef ? '' : 'none'; }
-        if (defArEl) { defArEl.textContent = data.definitionAr || ''; defArEl.style.display = hasDef ? '' : 'none'; }
-        if (tierEl) tierEl.textContent = getTierLabel(data.tier, isAr ? 'ar' : 'en');
+        if (defEl) {
+          var defText = (isAr && data.definitionAr) ? data.definitionAr : (data.definitionEn || data.definitionAr || '');
+          defEl.textContent = defText || '';
+          defEl.style.display = hasDef ? '' : 'none';
+        }
+        if (tierEl) tierEl.textContent = getTierLabel(data.tier);
         var card = document.getElementById('certificate-card');
         if (card) {
           card.classList.remove('cert-tier--cooperating', 'cert-tier--shared', 'cert-tier--premium_2143', 'cert-tier--premium_3143', 'cert-tier--premium_4143');
           card.classList.add('cert-tier--' + (data.tier || 'cooperating'));
         }
         if (dateEl) { dateEl.textContent = (data.startDate && data.endDate) ? '' : (data.date || ''); dateEl.style.display = (data.startDate && data.endDate) ? 'none' : ''; }
-        if (dateRangeEn) dateRangeEn.textContent = (data.startDate && data.endDate) ? ('Valid from ' + data.startDate + ' to ' + data.endDate) : '';
-        if (dateRangeAr) dateRangeAr.textContent = (data.startDate && data.endDate) ? ('صالحة من ' + data.startDate + ' إلى ' + data.endDate) : '';
-        if (dateRangeEn) dateRangeEn.style.display = (data.startDate && data.endDate) ? '' : 'none';
-        if (dateRangeAr) dateRangeAr.style.display = (data.startDate && data.endDate) && isAr ? '' : 'none';
-        if (downloadBtn) downloadBtn.style.display = data.id ? 'inline-flex' : 'none';
-        if (emailLink && data.email) {
-          var safeEmail = sanitizeEmailForMailto(data.email);
-          emailLink.href = safeEmail ? ('mailto:' + encodeURIComponent(safeEmail) + '?subject=' + encodeURIComponent(isAr ? 'بطاقة العضوية الرقمية - صندوق الاستثمار الدولي' : 'IIF digital membership card') + '&body=' + encodeURIComponent(isAr ? 'مرفق بطاقة العضوية الرقمية (يرجى إرفاق الملف بعد التحميل من الموقع).' : 'Please find my digital membership card attached (download from the site and attach to this email).')) : '#';
+        if (dateRangeEl) {
+          if (T && T.certDateRangeValid && data.startDate && data.endDate) {
+            dateRangeEl.textContent = String(T.certDateRangeValid).replace('{start}', data.startDate).replace('{end}', data.endDate);
+            dateRangeEl.style.display = '';
+          } else {
+            dateRangeEl.textContent = '';
+            dateRangeEl.style.display = 'none';
+          }
         }
+        if (downloadBtn) downloadBtn.style.display = data.id ? 'inline-flex' : 'none';
         if (emailLink) emailLink.style.display = data.email ? 'inline-flex' : 'none';
         var memberImagesEl = document.getElementById('certificate-member-images');
         if (memberImagesEl) {
@@ -14399,7 +3219,7 @@
         }
         if (verifyBadge) verifyBadge.style.display = isVerification ? 'block' : 'none';
         var closeBtn = document.getElementById('certificate-close-btn');
-        if (closeBtn) { closeBtn.style.display = isVerification ? 'inline-flex' : 'none'; closeBtn.querySelectorAll('.lang-en').forEach(function (el) { el.style.display = isAr ? 'none' : ''; }); closeBtn.querySelectorAll('.lang-ar').forEach(function (el) { el.style.display = isAr ? '' : 'none'; }); }
+        if (closeBtn) { closeBtn.style.display = isVerification ? 'inline-flex' : 'none'; }
         if (qrWrap) {
           qrWrap.innerHTML = '';
           var baseUrl = (typeof location !== 'undefined' && location.origin) ? (location.origin + (location.pathname || '') + location.search) : '';
@@ -14410,6 +3230,24 @@
         }
         overlay.classList.add('is-open');
         overlay.setAttribute('aria-hidden', 'false');
+        if (typeof window.IIF_I18N === 'object' && typeof window.IIF_I18N.apply === 'function') {
+          window.IIF_I18N.apply(lang);
+        }
+        if (nameEl) nameEl.textContent = data.name || data.email || '';
+        if (defEl && hasDef) {
+          var defText2 = (isAr && data.definitionAr) ? data.definitionAr : (data.definitionEn || data.definitionAr || '');
+          defEl.textContent = defText2 || '';
+        }
+        if (dateRangeEl && T && T.certDateRangeValid && data.startDate && data.endDate) {
+          dateRangeEl.textContent = String(T.certDateRangeValid).replace('{start}', data.startDate).replace('{end}', data.endDate);
+        }
+        if (tierEl) tierEl.textContent = getTierLabel(data.tier);
+        if (emailLink && data.email) {
+          var safeEmail2 = sanitizeEmailForMailto(data.email);
+          var subj = T && T.certEmailMailtoSubject ? T.certEmailMailtoSubject : 'IIF digital membership card';
+          var body = T && T.certEmailMailtoBody ? T.certEmailMailtoBody : 'Please find my digital membership card attached (download from the site and attach to this email).';
+          emailLink.href = safeEmail2 ? ('mailto:' + encodeURIComponent(safeEmail2) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body)) : '#';
+        }
       }
       function closeCertificateView() {
         var overlay = document.getElementById('certificate-overlay');
@@ -14419,25 +3257,24 @@
         if (!currentCertificateData) return;
         var downloadBtn = document.getElementById('certificate-download-btn');
         if (downloadBtn && downloadBtn.getAttribute('aria-busy') === 'true') return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        var loadingMsg = typeof iifMessage === 'function' ? iifMessage('downloadPreparing') : (isAr ? 'جاري التحميل…' : 'Preparing download…');
-        var doneMsg = typeof iifMessage === 'function' ? iifMessage('downloadDone') : (isAr ? 'تم بدء التحميل' : 'Download started');
-        var errMsg = typeof iifMessage === 'function' ? iifMessage('downloadFailed') : (isAr ? 'فشل التحميل — جرّب مرة أخرى' : 'Download failed — try again');
+        var loadingMsg = iifMessage('downloadPreparing');
+        var doneMsg = iifMessage('downloadDone');
+        var errMsg = iifMessage('downloadFailed');
         var savedBtnHtml = downloadBtn ? downloadBtn.innerHTML : '';
         function setDownloadButtonLoading(loading) {
           if (!downloadBtn) return;
           downloadBtn.disabled = loading;
           if (loading) {
             downloadBtn.setAttribute('aria-busy', 'true');
-            var en = downloadBtn.querySelector('.lang-en');
-            var ar = downloadBtn.querySelector('.lang-ar');
-            if (en) en.textContent = loadingMsg;
-            if (ar) ar.textContent = loadingMsg;
-            if (en) en.style.display = isAr ? 'none' : '';
-            if (ar) ar.style.display = isAr ? '' : 'none';
+            var labelEl = downloadBtn.querySelector('[data-i18n]') || downloadBtn;
+            labelEl.textContent = loadingMsg;
           } else {
             downloadBtn.removeAttribute('aria-busy');
             downloadBtn.innerHTML = savedBtnHtml;
+            try {
+              var Lg = (document.documentElement.getAttribute('data-lang') || 'en').trim().toLowerCase();
+              if (window.IIF_I18N && typeof window.IIF_I18N.apply === 'function') window.IIF_I18N.apply(Lg);
+            } catch (eCertAp) { }
           }
         }
         function restoreDownloadButton(showSuccessToast, showErrorToast) {
@@ -14471,10 +3308,10 @@
           ctx.fillStyle = '#c9a227';
           ctx.font = 'bold 22px system-ui, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(isAr ? 'بطاقة العضوية الرقمية' : 'Digital membership card', w / 2, 70);
+          ctx.fillText(iifMessage('certTitleDigitalCard'), w / 2, 70);
           ctx.fillStyle = '#94a3b8';
           ctx.font = '14px system-ui, sans-serif';
-          ctx.fillText('International Investment Fund — FII', w / 2, 95);
+          ctx.fillText('International Investment Fund — IIF', w / 2, 95);
         }
         function drawMemberImagesAndRest(imagesLoaded) {
           var imgY = 108;
@@ -14512,11 +3349,11 @@
           var tierFontSize = 14 + tierLevel * 2;
           ctx.fillStyle = tierLevel >= 2 ? '#e8d48a' : (tierLevel >= 1 ? '#d4ae2a' : '#c9a227');
           ctx.font = 'bold ' + tierFontSize + 'px system-ui, sans-serif';
-          ctx.fillText(getTierLabel(data.tier, isAr ? 'ar' : 'en'), w / 2, nameY + 35);
+          ctx.fillText(getTierLabel(data.tier), w / 2, nameY + 35);
           if (data.startDate && data.endDate) {
             ctx.fillStyle = '#94a3b8';
             ctx.font = '13px system-ui, sans-serif';
-            ctx.fillText((isAr ? 'صالحة من ' : 'Valid from ') + data.startDate + (isAr ? ' إلى ' : ' to ') + data.endDate, w / 2, nameY + 58);
+            ctx.fillText(iifMessage('certValidFrom') + data.startDate + iifMessage('certValidTo') + data.endDate, w / 2, nameY + 58);
           }
           var qrY = nameY + 85;
           if (qrCanvas) {
@@ -14526,7 +3363,7 @@
                 ctx.drawImage(qrImg, w / 2 - 90, qrY, 180, 180);
                 ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px system-ui, sans-serif';
-                ctx.fillText(isAr ? 'امسح للتحقق من بطاقة العضوية الرقمية' : 'Scan to verify digital membership card', w / 2, qrY + 200);
+                ctx.fillText(iifMessage('certScanVerifyQr'), w / 2, qrY + 200);
                 var link = document.createElement('a');
                 link.download = (data.name || 'member').replace(/[^a-zA-Z0-9\u0600-\u06FF\-]/g, '_') + '_IIF_digital_membership_card.png';
                 link.href = canvas.toDataURL('image/png');
@@ -14541,7 +3378,7 @@
           } else {
             ctx.fillStyle = '#94a3b8';
             ctx.font = '11px system-ui, sans-serif';
-            ctx.fillText(isAr ? 'امسح للتحقق من بطاقة العضوية الرقمية' : 'Scan to verify digital membership card', w / 2, qrY + 90);
+            ctx.fillText(iifMessage('certScanVerifyQr'), w / 2, qrY + 90);
             finishDownload();
           }
           function finishDownload() {
@@ -14607,7 +3444,7 @@
           var endDate = (endEl && endEl.value) || '';
           if (!endDate) { var d = new Date(); d.setFullYear(d.getFullYear() + 1); endDate = d.toISOString().slice(0, 10); }
           if (val && (new Date(endDate) <= new Date(startDate))) {
-            alert(typeof iifMessage === 'function' ? iifMessage('membershipDateError') : (document.documentElement.getAttribute('data-lang') === 'ar' ? 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية.' : 'End date must be after start date.'));
+            alert(iifMessage('membershipDateError'));
             return;
           }
           setMembershipType(val);
@@ -14625,7 +3462,7 @@
             var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
             addToMembershipRegistry(email, '', '', '');
           }
-          alert(typeof iifMessage === 'function' ? iifMessage('membershipSet') : (document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم تعيين العضوية.' : 'Membership set.'));
+          alert(iifMessage('membershipSet'));
         });
       })();
       (function initVerifyCertificateFromHash() {
@@ -14639,7 +3476,7 @@
           if (data) {
             showCertificateView(data, { isVerification: true });
           } else {
-            alert(typeof iifMessage === 'function' ? iifMessage('certificateInvalid') : (document.documentElement.getAttribute('data-lang') === 'ar' ? 'بطاقة العضوية الرقمية غير موجودة أو لم تعد صالحة. ربما أُصدرت من جهاز آخر.' : 'This digital membership card was not found or is no longer valid. It may have been issued on another device.'));
+            alert(iifMessage('certificateInvalid'));
           }
         }
         if (typeof window !== 'undefined' && window.addEventListener) {
@@ -14687,8 +3524,12 @@
         try {
           if (window.IIF_SECURE_STORAGE && typeof window.IIF_SECURE_STORAGE.clearSecure === 'function') window.IIF_SECURE_STORAGE.clearSecure();
           localStorage.removeItem('iif-logged-in');
+          sessionStorage.removeItem('iif-logged-in');
           localStorage.removeItem('iif-is-admin');
           localStorage.removeItem('iif-device-fingerprint');
+          localStorage.removeItem('iif-device-bound-email');
+          localStorage.removeItem('iif-user-email');
+          localStorage.removeItem('iif-user-name');
         } catch (e) { }
         if (typeof closeServicePage === 'function') closeServicePage();
 
@@ -14711,9 +3552,7 @@
             }
           });
 
-          // رسالة تأكيد تسجيل الخروج
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          console.log(isAr ? 'تم تسجيل الخروج بنجاح' : 'Logged out successfully');
+          console.log(typeof iifMessage === 'function' ? iifMessage('jsLoggedOutSuccess') : 'Logged out successfully');
         }, 100);
       }
       function updateDashboardNav() {
@@ -14769,15 +3608,15 @@
               userPhoto.style.display = '';
             }
             var roleLabel = (function () {
-              if (isAdmin()) return isAr ? 'رئيس مجلس الإدارة' : 'Chairman of the Board';
+              if (isAdmin()) return iifMessage('dashRoleChairman');
               if (typeof getDashboardAccessType === 'function') {
                 var dt = getDashboardAccessType();
-                if (dt === 'staff') return isAr ? 'موظف' : 'Staff';
-                if (dt === 'member') return isAr ? 'عضو' : 'Member';
-                if (dt === 'user') return isAr ? 'مسجّل' : 'Registered user';
+                if (dt === 'staff') return iifMessage('dashRoleStaff');
+                if (dt === 'member') return iifMessage('dashRoleMember');
+                if (dt === 'user') return iifMessage('dashRoleRegisteredUser');
               }
-              if (typeof isStaff === 'function' && isStaff()) return isAr ? 'موظف' : 'Staff';
-              return isAr ? 'عضو' : 'Member';
+              if (typeof isStaff === 'function' && isStaff()) return iifMessage('dashRoleStaff');
+              return iifMessage('dashRoleMember');
             })();
             var memType = typeof getMembershipType === 'function' ? getMembershipType() : '';
             var hasValidMem = typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.hasValidMembership && IIF_MEMBERSHIP_AUTH.hasValidMembership();
@@ -14786,13 +3625,13 @@
               var t = IIF_CONFIG.membershipTiers.find(function (x) { return x.id === memType; });
               tierLabel = t ? (isAr ? t.labelAr : t.labelEn) : memType;
             }
-            if (!tierLabel && roleLabel === (isAr ? 'عضو' : 'Member')) tierLabel = hasValidMem ? (isAr ? 'اشتراك ساري' : 'Active subscription') : (isAr ? 'بدون اشتراك ساري' : 'No active subscription');
+            if (!tierLabel && roleLabel === iifMessage('dashRoleMember')) tierLabel = hasValidMem ? iifMessage('dashTierActiveSubscription') : iifMessage('dashTierNoActiveSubscription');
             var entity = typeof getStoredEntity === 'function' ? getStoredEntity() : '';
-            var entityLabel = entity === 'company' ? (isAr ? 'شركة' : 'Company') : entity === 'state' || entity === 'government_org' ? (isAr ? 'جهة حكومية' : 'Government') : '';
+            var entityLabel = entity === 'company' ? iifMessage('dashEntityCompany') : entity === 'state' || entity === 'government_org' ? iifMessage('dashEntityGovernment') : '';
             var meta = roleLabel + (tierLabel ? ' · ' + tierLabel : '') + (entityLabel ? ' · ' + entityLabel : '');
             if (hasValidMem) {
               var expDate = typeof getMembershipExpiry === 'function' ? getMembershipExpiry() : '';
-              if (expDate) meta += (isAr ? ' · حتى ' : ' · Until ') + expDate;
+              if (expDate) meta += iifMessage('dashMetaUntil') + expDate;
             }
             if (userMetaEl) userMetaEl.textContent = meta;
           } else {
@@ -14880,23 +3719,35 @@
       function showAuthWelcome(messageKey) {
         var welcomeEl = document.getElementById('auth-welcome');
         var textEl = document.getElementById('auth-welcome-text');
+        var hintEl = document.getElementById('auth-welcome-static-hint');
         var modal = overlay && overlay.querySelector('.auth-modal');
         if (!welcomeEl || !textEl || !modal) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        var messages = {
-          login: { en: 'Welcome back!', ar: 'أهلاً بعودتك!' },
-          register: { en: 'Welcome! Your account has been created.', ar: 'مرحباً! تم إنشاء حسابك.' }
-        };
-        var msg = messages[messageKey] ? (isAr ? messages[messageKey].ar : messages[messageKey].en) : (isAr ? 'مرحباً!' : 'Welcome!');
+        var msg = messageKey === 'login' ? iifMessage('authWelcomeLogin') : messageKey === 'register' ? iifMessage('authWelcomeRegister') : iifMessage('authWelcomeDefault');
         welcomeEl.hidden = false;
         textEl.textContent = msg;
+        var staticHost = typeof window.iifIsStaticPublicHost === 'function' && window.iifIsStaticPublicHost();
+        if (hintEl) {
+          if (staticHost) {
+            hintEl.hidden = false;
+            hintEl.innerHTML =
+              '<span dir="ltr">This site has no shared server: your session stays on this device. Use Dashboard → Export/Import JSON to move data.</span><br /><span dir="rtl">لا يوجد خادم مشترك: جلستك تبقى على هذا الجهاز. لنقل البيانات استخدم من اللوحة تصدير/استيراد JSON.</span>';
+          } else {
+            hintEl.hidden = true;
+            hintEl.textContent = '';
+          }
+        }
         modal.classList.add('show-welcome');
+        var delayMs = staticHost ? 5200 : 2200;
         setTimeout(function () {
           modal.classList.remove('show-welcome');
           welcomeEl.hidden = true;
           textEl.textContent = '';
+          if (hintEl) {
+            hintEl.hidden = true;
+            hintEl.textContent = '';
+          }
           closeAuth();
-        }, 2200);
+        }, delayMs);
       }
       var DEVICE_BOUND_EMAIL_KEY = 'iif-device-bound-email';
       var VERIFY_CODE_STORAGE_KEY = 'iif-verify-pending';
@@ -14905,13 +3756,13 @@
         var loginEmail = (email || '').trim().toLowerCase();
         if (!loginEmail) return;
         if (typeof isEmailBlockedFromSite === 'function' && isEmailBlockedFromSite(loginEmail)) {
-          var isArBl = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isArBl ? 'تم استبعاد هذا البريد من الموقع. تواصل مع الإدارة.' : 'This email has been excluded from the site. Contact administration.');
+          alert(iifMessage('jsEmailExcludedFromSite'));
           try { setLoggedIn(false); } catch (e1) { }
           return;
         }
         try {
-          setLoggedIn(true);
+          var shouldPersist = opts.trustDevice !== false;
+          setLoggedIn(true, { persist: shouldPersist });
           setAdminByEmail(loginEmail);
           localStorage.setItem('iif-user-email', loginEmail);
           if (opts.trustDevice !== false) {
@@ -15105,11 +3956,10 @@
         if (!isWebAuthnSupported() || !email) return;
         if (hasStoredWebAuthnCredential()) return;
         var loginEmail = (email || '').trim().toLowerCase();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        var msg = isAr ? 'تفعيل الدخول بالبصمة أو التعرف على الوجه لهذا الجهاز؟' : 'Enable sign-in with fingerprint or face for this device?';
+        var msg = iifMessage('biometricEnablePrompt');
         if (!confirm(msg)) return;
         registerBiometric(loginEmail, function (ok) {
-          if (ok) alert(isAr ? 'تم تفعيل الدخول بالبصمة/الوجه.' : 'Fingerprint/Face sign-in enabled.');
+          if (ok) alert(iifMessage('biometricEnabled'));
           if (typeof updateAuthLoginOptions === 'function') updateAuthLoginOptions();
         });
       }
@@ -15196,20 +4046,19 @@
         var passwordEl = document.getElementById('login-password');
         var email = emailEl ? emailEl.value : '';
         var password = passwordEl ? passwordEl.value : '';
-        var isArL = document.documentElement.getAttribute('data-lang') === 'ar';
         if (!isValidEmail(email)) { alert(iifMessage('invalidEmail')); if (emailEl) emailEl.focus(); return; }
         if (!(password && String(password).trim())) { alert(iifMessage('emptyPassword')); if (passwordEl) passwordEl.focus(); return; }
         var trustCb = document.getElementById('login-trust-device');
         if (typeof verifyLoginPassword === 'function') {
           verifyLoginPassword(email, password).then(function (ok) {
             if (!ok) {
-              alert(isArL ? 'البريد أو كلمة المرور غير صحيحة.' : 'Invalid email or password.');
+              alert(iifMessage('jsLoginInvalidCredentials'));
               if (passwordEl) passwordEl.focus();
               return;
             }
             completeLogin(email, { trustDevice: !trustCb || trustCb.checked });
           }).catch(function () {
-            alert(isArL ? 'تعذر التحقق من كلمة المرور.' : 'Could not verify password.');
+            alert(iifMessage('jsLoginVerifyPasswordFailed'));
           });
         } else {
           completeLogin(email, { trustDevice: !trustCb || trustCb.checked });
@@ -15231,24 +4080,22 @@
         var verifyCodeInp = document.getElementById('verify-code');
         var verifyCodeWrap = document.getElementById('verify-code-wrap');
         if (btnGoogle) btnGoogle.addEventListener('click', function () {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           if (window.IIF_CONFIG && IIF_CONFIG.googleClientId && typeof window.google !== 'undefined') {
             /* عند ضبط googleClientId واستدعاء GSI يمكن تفعيل الدخول الحقيقي هنا */
-            var email = (prompt(isAr ? 'أدخل البريد الإلكتروني المرتبط بحساب Google' : 'Enter email linked to your Google account') || '').trim().toLowerCase();
+            var email = (prompt(iifMessage('oauthPromptGoogleEmail')) || '').trim().toLowerCase();
             if (isValidEmail(email)) completeLogin(email, { trustDevice: true, name: '' });
           } else {
-            var email = (prompt(isAr ? 'أدخل البريد الإلكتروني' : 'Enter your email') || '').trim().toLowerCase();
+            var email = (prompt(iifMessage('oauthPromptEmail')) || '').trim().toLowerCase();
             if (isValidEmail(email)) completeLogin(email, { trustDevice: true, name: '' });
           }
         });
         if (btnFacebook) btnFacebook.addEventListener('click', function () {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           if (window.IIF_CONFIG && IIF_CONFIG.facebookAppId && typeof window.FB !== 'undefined') {
             /* عند ضبط facebookAppId واستدعاء FB SDK يمكن تفعيل الدخول الحقيقي هنا */
-            var email = (prompt(isAr ? 'أدخل البريد الإلكتروني المرتبط بحساب فيسبوك' : 'Enter email linked to your Facebook account') || '').trim().toLowerCase();
+            var email = (prompt(iifMessage('oauthPromptFacebookEmail')) || '').trim().toLowerCase();
             if (isValidEmail(email)) completeLogin(email, { trustDevice: true, name: '' });
           } else {
-            var email = (prompt(isAr ? 'أدخل البريد الإلكتروني' : 'Enter your email') || '').trim().toLowerCase();
+            var email = (prompt(iifMessage('oauthPromptEmail')) || '').trim().toLowerCase();
             if (isValidEmail(email)) completeLogin(email, { trustDevice: true, name: '' });
           }
         });
@@ -15266,8 +4113,7 @@
           if (!isValidEmail(email)) { alert(iifMessage('invalidEmail')); return; }
           var code = '123456';
           try { sessionStorage.setItem(VERIFY_CODE_STORAGE_KEY, JSON.stringify({ email: email, code: code, at: Date.now() })); } catch (e) { }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'تم إرسال رمز التأكيد. تحقق من بريدك أو أدخل الرمز أدناه.' : 'Verification code sent. Check your email or enter the code below.');
+          alert(iifMessage('verificationCodeSent'));
           if (verifyCodeWrap) verifyCodeWrap.style.display = 'block';
         });
         if (confirmCodeBtn && verifyCodeInp) confirmCodeBtn.addEventListener('click', function () {
@@ -15282,8 +4128,7 @@
               return;
             }
           } catch (e) { }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'الرمز غير صحيح. يرجى إدخال الرمز المرسل إلى بريدك.' : 'Invalid code. Please enter the code sent to your email.');
+          alert(iifMessage('verificationCodeInvalid'));
         });
         if (btnDevice) btnDevice.addEventListener('click', function () {
           if (!hasTrustedDevice()) return;
@@ -15297,15 +4142,13 @@
         });
         if (btnBiometric) btnBiometric.addEventListener('click', function () {
           if (!isWebAuthnSupported() || !hasStoredWebAuthnCredential()) {
-            var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isAr ? 'سجّل الدخول أولاً (كلمة مرور أو غيره) ثم فعّل البصمة/الوجه عند الطلب.' : 'Sign in first (password or other), then enable fingerprint/face when prompted.');
+            alert(iifMessage('signInFirstForBiometric'));
             return;
           }
           authenticateBiometric(function (email) {
             if (email) completeLogin(email, { trustDevice: true });
             else {
-              var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-              alert(isAr ? 'لم يتم التحقق. جرّب مرة أخرى.' : 'Verification failed. Try again.');
+              alert(iifMessage('verificationFailedRetry'));
             }
           });
         });
@@ -15404,20 +4247,19 @@
       }
       function getPasswordStrengthLabel(p) {
         if (!p || p.length === 0) return { text: '', level: '' };
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         if (isStrongPassword(p)) {
-          return { text: isAr ? 'كلمة مرور قوية' : 'Strong password', level: 'strong' };
+          return { text: iifMessage('pwStrengthStrong'), level: 'strong' };
         }
         if (p.length < 8) {
-          return { text: isAr ? 'أضف حروفاً (8 على الأقل)' : 'Add more characters (at least 8)', level: 'weak' };
+          return { text: iifMessage('pwStrengthWeakMoreChars'), level: 'weak' };
         }
         var missing = [];
-        if (!/[a-z]/.test(p)) missing.push(isAr ? 'حرف صغير' : 'lowercase');
-        if (!/[A-Z]/.test(p)) missing.push(isAr ? 'حرف كبير' : 'uppercase');
-        if (!/\d/.test(p)) missing.push(isAr ? 'رقم' : 'number');
-        if (!/[\W_]/.test(p)) missing.push(isAr ? 'علامة' : 'symbol');
+        if (!/[a-z]/.test(p)) missing.push(iifMessage('pwMissingLowercase'));
+        if (!/[A-Z]/.test(p)) missing.push(iifMessage('pwMissingUppercase'));
+        if (!/\d/.test(p)) missing.push(iifMessage('pwMissingNumber'));
+        if (!/[\W_]/.test(p)) missing.push(iifMessage('pwMissingSymbol'));
         return {
-          text: (isAr ? 'ينقص: ' : 'Missing: ') + missing.join(', '),
+          text: iifMessage('pwMissingPrefix') + missing.join(', '),
           level: 'ok'
         };
       }
@@ -15440,12 +4282,11 @@
           var p1 = regPwInput ? regPwInput.value : '';
           var p2 = regPw2Input.value;
           if (!p2) { regPw2MatchEl.textContent = ''; regPw2MatchEl.className = 'auth-password-strength'; return; }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           if (p1 === p2) {
-            regPw2MatchEl.textContent = isAr ? 'متطابق' : 'Match';
+            regPw2MatchEl.textContent = iifMessage('pwMatch');
             regPw2MatchEl.className = 'auth-password-strength auth-password-strength--match';
           } else {
-            regPw2MatchEl.textContent = isAr ? 'لا يتطابق' : 'Does not match';
+            regPw2MatchEl.textContent = iifMessage('pwNoMatch');
             regPw2MatchEl.className = 'auth-password-strength auth-password-strength--mismatch';
           }
         }
@@ -15457,17 +4298,16 @@
           var inp = document.getElementById(inpId);
           var btn = document.getElementById(btnId);
           if (!inp || !btn) return;
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           if (inp.type === 'password') {
             inp.type = 'text';
-            btn.setAttribute('aria-label', isAr ? 'إخفاء كلمة المرور' : 'Hide password');
-            btn.title = isAr ? 'إخفاء' : 'Hide';
-            btn.textContent = isAr ? 'إخفاء' : 'Hide';
+            btn.setAttribute('aria-label', iifMessage('pwToggleHideAria'));
+            btn.title = iifMessage('pwToggleHideTitle');
+            btn.textContent = iifMessage('pwToggleHide');
           } else {
             inp.type = 'password';
-            btn.setAttribute('aria-label', isAr ? 'إظهار كلمة المرور' : 'Show password');
-            btn.title = isAr ? 'إظهار' : 'Show';
-            btn.textContent = isAr ? 'إظهار' : 'Show';
+            btn.setAttribute('aria-label', iifMessage('pwToggleShowAria'));
+            btn.title = iifMessage('pwToggleShowTitle');
+            btn.textContent = iifMessage('pwToggleShow');
           }
         }
         function makeToggleHandler(inpId, btnId) {
@@ -15482,8 +4322,7 @@
         var tLogin = document.getElementById('login-password-toggle');
         var setInitialToggleLabel = function (btn) {
           if (!btn) return;
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          btn.textContent = isAr ? 'إظهار' : 'Show';
+          btn.textContent = iifMessage('pwToggleShow');
         };
         if (t1) { setInitialToggleLabel(t1); t1.addEventListener('click', makeToggleHandler('reg-password', 'reg-password-toggle')); t1.style.cursor = 'pointer'; t1.setAttribute('tabindex', '0'); }
         if (t2) { setInitialToggleLabel(t2); t2.addEventListener('click', makeToggleHandler('reg-password2', 'reg-password2-toggle')); t2.style.cursor = 'pointer'; t2.setAttribute('tabindex', '0'); }
@@ -15511,7 +4350,7 @@
         if (!isValidEmail(newEmail)) { alert(iifMessage('invalidEmail')); if (emailEl) emailEl.focus(); return; }
         if (!(nameEl && nameEl.value && String(nameEl.value).trim())) { alert(iifMessage('emptyName')); if (nameEl) nameEl.focus(); return; }
         if (typeof isEmailBlockedFromSite === 'function' && isEmailBlockedFromSite(newEmail)) {
-          alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم استبعاد هذا البريد من الموقع. تواصل مع الإدارة.' : 'This email has been excluded from the site. Contact administration.');
+          alert(iifMessage('jsEmailExcludedFromSite'));
           return;
         }
         var termsCb = document.getElementById('reg-terms-accept');
@@ -15520,17 +4359,16 @@
         var regPw2El = document.getElementById('reg-password2');
         var pw = regPwEl ? regPwEl.value : '';
         var pw2 = regPw2El ? regPw2El.value : '';
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         if (!pw || pw.length < 8) {
-          alert(isAr ? 'كلمة المرور لا تقل عن 8 أحرف.' : 'Password must be at least 8 characters.');
+          alert(iifMessage('pwMinLength8'));
           if (regPwEl) regPwEl.focus(); return;
         }
         if (!isStrongPassword(pw)) {
-          alert(isAr ? 'كلمة المرور يجب أن تحتوي على حرف صغير وحرف كبير ورقم وعلامة (مثل !@#$).' : 'Password must include lowercase, uppercase, number and a symbol (e.g. !@#$).');
+          alert(iifMessage('pwRequirementsComplex'));
           if (regPwEl) regPwEl.focus(); return;
         }
         if (pw !== pw2) {
-          alert(isAr ? 'تأكيد كلمة المرور غير مطابق.' : 'Password confirmation does not match.');
+          alert(iifMessage('pwConfirmMismatch'));
           if (regPw2El) regPw2El.focus(); return;
         }
         try {
@@ -15586,12 +4424,12 @@
         if (typeof setCredentialForEmail === 'function') {
           setCredentialForEmail(newEmail, pw).then(function (ok) {
             if (!ok) {
-              alert(isAr ? 'تعذر حفظ كلمة المرور.' : 'Could not save password.');
+              alert(iifMessage('pwSaveFailedGeneric'));
               return;
             }
             finishRegister();
           }).catch(function () {
-            alert(isAr ? 'خطأ في حفظ كلمة المرور.' : 'Error saving password.');
+            alert(iifMessage('pwSaveErrorGeneric'));
           });
         } else {
           finishRegister();
@@ -15654,18 +4492,17 @@
         var ul = document.getElementById('dashboard-submissions-list');
         if (!ul) return;
         var list = typeof getSubmissions === 'function' ? getSubmissions() : [];
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         ul.innerHTML = '';
         if (!list.length) {
-          ul.innerHTML = '<li style="color:var(--color-text-muted);">' + (isAr ? 'لا توجد طلبات مسجّلة.' : 'No submissions yet.') + '</li>';
+          ul.innerHTML = '<li style="color:var(--color-text-muted);">' + escapeHtml(iifText('dashNoSubmissions', 'No submissions yet.')) + '</li>';
           return;
         }
         list.slice().reverse().forEach(function (s) {
           var li = document.createElement('li');
-          var typeLabel = s.type === 'contact' ? (isAr ? 'تواصل' : 'Contact') :
-            s.type === 'investor' ? (isAr ? 'مستثمر' : 'Investor') :
-              s.type === 'urgent' ? (isAr ? 'عاجل' : 'Urgent') :
-                s.type === 'membership_request' ? (isAr ? 'طلب عضوية' : 'Membership request') : String(s.type || '');
+          var typeLabel = s.type === 'contact' ? iifMessage('dashArchiveSubTypeContact') :
+            s.type === 'investor' ? iifMessage('dashArchiveSubTypeInvestor') :
+              s.type === 'urgent' ? iifMessage('dashArchiveSubTypeUrgent') :
+                s.type === 'membership_request' ? iifMessage('dashArchiveSubTypeMembership') : String(s.type || '');
           var loc = s.location || {};
           var locStr = [loc.ipCity, loc.ipCountry].filter(Boolean).join(', ') || (loc.lat && loc.lng ? String(loc.lat) + ',' + String(loc.lng) : '');
           var dataStr = JSON.stringify(s.data || {}, null, 0);
@@ -15673,22 +4510,17 @@
           ul.appendChild(li);
         });
       }
-      function exclusionArchiveKindLabel(kind, isAr) {
-        var map = {
-          fund_member_excluded: { en: 'Paid member excluded', ar: 'استبعاد عضو مدفوع' },
-          site_user_excluded: { en: 'Registered — excluded', ar: 'مسجّل — استبعاد' },
-          site_user_rejected: { en: 'Registered — rejected', ar: 'مسجّل — رفض' },
-          membership_app_rejected: { en: 'Membership form — rejected', ar: 'طلب عضوية — رفض' }
-        };
-        var m = map[kind] || { en: String(kind || ''), ar: String(kind || '') };
-        return isAr ? m.ar : m.en;
+      function exclusionArchiveKindLabel(kind) {
+        var map = { fund_member_excluded: 'exclKindFundMemberExcluded', site_user_excluded: 'exclKindSiteUserExcluded', site_user_rejected: 'exclKindSiteUserRejected', membership_app_rejected: 'exclKindMembershipAppRejected' };
+        var i18nKey = map[kind];
+        if (i18nKey && typeof iifMessage === 'function') return iifMessage(i18nKey);
+        return String(kind || '');
       }
       function renderDashboardExclusionArchive() {
         var root = document.getElementById('dashboard-exclusion-archive');
         var listEl = document.getElementById('dashboard-exclusion-archive-list');
         var statsEl = document.getElementById('dashboard-exclusion-archive-stats');
         if (!root || !listEl) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var tab = window.__dashboardExclTab || 'all';
         var all = typeof getExclusionArchive === 'function' ? getExclusionArchive().slice().reverse() : [];
         var filtered = all.filter(function (r) {
@@ -15699,19 +4531,17 @@
           return true;
         });
         if (statsEl) {
-          statsEl.textContent = isAr
-            ? ('إجمالي السجلات: ' + all.length + ' — المعروض: ' + filtered.length)
-            : ('Total records: ' + all.length + ' — Showing: ' + filtered.length);
+          statsEl.textContent = typeof iifMessageFmt === 'function' ? iifMessageFmt('dashExclArchiveStats', { total: all.length, showing: filtered.length }) : ('Total records: ' + all.length + ' — Showing: ' + filtered.length);
         }
         listEl.innerHTML = '';
         if (!filtered.length) {
-          listEl.innerHTML = '<li class="dashboard-archive-empty">' + (isAr ? 'لا توجد سجلات في هذا الجزء.' : 'No records in this segment.') + '</li>';
+          listEl.innerHTML = '<li class="dashboard-archive-empty">' + iifMessage('dashArchiveEmptySegment') + '</li>';
           return;
         }
         filtered.forEach(function (e) {
           var li = document.createElement('li');
           li.className = 'dashboard-archive-item';
-          var kindLabel = exclusionArchiveKindLabel(e.kind, isAr);
+          var kindLabel = exclusionArchiveKindLabel(e.kind);
           var at = e.at || '';
           var actor = e.actorEmail || '';
           var em = escapeHtml(e.email || '');
@@ -15725,10 +4555,10 @@
             '</div>' +
             '<div class="dashboard-archive-item__body">' +
             '<strong>' + em + '</strong>' + (title ? ' <span class="dashboard-archive-title">— ' + title + '</span>' : '') +
-            (actor ? '<div class="dashboard-archive-actor">' + (isAr ? 'بواسطة: ' : 'By: ') + escapeHtml(actor) + '</div>' : '') +
+            (actor ? '<div class="dashboard-archive-actor">' + escapeHtml(iifMessage('dashArchiveBy')) + escapeHtml(actor) + '</div>' : '') +
             '</div>' +
             '<details class="dashboard-archive-details">' +
-            '<summary>' + (isAr ? 'الاطلاع على لقطة البيانات المؤرشفة' : 'View archived data snapshot') + '</summary>' +
+            '<summary>' + escapeHtml(iifMessage('dashArchiveViewSnapshot')) + '</summary>' +
             '<pre class="dashboard-archive-pre">' + escapeHtml(snapShort) + '</pre>' +
             '</details>';
           listEl.appendChild(li);
@@ -15755,13 +4585,12 @@
       function renderDashboardUserRegistry() {
         var ulApps = document.getElementById('dashboard-membership-apps-list');
         var ulSite = document.getElementById('dashboard-site-users-list');
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var apps = typeof getMembershipApplications === 'function' ? getMembershipApplications() : [];
         if (ulApps) {
           ulApps.innerHTML = '';
           var pendingApps = apps.filter(function (a) { return (a.status || 'pending') === 'pending'; });
           if (!pendingApps.length) {
-            ulApps.innerHTML = '<li style="color:var(--color-text-muted);">' + (isAr ? 'لا توجد طلبات عضوية معلّقة.' : 'No pending membership applications.') + '</li>';
+            ulApps.innerHTML = '<li style="color:var(--color-text-muted);">' + iifMessage('dashMemPendingAppsEmpty') + '</li>';
           } else {
             pendingApps.slice().reverse().forEach(function (app) {
               var li = document.createElement('li');
@@ -15770,8 +4599,8 @@
               var summary = escapeHtml((d.entity_name || d.name || '') + ' — ' + em);
               li.innerHTML = '<div class="content"><strong>' + summary + '</strong><br><small style="opacity:0.9;">' + escapeHtml(JSON.stringify(d).slice(0, 400)) + (JSON.stringify(d).length > 400 ? '…' : '') + '</small></div>' +
                 '<div class="actions" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">' +
-                '<button type="button" class="btn btn--primary btn-sm mem-app-accept" data-id="' + escapeHtml(app.id) + '">' + (isAr ? 'قبول (عضو مدفوع)' : 'Accept (member)') + '</button>' +
-                '<button type="button" class="btn btn--ghost btn-sm mem-app-reject" data-id="' + escapeHtml(app.id) + '">' + (isAr ? 'رفض' : 'Reject') + '</button>' +
+                '<button type="button" class="btn btn--primary btn-sm mem-app-accept" data-id="' + escapeHtml(app.id) + '">' + escapeHtml(iifMessage('dashMemAppAcceptPaidBtn')) + '</button>' +
+                '<button type="button" class="btn btn--ghost btn-sm mem-app-reject" data-id="' + escapeHtml(app.id) + '">' + escapeHtml(iifMessage('dashBtnReject')) + '</button>' +
                 '</div>';
               ulApps.appendChild(li);
             });
@@ -15783,7 +4612,7 @@
                 if (!app || !app.data) return;
                 var d = app.data;
                 var em = (d.email || '').trim().toLowerCase();
-                if (!em) { alert(isAr ? 'بريد غير صالح.' : 'Invalid email.'); return; }
+                if (!em) { alert(iifMessage('jsInvalidEmailShort')); return; }
                 var tier = (d.membership_tier || 'shared').trim() || 'shared';
                 var ne = (d.entity_name || '').trim() || em;
                 promoteEmailToFundMember(em, ne, ne, tier);
@@ -15791,7 +4620,7 @@
                 app.decidedAt = new Date().toISOString();
                 saveMembershipApplications(appsFresh);
                 if (typeof renderDashboardUserRegistry === 'function') renderDashboardUserRegistry();
-                alert(isAr ? 'تم قبول الطلب وإضافة العضو كمدفوع.' : 'Application accepted; member added as paid.');
+                alert(iifMessage('dashMemAppAcceptedPaidAlert'));
               });
             });
             ulApps.querySelectorAll('.mem-app-reject').forEach(function (btn) {
@@ -15826,18 +4655,18 @@
           if (typeof getFundMembers === 'function') getFundMembers().forEach(function (m) { fundEmails[(m.email || '').trim().toLowerCase()] = true; });
           var regOnly = show.filter(function (u) { return !fundEmails[(u.email || '').trim().toLowerCase()]; });
           if (!regOnly.length) {
-            ulSite.innerHTML = '<li style="color:var(--color-text-muted);">' + (isAr ? 'لا يوجد مسجّلون بدون عضوية مدفوعة (أو الجميع أعضاء).' : 'No registered-only users (or all are members).') + '</li>';
+            ulSite.innerHTML = '<li style="color:var(--color-text-muted);">' + iifMessage('dashSiteRegOnlyEmpty') + '</li>';
           } else {
             regOnly.forEach(function (u) {
               var li = document.createElement('li');
               var em = (u.email || '').trim().toLowerCase();
               var st = u.status || 'active';
               li.innerHTML = '<div class="content"><strong>' + escapeHtml(u.name || em) + '</strong> <small>' + escapeHtml(em) + '</small> ' +
-                '<span style="font-size:0.75rem;opacity:0.9;">(' + (isAr ? 'مسجّل فقط' : 'Registered only') + (st === 'rejected' ? ' — ' + (isAr ? 'مرفوض' : 'Rejected') : '') + ')</span></div>' +
+                '<span style="font-size:0.75rem;opacity:0.9;">(' + escapeHtml(iifMessage('dashBadgeRegisteredOnly')) + (st === 'rejected' ? ' — ' + escapeHtml(iifMessage('dashBadgeRejected')) : '') + ')</span></div>' +
                 '<div class="actions" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.5rem;">' +
-                '<button type="button" class="btn btn--primary btn-sm site-user-accept" data-email="' + escapeHtml(em) + '">' + (isAr ? 'قبول كعضو مدفوع' : 'Accept as paid member') + '</button>' +
-                '<button type="button" class="btn btn--ghost btn-sm site-user-reject" data-email="' + escapeHtml(em) + '">' + (isAr ? 'رفض' : 'Reject') + '</button>' +
-                '<button type="button" class="btn btn--ghost btn-sm site-user-excl-reg" data-email="' + escapeHtml(em) + '">' + (isAr ? 'استبعاد مسجّل' : 'Exclude registered') + '</button>' +
+                '<button type="button" class="btn btn--primary btn-sm site-user-accept" data-email="' + escapeHtml(em) + '">' + escapeHtml(iifMessage('dashSiteAcceptAsPaidBtn')) + '</button>' +
+                '<button type="button" class="btn btn--ghost btn-sm site-user-reject" data-email="' + escapeHtml(em) + '">' + escapeHtml(iifMessage('dashBtnReject')) + '</button>' +
+                '<button type="button" class="btn btn--ghost btn-sm site-user-excl-reg" data-email="' + escapeHtml(em) + '">' + escapeHtml(iifMessage('dashSiteExcludeRegisteredBtn')) + '</button>' +
                 '</div>';
               ulSite.appendChild(li);
             });
@@ -15845,7 +4674,7 @@
               btn.addEventListener('click', function () {
                 var em = (btn.getAttribute('data-email') || '').trim().toLowerCase();
                 if (!em) return;
-                var tier = prompt(isAr ? 'مستوى العضوية (shared / premium_2143 / premium_3143 / premium_4143):' : 'Membership tier (shared / premium_2143 / premium_3143 / premium_4143):', 'shared');
+                var tier = prompt(iifMessage('dashPromptMembershipTier'), 'shared');
                 if (tier === null) return;
                 var u = users.find(function (x) { return (x.email || '').toLowerCase() === em; });
                 var name = u ? (u.name || em) : em;
@@ -15876,7 +4705,7 @@
             ulSite.querySelectorAll('.site-user-excl-reg').forEach(function (btn) {
               btn.addEventListener('click', function () {
                 var em = (btn.getAttribute('data-email') || '').trim().toLowerCase();
-                if (!confirm(isAr ? 'استبعاد هذا المسجّل (بدون إلغاء عضوية مدفوعة)؟ سيُحظر البريد من الدخول.' : 'Exclude this registered user (not paid member)? Email will be blocked from sign-in.')) return;
+                if (!confirm(iifMessage('dashConfirmExcludeRegistered'))) return;
                 if (typeof excludeSiteUserOnly === 'function') excludeSiteUserOnly(em);
                 if (typeof renderDashboardUserRegistry === 'function') renderDashboardUserRegistry();
               });
@@ -15888,19 +4717,19 @@
           ulEx.innerHTML = '';
           var members = getFundMembers();
           if (!members.length) {
-            ulEx.innerHTML = '<li style="color:var(--color-text-muted);">' + (isAr ? 'لا يوجد أعضاء في قائمة الصندوق.' : 'No fund members in list.') + '</li>';
+            ulEx.innerHTML = '<li style="color:var(--color-text-muted);">' + iifMessage('dashFundMembersListEmpty') + '</li>';
           } else {
             members.forEach(function (m, idx) {
               var li = document.createElement('li');
               var em = (m.email || '').trim().toLowerCase();
-              li.innerHTML = '<div class="content"><strong>' + escapeHtml(m.nameEn || m.nameAr || em) + '</strong> <small>' + escapeHtml(em) + '</small> <span style="font-size:0.75rem;">(' + (isAr ? 'عضو مدفوع / قائمة الصندوق' : 'Paid / fund list') + ')</span></div>' +
-                '<div class="actions"><button type="button" class="btn btn--ghost btn-sm fund-exclude-member" data-email="' + escapeHtml(em) + '">' + (isAr ? 'استبعاد عضو' : 'Exclude member') + '</button></div>';
+              li.innerHTML = '<div class="content"><strong>' + escapeHtml(m.nameEn || m.nameAr || em) + '</strong> <small>' + escapeHtml(em) + '</small> <span style="font-size:0.75rem;">(' + escapeHtml(iifMessage('dashBadgePaidFundList')) + ')</span></div>' +
+                '<div class="actions"><button type="button" class="btn btn--ghost btn-sm fund-exclude-member" data-email="' + escapeHtml(em) + '">' + escapeHtml(iifMessage('dashExcludeMemberBtn')) + '</button></div>';
               ulEx.appendChild(li);
             });
             ulEx.querySelectorAll('.fund-exclude-member').forEach(function (btn) {
               btn.addEventListener('click', function () {
                 var em = (btn.getAttribute('data-email') || '').trim().toLowerCase();
-                if (!confirm(isAr ? 'إزالة العضوية المدفوعة واستبعاد هذا العضو من القائمة؟' : 'Remove paid membership and exclude this member from the list?')) return;
+                if (!confirm(iifMessage('dashConfirmRemovePaidExclude'))) return;
                 if (typeof excludeFundMemberByEmail === 'function') excludeFundMemberByEmail(em);
                 if (typeof renderDashboardUserRegistry === 'function') renderDashboardUserRegistry();
               });
@@ -15918,16 +4747,16 @@
           Object.keys(credMap || {}).forEach(function (k) { emailSet[(k || '').trim().toLowerCase()] = true; });
           var emails = Object.keys(emailSet).filter(Boolean).sort();
           if (!emails.length) {
-            adminPwUl.innerHTML = '<li style="color:var(--color-text-muted);">' + (isAr ? 'لا توجد كلمات مرور محفوظة بعد.' : 'No stored passwords yet.') + '</li>';
+            adminPwUl.innerHTML = '<li style="color:var(--color-text-muted);">' + iifMessage('dashAdminPwListEmpty') + '</li>';
           } else {
             adminPwUl.innerHTML = '';
             emails.forEach(function (em) {
               var li = document.createElement('li');
               var showPw = plainMap[em] || '';
               li.innerHTML =
-                '<div class="content"><strong>' + escapeHtml(em) + '</strong><br><code style="font-size:0.85rem; word-break:break-all; display:block; margin-top:0.35rem;">' + escapeHtml(showPw || (isAr ? '(لا توجد نسخة نصية — استخدم «تعيين»)' : '(no plain copy — use Set)')) + '</code></div>' +
+                '<div class="content"><strong>' + escapeHtml(em) + '</strong><br><code style="font-size:0.85rem; word-break:break-all; display:block; margin-top:0.35rem;">' + escapeHtml(showPw || iifMessage('dashAdminPwNoPlain')) + '</code></div>' +
                 '<div class="actions" style="display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem;">' +
-                '<button type="button" class="btn btn--primary btn-sm admin-pw-set" data-email="' + escapeHtml(em) + '">' + (isAr ? 'تعيين / تغيير' : 'Set / change') + '</button>' +
+                '<button type="button" class="btn btn--primary btn-sm admin-pw-set" data-email="' + escapeHtml(em) + '">' + escapeHtml(iifMessage('dashAdminPwSetChange')) + '</button>' +
                 '</div>';
               adminPwUl.appendChild(li);
             });
@@ -15935,19 +4764,19 @@
               btn.addEventListener('click', function () {
                 var em = (btn.getAttribute('data-email') || '').trim().toLowerCase();
                 if (!em || typeof setCredentialForEmail !== 'function') return;
-                var p1 = prompt(isAr ? 'كلمة مرور جديدة لـ ' + em + ' (8+ أحرف، كبير وصغير ورقم ورمز):' : 'New password for ' + em + ' (8+ chars, upper, lower, digit, symbol):');
+                var p1 = prompt(iifMessageFmt('dashPromptNewPasswordFor', { email: em }), '');
                 if (p1 === null || p1 === '') return;
                 if (typeof isStrongPassword === 'function' && !isStrongPassword(p1)) {
-                  alert(isAr ? 'كلمة المرور ضعيفة.' : 'Password is too weak.');
+                  alert(iifMessage('jsPasswordWeakShort'));
                   return;
                 }
-                var p2 = prompt(isAr ? 'تأكيد كلمة المرور:' : 'Confirm password:');
+                var p2 = prompt(iifMessage('dashPromptConfirmPassword'));
                 if (p2 !== p1) {
-                  alert(isAr ? 'غير متطابقة.' : 'Passwords do not match.');
+                  alert(iifMessage('jsPasswordsMismatchShort'));
                   return;
                 }
                 setCredentialForEmail(em, p1).then(function (ok) {
-                  if (!ok) { alert(isAr ? 'فشل الحفظ.' : 'Save failed.'); return; }
+                  if (!ok) { alert(iifMessage('jsSaveFailedShort')); return; }
                   if (typeof renderDashboardUserRegistry === 'function') renderDashboardUserRegistry();
                 });
               });
@@ -15969,15 +4798,16 @@
           li.dataset.id = item.id;
           var lang = document.documentElement.getAttribute('data-lang');
           var title = lang === 'ar' ? (item.titleAr || item.titleEn) : (item.titleEn || item.titleAr);
+          var descPrev = (lang === 'ar' ? (item.descAr || item.descEn) : (item.descEn || item.descAr)) || '';
+          if (descPrev.length > 80) descPrev = descPrev.slice(0, 80) + '…';
           li.innerHTML =
             '<div class="content">' +
             '<strong>' + escapeHtml(title) + '</strong>' +
-            '<small class="lang-en">' + escapeHtml((item.descEn || '').slice(0, 80)) + (item.descEn && item.descEn.length > 80 ? '…' : '') + '</small>' +
-            '<small class="lang-ar">' + escapeHtml((item.descAr || '').slice(0, 80)) + (item.descAr && item.descAr.length > 80 ? '…' : '') + '</small>' +
+            '<small style="color:var(--color-text-muted);">' + escapeHtml(descPrev) + '</small>' +
             '</div>' +
             '<div class="actions">' +
-            '<button type="button" class="btn-edit" data-id="' + escapeHtml(item.id) + '"><span class="lang-en">Edit</span><span class="lang-ar">تعديل الوصف</span></button>' +
-            '<button type="button" class="btn-delete" data-id="' + escapeHtml(item.id) + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button>' +
+            '<button type="button" class="btn-edit" data-id="' + escapeHtml(item.id) + '">' + iifBilingualSpans('dashBtnEditDescription', 'Edit description', 'تعديل الوصف') + '</button>' +
+            '<button type="button" class="btn-delete" data-id="' + escapeHtml(item.id) + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button>' +
             '</div>';
           ul.appendChild(li);
         });
@@ -15987,9 +4817,9 @@
             var list = getActivities();
             var item = list.find(function (x) { return x.id === id; });
             if (!item) return;
-            var newDescEn = prompt(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الوصف (إنجليزي):' : 'Description (EN):', item.descEn || '');
+            var newDescEn = prompt(iifMessage('jsPromptDescEn'), item.descEn || '');
             if (newDescEn === null) return;
-            var newDescAr = prompt(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الوصف (عربي):' : 'Description (AR):', item.descAr || '');
+            var newDescAr = prompt(iifMessage('jsPromptDescAr'), item.descAr || '');
             if (newDescAr === null) return;
             item.descEn = newDescEn;
             item.descAr = newDescAr;
@@ -16001,7 +4831,7 @@
         ul.querySelectorAll('.btn-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-id');
-            if (!confirm(document.documentElement.getAttribute('data-lang') === 'ar' ? 'حذف هذا المشروع الاستثماري؟' : 'Delete this investment project?')) return;
+            if (!confirm(iifMessage('jsConfirmDeleteInvestmentProject'))) return;
             var list = getActivities().filter(function (x) { return x.id !== id; });
             saveActivities(list);
             renderActivitiesSection();
@@ -16196,21 +5026,18 @@
             if (typeof openAuth === 'function') openAuth();
             return;
           }
-          var isArDeny = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isArDeny ? 'لا تملك صلاحية الدخول إلى لوحة التحكم. سجّل الدخول بحساب مسموح (مالك، موظف بصلاحية لوحة التحكم، عضو مدفوع، أو مستخدم مسجّل).' : 'You do not have permission to open the dashboard. Sign in with an allowed account (owner, staff with dashboard access, paid member, or registered user).');
+          alert(iifMessage('dashOpenDenied'));
           return;
         }
         if (typeof clearSessionIfDeviceChanged === 'function' && clearSessionIfDeviceChanged()) {
           updateDashboardNav();
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isAr ? 'تم تغيير الجهاز أو المتصفح. يرجى تسجيل الدخول مرة أخرى.' : 'Device or browser changed. Please sign in again.');
+          alert(iifMessage('jsDeviceBrowserChangedRelogin'));
           return;
         }
         var d = IIF_getDashboardOverlay();
         if (!d) {
           try { console.error('IIF: #dashboard-overlay not found in DOM'); } catch (eLog) { }
-          var isArMiss = document.documentElement.getAttribute('data-lang') === 'ar';
-          alert(isArMiss ? 'تعذر تحميل واجهة لوحة التحكم (عنصر اللوحة غير موجود في الصفحة). حدّث الصفحة أو أعد نشر الموقع.' : 'Dashboard UI failed to load (#dashboard-overlay missing). Refresh or redeploy.');
+          alert(iifMessage('dashOpenOverlayMissing'));
           return;
         }
         if (d) {
@@ -16267,6 +5094,69 @@
           if (typeof addSampleData === 'function') addSampleData();
           if (typeof refreshCertImagePreviews === 'function') refreshCertImagePreviews();
           renderDashboardList();
+          // Local dev system status bar (health + diagnostics)
+          try {
+            (function () {
+              var bar = document.getElementById('dashboard-local-statusbar');
+              if (!bar) return;
+
+              function dashT() {
+                var lang = document.documentElement.getAttribute('data-lang') || 'en';
+                return window.IIF_I18N && window.IIF_I18N.T && (window.IIF_I18N.T[lang] || window.IIF_I18N.T.en) || {};
+              }
+              function escAttr(s) {
+                return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+              }
+
+              async function updateOnce() {
+                try {
+                  var T0 = dashT();
+                  bar.innerHTML = '<span>' + escapeHtml(T0.dashSystemStatusLoading || 'System status: loading…') + '</span>';
+
+                  var res = await fetch('/healthz', { cache: 'no-store' });
+                  if (!res.ok) throw new Error('HTTP ' + res.status);
+                  var data = await res.json();
+
+                  var searxOk = Boolean(data && data.searx && data.searx.ok);
+                  var latency = data && data.searx ? data.searx.latencyMs : null;
+                  var diagSize = data && data.diagnostics ? data.diagnostics.size : null;
+
+                  var latencyText = (typeof latency === 'number') ? (latency + 'ms') : 'N/A';
+                  var diagText = (typeof diagSize === 'number') ? String(diagSize) : 'N/A';
+                  var dotColor = searxOk ? 'rgba(16, 185, 129, 0.95)' : 'rgba(239, 68, 68, 0.95)';
+                  var dotShadow = searxOk ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+
+                  var T = dashT();
+                  var searxLabel = escapeHtml(T.dashSearxLabel || 'SearXNG:');
+                  var diagLabel = escapeHtml(T.dashDiagEventsLabel || 'Diag events:');
+                  var diagTitle = escAttr(T.dashDiagEventsTitle || '');
+                  bar.innerHTML =
+                    '<span aria-hidden="true" style="display:inline-block;width:9px;height:9px;border-radius:999px;background:' +
+                    dotColor +
+                    ';margin-inline-end:6px;box-shadow:0 0 0 3px ' +
+                    dotShadow +
+                    '"></span>' +
+                    '<span>' + searxLabel + '</span>' +
+                    '<strong>' + (searxOk ? 'OK' : 'FAIL') + '</strong>' +
+                    '<span style="opacity:0.9;margin-inline-start:6px">(' + latencyText + ')</span>' +
+                    '<span aria-hidden="true" style="opacity:0.7;margin-inline:10px">•</span>' +
+                    '<span title="' + diagTitle + '">' + diagLabel + '</span>' +
+                    '<strong>' + escapeHtml(diagText) + '</strong>';
+                } catch (e) {
+                  var Te = dashT();
+                  bar.innerHTML = Te.dashSystemStatusUnavailableHtml ||
+                    '<span>System status: unavailable — static or local. <a href="health.html" style="color:inherit;text-decoration:underline;">Health page</a> · <a href="diagnostics.html" style="color:inherit;text-decoration:underline;">Diagnostics</a></span>';
+                }
+              }
+
+              // أول تحديث فوراً ثم تحديث كل 15 ثانية (حتى لو كان SearXNG غير متاح عند أول فتح)
+              updateOnce();
+              try {
+                if (window.IIF_DASH_LOCAL_STATUS_TIMER) clearInterval(window.IIF_DASH_LOCAL_STATUS_TIMER);
+              } catch (e) { }
+              window.IIF_DASH_LOCAL_STATUS_TIMER = setInterval(updateOnce, 15000);
+            })();
+          } catch (eDashStatus) { }
           if (typeof renderDashboardTeamList === 'function') renderDashboardTeamList();
           if (typeof renderDashboardUploads === 'function') renderDashboardUploads();
           if (typeof renderDashboardPermLists === 'function') renderDashboardPermLists();
@@ -16505,7 +5395,7 @@
       }
       if (window.addEventListener) {
         window.addEventListener('hashchange', function () {
-          try { window.__iifHashDashOpenScheduled = false; } catch (e) {}
+          try { window.__iifHashDashOpenScheduled = false; } catch (e) { }
           openDashboardIfHash();
           window.IIF_runAfterUI(function () {
             try {
@@ -16648,6 +5538,7 @@
           }
           if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureBtn);
           else ensureBtn();
+          /* لا نستدعي openDashboardEnhanced هنا — فتح اللوحة من /dashboard أو iifTryPendingDashboardAfterSecureInit فقط */
         } catch (e0) { }
       })();
 
@@ -16719,7 +5610,7 @@
           /* ضمان إضافي: كرّر المحاولة عدة مرات حتى لا يبقى embed على صفحة عامة ثابتة */
           (function ensureEmbedEntryFlow() {
             var tries = 0;
-            var maxTries = 80; /* ~32 ثانية */
+            var maxTries = 30; /* ~12 ثانية */
             var timer = setInterval(function () {
               tries += 1;
               try {
@@ -16877,7 +5768,7 @@
         try { window.IIF_refreshDashboardLists = refreshDashboardListsFromStorage; } catch (e) { }
 
         function saveAllToDB() {
-          setStatus(document.documentElement.getAttribute('data-lang') === 'ar' ? 'جاري الحفظ…' : 'Saving…');
+          setStatus(iifMessage('jsDbSaving'));
           openDB().then(function (db) {
             var tx = db.transaction(STORE_NAME, 'readwrite');
             var store = tx.objectStore(STORE_NAME);
@@ -16891,11 +5782,11 @@
             for (var j = 0; j < keys.length; j++) store.put({ key: keys[j], value: localStorage.getItem(keys[j]) || '' });
             tx.oncomplete = function () {
               db.close();
-              setStatus(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم حفظ ' + keys.length + ' عنصراً في قاعدة البيانات.' : 'Saved ' + keys.length + ' items to database.');
+              setStatus(iifMessageFmt('jsDbSavedCount', { n: keys.length }));
               refreshDashboardListsFromStorage();
             };
-            tx.onerror = function () { db.close(); setStatus(document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل الحفظ.' : 'Save failed.', true); };
-          }).catch(function (e) { setStatus((document.documentElement.getAttribute('data-lang') === 'ar' ? 'خطأ: ' : 'Error: ') + (e && e.message ? e.message : 'IndexedDB failed'), true); });
+            tx.onerror = function () { db.close(); setStatus(iifMessage('jsDbSaveFailed'), true); };
+          }).catch(function (e) { setStatus(iifMessage('jsErrorPrefix') + (e && e.message ? e.message : iifMessage('jsIndexeddbFailed')), true); });
         }
         function loadAllFromDB() {
           setStatus('');
@@ -16911,16 +5802,123 @@
                 }
               } catch (e) { }
               db.close();
-              setStatus(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم تحميل ' + items.length + ' عنصراً من قاعدة البيانات. حدّثت القوائم.' : 'Loaded ' + items.length + ' items from database. Lists updated.');
+              setStatus(iifMessageFmt('jsDbLoadedCount', { n: items.length }));
               refreshDashboardListsFromStorage();
             };
-            req.onerror = function () { db.close(); setStatus(document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل التحميل.' : 'Load failed.', true); };
-          }).catch(function (e) { setStatus((document.documentElement.getAttribute('data-lang') === 'ar' ? 'خطأ: ' : 'Error: ') + (e && e.message ? e.message : 'IndexedDB failed'), true); });
+            req.onerror = function () { db.close(); setStatus(iifMessage('jsDbLoadFailed'), true); };
+          }).catch(function (e) { setStatus(iifMessage('jsErrorPrefix') + (e && e.message ? e.message : iifMessage('jsIndexeddbFailed')), true); });
+        }
+        function exportLocalStorageJsonFile() {
+          var obj = {};
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) obj[k] = localStorage.getItem(k) || '';
+            }
+          } catch (e) { }
+          try {
+            var blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'iif-site-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+            setStatus('Exported ' + Object.keys(obj).length + ' keys to JSON file');
+          } catch (e2) {
+            setStatus((iifMessage('jsErrorPrefix') || '') + (e2 && e2.message ? e2.message : 'export failed'), true);
+          }
+        }
+        function importLocalStorageJsonFile(file) {
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var obj = JSON.parse(reader.result);
+              if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+                setStatus('JSON must be a single object / يجب أن يكون الملف كائناً واحداً.', true);
+                return;
+              }
+              var keysToApply = [];
+              Object.keys(obj).forEach(function (k) {
+                if (k && (k.substring(0, 3) === 'iif' || k.substring(0, 4) === 'iif_')) keysToApply.push(k);
+              });
+              if (keysToApply.length === 0) {
+                setStatus('No iif* keys in file / لا توجد مفاتيح iif* في الملف.', true);
+                return;
+              }
+              var newKeys = 0;
+              var overwrite = 0;
+              var same = 0;
+              keysToApply.forEach(function (k) {
+                try {
+                  var cur = localStorage.getItem(k);
+                  var next = obj[k] == null ? '' : String(obj[k]);
+                  if (cur === null) newKeys++;
+                  else if (cur !== next) overwrite++;
+                  else same++;
+                } catch (eC) {}
+              });
+              var confirmMsg =
+                'استيراد ' + keysToApply.length + ' مفتاحاً (iif*) إلى هذا المتصفح.\n' +
+                'جديدة: ' + newKeys + ' · تحديث قيمة: ' + overwrite + ' · نفس القيمة: ' + same + '\n\n' +
+                'Import ' + keysToApply.length + ' iif* key(s) into this browser.\n' +
+                'New: ' + newKeys + ' · value updates: ' + overwrite + ' · unchanged: ' + same + '\n\n' +
+                'متابعة؟ / Proceed?';
+              if (typeof window.confirm === 'function' && !window.confirm(confirmMsg)) {
+                setStatus('استيراد JSON أُلغي / Import cancelled.');
+                return;
+              }
+              var n = 0;
+              keysToApply.forEach(function (k) {
+                localStorage.setItem(k, obj[k] == null ? '' : String(obj[k]));
+                n++;
+              });
+              setStatus('Imported ' + n + ' keys from JSON / تم استيراد ' + n + ' مفتاحاً.');
+              refreshDashboardListsFromStorage();
+            } catch (e) {
+              setStatus((iifMessage('jsErrorPrefix') || '') + (e && e.message ? e.message : 'invalid JSON'), true);
+            }
+          };
+          reader.onerror = function () { setStatus('File read failed', true); };
+          reader.readAsText(file, 'utf-8');
         }
         var saveBtn = document.getElementById('db-save-btn');
         var loadBtn = document.getElementById('db-load-btn');
+        var exBtn = document.getElementById('ls-export-file-btn');
+        var imBtn = document.getElementById('ls-import-file-btn');
+        var imInp = document.getElementById('ls-import-file-input');
         if (saveBtn) saveBtn.addEventListener('click', saveAllToDB);
         if (loadBtn) loadBtn.addEventListener('click', loadAllFromDB);
+        if (exBtn) exBtn.addEventListener('click', exportLocalStorageJsonFile);
+        if (imBtn && imInp) {
+          imBtn.addEventListener('click', function () { imInp.click(); });
+          imInp.addEventListener('change', function () {
+            var f = imInp.files && imInp.files[0];
+            if (f) importLocalStorageJsonFile(f);
+            imInp.value = '';
+          });
+        }
+        var showBannerAgain = document.getElementById('iif-static-banner-show-again');
+        if (showBannerAgain) {
+          showBannerAgain.addEventListener('click', function () {
+            if (typeof window.iifIsStaticPublicHost === 'function' && !window.iifIsStaticPublicHost()) {
+              setStatus('الشريط يظهر على github.io و netlify فقط / Banner: GitHub Pages & Netlify only.', true);
+              return;
+            }
+            if (typeof window.IIF_showStaticHostBannerAgain === 'function') {
+              window.IIF_showStaticHostBannerAgain();
+              setStatus('تم إظهار الشريط أسفل الصفحة / Notice shown at bottom.');
+            } else {
+              try {
+                localStorage.removeItem('iif-static-host-banner-dismissed');
+              } catch (eB) {}
+              var bar = document.getElementById('iif-static-host-banner');
+              if (bar) bar.hidden = false;
+            }
+          });
+        }
       })();
 
       /* قبول ممثلاً لنا + إضافة أعضاء مباشرة (مشروع واحد على الهارد سي) */
@@ -16934,8 +5932,6 @@
         window.renderRepApps = function () {
           if (!listEl) return;
           var apps = getApps();
-          var lang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
-          var isAr = lang === 'ar';
           listEl.innerHTML = '';
           apps.forEach(function (a) {
             var li = document.createElement('li');
@@ -16945,21 +5941,21 @@
             var date = a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : '';
             var linkedLine = '';
             var emails = a.linkedToEmails || (a.linkedToAdminEmail ? [a.linkedToAdminEmail] : []);
-            if (emails.length) linkedLine = '<div style="font-size: 0.85rem; color: var(--color-accent-gold-soft); margin-top: 0.25rem;">' + (isAr ? 'مرتبط ب: ' : 'Linked to: ') + escapeHtml(emails.join(', ')) + '</div>';
+            if (emails.length) linkedLine = '<div style="font-size: 0.85rem; color: var(--color-accent-gold-soft); margin-top: 0.25rem;">' + escapeHtml(iifMessage('repLinkedTo')) + escapeHtml(emails.join(', ')) + '</div>';
             var kycParts = [];
             if (a.kyc_dob) {
               var dobStr = String(a.kyc_dob);
               try { var d = new Date(dobStr + 'T12:00:00'); if (!isNaN(d.getTime())) dobStr = d.toLocaleDateString(); } catch (e) { }
-              kycParts.push((isAr ? 'تاريخ ميلاد ' : 'DOB ') + escapeHtml(dobStr));
+              kycParts.push(escapeHtml(iifMessage('repKycDobPrefix')) + escapeHtml(dobStr));
             }
-            if (a.kyc_age) kycParts.push((isAr ? 'عمر ' : 'age ') + escapeHtml(String(a.kyc_age)));
+            if (a.kyc_age) kycParts.push(escapeHtml(iifMessage('repKycAgePrefix')) + escapeHtml(String(a.kyc_age)));
             if (a.kyc_income) kycParts.push(escapeHtml(String(a.kyc_income)));
-            if (a.kyc_relationships) kycParts.push((isAr ? 'علاقات: ' : 'relations: ') + escapeHtml(String(a.kyc_relationships).slice(0, 60)) + (a.kyc_relationships.length > 60 ? '…' : ''));
-            if (a.kyc_positions) kycParts.push((isAr ? 'مناصب: ' : 'positions: ') + escapeHtml(String(a.kyc_positions).slice(0, 60)) + (a.kyc_positions.length > 60 ? '…' : ''));
-            if (a.kyc_management_capacity) kycParts.push((isAr ? 'إدارة: ' : 'capacity: ') + escapeHtml(String(a.kyc_management_capacity).slice(0, 60)) + (a.kyc_management_capacity.length > 60 ? '…' : ''));
+            if (a.kyc_relationships) kycParts.push(escapeHtml(iifMessage('repKycRelationsPrefix')) + escapeHtml(String(a.kyc_relationships).slice(0, 60)) + (a.kyc_relationships.length > 60 ? '…' : ''));
+            if (a.kyc_positions) kycParts.push(escapeHtml(iifMessage('repKycPositionsPrefix')) + escapeHtml(String(a.kyc_positions).slice(0, 60)) + (a.kyc_positions.length > 60 ? '…' : ''));
+            if (a.kyc_management_capacity) kycParts.push(escapeHtml(iifMessage('repKycCapacityPrefix')) + escapeHtml(String(a.kyc_management_capacity).slice(0, 60)) + (a.kyc_management_capacity.length > 60 ? '…' : ''));
             var kycLine = kycParts.length ? '<div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.25rem;">KYC: ' + kycParts.join(' · ') + '</div>' : '';
             li.innerHTML = '<div style="font-weight: 600;">' + escapeHtml(name) + '</div><div style="font-size: 0.9rem; color: var(--color-text-muted);">' + escapeHtml(meta) + (date ? ' · ' + date : '') + '</div>' + linkedLine + kycLine +
-              (a.status !== 'accepted' ? '<button type="button" class="btn btn--primary btn-sm" style="margin-top: var(--space-2);" data-rep-id="' + escapeHtml(a.id) + '">' + (isAr ? 'قبول ممثلاً لنا' : 'Accept as our representative') + '</button>' : '<span style="font-size: 0.9rem; color: var(--color-text-muted);">' + (isAr ? 'تم القبول' : 'Accepted') + '</span>');
+              (a.status !== 'accepted' ? '<button type="button" class="btn btn--primary btn-sm" style="margin-top: var(--space-2);" data-rep-id="' + escapeHtml(a.id) + '">' + escapeHtml(iifMessage('repAcceptAsRepBtn')) + '</button>' : '<span style="font-size: 0.9rem; color: var(--color-text-muted);">' + escapeHtml(iifMessage('repAcceptedLabel')) + '</span>');
             listEl.appendChild(li);
           });
           listEl.querySelectorAll('[data-rep-id]').forEach(function (btn) {
@@ -16976,11 +5972,11 @@
         if (acceptAllBtn) acceptAllBtn.addEventListener('click', function () {
           var apps = getApps();
           var pending = apps.filter(function (a) { return a.status !== 'accepted'; });
-          if (!pending.length) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لا توجد طلبات معلقة.' : 'No pending applications.'); return; }
+          if (!pending.length) { alert(iifMessage('jsRepNoPendingApps')); return; }
           apps.forEach(function (a) { if (a.status !== 'accepted') { a.status = 'accepted'; a.acceptedAt = new Date().toISOString(); } });
           saveApps(apps);
           window.renderRepApps();
-          alert((document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم قبول ' : 'All ') + pending.length + (document.documentElement.getAttribute('data-lang') === 'ar' ? ' طلباً.' : ' accepted.'));
+          alert(iifMessageFmt('jsRepAcceptedCount', { n: pending.length }));
         });
         var REP_LINK_EMAILS_KEY = 'iif-rep-link-emails';
         var repLinkTextarea = document.getElementById('rep-link-emails');
@@ -16991,7 +5987,7 @@
         if (repSaveLinkBtn && repLinkTextarea) repSaveLinkBtn.addEventListener('click', function () {
           var raw = (repLinkTextarea.value || '').split(/[,;\n]+/).map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean);
           try { localStorage.setItem(REP_LINK_EMAILS_KEY, JSON.stringify(raw)); } catch (e) { }
-          alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم حفظ البريديات. طلبات التمثيل الجديدة ستُربط بها.' : 'Emails saved. New representative requests will be linked to them.');
+          alert(iifMessage('jsRepEmailsSavedLinked'));
         });
         window.renderRepApps();
 
@@ -17008,7 +6004,7 @@
         document.querySelectorAll('.btn-membership').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var email = (emailInput && emailInput.value) ? String(emailInput.value).trim().toLowerCase() : '';
-            if (!email) { showAddMsg(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أدخل البريد الإلكتروني.' : 'Enter email.', true); return; }
+            if (!email) { showAddMsg(iifMessage('jsEnterEmail'), true); return; }
             var type = this.getAttribute('data-type');
             var duration = this.getAttribute('data-duration') || 'year';
             var startDate = getTodayISO();
@@ -17025,31 +6021,47 @@
             var certData = { email: email, name: name || email, type: type, startDate: startDate, endDate: endDate, entityType: typeof getStoredEntity === 'function' ? getStoredEntity() : 'personal', photo: typeof getCertPhoto === 'function' ? getCertPhoto() : '', logo: typeof getCertLogo === 'function' ? getCertLogo() : '', flag: typeof getCertFlag === 'function' ? getCertFlag() : '' };
             if (typeof createCertificate === 'function') certData = createCertificate(certData);
             if (typeof showCertificateView === 'function') showCertificateView(certData);
-            showAddMsg(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تمت إضافة العضو وإصدار بطاقة العضوية الرقمية.' : 'Member added and digital membership card issued.');
+            showAddMsg(iifMessage('jsMemberAddedCardIssued'));
           });
         });
         var issueOnlyBtn = document.getElementById('direct-issue-cert-only');
         if (issueOnlyBtn) issueOnlyBtn.addEventListener('click', function () {
           var email = (emailInput && emailInput.value) ? String(emailInput.value).trim().toLowerCase() : '';
-          if (!email) { showAddMsg(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أدخل بريد العضو.' : 'Enter member email.', true); return; }
+          if (!email) { showAddMsg(iifMessage('jsEnterMemberEmail'), true); return; }
           var type = localStorage.getItem(prefix + email);
           var startDate = localStorage.getItem(startPrefix + email);
           var endDate = localStorage.getItem(expiryPrefix + email);
-          if (!type || !endDate) { showAddMsg(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لم يُعثر على عضوية.' : 'No membership found.', true); return; }
+          if (!type || !endDate) { showAddMsg(iifMessage('jsNoMembershipFound'), true); return; }
           var certData = { email: email, name: (nameInput && nameInput.value) ? nameInput.value.trim() : email, type: type, startDate: startDate || '', endDate: endDate, entityType: typeof getStoredEntity === 'function' ? getStoredEntity() : 'personal', photo: typeof getCertPhoto === 'function' ? getCertPhoto() : '', logo: typeof getCertLogo === 'function' ? getCertLogo() : '', flag: typeof getCertFlag === 'function' ? getCertFlag() : '' };
           if (typeof createCertificate === 'function') certData = createCertificate(certData);
           if (typeof showCertificateView === 'function') showCertificateView(certData);
-          showAddMsg(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم إصدار بطاقة العضوية الرقمية.' : 'Digital membership card issued.');
+          showAddMsg(iifMessage('jsDigitalCardIssued'));
         });
       })();
 
-      function updateFeasibilityGate() {
+      function updateServiceFormsGates() {
+        var ok = typeof canUseServiceForms === 'function' && canUseServiceForms();
         var gate = document.getElementById('feasibility-gate');
         var memberBox = document.getElementById('feasibility-member-box');
-        if (!gate || !memberBox) return;
-        var isMember = typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.hasValidMembership && IIF_MEMBERSHIP_AUTH.hasValidMembership();
-        gate.style.display = isMember ? 'none' : 'block';
-        memberBox.style.display = isMember ? 'block' : 'none';
+        if (gate && memberBox) {
+          gate.style.display = ok ? 'none' : 'block';
+          memberBox.style.display = ok ? 'block' : 'none';
+        }
+        var fg = document.getElementById('financing-gate');
+        var fm = document.getElementById('financing-member-box');
+        if (fg && fm) {
+          fg.style.display = ok ? 'none' : 'block';
+          fm.style.display = ok ? 'block' : 'none';
+        }
+        var ig = document.getElementById('investor-gate');
+        var im = document.getElementById('investor-member-box');
+        if (ig && im) {
+          ig.style.display = ok ? 'none' : 'block';
+          im.style.display = ok ? 'block' : 'none';
+        }
+      }
+      function updateFeasibilityGate() {
+        updateServiceFormsGates();
       }
 
       var dashForm = document.getElementById('dashboard-form');
@@ -17147,6 +6159,7 @@
           localStorage.setItem(TEAM_KEY, JSON.stringify(toSave));
         } catch (e) { }
       }
+      /* بعد تهيئة DEFAULT_TEAM/getTeamMembers — تجنّب استدعاء updateDashboardNav مبكراً (كان يسقط السكربت قبل تصدير openDashboard) */
       (function initNavOnly() {
         try {
           updateDashboardNav();
@@ -17196,14 +6209,15 @@
           li.dataset.index = String(idx);
           var lang = document.documentElement.getAttribute('data-lang');
           var name = lang === 'ar' ? (p.nameAr || p.nameEn) : (p.nameEn || p.nameAr);
+          var titlePrev = ((lang === 'ar' ? (p.titleAr || p.titleEn) : (p.titleEn || p.titleAr)) || '').slice(0, 60) + '…';
           li.innerHTML =
             '<div class="content">' +
             '<strong>' + escapeHtml(name) + '</strong>' +
-            '<small>' + escapeHtml((p.titleEn || '').slice(0, 60)) + '…</small>' +
+            '<small>' + escapeHtml(titlePrev) + '</small>' +
             '</div>' +
             '<div class="actions">' +
-            '<button type="button" class="btn-edit team-edit" data-index="' + idx + '"><span class="lang-en">Edit</span><span class="lang-ar">تعديل</span></button>' +
-            '<button type="button" class="btn-delete team-delete" data-index="' + idx + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button>' +
+            '<button type="button" class="btn-edit team-edit" data-index="' + idx + '">' + iifBilingualSpans('dashBtnEdit', 'Edit', 'تعديل') + '</button>' +
+            '<button type="button" class="btn-delete team-delete" data-index="' + idx + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button>' +
             '</div>';
           ul.appendChild(li);
         });
@@ -17232,19 +6246,19 @@
             var teamFile = document.getElementById('team-image-file');
             if (teamFile) teamFile.value = '';
             document.getElementById('team-edit-index').value = String(idx);
-            document.getElementById('team-add-btn').innerHTML = '<span class="lang-en">Save changes</span><span class="lang-ar">حفظ التعديل</span>';
+            document.getElementById('team-add-btn').innerHTML = iifBilingualSpans('dashSaveChanges', 'Save changes', 'حفظ التعديل');
           });
         });
         ul.querySelectorAll('.team-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
-            if (!confirm(document.documentElement.getAttribute('data-lang') === 'ar' ? 'حذف هذا العضو؟' : 'Delete this team member?')) return;
+            if (!confirm(iifMessage('jsConfirmDeleteTeamMember'))) return;
             var idx = parseInt(btn.getAttribute('data-index'), 10);
             var list = getTeamMembers().filter(function (_, i) { return i !== idx; });
             saveTeamMembers(list);
             renderAboutTeam();
             renderDashboardTeamList();
             document.getElementById('team-edit-index').value = '';
-            document.getElementById('team-add-btn').innerHTML = '<span class="lang-en">Add team member</span><span class="lang-ar">إضافة عضو فريق</span>';
+            document.getElementById('team-add-btn').innerHTML = iifBilingualSpans('dashAddTeamMember', 'Add team member', 'إضافة عضو فريق');
           });
         });
       }
@@ -17303,7 +6317,7 @@
           this.reset();
           if (document.getElementById('team-image-data')) document.getElementById('team-image-data').value = '';
           document.getElementById('team-edit-index').value = '';
-          document.getElementById('team-add-btn').innerHTML = '<span class="lang-en">Add team member</span><span class="lang-ar">إضافة عضو فريق</span>';
+          document.getElementById('team-add-btn').innerHTML = iifBilingualSpans('dashAddTeamMember', 'Add team member', 'إضافة عضو فريق');
         });
       }
       (function teamImageUpload() {
@@ -17313,9 +6327,9 @@
         if (fileInput && dataInput) fileInput.addEventListener('change', function () {
           var f = fileInput.files && fileInput.files[0];
           if (!f) { dataInput.value = ''; return; }
-          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'نوع الملف غير مسموح. استخدم JPEG، PNG، GIF أو WebP.' : 'File type not allowed. Use JPEG, PNG, GIF or WebP.'); fileInput.value = ''; dataInput.value = ''; return; }
+          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(iifMessage('jsFileTypeNotAllowedDetailed')); fileInput.value = ''; dataInput.value = ''; return; }
           var teamMax = getCertImageMaxSize();
-          if (f.size > teamMax) { var mb = Math.round(teamMax / 1024 / 1024); alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الملف كبير جداً. الحد ' + mb + ' ميجا.' : 'File too large. Max ' + mb + ' MB.'); fileInput.value = ''; dataInput.value = ''; return; }
+          if (f.size > teamMax) { var mb = Math.round(teamMax / 1024 / 1024); alert(iifMessageFmt('jsFileTooLargeMb', { mb: mb })); fileInput.value = ''; dataInput.value = ''; return; }
           fileInput.disabled = true;
           var r = new FileReader();
           r.onload = function () {
@@ -17325,12 +6339,12 @@
               fileInput.disabled = false;
               if (!ck.safe) { alert(getContentRejectMessage(ck.reason)); fileInput.value = ''; dataInput.value = ''; return; }
               dataInput.value = res; if (urlInput) urlInput.value = '';
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم رفع الصورة بنجاح.' : 'Photo uploaded successfully.');
+              alert(iifMessage('jsPhotoUploadSuccess'));
             });
           };
           r.onerror = function () {
             fileInput.disabled = false;
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل قراءة الملف.' : 'Failed to read file.');
+            alert(iifMessage('jsFileReadFailed'));
           };
           r.readAsDataURL(f);
         });
@@ -17357,8 +6371,7 @@
             letterPageCount++;
             var wrap = document.createElement('div');
             wrap.className = 'letter-page-wrap';
-            var lang = document.documentElement.getAttribute('data-lang') === 'ar' ? 'ar' : 'en';
-            var label = lang === 'ar' ? 'الصفحة ' + letterPageCount + ' — نص الخطاب' : 'Page ' + letterPageCount + ' — Letter body';
+            var label = typeof iifMessageFmt === 'function' ? iifMessageFmt('letterAddPageLabel', { n: letterPageCount }) : ('Page ' + letterPageCount + ' — Letter body');
             wrap.innerHTML = '<label class="letter-page-label">' + escapeHtml(label) + '</label><textarea class="letter-body" rows="8" data-page="' + letterPageCount + '" placeholder=""></textarea>';
             letterPages.appendChild(wrap);
           });
@@ -17390,20 +6403,20 @@
             var bodies = [];
             letterPages.querySelectorAll('.letter-body').forEach(function (ta) { bodies.push(ta.value || ''); });
             var bodyHtml = bodies.map(function (b) { return '<div class="letter-body-print">' + escapeHtml(b).replace(/\n/g, '<br>') + '</div>'; }).join('');
-            var toLine = toVal ? '<p class="letter-meta-print"><strong>' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'إلى: ' : 'To: ') + escapeHtml(toVal) + '</strong></p>' : '';
-            var refLine = refVal ? '<p class="letter-meta-print">' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'المرجع: ' : 'Ref: ') + escapeHtml(refVal) + '</p>' : '';
-            var dateLine = dateVal ? '<p class="letter-meta-print">' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'التاريخ: ' : 'Date: ') + escapeHtml(dateVal) + '</p>' : '';
-            var subjectLine = subjectVal ? '<p class="letter-meta-print"><strong>' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'الموضوع: ' : 'Subject: ') + escapeHtml(subjectVal) + '</strong></p>' : '';
+            var toLine = toVal ? '<p class="letter-meta-print"><strong>' + escapeHtml(iifMessage('letterPrintTo')) + escapeHtml(toVal) + '</strong></p>' : '';
+            var refLine = refVal ? '<p class="letter-meta-print">' + escapeHtml(iifMessage('letterPrintRef')) + escapeHtml(refVal) + '</p>' : '';
+            var dateLine = dateVal ? '<p class="letter-meta-print">' + escapeHtml(iifMessage('letterPrintDate')) + escapeHtml(dateVal) + '</p>' : '';
+            var subjectLine = subjectVal ? '<p class="letter-meta-print"><strong>' + escapeHtml(iifMessage('letterPrintSubject')) + escapeHtml(subjectVal) + '</strong></p>' : '';
             var saderDisp = document.getElementById('letter-sader-display');
             var saderVal = (saderDisp && saderDisp.value && saderDisp.value !== '') ? saderDisp.value : '';
-            var saderLine = saderVal ? '<p class="letter-meta-print"><span class="sader-num">' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'رقم الصادر: ' : 'Outgoing no.: ') + escapeHtml(saderVal) + '</span></p>' : '';
+            var saderLine = saderVal ? '<p class="letter-meta-print"><span class="sader-num">' + escapeHtml(iifMessage('letterPrintOutgoingNo')) + escapeHtml(saderVal) + '</span></p>' : '';
             var qrImg = '';
             if (lastQrDataUrl && typeof lastQrDataUrl === 'string') {
               var qr = lastQrDataUrl.trim();
               if (qr.indexOf('data:image/') === 0 && qr.indexOf(';base64,') > 0 && qr.length < 500000 && qr.indexOf('"') === -1 && qr.indexOf('<') === -1 && qr.indexOf('>') === -1)
-                qrImg = '<div class="letter-qr-print"><img src="' + qr.replace(/&/g, '&amp;') + '" alt="QR verification" width="120" height="120"/><p style="font-size:0.8rem; margin-top:0.25rem;">' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'مسح للتحقق من صحة الخطاب' : 'Scan to verify letter') + '</p></div>';
+                qrImg = '<div class="letter-qr-print"><img src="' + qr.replace(/&/g, '&amp;') + '" alt="' + escapeHtml(iifMessage('letterQrAlt')).replace(/"/g, '&quot;') + '" width="120" height="120"/><p style="font-size:0.8rem; margin-top:0.25rem;">' + escapeHtml(iifMessage('letterQrCaption')) + '</p></div>';
             }
-            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Letter - IIF</title><style>body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:1.5rem;color:#111;}.letterhead-title{font-size:1.25rem;font-weight:700;margin-bottom:0.5rem;}.letter-meta-print{margin:0.25rem 0;}.letter-body-print{white-space:pre-wrap;line-height:1.6;margin-bottom:1rem;}.letter-qr-print{margin-top:1.5rem;}.sader-num{color:#c00;font-weight:700;}</style></head><body class="letter-print-area"><div class="letterhead-title">International Investment Fund · FII · Paris</div><p class="letter-meta-print">Financing for Global Prosperity</p>' + dateLine + subjectLine + saderLine + toLine + refLine + bodyHtml + qrImg + '</body></html>';
+            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Letter - IIF</title><style>body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:1.5rem;color:#111;}.letterhead-title{font-size:1.25rem;font-weight:700;margin-bottom:0.5rem;}.letter-meta-print{margin:0.25rem 0;}.letter-body-print{white-space:pre-wrap;line-height:1.6;margin-bottom:1rem;}.letter-qr-print{margin-top:1.5rem;}.sader-num{color:#c00;font-weight:700;}</style></head><body class="letter-print-area"><div class="letterhead-title">International Investment Fund · IIF · Paris</div><p class="letter-meta-print">Financing for Global Prosperity</p>' + dateLine + subjectLine + saderLine + toLine + refLine + bodyHtml + qrImg + '</body></html>';
             var w = window.open('', '_blank');
             if (w) { w.document.write(html); w.document.close(); w.focus(); w.print(); }
           });
@@ -17419,7 +6432,7 @@
           var bodies = [];
           if (letterPages) letterPages.querySelectorAll('.letter-body').forEach(function (ta) { bodies.push(ta.value || ''); });
           var body = bodies.join('\n\n');
-          if (!body && !subjectVal) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أضف الموضوع أو نص الخطاب.' : 'Add subject or letter body.'); return; }
+          if (!body && !subjectVal) { alert(iifMessage('jsAddSubjectOrLetterBody')); return; }
           var saderNum = typeof getNextSaderNumber === 'function' ? getNextSaderNumber() : '';
           var list = typeof getLettersOutbox === 'function' ? getLettersOutbox() : [];
           list.unshift({ id: 'S' + Date.now(), saderNumber: saderNum, subject: subjectVal, date: dateVal, toPerson: toVal, toEmail: '', country: countryVal, body: body, source: 'letter' });
@@ -17491,12 +6504,11 @@
         var ul = document.getElementById('letterhead-pending-list');
         if (!ul) return;
         ul.innerHTML = '';
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         list.forEach(function (item, idx) {
           var li = document.createElement('li');
-          var assigned = item.assignedToEmail || (isAr ? '— غير معيّن' : '— Not assigned');
-          var qrInfo = item.qrIssueDate ? (isAr ? 'كيو آر مُصدر ' : 'QR issued ') + item.qrIssueDate : '';
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.fromName || item.fromEmail || '') + '</strong> ' + escapeHtml(item.fromEmail || '') + '<br><small>' + escapeHtml((item.content || '').slice(0, 80)) + '…</small><br><small>' + escapeHtml(assigned) + '</small> ' + (qrInfo ? '<br><small>' + qrInfo + '</small>' : '') + '</div><div class="assign-row"><select class="letterhead-assign-select" data-index="' + idx + '"><option value="">' + (isAr ? 'تعيين لـ' : 'Assign to') + '</option></select><input type="text" class="letterhead-assign-email" data-index="' + idx + '" placeholder="or email" style="width:120px;" /><button type="button" class="btn btn--primary btn-sm letterhead-gen-qr" data-index="' + idx + '">' + (isAr ? 'توليد كيو آر تصديق' : 'Generate verify QR') + '</button></div>';
+          var assigned = item.assignedToEmail || iifMessage('letterNotAssigned');
+          var qrInfo = item.qrIssueDate ? iifMessage('letterQrIssuedPrefix') + item.qrIssueDate : '';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.fromName || item.fromEmail || '') + '</strong> ' + escapeHtml(item.fromEmail || '') + '<br><small>' + escapeHtml((item.content || '').slice(0, 80)) + '…</small><br><small>' + escapeHtml(assigned) + '</small> ' + (qrInfo ? '<br><small>' + escapeHtml(qrInfo) + '</small>' : '') + '</div><div class="assign-row"><select class="letterhead-assign-select" data-index="' + idx + '"><option value="">' + escapeHtml(iifMessage('letterAssignTo')) + '</option></select><input type="text" class="letterhead-assign-email" data-index="' + idx + '" placeholder="' + escapeHtml(iifMessage('letterAssignEmailPlaceholder')) + '" style="width:120px;" /><button type="button" class="btn btn--primary btn-sm letterhead-gen-qr" data-index="' + idx + '">' + escapeHtml(iifMessage('letterGenVerifyQr')) + '</button></div>';
           ul.appendChild(li);
         });
         var staffList = typeof getStaffList === 'function' ? getStaffList() : [];
@@ -17519,7 +6531,7 @@
         ul.querySelectorAll('.letterhead-gen-qr').forEach(function (btn) {
           btn.addEventListener('click', function () {
             if (!isAdmin() && typeof hasStaffPermission === 'function' && !hasStaffPermission('verify_qr')) {
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'ليس لديك صلاحية تصديق كيو آر. راجع الإدارة.' : 'You do not have permission to issue verification QR. Contact admin.');
+              alert(iifMessage('jsNoVerificationQrPermission'));
               return;
             }
             var idx = parseInt(btn.getAttribute('data-index'), 10);
@@ -17548,7 +6560,7 @@
         if (contactBtn) contactBtn.addEventListener('click', function () {
           var f = getLetterheadFooter();
           var lines = [f.website || '', f.email || '', f.phone || '', f.address || '', f.siret || ''];
-          var msg = document.documentElement.getAttribute('data-lang') === 'ar' ? 'سطر لكل حقل: الموقع، البريد، الهاتف، العنوان، SIRET' : 'One line per field: Website, Email, Phone, Address, SIRET';
+          var msg = iifMessage('jsCompanyFieldsOneLineHint');
           var s = prompt(msg, lines.join('\n'));
           if (s != null) {
             var arr = s.split('\n').map(function (x) { return x.trim(); });
@@ -17567,7 +6579,7 @@
           if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(bodyEl.value).catch(function () { });
         });
         if (clearBtn && bodyEl) clearBtn.addEventListener('click', function () {
-          if (confirm(document.documentElement.getAttribute('data-lang') === 'ar' ? 'مسح النص؟' : 'Clear text?')) bodyEl.value = '';
+          if (confirm(iifMessage('jsConfirmClearTextShort'))) bodyEl.value = '';
         });
         var websiteQrWrap = document.getElementById('letterhead-qr-website-wrap');
         if (websiteQrWrap && typeof QRCode !== 'undefined') {
@@ -17596,7 +6608,7 @@
           var subject = (document.getElementById('letterhead-subject') && document.getElementById('letterhead-subject').value) || '';
           var dateVal = (letterheadDateEl && letterheadDateEl.value) || new Date().toISOString().slice(0, 10);
           var content = (bodyEl.value || '').trim();
-          if (!content && !subject) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أضف الموضوع أو النص.' : 'Add subject or body.'); return; }
+          if (!content && !subject) { alert(iifMessage('jsAddSubjectOrBody')); return; }
           var saderNum = 'S' + Date.now();
           var outgoingNoEl = document.getElementById('letterhead-outgoing-no');
           if (outgoingNoEl) outgoingNoEl.value = saderNum;
@@ -17610,7 +6622,7 @@
         if (copyBtn && bodyEl) copyBtn.addEventListener('click', function () {
           if (bodyEl.value.trim()) {
             navigator.clipboard.writeText(bodyEl.value).then(function () {
-              var msg = document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم نسخ النص!' : 'Text copied!';
+              var msg = iifMessage('jsTextCopied');
               var alertDiv = document.createElement('div');
               alertDiv.textContent = msg;
               alertDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#4CAF50;color:white;padding:10px;border-radius:4px;z-index:10000;';
@@ -17623,7 +6635,7 @@
         // وظيفة مسح النص
         var clearBtn = document.getElementById('letterhead-clear-btn');
         if (clearBtn && bodyEl) clearBtn.addEventListener('click', function () {
-          if (confirm(document.documentElement.getAttribute('data-lang') === 'ar' ? 'هل أنت متأكد من مسح النص؟' : 'Are you sure you want to clear the text?')) {
+          if (confirm(iifMessage('jsConfirmClearTextLong'))) {
             bodyEl.value = '';
             var subjectEl = document.getElementById('letterhead-subject');
             var outgoingNoEl = document.getElementById('letterhead-outgoing-no');
@@ -17670,7 +6682,7 @@
             if (channel === 'employees') { var s = typeof getStaffList === 'function' ? getStaffList() : []; emails = s.map(function (x) { return x.email || ''; }).filter(Boolean); }
             else if (channel === 'members') emails = getLetterheadMembers();
             else if (channel === 'registered') emails = getLetterheadRegistered();
-            if (emails.length === 0) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لا توجد بريدات في هذه الفئة.' : 'No emails in this channel.'); return; }
+            if (emails.length === 0) { alert(iifMessage('jsNoEmailsInChannel')); return; }
             var mailto = 'mailto:' + encodeURIComponent(emails[0]) + (emails.length > 1 ? '?bcc=' + encodeURIComponent(emails.slice(1).join(',')) : '') + (body ? (emails.length > 1 ? '&' : '?') + 'body=' + encodeURIComponent(body) : '');
             window.location.href = mailto;
           });
@@ -17684,11 +6696,10 @@
         var ul = document.getElementById('inbox-list');
         if (!ul) return;
         var list = getLettersInbox();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         ul.innerHTML = '';
         list.forEach(function (item, idx) {
           var li = document.createElement('li');
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.subject || item.from || '') + '</strong><br><small>' + escapeHtml((item.body || '').slice(0, 100)) + (item.body && item.body.length > 100 ? '…' : '') + '</small><br><small>' + escapeHtml(item.date || '') + ' ' + escapeHtml(item.from || item.fromEmail || '') + '</small></div><div class="actions"><button type="button" class="btn-delete inbox-delete" data-idx="' + idx + '">' + (isAr ? 'حذف' : 'Delete') + '</button></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.subject || item.from || '') + '</strong><br><small>' + escapeHtml((item.body || '').slice(0, 100)) + (item.body && item.body.length > 100 ? '…' : '') + '</small><br><small>' + escapeHtml(item.date || '') + ' ' + escapeHtml(item.from || item.fromEmail || '') + '</small></div><div class="actions"><button type="button" class="btn-delete inbox-delete" data-idx="' + idx + '">' + escapeHtml(iifMessage('dashBtnDelete')) + '</button></div>';
           ul.appendChild(li);
         });
         ul.querySelectorAll('.inbox-delete').forEach(function (btn) {
@@ -17715,7 +6726,7 @@
           ul.querySelectorAll('.outbox-item-checkbox:checked').forEach(function (chk) {
             ids.push(chk.getAttribute('data-id'));
           });
-          if (ids.length === 0) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'اختر رسائل للتحويل إلى الأرشيف.' : 'Select messages to move to archive.'); return; }
+          if (ids.length === 0) { alert(iifMessage('jsSelectMessagesForArchive')); return; }
           var list = getLettersOutbox();
           var archiveList = getLettersArchive();
           list.forEach(function (item) {
@@ -17784,7 +6795,7 @@
               panels.archive.style.display = box === 'archive' ? '' : 'none';
               if (box === 'archive' && !canViewFullArchive()) {
                 var ul = document.getElementById('archive-list');
-                if (ul) ul.innerHTML = '<li class="content"><span class="lang-en">You do not have permission to view the full archive.</span><span class="lang-ar">ليس لديك صلاحية رؤية الأرشيف كامل.</span></li>';
+                if (ul) ul.innerHTML = '<li class="content">' + iifBilingualSpans('dashArchiveNoPermission', 'You do not have permission to view the full archive.', 'ليس لديك صلاحية رؤية الأرشيف كامل.') + '</li>';
               }
             }
             if (box === 'outbox') renderOutboxList();
@@ -17793,7 +6804,7 @@
         });
         var searchInput = document.getElementById('archive-search-input');
         var searchBtn = document.getElementById('archive-search-btn');
-        if (searchInput) searchInput.placeholder = document.documentElement.getAttribute('data-lang') === 'ar' ? 'رقم الصادر، الموضوع، الدولة، الشخص، الإيميل' : 'Outgoing no., subject, country, person, email';
+        if (searchInput) searchInput.placeholder = iifMessage('letterSearchPlaceholder');
         if (searchBtn) searchBtn.addEventListener('click', function () { if (canViewFullArchive()) renderArchiveList(); });
         if (searchInput) searchInput.addEventListener('keydown', function (e) { if (e.key === 'Enter' && canViewFullArchive()) renderArchiveList(); });
         var dateFrom = document.getElementById('archive-date-from');
@@ -17802,10 +6813,9 @@
         if (dateTo) dateTo.addEventListener('change', function () { if (canViewFullArchive()) renderArchiveList(); });
         var inboxAddBtn = document.getElementById('inbox-add-btn');
         if (inboxAddBtn) inboxAddBtn.addEventListener('click', function () {
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          var subject = prompt(isAr ? 'الموضوع أو المرسل' : 'Subject or from', '');
+          var subject = prompt(iifMessage('letterPromptSubjectFrom'), '');
           if (subject == null) return;
-          var body = prompt(isAr ? 'مقتطف النص (اختياري)' : 'Body snippet (optional)', '');
+          var body = prompt(iifMessage('letterPromptBodySnippet'), '');
           if (body == null) return;
           var arr = getLettersInbox();
           arr.unshift({ id: 'I' + Date.now(), subject: subject, from: subject, body: body || '', date: new Date().toISOString().slice(0, 10) });
@@ -17828,7 +6838,7 @@
         var translateTarget = null;
         function canTranslate() { return typeof isAdmin === 'function' && isAdmin() || (typeof isStaff === 'function' && isStaff()); }
         function openTranslate(target) {
-          if (!canTranslate()) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'صلاحية الترجمة: كاتب الخطاب أو الإدمن فقط.' : 'Translation: letter writer or admin only.'); return; }
+          if (!canTranslate()) { alert(iifMessage('jsTranslatePermissionDenied')); return; }
           translateTarget = target;
           if (resultTa) resultTa.value = '';
           if (statusEl) statusEl.textContent = '';
@@ -17846,15 +6856,15 @@
         if (closeBtn && overlay) closeBtn.addEventListener('click', function () { overlay.style.display = 'none'; });
         if (doBtn && resultTa) doBtn.addEventListener('click', function () {
           var text = getSourceText().trim();
-          if (!text) { if (statusEl) statusEl.textContent = document.documentElement.getAttribute('data-lang') === 'ar' ? 'لا يوجد نص.' : 'No text.'; return; }
+          if (!text) { if (statusEl) statusEl.textContent = iifMessage('jsNoText'); return; }
           var targetLang = (targetSelect && targetSelect.value) || 'en';
           var langpair = 'auto|' + targetLang;
-          if (statusEl) statusEl.textContent = document.documentElement.getAttribute('data-lang') === 'ar' ? 'جاري الترجمة…' : 'Translating…';
+          if (statusEl) statusEl.textContent = iifMessage('jsTranslating');
           fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.slice(0, 500)) + '&langpair=' + encodeURIComponent(langpair)).then(function (r) { return r.json(); }).then(function (data) {
             var translated = (data && data.response && data.response.translatedText) ? data.response.translatedText : '';
             resultTa.value = translated;
-            if (statusEl) statusEl.textContent = data.responseStatus === 200 ? (document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم.' : 'Done.') : (data.responseStatus || '');
-          }).catch(function () { if (statusEl) statusEl.textContent = document.documentElement.getAttribute('data-lang') === 'ar' ? 'خطأ في الترجمة.' : 'Translation error.'; });
+            if (statusEl) statusEl.textContent = data.responseStatus === 200 ? iifMessage('jsDone') : (data.responseStatus || '');
+          }).catch(function () { if (statusEl) statusEl.textContent = iifMessage('jsTranslationError'); });
         });
         if (useBtn && resultTa) useBtn.addEventListener('click', function () { var t = resultTa.value.trim(); if (t) setTranslatedText(t); overlay.style.display = 'none'; });
         var letterheadTranslateBtn = document.getElementById('letterhead-translate-btn');
@@ -17877,12 +6887,11 @@
           e.preventDefault();
           var effectiveMax = maxSize && (typeof hasDoubleUploadLimit === 'function' && hasDoubleUploadLimit()) ? maxSize * 2 : maxSize;
           var files = input.files || [];
-          if (!files.length) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'اختر ملفاً واحداً على الأقل.' : 'Select at least one file.'); return; }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
+          if (!files.length) { alert(iifMessage('jsSelectAtLeastOneFile')); return; }
           var submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
           var origText = submitBtn ? (submitBtn.textContent || submitBtn.value || '') : '';
-          function resetBtn() { if (submitBtn) { submitBtn.disabled = false; var t = submitBtn.getAttribute('data-orig-text') || (isAr ? 'رفع' : 'Upload'); if (submitBtn.value !== undefined) submitBtn.value = t; else submitBtn.textContent = t; } }
-          if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('data-orig-text', origText); if (submitBtn.value !== undefined) submitBtn.value = isAr ? 'جاري الرفع…' : 'Uploading…'; else submitBtn.textContent = isAr ? 'جاري الرفع…' : 'Uploading…'; }
+          function resetBtn() { if (submitBtn) { submitBtn.disabled = false; var t = submitBtn.getAttribute('data-orig-text') || iifMessage('dashUploadBtn'); if (submitBtn.value !== undefined) submitBtn.value = t; else submitBtn.textContent = t; } }
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('data-orig-text', origText); if (submitBtn.value !== undefined) submitBtn.value = iifMessage('dashUploading'); else submitBtn.textContent = iifMessage('dashUploading'); }
           function doAddUploads() {
             try {
               for (var i = 0; i < files.length; i++) {
@@ -17890,7 +6899,7 @@
                 if (effectiveMax && f.size > effectiveMax) { alert((f.name || '') + ' > max size'); resetBtn(); return; }
                 addUpload(typeKey === 'docs' ? UPLOADS_DOCS_KEY : typeKey === 'images' ? UPLOADS_IMAGES_KEY : UPLOADS_VIDEO_KEY, { name: f.name, size: f.size, type: f.type });
               }
-              alert((isAr ? 'تم رفع الملفات بنجاح.' : 'Files uploaded successfully.') + '\n\n' + iifNonBindingDisclaimer(isAr));
+              alert(iifMessage('jsFilesUploadedSuccess') + '\n\n' + (typeof iifNonBindingDisclaimer === 'function' ? iifNonBindingDisclaimer() : ''));
             } finally { resetBtn(); }
             form.reset();
           }
@@ -17934,17 +6943,16 @@
         var dataInput = document.getElementById('live-capture-data');
         var formLive = document.getElementById('form-upload-live');
         var placeholder = document.getElementById('live-placeholder');
-        var placeholderAr = document.getElementById('live-placeholder-ar');
         var stream = null;
         var lastCaptureData = '';
-        function showPlaceholder() { if (placeholder) placeholder.style.display = ''; if (placeholderAr) placeholderAr.style.display = ''; if (video) video.style.display = 'none'; }
-        function hidePlaceholder() { if (placeholder) placeholder.style.display = 'none'; if (placeholderAr) placeholderAr.style.display = 'none'; if (video) video.style.display = 'block'; }
+        function showPlaceholder() { if (placeholder) placeholder.style.display = ''; if (video) video.style.display = 'none'; }
+        function hidePlaceholder() { if (placeholder) placeholder.style.display = 'none'; if (video) video.style.display = 'block'; }
         if (startBtn) startBtn.addEventListener('click', function () {
           if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Camera not supported'); return; }
           navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (s) {
             stream = s; if (video) { video.srcObject = s; video.style.display = 'block'; } hidePlaceholder();
             if (photoBtn) photoBtn.disabled = false; if (videoBtn) videoBtn.disabled = false; if (stopBtn) stopBtn.disabled = false;
-          }).catch(function () { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لم يتم الوصول للكاميرا.' : 'Camera access denied.'); });
+          }).catch(function () { alert(iifMessage('jsCameraAccessDenied')); });
         });
         if (stopBtn) stopBtn.addEventListener('click', function () {
           if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); stream = null;
@@ -17961,21 +6969,20 @@
           if (!stream) return;
           lastCaptureData = 'video-capture-' + new Date().toISOString();
           if (dataInput) dataInput.value = lastCaptureData; if (submitBtn) submitBtn.disabled = false;
-          alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم تسجيل الفيديو المباشر (مرجع). الإرسال للإدارة.' : 'Live video recorded (reference). Sending to admin.');
+          alert(iifMessage('jsLiveVideoRecordedSent'));
         });
         if (formLive) formLive.addEventListener('submit', function (e) {
           e.preventDefault();
           var data = (dataInput && dataInput.value) || lastCaptureData;
           if (!data) return;
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           if (submitBtn) {
             submitBtn.disabled = true;
             submitBtn.setAttribute('data-orig-html', submitBtn.innerHTML);
-            submitBtn.innerHTML = isAr ? 'جاري الإرسال…' : 'Sending…';
+            submitBtn.innerHTML = iifMessage('dashCaptureSending');
           }
           function doSend() {
             addUpload(UPLOADS_LIVE_KEY, { kind: data.indexOf('data:') === 0 ? 'photo' : 'video', data: data.length > 50000 ? data.slice(0, 50000) + '...[truncated]' : data, at: new Date().toISOString() });
-            alert(isAr ? 'تم إرسال التصوير للإدارة بنجاح.' : 'Capture sent to administration successfully.');
+            alert(iifMessage('dashCaptureSentAdmin'));
             if (dataInput) dataInput.value = '';
             if (submitBtn) { var orig = submitBtn.getAttribute('data-orig-html'); if (orig) submitBtn.innerHTML = orig; submitBtn.disabled = false; }
           }
@@ -17991,19 +6998,59 @@
       })();
 
       /* تحليل الميزانيات ودراسات الجدوى — نتائج محمية، صلاحية من لوحة التحكم */
-      var PERM_BUDGET_KEY = 'iif-perm-budget', PERM_FEASIBILITY_KEY = 'iif-perm-feasibility';
+      var PERM_BUDGET_KEY = 'iif-perm-budget', PERM_FEASIBILITY_KEY = 'iif-perm-feasibility', PERM_SERVICE_FORMS_KEY = 'iif-perm-service-forms';
       function getPermittedBudget() { try { var r = localStorage.getItem(PERM_BUDGET_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
       function getPermittedFeasibility() { try { var r = localStorage.getItem(PERM_FEASIBILITY_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
+      function getPermittedServiceForms() { try { var r = localStorage.getItem(PERM_SERVICE_FORMS_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
       function canViewBudget() { if (isAdmin()) return true; try { var email = (localStorage.getItem('iif-user-email') || '').toLowerCase(); return getPermittedBudget().indexOf(email) >= 0; } catch (e) { return false; } }
       function canViewFeasibility() { if (isAdmin()) return true; try { var email = (localStorage.getItem('iif-user-email') || '').toLowerCase(); return getPermittedFeasibility().indexOf(email) >= 0; } catch (e) { return false; } }
+      /** نماذج الخدمات متاحة للجميع — دون اشتراك مدفوع */
+      function canUseServiceForms() {
+        return true;
+      }
       function parseNumberList(str) {
         var s = (str || '').replace(/,/g, ' ').replace(/\n/g, ' ').split(/\s+/);
         var out = []; for (var i = 0; i < s.length; i++) { var n = parseFloat(s[i]); if (!isNaN(n)) out.push(n); } return out;
       }
       document.querySelectorAll('.protected-results').forEach(function (el) {
         if (!el) return;
-        el.addEventListener('contextmenu', function (e) { if (!isAdmin()) e.preventDefault(); });
-        el.addEventListener('copy', function (e) { if (!isAdmin()) e.preventDefault(); });
+        function allowCopyTarget(t) {
+          try {
+            if (!t) return false;
+            var tag = (t.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return true;
+            if (t.isContentEditable) return true;
+            if (t.closest && t.closest('a[href]')) return true; // allow copying links
+            return false;
+          } catch (eAllow) { return false; }
+        }
+        function allowCopySelection() {
+          try {
+            var sel = (window.getSelection && window.getSelection()) ? String(window.getSelection().toString() || '') : '';
+            sel = sel.trim();
+            if (!sel) return false;
+            // Allow copying link-like snippets (URL or common page/path tokens) without unlocking full protected content.
+            if (sel.length > 260) return false;
+            if (/^https?:\/\//i.test(sel)) return true;
+            if (/^www\./i.test(sel)) return true;
+            if (/[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/\S*)?/i.test(sel)) return true;
+            if (/(^|\/)[\w.-]+\.html?(\\?|#|$)/i.test(sel)) return true;
+            if (/financial-consulting\/iif-fund-demo/i.test(sel)) return true;
+            return false;
+          } catch (eSel) { return false; }
+        }
+        el.addEventListener('contextmenu', function (e) {
+          if (isAdmin()) return;
+          if (allowCopyTarget(e && e.target)) return;
+          if (allowCopySelection()) return;
+          e.preventDefault();
+        });
+        el.addEventListener('copy', function (e) {
+          if (isAdmin()) return;
+          if (allowCopyTarget(e && e.target)) return;
+          if (allowCopySelection()) return;
+          e.preventDefault();
+        });
       });
       function updateAdminBodyClass() {
         try {
@@ -18030,11 +7077,752 @@
         }
         return out;
       }
-      function readBudgetFile(file, cb) {
+      function parseBudgetCsvLine(line) {
+        var out = [];
+        var cur = '';
+        var inQ = false;
+        for (var i = 0; i < line.length; i++) {
+          var ch = line[i];
+          if (ch === '"') {
+            inQ = !inQ;
+            continue;
+          }
+          if (!inQ && ch === ',') {
+            out.push(cur.trim());
+            cur = '';
+            continue;
+          }
+          cur += ch;
+        }
+        out.push(cur.trim());
+        return out;
+      }
+      function applyBudgetScenario(revenues, expenses, lineItems, opts) {
+        opts = opts || {};
+        var revMult = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expMult = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        if (revMult < 0) revMult = 0;
+        if (expMult < 0) expMult = 0;
+        return {
+          revenues: (revenues || []).map(function (x) { return x * revMult; }),
+          expenses: (expenses || []).map(function (x) { return x * expMult; }),
+          lineItems: (lineItems || []).map(function (row) {
+            var m = row.type === 'revenue' ? revMult : expMult;
+            var o = { category: row.category, type: row.type, amount: (row.amount || 0) * m };
+            if (row.period) o.period = row.period;
+            if (row.scenario) o.scenario = row.scenario;
+            if (row.currency) o.currency = row.currency;
+            return o;
+          })
+        };
+      }
+      function budgetValidationMessages(data, fileName) {
+        var msgs = [];
+        if (!data || (!data.revenues.length && !data.expenses.length)) return msgs;
+        var ext = (fileName || '').split('.').pop().toLowerCase();
+        if (/^(pdf|doc|docx)$/i.test(ext)) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnHeuristic') : '');
+        function hasNeg(arr) { return (arr || []).some(function (n) { return n < 0; }); }
+        if (hasNeg(data.revenues) || hasNeg(data.expenses)) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnNegative') : '');
+        if (!data.lineItems || !data.lineItems.length) msgs.push(typeof iifMessage === 'function' ? iifMessage('budgetWarnNoCategories') : '');
+        if (data.parseSource === 'server' && data.serverWarnings && data.serverWarnings.length) {
+          data.serverWarnings.forEach(function (w) { msgs.push(String(w)); });
+        }
+        if (data.serverFallbackErrors && data.serverFallbackErrors.length) {
+          var fb = typeof iifMessage === 'function' ? iifMessage('budgetServerFallback') : '';
+          msgs.push(fb + ' ' + data.serverFallbackErrors.join('; '));
+        }
+        if (data.serverFallbackWarnings && data.serverFallbackWarnings.length) {
+          data.serverFallbackWarnings.forEach(function (w) { msgs.push(String(w)); });
+        }
+        if (data.parseSource === 'server' && typeof iifMessage === 'function' && !(data.serverFallbackErrors && data.serverFallbackErrors.length)) {
+          msgs.push(iifMessage('budgetServerParseOk'));
+        }
+        return msgs.filter(Boolean);
+      }
+      function renderBudgetValidationList(msgs) {
+        var ul = document.getElementById('budget-validation-list');
+        if (!ul) return;
+        if (!msgs || !msgs.length) {
+          ul.innerHTML = '';
+          ul.hidden = true;
+          return;
+        }
+        ul.innerHTML = msgs.map(function (m) { return '<li>' + escapeHtml(m) + '</li>'; }).join('');
+        ul.hidden = false;
+      }
+      var BUDGET_DRAFT_KEY = 'iif-budget-draft-v1';
+      var BUDGET_AUDIT_KEY = 'iif-budget-audit-log';
+      var BUDGET_AUDIT_MAX = 25;
+      var BUDGET_CTX_FIELD_IDS = [
+        'budget-ctx-company', 'budget-ctx-office', 'budget-ctx-from', 'budget-ctx-to',
+        'budget-ctx-prev-rev', 'budget-ctx-prev-exp', 'budget-ctx-assets', 'budget-ctx-prev-assets',
+        'budget-ctx-liab', 'budget-ctx-equity', 'budget-ctx-cur-assets', 'budget-ctx-cur-liab',
+        'budget-ctx-consolidated', 'budget-ctx-entities', 'budget-ctx-cogs', 'budget-ctx-inventory',
+        'budget-ctx-payables', 'budget-ctx-ppe', 'budget-ctx-depr-rate', 'budget-ctx-depr-exp',
+        'budget-ctx-banks', 'budget-ctx-activity', 'budget-ctx-country',
+        'budget-ctx-target-rev', 'budget-ctx-target-exp'
+      ];
+      function gatherBudgetContextFromDom() {
+        var ctx = {};
+        BUDGET_CTX_FIELD_IDS.forEach(function (id) {
+          var el = document.getElementById(id);
+          ctx[id] = el ? String(el.value || '') : '';
+        });
+        return ctx;
+      }
+      function applyBudgetContextToDom(ctx) {
+        if (!ctx) return;
+        BUDGET_CTX_FIELD_IDS.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el && ctx[id] != null) el.value = ctx[id];
+        });
+      }
+      function appendBudgetAuditLog(meta) {
+        try {
+          var raw = localStorage.getItem(BUDGET_AUDIT_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(arr)) arr = [];
+          arr.unshift({
+            at: meta.at || new Date().toISOString(),
+            fileName: meta.fileName || '',
+            revCount: meta.revCount | 0,
+            expCount: meta.expCount | 0,
+            lineCount: meta.lineCount | 0
+          });
+          while (arr.length > BUDGET_AUDIT_MAX) arr.pop();
+          localStorage.setItem(BUDGET_AUDIT_KEY, JSON.stringify(arr));
+        } catch (e) { }
+      }
+      function getBudgetAuditLog() {
+        try {
+          var raw = localStorage.getItem(BUDGET_AUDIT_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+      }
+      function saveBudgetDraft() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        try {
+          var draft = {
+            version: 1,
+            at: new Date().toISOString(),
+            fileName: (window.__lastBudgetUploadMeta && window.__lastBudgetUploadMeta.fileName) || '',
+            revenues: pack.revenues,
+            expenses: pack.expenses,
+            lineItems: pack.lineItems || [],
+            rollup: pack.rollup,
+            byPeriod: pack.byPeriod,
+            currencies: pack.currencies || [],
+            primaryScenario: pack.primaryScenario || 'actual',
+            parseSource: pack.parseSource || 'client',
+            context: gatherBudgetContextFromDom(),
+            scenarioRev: (document.getElementById('budget-scenario-rev') || {}).value || '0',
+            scenarioExp: (document.getElementById('budget-scenario-exp') || {}).value || '0',
+            reportLang: (document.getElementById('budget-report-lang') || {}).value || 'ar'
+          };
+          localStorage.setItem(BUDGET_DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) { }
+      }
+      function scheduleBudgetDraftSave() {
+        clearTimeout(window.__budgetDraftTimer);
+        window.__budgetDraftTimer = setTimeout(saveBudgetDraft, 700);
+      }
+      function clearBudgetDraftFromStorage() {
+        try { localStorage.removeItem(BUDGET_DRAFT_KEY); } catch (e) { }
+        var ban = document.getElementById('budget-draft-banner');
+        if (ban) ban.hidden = true;
+      }
+      function restoreBudgetDraftFromStorage() {
+        try {
+          var raw = localStorage.getItem(BUDGET_DRAFT_KEY);
+          if (!raw) return;
+          var d = JSON.parse(raw);
+          if (!d || !d.revenues || (!d.revenues.length && !d.expenses.length)) return;
+          window.__lastBudgetAnalysis = {
+            revenues: d.revenues,
+            expenses: d.expenses,
+            lineItems: d.lineItems || [],
+            rollup: d.rollup,
+            byPeriod: d.byPeriod,
+            currencies: d.currencies || [],
+            primaryScenario: d.primaryScenario || 'actual',
+            parseSource: d.parseSource || 'client'
+          };
+          window.__lastBudgetUploadMeta = {
+            fileName: d.fileName || 'draft',
+            at: d.at || '',
+            revCount: d.revenues.length,
+            expCount: d.expenses.length,
+            lineCount: (d.lineItems || []).length,
+            restored: true
+          };
+          applyBudgetContextToDom(d.context);
+          if (d.reportLang) {
+            var sel = document.getElementById('budget-report-lang');
+            if (sel && (d.reportLang === 'ar' || d.reportLang === 'en')) sel.value = d.reportLang;
+          }
+          if (d.scenarioRev != null) {
+            var sr = document.getElementById('budget-scenario-rev');
+            if (sr) sr.value = d.scenarioRev;
+          }
+          if (d.scenarioExp != null) {
+            var se = document.getElementById('budget-scenario-exp');
+            if (se) se.value = d.scenarioExp;
+          }
+          updateBudgetScenarioLabels();
+          var bp = document.getElementById('budget-context-panel');
+          if (bp) bp.hidden = false;
+          var tb = document.getElementById('budget-toolbar');
+          if (tb) tb.hidden = false;
+          var ban = document.getElementById('budget-draft-banner');
+          if (ban) ban.hidden = true;
+          refreshBudgetReport();
+        } catch (e) { }
+      }
+      function initBudgetDraftBanner() {
+        var ban = document.getElementById('budget-draft-banner');
+        var txt = document.getElementById('budget-draft-banner-text');
+        if (!ban) return;
+        try {
+          var cur = window.__lastBudgetAnalysis;
+          if (cur && (cur.revenues.length || cur.expenses.length)) {
+            ban.hidden = true;
+            return;
+          }
+          var raw = localStorage.getItem(BUDGET_DRAFT_KEY);
+          if (!raw) { ban.hidden = true; return; }
+          var d = JSON.parse(raw);
+          if (!d || !d.revenues || (!d.revenues.length && !d.expenses.length)) { ban.hidden = true; return; }
+          ban.hidden = false;
+          if (txt) {
+            var msg = typeof iifMessage === 'function' ? iifMessage('budgetDraftBanner') : '';
+            var fn = d.fileName ? ' — ' + d.fileName : '';
+            var at = d.at ? ' (' + d.at.slice(0, 19) + ')' : '';
+            txt.textContent = msg + fn + at;
+          }
+        } catch (e) { ban.hidden = true; }
+      }
+      function buildBudgetMarkdownExport(lang) {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return '';
+        var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        opts.rollup = pack.rollup;
+        opts.byPeriod = pack.byPeriod;
+        opts.currencies = pack.currencies || [];
+        opts.primaryScenario = pack.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(pack.lineItems || [], opts.primaryScenario);
+        var scaled = applyBudgetScenario(pack.revenues, pack.expenses, itemsForScale, opts);
+        var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        var rollupReport = opts.rollup ? scaleBudgetRollup(opts.rollup, revM, expM) : null;
+        var byPeriodReport = null;
+        if (opts.byPeriod) {
+          byPeriodReport = {};
+          Object.keys(opts.byPeriod).forEach(function (k) {
+            byPeriodReport[k] = scaleBudgetRollup(opts.byPeriod[k], revM, expM);
+          });
+        }
+        var tr = scaled.revenues.reduce(function (a, b) { return a + b; }, 0);
+        var te = scaled.expenses.reduce(function (a, b) { return a + b; }, 0);
+        var bal = tr - te;
+        var lines = ['# ' + (L.title || 'Budget'), ''];
+        lines.push('## ' + (L.totals || 'Totals'));
+        lines.push('| | ' + (L.deepColAmount || 'Amount') + ' |');
+        lines.push('| --- | ---: |');
+        lines.push('| ' + (L.revenue || '') + ' | ' + tr.toFixed(2) + ' |');
+        lines.push('| ' + (L.expenses || '') + ' | ' + te.toFixed(2) + ' |');
+        lines.push('| ' + (L.balance || '') + ' | ' + bal.toFixed(2) + ' |');
+        lines.push('');
+        if (opts.currencies && opts.currencies.length > 1) {
+          lines.push('> ' + (L.budgetMultiCurrencyNote || '') + '');
+          lines.push('');
+        } else if (opts.currencies && opts.currencies.length === 1) {
+          lines.push('*' + (L.budgetSingleCurrencyLabel || '') + ': ' + opts.currencies[0] + '*');
+          lines.push('');
+        }
+        var tRev = parseFloat(opts.targetRevenue) || 0;
+        var tExp = parseFloat(opts.targetExpenses) || 0;
+        if (tRev > 0 || tExp > 0) {
+          lines.push('## ' + (L.budgetTargetsSection || 'Targets'));
+          if (tRev > 0) lines.push('- ' + (L.budgetTargetRevLabel || '') + ': ' + tRev.toFixed(2) + ' → Δ ' + (tRev ? ((tr - tRev) / tRev * 100).toFixed(1) : '0') + '%');
+          if (tExp > 0) lines.push('- ' + (L.budgetTargetExpLabel || '') + ': ' + tExp.toFixed(2) + ' → Δ ' + (tExp ? ((te - tExp) / tExp * 100).toFixed(1) : '0') + '%');
+          lines.push('');
+        }
+        if ((parseFloat(opts.scenarioRevPct) || 0) !== 0 || (parseFloat(opts.scenarioExpPct) || 0) !== 0) {
+          lines.push('*' + (L.scenarioBanner || '').replace(/\{r\}/g, String(opts.scenarioRevPct || 0)).replace(/\{e\}/g, String(opts.scenarioExpPct || 0)) + '*');
+          lines.push('');
+        }
+        var rollup = rollupReport;
+        if (rollup && rollup.revenue && rollup.expense) {
+          var scenUsed = ['approved', 'actual', 'forecast'].filter(function (k) {
+            return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+          });
+          if (scenUsed.length >= 2) {
+            lines.push('## ' + (L.budgetScenarioRollupTitle || ''));
+            lines.push('| | ' + (L.budgetScenarioApproved || '') + ' | ' + (L.budgetScenarioActual || '') + ' | ' + (L.budgetScenarioForecast || '') + ' |');
+            lines.push('| --- | ---: | ---: | ---: |');
+            lines.push('| ' + (L.revenue || '') + ' | ' + (rollup.revenue.approved || 0).toFixed(2) + ' | ' + (rollup.revenue.actual || 0).toFixed(2) + ' | ' + (rollup.revenue.forecast || 0).toFixed(2) + ' |');
+            lines.push('| ' + (L.expenses || '') + ' | ' + (rollup.expense.approved || 0).toFixed(2) + ' | ' + (rollup.expense.actual || 0).toFixed(2) + ' | ' + (rollup.expense.forecast || 0).toFixed(2) + ' |');
+            lines.push('');
+            if (L.budgetScenarioRollupNote) {
+              lines.push('*' + L.budgetScenarioRollupNote + '*');
+              lines.push('');
+            }
+          }
+        }
+        var bp = byPeriodReport || {};
+        var pKeys = Object.keys(bp).filter(function (k) { return k !== '_all'; }).sort();
+        if (pKeys.length) {
+          var sa = L.budgetScenarioApproved || 'approved';
+          var sn = L.budgetScenarioActual || 'actual';
+          var sf = L.budgetScenarioForecast || 'forecast';
+          var revHdr = (L.revenue || '') + ' (' + sa + ' / ' + sn + ' / ' + sf + ')';
+          var expHdr = (L.expenses || '') + ' (' + sa + ' / ' + sn + ' / ' + sf + ')';
+          lines.push('## ' + (L.budgetPeriodBreakdownTitle || ''));
+          lines.push('| ' + (L.budgetColPeriod || '') + ' | ' + revHdr + ' | ' + expHdr + ' |');
+          lines.push('| --- | --- | --- |');
+          pKeys.forEach(function (pk) {
+            var slice = bp[pk] || { revenue: {}, expense: {} };
+            var rv = ((slice.revenue && slice.revenue.approved) || 0).toFixed(2) + ' / ' + ((slice.revenue && slice.revenue.actual) || 0).toFixed(2) + ' / ' + ((slice.revenue && slice.revenue.forecast) || 0).toFixed(2);
+            var ex = ((slice.expense && slice.expense.approved) || 0).toFixed(2) + ' / ' + ((slice.expense && slice.expense.actual) || 0).toFixed(2) + ' / ' + ((slice.expense && slice.expense.forecast) || 0).toFixed(2);
+            lines.push('| ' + String(pk).replace(/\|/g, '/') + ' | ' + rv + ' | ' + ex + ' |');
+          });
+          lines.push('');
+        }
+        if (scaled.lineItems && scaled.lineItems.length) {
+          var hasPeriod = scaled.lineItems.some(function (r) { return r.period; });
+          var hasScen = scaled.lineItems.some(function (r) { return r.scenario; });
+          var hasCur = scaled.lineItems.some(function (r) { return r.currency; });
+          lines.push('## ' + (L.deepCategoryRev || '') + ' / ' + (L.deepCategoryExp || ''));
+          var hdr = ['| ' + (L.deepColItem || 'Item'), 'type', (L.deepColAmount || '')];
+          var sep = ['| ---', '---', '---:'];
+          if (hasPeriod) { hdr.push(L.budgetColPeriod || 'period'); sep.push('---'); }
+          if (hasScen) { hdr.push('scenario'); sep.push('---'); }
+          if (hasCur) { hdr.push('currency'); sep.push('---'); }
+          lines.push(hdr.join(' | ') + ' |');
+          lines.push(sep.join(' | ') + ' |');
+          scaled.lineItems.forEach(function (row) {
+            var cells = [
+              String(row.category || '').replace(/\|/g, '/'),
+              row.type,
+              row.amount != null ? row.amount.toFixed(2) : ''
+            ];
+            if (hasPeriod) cells.push(String(row.period || '').replace(/\|/g, '/'));
+            if (hasScen) cells.push(String(row.scenario || '').replace(/\|/g, '/'));
+            if (hasCur) cells.push(String(row.currency || '').replace(/\|/g, '/'));
+            lines.push('| ' + cells.join(' | ') + ' |');
+          });
+          lines.push('');
+        }
+        lines.push('---');
+        lines.push((L.budgetDisclaimerLegal || '') + ' ' + (L.budgetDisclaimerContact || '') + ': #contact');
+        return lines.join('\n');
+      }
+      function copyBudgetMarkdownToClipboard() {
+        var lang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
+        if (lang !== 'ar' && lang !== 'en') lang = 'ar';
+        var md = buildBudgetMarkdownExport(lang);
+        if (!md) return;
+        function ok() { if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetCopyOk') : ''); }
+        function fail() { if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetCopyFail') : ''); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(md).then(ok).catch(fail);
+        } else fail();
+      }
+      function ensureChartJs(next) {
+        if (typeof Chart !== 'undefined') { next(); return; }
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js';
+        s.crossOrigin = 'anonymous';
+        s.onload = function () { next(); };
+        s.onerror = function () { next(); };
+        document.head.appendChild(s);
+      }
+      function destroyBudgetCharts() {
+        if (window.__budgetChartInstances && window.__budgetChartInstances.length) {
+          window.__budgetChartInstances.forEach(function (c) { try { c.destroy(); } catch (e) {} });
+        }
+        window.__budgetChartInstances = [];
+      }
+      function budgetChartTopNLabelsData(rows, total, maxN, otherLabel) {
+        if (!rows || !rows.length || total <= 0) return { labels: [], data: [] };
+        var top = rows.slice(0, maxN);
+        var sumTop = 0;
+        top.forEach(function (x) { sumTop += x.amount; });
+        var other = Math.max(0, total - sumTop);
+        var labels = top.map(function (x) {
+          var n = String(x.name || '—');
+          return n.length > 26 ? n.slice(0, 23) + '…' : n;
+        });
+        var data = top.map(function (x) { return x.amount; });
+        if (other > total * 0.001 && rows.length > maxN) {
+          labels.push(otherLabel || 'Other');
+          data.push(other);
+        }
+        return { labels: labels, data: data };
+      }
+      function budgetLineItemsPrimarySlice(lineItems, primaryScenario) {
+        if (!lineItems || !lineItems.length) return [];
+        var hasScen = lineItems.some(function (r) { return r && r.scenario; });
+        if (!hasScen || !primaryScenario) return lineItems;
+        return lineItems.filter(function (r) { return (r.scenario || 'actual') === primaryScenario; });
+      }
+      function budgetScenarioKeysActive(rollup) {
+        if (!rollup || !rollup.revenue || !rollup.expense) return [];
+        return ['approved', 'actual', 'forecast'].filter(function (k) {
+          return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+        });
+      }
+      function scaleBudgetRollup(rollup, revMult, expMult) {
+        if (!rollup || !rollup.revenue || !rollup.expense) return null;
+        revMult = revMult != null ? revMult : 1;
+        expMult = expMult != null ? expMult : 1;
+        var out = { revenue: {}, expense: {} };
+        ['approved', 'actual', 'forecast'].forEach(function (k) {
+          out.revenue[k] = (rollup.revenue[k] || 0) * revMult;
+          out.expense[k] = (rollup.expense[k] || 0) * expMult;
+        });
+        return out;
+      }
+      function renderBudgetCharts(revenues, expenses, lineItems, lang, chartOpts) {
+        chartOpts = chartOpts || {};
+        destroyBudgetCharts();
+        var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
+        if (typeof Chart === 'undefined') return;
+        var prim = chartOpts.primaryScenario || 'actual';
+        var sliceItems = budgetLineItemsPrimarySlice(lineItems, prim);
+        var totalRev = revenues.reduce(function (a, b) { return a + b; }, 0);
+        var totalExp = expenses.reduce(function (a, b) { return a + b; }, 0);
+        var revByCat = aggregateBudgetLineItemsByCategory(sliceItems, 'revenue');
+        var expByCat = aggregateBudgetLineItemsByCategory(sliceItems, 'expense');
+        var green = '#2ea36f';
+        var coral = '#d47850';
+        var muted = ['#5a6b82', '#8b7355', '#4a7c8c', '#7c6b9e', '#6b8c7a', '#9e7b6b', '#6b7c9e'];
+        var elBar = document.getElementById('budget-chart-rev-exp');
+        if (elBar && (totalRev > 0 || totalExp > 0)) {
+          var c1 = new Chart(elBar, {
+            type: 'bar',
+            data: {
+              labels: [L.revenue, L.expenses],
+              datasets: [{
+                label: L.totals || '',
+                data: [totalRev, totalExp],
+                backgroundColor: [green, coral],
+                borderColor: [green, coral],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { display: false },
+                title: { display: true, text: L.chartRevExpBar || '', color: '#e8ecf4' }
+              },
+              scales: {
+                x: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c1);
+        }
+        var otherL = L.chartOther || 'Other';
+        var elExp = document.getElementById('budget-chart-exp-pie');
+        if (elExp && totalExp > 0 && expByCat.length) {
+          var ed = budgetChartTopNLabelsData(expByCat, totalExp, 7, otherL);
+          var c2 = new Chart(elExp, {
+            type: 'doughnut',
+            data: {
+              labels: ed.labels,
+              datasets: [{
+                data: ed.data,
+                backgroundColor: ed.data.map(function (_, i) { return muted[i % muted.length]; }),
+                borderColor: '#1a2332',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                title: { display: true, text: L.chartExpBreakdown || '', color: '#e8ecf4' },
+                legend: { position: 'bottom', labels: { color: '#c4cddf', boxWidth: 12 } }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c2);
+        }
+        var elRev = document.getElementById('budget-chart-rev-pie');
+        if (elRev && totalRev > 0 && revByCat.length) {
+          var rd = budgetChartTopNLabelsData(revByCat, totalRev, 7, otherL);
+          var revPalette = ['#2ea36f', '#c9a227', '#4a9e7a', '#8cb894', '#3d8a62', '#6abf8f', '#2d6b4f'];
+          var c3 = new Chart(elRev, {
+            type: 'doughnut',
+            data: {
+              labels: rd.labels,
+              datasets: [{
+                data: rd.data,
+                backgroundColor: rd.data.map(function (_, i) { return revPalette[i % revPalette.length]; }),
+                borderColor: '#1a2332',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                title: { display: true, text: L.chartRevBreakdown || '', color: '#e8ecf4' },
+                legend: { position: 'bottom', labels: { color: '#c4cddf', boxWidth: 12 } }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c3);
+        }
+        var rollup = chartOpts.rollup;
+        var active = rollup ? budgetScenarioKeysActive(rollup) : [];
+        var elScen = document.getElementById('budget-chart-scenarios');
+        if (elScen && rollup && active.length >= 2) {
+          var scenLabels = {
+            approved: L.budgetScenarioApproved || 'Approved',
+            actual: L.budgetScenarioActual || 'Actual',
+            forecast: L.budgetScenarioForecast || 'Forecast'
+          };
+          var labels = active.map(function (k) { return scenLabels[k] || k; });
+          var c4 = new Chart(elScen, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: L.revenue || '',
+                  data: active.map(function (k) { return rollup.revenue[k] || 0; }),
+                  backgroundColor: green,
+                  borderColor: green,
+                  borderWidth: 1
+                },
+                {
+                  label: L.expenses || '',
+                  data: active.map(function (k) { return rollup.expense[k] || 0; }),
+                  backgroundColor: coral,
+                  borderColor: coral,
+                  borderWidth: 1
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: { labels: { color: '#c4cddf' } },
+                title: { display: true, text: L.chartScenarioCompare || '', color: '#e8ecf4' }
+              },
+              scales: {
+                x: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { ticks: { color: '#a6b0c2' }, grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
+              }
+            }
+          });
+          window.__budgetChartInstances.push(c4);
+        }
+      }
+      function getBudgetApiBase() {
+        try {
+          if (typeof window.IIF_BUDGET_API_BASE === 'string' && window.IIF_BUDGET_API_BASE.trim()) {
+            return String(window.IIF_BUDGET_API_BASE).trim().replace(/\/$/, '');
+          }
+          var meta = document.querySelector('meta[name="iif-budget-api-base"]');
+          var c = meta && meta.getAttribute('content');
+          if (c != null && String(c).trim() !== '') {
+            return String(c).trim().replace(/\/$/, '');
+          }
+          var host = location.hostname || '';
+          var port = String(location.port || '');
+          var isLocal = host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
+          if (isLocal && port === '3333') return 'http://127.0.0.1:3000';
+          return '';
+        } catch (e) { return ''; }
+      }
+      function tryBudgetServerParse(file, cb) {
+        var base = getBudgetApiBase();
+        if (!base) {
+          cb(null, null);
+          return;
+        }
+        var fd = new FormData();
+        fd.append('file', file);
+        fetch(base + '/api/budget/parse', { method: 'POST', body: fd })
+          .then(function (res) {
+            return res.json().then(function (j) {
+              return { status: res.status, j: j };
+            });
+          })
+          .then(function (x) {
+            var j = x.j || {};
+            var hasData = (j.revenues && j.revenues.length) || (j.expenses && j.expenses.length) || (j.lineItems && j.lineItems.length);
+            if (x.status === 200 && j.ok && hasData) {
+              cb({
+                revenues: j.revenues || [],
+                expenses: j.expenses || [],
+                lineItems: j.lineItems || [],
+                rollup: j.rollup,
+                byPeriod: j.byPeriod,
+                currencies: j.currencies || [],
+                primaryScenario: j.primaryScenario || 'actual',
+                serverWarnings: j.warnings || [],
+                serverErrors: [],
+                parseSource: 'server'
+              }, null);
+              return;
+            }
+            cb(null, j);
+          })
+          .catch(function () {
+            cb(null, null);
+          });
+      }
+      function normalizeBudgetScenarioCell(raw) {
+        var s = String(raw == null ? '' : raw).toLowerCase().trim();
+        if (!s) return 'actual';
+        if (/^approved|budget|معتمد|ميزانية\s*معتمدة/.test(s)) return 'approved';
+        if (/^forecast|projected|متوقع|تقدير/.test(s)) return 'forecast';
+        if (/^actual|فعلي|تحقق/.test(s)) return 'actual';
+        return 'actual';
+      }
+      function mergeBudgetLegacyFromLineItems(lineItems) {
+        var scenSet = {};
+        (lineItems || []).forEach(function (r) {
+          scenSet[(r && r.scenario) || 'actual'] = true;
+        });
+        var keys = Object.keys(scenSet);
+        var pick = 'actual';
+        if (keys.length === 1) {
+          pick = keys[0];
+        } else if (keys.length > 1 && !scenSet.actual) {
+          if (scenSet.approved) pick = 'approved';
+          else if (scenSet.forecast) pick = 'forecast';
+        }
+        var rev = [];
+        var exp = [];
+        (lineItems || []).forEach(function (row) {
+          if (keys.length > 1 && ((row.scenario || 'actual') !== pick)) return;
+          if (row.type === 'revenue') rev.push(row.amount);
+          else if (row.type === 'expense') exp.push(row.amount);
+        });
+        return { revenues: rev, expenses: exp, primaryScenario: pick };
+      }
+      function buildRollupFromLineItems(lineItems) {
+        var rollup = {
+          revenue: { approved: 0, actual: 0, forecast: 0 },
+          expense: { approved: 0, actual: 0, forecast: 0 }
+        };
+        (lineItems || []).forEach(function (row) {
+          var scen = row.scenario || 'actual';
+          var side = row.type === 'revenue' ? 'revenue' : 'expense';
+          rollup[side][scen] = (rollup[side][scen] || 0) + (row.amount || 0);
+        });
+        return rollup;
+      }
+      function buildByPeriodFromLineItems(lineItems) {
+        var byPeriod = {};
+        (lineItems || []).forEach(function (row) {
+          var pKey = row.period || '_all';
+          if (!byPeriod[pKey]) {
+            byPeriod[pKey] = {
+              revenue: { approved: 0, actual: 0, forecast: 0 },
+              expense: { approved: 0, actual: 0, forecast: 0 }
+            };
+          }
+          var scen = row.scenario || 'actual';
+          var side = row.type === 'revenue' ? 'revenue' : 'expense';
+          byPeriod[pKey][side][scen] = (byPeriod[pKey][side][scen] || 0) + (row.amount || 0);
+        });
+        return byPeriod;
+      }
+      function tryParseStructuredBudgetMatrix(matrix) {
+        if (!matrix || matrix.length < 2) return null;
+        var headerCells = matrix[0].map(function (c) {
+          return String(c == null ? '' : c).replace(/^\ufeff/g, '').toLowerCase().trim();
+        });
+        var typeIdx = -1;
+        var amtIdx = -1;
+        var catIdx = -1;
+        var periodIdx = -1;
+        var scenIdx = -1;
+        var curIdx = -1;
+        for (var j = 0; j < headerCells.length; j++) {
+          var h = headerCells[j];
+          if (h === 'type' || h === 'نوع' || h === 'kind') typeIdx = j;
+          if (h === 'amount' || h === 'مبلغ' || h === 'value') amtIdx = j;
+          if (h === 'category' || h === 'item' || h === 'account' || h === 'بند' || h === 'description' || h === 'name') catIdx = j;
+          if (h === 'period' || h === 'فترة' || h === 'month' || h === 'quarter' || h === 'year') periodIdx = j;
+          if (h === 'scenario' || h === 'سيناريو' || h === 'version' || h === 'نوع_الميزانية') scenIdx = j;
+          if (h === 'currency' || h === 'عملة' || h === 'ccy') curIdx = j;
+        }
+        if (typeIdx < 0 || amtIdx < 0) return null;
+        var lineItems = [];
+        for (var r = 1; r < matrix.length; r++) {
+          var row = matrix[r];
+          if (!row || !row.length) continue;
+          var t = String(row[typeIdx] != null ? row[typeIdx] : '').toLowerCase();
+          var raw = row[amtIdx];
+          var amt = typeof raw === 'number' && !isNaN(raw) ? raw : parseFloat(String(raw).replace(/[^\d.-]/g, ''));
+          if (isNaN(amt)) continue;
+          var cat = catIdx >= 0 ? String(row[catIdx] != null ? row[catIdx] : '').trim() : '';
+          var period = periodIdx >= 0 ? String(row[periodIdx] != null ? row[periodIdx] : '').trim() : '';
+          var scenario = scenIdx >= 0 ? normalizeBudgetScenarioCell(row[scenIdx]) : 'actual';
+          var currency = curIdx >= 0 ? String(row[curIdx] != null ? row[curIdx] : '').trim().toUpperCase().slice(0, 8) : '';
+          var rowType = null;
+          if (/revenue|rev\b|إيراد|ايراد|income/.test(t)) rowType = 'revenue';
+          else if (/expense|exp\b|مصروف|^cost/.test(t)) rowType = 'expense';
+          if (!rowType) continue;
+          var item = { category: cat || '—', type: rowType, amount: amt, scenario: scenario };
+          if (period) item.period = period;
+          if (currency) item.currency = currency;
+          lineItems.push(item);
+        }
+        if (lineItems.length === 0) return null;
+        var legacy = mergeBudgetLegacyFromLineItems(lineItems);
+        var currencies = [];
+        var curSet = {};
+        lineItems.forEach(function (li) {
+          if (li.currency && !curSet[li.currency]) {
+            curSet[li.currency] = true;
+            currencies.push(li.currency);
+          }
+        });
+        return {
+          revenues: legacy.revenues,
+          expenses: legacy.expenses,
+          lineItems: lineItems,
+          primaryScenario: legacy.primaryScenario,
+          rollup: buildRollupFromLineItems(lineItems),
+          byPeriod: buildByPeriodFromLineItems(lineItems),
+          currencies: currencies,
+          parseSource: 'client'
+        };
+      }
+      function readBudgetFileClient(file, cb) {
         if (!file) { cb(null, null); return; }
         var name = (file.name || '').toLowerCase();
         var rev = [], exp = [];
-        function done() { cb(rev.length || exp.length ? { revenues: rev, expenses: exp } : null, null); }
+        var lineItems = [];
+        var rollup, byPeriod, currencies, primaryScenario, parseSource;
+        function packResult() {
+          if (!(rev.length || exp.length)) return null;
+          var o = { revenues: rev, expenses: exp, lineItems: lineItems };
+          if (rollup) o.rollup = rollup;
+          if (byPeriod) o.byPeriod = byPeriod;
+          if (currencies && currencies.length) o.currencies = currencies;
+          if (primaryScenario) o.primaryScenario = primaryScenario;
+          if (parseSource) o.parseSource = parseSource;
+          return o;
+        }
+        function done() {
+          cb(packResult(), null);
+        }
         function ensureXLSX(next) {
           if (typeof XLSX !== 'undefined') { next(); return; }
           var s = document.createElement('script');
@@ -18056,18 +7844,43 @@
           var r = new FileReader();
           r.onload = function () {
             var text = (r.result || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-            var lines = text.split('\n');
-            if (lines.length >= 2 && lines[0].indexOf(',') !== -1) {
-              var col0 = [], col1 = [];
-              for (var i = 1; i < lines.length; i++) {
-                var cells = lines[i].split(',');
-                var a = parseFloat(String(cells[0]).replace(/[^\d.-]/g, ''));
-                var b = parseFloat(String(cells[1] || '').replace(/[^\d.-]/g, ''));
-                if (!isNaN(a)) col0.push(a);
-                if (!isNaN(b)) col1.push(b);
+            var rawLines = text.split('\n');
+            var nonEmpty = [];
+            for (var li = 0; li < rawLines.length; li++) {
+              if (rawLines[li].trim()) nonEmpty.push(rawLines[li]);
+            }
+            var structured = null;
+            if (nonEmpty.length >= 2) {
+              var matrix = [];
+              for (var mi = 0; mi < nonEmpty.length; mi++) {
+                matrix.push(parseBudgetCsvLine(nonEmpty[mi]));
               }
-              if (col0.length || col1.length) { rev = col0; exp = col1; }
-            } else trySplitAll(extractNumbersFromText(text));
+              structured = tryParseStructuredBudgetMatrix(matrix);
+            }
+            if (structured) {
+              rev = structured.revenues;
+              exp = structured.expenses;
+              lineItems = structured.lineItems || [];
+              rollup = structured.rollup;
+              byPeriod = structured.byPeriod;
+              currencies = structured.currencies;
+              primaryScenario = structured.primaryScenario;
+              parseSource = structured.parseSource;
+            } else {
+              var lines = rawLines;
+              if (lines.length >= 2 && lines[0].indexOf(',') !== -1) {
+                var col0 = [], col1 = [];
+                for (var i = 1; i < lines.length; i++) {
+                  if (!lines[i].trim()) continue;
+                  var cells = parseBudgetCsvLine(lines[i]);
+                  var a = parseFloat(String(cells[0]).replace(/[^\d.-]/g, ''));
+                  var b = parseFloat(String(cells[1] || '').replace(/[^\d.-]/g, ''));
+                  if (!isNaN(a)) col0.push(a);
+                  if (!isNaN(b)) col1.push(b);
+                }
+                if (col0.length || col1.length) { rev = col0; exp = col1; }
+              } else trySplitAll(extractNumbersFromText(text));
+            }
             done();
           };
           r.readAsText(file, 'UTF-8');
@@ -18084,19 +7897,31 @@
                 if (!first) { done(); return; }
                 var sheet = wb.Sheets[first];
                 var json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                var all = [];
-                var colA = [], colB = [];
-                for (var r = 0; r < json.length; r++) {
-                  var row = json[r];
-                  if (!Array.isArray(row)) continue;
-                  for (var c = 0; c < row.length; c++) {
-                    var v = row[c];
-                    var num = typeof v === 'number' && !isNaN(v) ? v : parseFloat(String(v).replace(/[^\d.-]/g, ''));
-                    if (!isNaN(num)) { all.push(num); if (c === 0) colA.push(num); else if (c === 1) colB.push(num); }
+                var structuredX = tryParseStructuredBudgetMatrix(json);
+                if (structuredX) {
+                  rev = structuredX.revenues;
+                  exp = structuredX.expenses;
+                  lineItems = structuredX.lineItems || [];
+                  rollup = structuredX.rollup;
+                  byPeriod = structuredX.byPeriod;
+                  currencies = structuredX.currencies;
+                  primaryScenario = structuredX.primaryScenario;
+                  parseSource = structuredX.parseSource;
+                } else {
+                  var all = [];
+                  var colA = [], colB = [];
+                  for (var r = 0; r < json.length; r++) {
+                    var row = json[r];
+                    if (!Array.isArray(row)) continue;
+                    for (var c = 0; c < row.length; c++) {
+                      var v = row[c];
+                      var num = typeof v === 'number' && !isNaN(v) ? v : parseFloat(String(v).replace(/[^\d.-]/g, ''));
+                      if (!isNaN(num)) { all.push(num); if (c === 0) colA.push(num); else if (c === 1) colB.push(num); }
+                    }
                   }
+                  if (colA.length && colB.length) { rev = colA; exp = colB; }
+                  else trySplitAll(all);
                 }
-                if (colA.length && colB.length) { rev = colA; exp = colB; }
-                else trySplitAll(all);
               } catch (err) { }
               done();
             };
@@ -18119,6 +7944,162 @@
         fr3.onload = function () { trySplitAll(extractNumbersFromText(fr3.result || '')); done(); };
         fr3.readAsText(file, 'UTF-8');
       }
+      function readBudgetFile(file, cb) {
+        if (!file) { cb(null, null); return; }
+        tryBudgetServerParse(file, function (serverData, errPayload) {
+          if (serverData) {
+            cb(serverData, null);
+            return;
+          }
+          readBudgetFileClient(file, function (clientData) {
+            if (clientData && errPayload && errPayload.errors && errPayload.errors.length) {
+              clientData.serverFallbackErrors = errPayload.errors.slice();
+            }
+            if (clientData && errPayload && errPayload.warnings && errPayload.warnings.length) {
+              clientData.serverFallbackWarnings = errPayload.warnings.slice();
+            }
+            cb(clientData, null);
+          });
+        });
+      }
+
+      function collectBudgetOptsFromForm(lineItems) {
+        function val(id) {
+          var el = document.getElementById(id);
+          if (!el || !String(el.value || '').trim()) return '';
+          return String(el.value).trim();
+        }
+        function num(id) {
+          var el = document.getElementById(id);
+          if (!el || !String(el.value || '').trim()) return 0;
+          var x = parseFloat(String(el.value).replace(/[^\d.-]/g, ''));
+          return isNaN(x) ? 0 : x;
+        }
+        var cons = document.getElementById('budget-ctx-consolidated');
+        return {
+          lineItems: lineItems || [],
+          companyName: val('budget-ctx-company'),
+          officeIssued: val('budget-ctx-office'),
+          dateFrom: val('budget-ctx-from'),
+          dateTo: val('budget-ctx-to'),
+          prevYearRevenue: num('budget-ctx-prev-rev'),
+          prevYearExpenses: num('budget-ctx-prev-exp'),
+          totalAssets: num('budget-ctx-assets'),
+          prevYearAssets: num('budget-ctx-prev-assets'),
+          totalLiabilities: num('budget-ctx-liab'),
+          equity: num('budget-ctx-equity'),
+          currentAssets: num('budget-ctx-cur-assets'),
+          currentLiabilities: num('budget-ctx-cur-liab'),
+          consolidated: (cons && cons.value) || 'no',
+          numEntities: val('budget-ctx-entities'),
+          cogs: num('budget-ctx-cogs'),
+          avgInventory: num('budget-ctx-inventory'),
+          supplierPayables: num('budget-ctx-payables'),
+          newPPE: num('budget-ctx-ppe'),
+          depreciationRate: num('budget-ctx-depr-rate'),
+          depreciationExpense: num('budget-ctx-depr-exp'),
+          bankLoans: (document.getElementById('budget-ctx-banks') && document.getElementById('budget-ctx-banks').value) || '',
+          businessActivity: val('budget-ctx-activity'),
+          country: val('budget-ctx-country'),
+          scenarioRevPct: (function () {
+            var el = document.getElementById('budget-scenario-rev');
+            return el ? parseFloat(el.value) || 0 : 0;
+          })(),
+          scenarioExpPct: (function () {
+            var el = document.getElementById('budget-scenario-exp');
+            return el ? parseFloat(el.value) || 0 : 0;
+          })(),
+          targetRevenue: num('budget-ctx-target-rev'),
+          targetExpenses: num('budget-ctx-target-exp'),
+          uploadMeta: window.__lastBudgetUploadMeta || null
+        };
+      }
+      function updateBudgetScenarioLabels() {
+        var sr = document.getElementById('budget-scenario-rev');
+        var se = document.getElementById('budget-scenario-exp');
+        var vr = document.getElementById('budget-scenario-rev-val');
+        var ve = document.getElementById('budget-scenario-exp-val');
+        if (vr && sr) vr.textContent = String(sr.value);
+        if (ve && se) ve.textContent = String(se.value);
+      }
+      function downloadBudgetCsv() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        var prim = pack.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(pack.lineItems || [], prim);
+        var scaled = applyBudgetScenario(pack.revenues, pack.expenses, itemsForScale, opts);
+        function escCell(s) {
+          s = String(s == null ? '' : s);
+          if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }
+        var lines = [];
+        if (scaled.lineItems && scaled.lineItems.length) {
+          var hasPeriod = scaled.lineItems.some(function (r) { return r && r.period; });
+          var hasScen = scaled.lineItems.some(function (r) { return r && r.scenario; });
+          var hasCur = scaled.lineItems.some(function (r) { return r && r.currency; });
+          var cols = ['category', 'type', 'amount'];
+          if (hasPeriod) cols.push('period');
+          if (hasScen) cols.push('scenario');
+          if (hasCur) cols.push('currency');
+          lines.push(cols.join(','));
+          scaled.lineItems.forEach(function (row) {
+            var cells = [escCell(row.category), escCell(row.type), String((row.amount != null ? row.amount : 0).toFixed(4))];
+            if (hasPeriod) cells.push(escCell(row.period || ''));
+            if (hasScen) cells.push(escCell(row.scenario || ''));
+            if (hasCur) cells.push(escCell(row.currency || ''));
+            lines.push(cells.join(','));
+          });
+        } else {
+          lines.push('kind,index,amount');
+          scaled.revenues.forEach(function (a, i) { lines.push(['revenue', String(i + 1), String(a)].join(',')); });
+          scaled.expenses.forEach(function (a, i) { lines.push(['expense', String(i + 1), String(a)].join(',')); });
+        }
+        var blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'budget-analysis.csv';
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      }
+      function refreshBudgetReport() {
+        var pack = window.__lastBudgetAnalysis;
+        if (!pack || (!pack.revenues.length && !pack.expenses.length)) return;
+        var reportLang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
+        if (reportLang !== 'ar' && reportLang !== 'en') reportLang = 'ar';
+        var opts = collectBudgetOptsFromForm(pack.lineItems);
+        opts.rollup = pack.rollup;
+        opts.byPeriod = pack.byPeriod;
+        opts.currencies = pack.currencies || [];
+        opts.primaryScenario = pack.primaryScenario || 'actual';
+        var noPerm = document.getElementById('budget-no-permission');
+        var res = document.getElementById('budget-results');
+        destroyBudgetCharts();
+        if (res && typeof buildBudgetReport === 'function') {
+          res.innerHTML = buildBudgetReport(pack.revenues, pack.expenses, reportLang, opts);
+          if (typeof canViewBudget === 'function' && canViewBudget()) {
+            if (noPerm) noPerm.style.display = 'none';
+            res.style.display = 'block';
+            var scaled = applyBudgetScenario(pack.revenues, pack.expenses, pack.lineItems || [], opts);
+            var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+            var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+            var rollupDisp = pack.rollup ? scaleBudgetRollup(pack.rollup, revM, expM) : null;
+            ensureChartJs(function () {
+              if (typeof Chart === 'undefined') return;
+              renderBudgetCharts(scaled.revenues, scaled.expenses, scaled.lineItems, reportLang, {
+                primaryScenario: opts.primaryScenario,
+                rollup: rollupDisp
+              });
+            });
+            scheduleBudgetDraftSave();
+          } else {
+            if (noPerm) noPerm.style.display = 'block';
+            res.style.display = 'none';
+            scheduleBudgetDraftSave();
+          }
+        }
+      }
 
       var budgetZone = document.getElementById('budget-upload-zone');
       var budgetFileInput = document.getElementById('budget-file-input');
@@ -18138,37 +8119,107 @@
           if (budgetZone) budgetZone.classList.toggle('has-file', !!f);
           if (!f) {
             if (budgetFileName) budgetFileName.textContent = '';
+            window.__lastBudgetAnalysis = null;
+            window.__lastBudgetUploadMeta = null;
+            var bp = document.getElementById('budget-context-panel');
+            if (bp) bp.hidden = true;
+            var tb = document.getElementById('budget-toolbar');
+            if (tb) tb.hidden = true;
+            renderBudgetValidationList([]);
+            destroyBudgetCharts();
+            initBudgetDraftBanner();
             return;
           }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-          if (budgetFileName) budgetFileName.textContent = (isAr ? 'جاري المعالجة…' : 'Processing…');
+          if (budgetFileName) budgetFileName.textContent = iifMessage('dashBudgetProcessing');
           readBudgetFile(f, function (data, err) {
             if (data && (data.revenues.length || data.expenses.length)) {
-              if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + (isAr ? 'تم التحليل.' : 'Analyzed.');
-              var reportLang = (document.getElementById('budget-report-lang') && document.getElementById('budget-report-lang').value) || 'ar';
-              if (reportLang !== 'ar' && reportLang !== 'en') reportLang = 'ar';
-              var opts = {};
-              var noPerm = document.getElementById('budget-no-permission');
-              var noPermAr = document.getElementById('budget-no-permission-ar');
-              var res = document.getElementById('budget-results');
-              if (res && typeof buildBudgetReport === 'function') {
-                res.innerHTML = buildBudgetReport(data.revenues, data.expenses, reportLang, opts);
-                res.style.display = 'block';
-                if (typeof canViewBudget === 'function' && canViewBudget()) {
-                  if (noPerm) noPerm.style.display = 'none';
-                  if (noPermAr) noPermAr.style.display = 'none';
-                  res.style.display = 'block';
-                } else {
-                  if (noPerm) noPerm.style.display = 'block';
-                  if (noPermAr) noPermAr.style.display = 'block';
-                  res.style.display = 'none';
-                }
-              }
+              if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + iifMessage('dashBudgetAnalyzed');
+              window.__lastBudgetAnalysis = {
+                revenues: data.revenues,
+                expenses: data.expenses,
+                lineItems: data.lineItems || [],
+                rollup: data.rollup,
+                byPeriod: data.byPeriod,
+                currencies: data.currencies || [],
+                primaryScenario: data.primaryScenario || 'actual',
+                parseSource: data.parseSource || 'client',
+                serverWarnings: data.serverWarnings,
+                serverErrors: data.serverErrors
+              };
+              window.__lastBudgetUploadMeta = {
+                fileName: f.name,
+                at: new Date().toISOString(),
+                revCount: data.revenues.length,
+                expCount: data.expenses.length,
+                lineCount: (data.lineItems || []).length,
+                restored: false
+              };
+              appendBudgetAuditLog(window.__lastBudgetUploadMeta);
+              var bp = document.getElementById('budget-context-panel');
+              if (bp) bp.hidden = false;
+              var tb = document.getElementById('budget-toolbar');
+              if (tb) tb.hidden = false;
+              var srev = document.getElementById('budget-scenario-rev');
+              var sexp = document.getElementById('budget-scenario-exp');
+              if (srev) srev.value = 0;
+              if (sexp) sexp.value = 0;
+              updateBudgetScenarioLabels();
+              renderBudgetValidationList(budgetValidationMessages(data, f.name));
+              refreshBudgetReport();
+              initBudgetDraftBanner();
             } else {
-              if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + (isAr ? 'لم يُستخرج أرقام. جرّب ملف Excel أو CSV.' : 'No numbers extracted. Try Excel or CSV.');
+              window.__lastBudgetAnalysis = null;
+              window.__lastBudgetUploadMeta = null;
+              var bp2 = document.getElementById('budget-context-panel');
+              if (bp2) bp2.hidden = true;
+              var tb2 = document.getElementById('budget-toolbar');
+              if (tb2) tb2.hidden = true;
+              renderBudgetValidationList([]);
+              initBudgetDraftBanner();
+              if (budgetFileName) budgetFileName.textContent = f.name + ' — ' + iifMessage('dashBudgetNoNumbers');
             }
           });
         });
+        var budgetLangSel = document.getElementById('budget-report-lang');
+        if (budgetLangSel) budgetLangSel.addEventListener('change', refreshBudgetReport);
+        var ctxPanel = document.getElementById('budget-context-panel');
+        if (ctxPanel) {
+          ctxPanel.addEventListener('change', refreshBudgetReport);
+          ctxPanel.addEventListener('input', function () {
+            clearTimeout(ctxPanel._budgetDeb);
+            ctxPanel._budgetDeb = setTimeout(refreshBudgetReport, 280);
+          });
+        }
+        var tbEl = document.getElementById('budget-toolbar');
+        if (tbEl) {
+          tbEl.addEventListener('change', function (e) {
+            if (e.target && (e.target.id === 'budget-scenario-rev' || e.target.id === 'budget-scenario-exp')) {
+              updateBudgetScenarioLabels();
+              refreshBudgetReport();
+            }
+          });
+          tbEl.addEventListener('input', function (e) {
+            if (e.target && (e.target.id === 'budget-scenario-rev' || e.target.id === 'budget-scenario-exp')) {
+              updateBudgetScenarioLabels();
+              clearTimeout(tbEl._scenDeb);
+              tbEl._scenDeb = setTimeout(refreshBudgetReport, 120);
+            }
+          });
+        }
+        var printBtn = document.getElementById('budget-print-btn');
+        if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
+        var csvBtn = document.getElementById('budget-csv-btn');
+        if (csvBtn) csvBtn.addEventListener('click', downloadBudgetCsv);
+        var mdBtn = document.getElementById('budget-copy-md-btn');
+        if (mdBtn) mdBtn.addEventListener('click', copyBudgetMarkdownToClipboard);
+        var dr = document.getElementById('budget-draft-restore-btn');
+        if (dr) dr.addEventListener('click', restoreBudgetDraftFromStorage);
+        var dc = document.getElementById('budget-draft-clear-btn');
+        if (dc) dc.addEventListener('click', function () {
+          clearBudgetDraftFromStorage();
+          if (typeof alert === 'function') alert(typeof iifMessage === 'function' ? iifMessage('budgetDraftCleared') : '');
+        });
+        initBudgetDraftBanner();
       }
 
       var BUDGET_REPORT_STRINGS = {
@@ -18427,6 +8478,155 @@
       BUDGET_REPORT_STRINGS.en.risksByCountry = 'By each country\'s regulations';
       BUDGET_REPORT_STRINGS.en.risksContextHint = 'Enter business activity type and country above to better align the analysis with sector and regulations.';
       BUDGET_REPORT_STRINGS.en.risksNote = 'The analysis considers market risks, state policy and regulatory risks, and competitor risks according to the type of business activity and each country\'s regulations. Specialist analysis by sector and country is recommended.';
+      BUDGET_REPORT_STRINGS.en.chartComparison = 'Totals comparison';
+      BUDGET_REPORT_STRINGS.ar.chartComparison = 'مقارنة المجاميع';
+      BUDGET_REPORT_STRINGS.en.deepAnalysisTitle = 'Deep budget diagnostics';
+      BUDGET_REPORT_STRINGS.ar.deepAnalysisTitle = 'تشخيص مالي معمّق للميزانية';
+      BUDGET_REPORT_STRINGS.en.deepCategoryRev = 'Revenue by line / category';
+      BUDGET_REPORT_STRINGS.ar.deepCategoryRev = 'الإيرادات حسب البند / الفئة';
+      BUDGET_REPORT_STRINGS.en.deepCategoryExp = 'Expenses by line / category';
+      BUDGET_REPORT_STRINGS.ar.deepCategoryExp = 'المصروفات حسب البند / الفئة';
+      BUDGET_REPORT_STRINGS.en.deepColItem = 'Item';
+      BUDGET_REPORT_STRINGS.ar.deepColItem = 'البند';
+      BUDGET_REPORT_STRINGS.en.deepColAmount = 'Amount';
+      BUDGET_REPORT_STRINGS.ar.deepColAmount = 'المبلغ';
+      BUDGET_REPORT_STRINGS.en.deepColShare = '% of subtotal';
+      BUDGET_REPORT_STRINGS.ar.deepColShare = '% من المجموع';
+      BUDGET_REPORT_STRINGS.en.deepConcentration = 'Concentration & dependency';
+      BUDGET_REPORT_STRINGS.ar.deepConcentration = 'التركيز والاعتمادية';
+      BUDGET_REPORT_STRINGS.en.deepTopRevShare = 'Largest revenue line as % of total revenue';
+      BUDGET_REPORT_STRINGS.ar.deepTopRevShare = 'أكبر بند إيراد كنسبة من إجمالي الإيرادات';
+      BUDGET_REPORT_STRINGS.en.deepTopExpShare = 'Largest expense line as % of total expenses';
+      BUDGET_REPORT_STRINGS.ar.deepTopExpShare = 'أكبر بند مصروف كنسبة من إجمالي المصروفات';
+      BUDGET_REPORT_STRINGS.en.deepHHI = 'Expense concentration index (HHI, 0–1)';
+      BUDGET_REPORT_STRINGS.ar.deepHHI = 'مؤشر تركيز المصروفات (HHI، بين 0 و1)';
+      BUDGET_REPORT_STRINGS.en.deepHHIHigh = 'High concentration — review dependency on few cost drivers.';
+      BUDGET_REPORT_STRINGS.ar.deepHHIHigh = 'تركيز مرتفع — راجع الاعتماد على عدد قليل من بنود التكلفة.';
+      BUDGET_REPORT_STRINGS.en.deepHHIModerate = 'Moderate concentration.';
+      BUDGET_REPORT_STRINGS.ar.deepHHIModerate = 'تركيز متوسط.';
+      BUDGET_REPORT_STRINGS.en.deepSensitivity = 'Simple stress test (revenue shock)';
+      BUDGET_REPORT_STRINGS.ar.deepSensitivity = 'اختبار إجهاد بسيط (صدمة في الإيرادات)';
+      BUDGET_REPORT_STRINGS.en.deepSens10 = 'If revenue falls by 10%, operating balance (revenue − expenses) ≈';
+      BUDGET_REPORT_STRINGS.ar.deepSens10 = 'عند هبوط الإيرادات 10%، الرصيد التشغيلي (إيرادات − مصروفات) تقريباً';
+      BUDGET_REPORT_STRINGS.en.deepSens20 = 'If revenue falls by 20%:';
+      BUDGET_REPORT_STRINGS.ar.deepSens20 = 'عند هبوط الإيرادات 20%:';
+      BUDGET_REPORT_STRINGS.en.deepFlagsTitle = 'Automated flags (rules-based)';
+      BUDGET_REPORT_STRINGS.ar.deepFlagsTitle = 'تنبيهات آلية (قواعد منطقية)';
+      BUDGET_REPORT_STRINGS.en.deepRecTitle = 'Indicative recommendations (not a substitute for professional advice)';
+      BUDGET_REPORT_STRINGS.ar.deepRecTitle = 'توصيات إرشادية (لا تحل محل مراجعة مهنية)';
+      BUDGET_REPORT_STRINGS.en.flagExpExceedsRev = 'Expenses exceed revenues — structural deficit.';
+      BUDGET_REPORT_STRINGS.ar.flagExpExceedsRev = 'المصروفات تتجاوز الإيرادات — عجز هيكلي.';
+      BUDGET_REPORT_STRINGS.en.flagExpNearRev = 'Expense-to-revenue ratio is very high (>90%).';
+      BUDGET_REPORT_STRINGS.ar.flagExpNearRev = 'نسبة المصروفات إلى الإيرادات مرتفعة جداً (>90%).';
+      BUDGET_REPORT_STRINGS.en.flagThinMargin = 'Surplus exists but margin on revenue is thin.';
+      BUDGET_REPORT_STRINGS.ar.flagThinMargin = 'يوجد فائض لكن الهامش على الإيرادات ضيق.';
+      BUDGET_REPORT_STRINGS.en.flagRevConcentrated = 'Revenue is highly concentrated on few lines.';
+      BUDGET_REPORT_STRINGS.ar.flagRevConcentrated = 'الإيرادات مركّزة على عدد قليل من البنود.';
+      BUDGET_REPORT_STRINGS.en.flagExpConcentrated = 'Costs are highly concentrated — single-line shock risk.';
+      BUDGET_REPORT_STRINGS.ar.flagExpConcentrated = 'التكاليف مركّزة — مخاطر صدمة على بند واحد.';
+      BUDGET_REPORT_STRINGS.en.recReduceExp = 'Review largest expense categories and discretionary spend.';
+      BUDGET_REPORT_STRINGS.ar.recReduceExp = 'راجع أكبر فئات المصروف والإنفاق التقديري.';
+      BUDGET_REPORT_STRINGS.en.recDiversifyRev = 'Consider revenue diversification and contract mix.';
+      BUDGET_REPORT_STRINGS.ar.recDiversifyRev = 'فكّر في تنويع الإيرادات ومزيج العقود.';
+      BUDGET_REPORT_STRINGS.en.recForecast = 'Maintain a rolling forecast tying revenue scenarios to obligations.';
+      BUDGET_REPORT_STRINGS.ar.recForecast = 'اعتمِد توقعاً مستمراً يربط سيناريوهات الإيرادات بالالتزامات.';
+      BUDGET_REPORT_STRINGS.en.recExpert = 'Validate conclusions with qualified finance and legal advisors.';
+      BUDGET_REPORT_STRINGS.ar.recExpert = 'ثبّت النتائج مع مستشارين ماليين وقانونيين مؤهلين.';
+      BUDGET_REPORT_STRINGS.en.noDeepFlags = 'No major rule-based flags for the current figures.';
+      BUDGET_REPORT_STRINGS.ar.noDeepFlags = 'لا تنبيهات قواعدية بارزة وفق الأرقام الحالية.';
+      BUDGET_REPORT_STRINGS.en.scenarioBanner = 'Interactive scenario active: revenue {r}%, expenses {e}% (uniform adjustment to all lines of each type).';
+      BUDGET_REPORT_STRINGS.ar.scenarioBanner = 'سيناريو تفاعلي: تعديل الإيرادات {r}% والمصروفات {e}% (تطبيق موحّد على كل البنود من كل نوع).';
+      BUDGET_REPORT_STRINGS.en.chartVisualTitle = 'Charts';
+      BUDGET_REPORT_STRINGS.ar.chartVisualTitle = 'الرسوم البيانية';
+      BUDGET_REPORT_STRINGS.en.chartVisualIntro = 'Bar: totals. Doughnuts: category mix. Wide bar (when present): approved / actual / forecast from file columns.';
+      BUDGET_REPORT_STRINGS.ar.chartVisualIntro = 'عمودي: المجاميع. دائري: الحصص حسب الفئة. الشريط العريض (إن وُجد): معتمد / فعلي / متوقع من أعمدة الملف.';
+      BUDGET_REPORT_STRINGS.en.chartRevExpBar = 'Revenue vs expenses (totals)';
+      BUDGET_REPORT_STRINGS.ar.chartRevExpBar = 'الإيرادات مقابل المصروفات (المجاميع)';
+      BUDGET_REPORT_STRINGS.en.chartExpBreakdown = 'Expense mix by category';
+      BUDGET_REPORT_STRINGS.ar.chartExpBreakdown = 'مزيج المصروفات حسب الفئة';
+      BUDGET_REPORT_STRINGS.en.chartRevBreakdown = 'Revenue mix by category';
+      BUDGET_REPORT_STRINGS.ar.chartRevBreakdown = 'مزيج الإيرادات حسب الفئة';
+      BUDGET_REPORT_STRINGS.en.chartOther = 'Other';
+      BUDGET_REPORT_STRINGS.ar.chartOther = 'أخرى';
+      BUDGET_REPORT_STRINGS.en.chartScenarioCompare = 'Approved vs actual vs forecast (from file)';
+      BUDGET_REPORT_STRINGS.ar.chartScenarioCompare = 'معتمد مقابل فعلي مقابل متوقع (من الملف)';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioRollupTitle = 'Budget versions in file (totals by scenario)';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioRollupTitle = 'إصدارات الميزانية في الملف (مجاميع حسب السيناريو)';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioRollupNote = 'Main totals and category charts use the primary slice (actual when present, else approved, else forecast). This table shows all scenario columns from your file.';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioRollupNote = 'المجاميع الرئيسية والرسوم حسب الفئة تعتمد على الجزء الأساسي (الفعلي إن وُجد، وإلا المعتمد، وإلا المتوقع). الجدول يعرض كل أعمدة السيناريو من الملف.';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioApproved = 'Approved / budget';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioApproved = 'معتمد / ميزانية';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioActual = 'Actual';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioActual = 'فعلي';
+      BUDGET_REPORT_STRINGS.en.budgetScenarioForecast = 'Forecast';
+      BUDGET_REPORT_STRINGS.ar.budgetScenarioForecast = 'متوقع';
+      BUDGET_REPORT_STRINGS.en.budgetPeriodBreakdownTitle = 'Totals by period (when a period column is present)';
+      BUDGET_REPORT_STRINGS.ar.budgetPeriodBreakdownTitle = 'مجاميع حسب الفترة (عند وجود عمود period)';
+      BUDGET_REPORT_STRINGS.en.budgetColPeriod = 'Period';
+      BUDGET_REPORT_STRINGS.ar.budgetColPeriod = 'الفترة';
+      BUDGET_REPORT_STRINGS.en.budgetMultiCurrencyNote = 'Multiple currencies in file — reconcile FX before comparing totals.';
+      BUDGET_REPORT_STRINGS.ar.budgetMultiCurrencyNote = 'أكثر من عملة في الملف — وفّق أسعار الصرف قبل مقارنة المجاميع.';
+      BUDGET_REPORT_STRINGS.en.budgetSingleCurrencyLabel = 'Currency (from file)';
+      BUDGET_REPORT_STRINGS.ar.budgetSingleCurrencyLabel = 'العملة (من الملف)';
+      BUDGET_REPORT_STRINGS.en.deepNoLines = 'For line-level tables and concentration metrics, use the CSV template (columns category, type, amount; optional period, scenario, currency).';
+      BUDGET_REPORT_STRINGS.ar.deepNoLines = 'لجداول البنود ومقاييس التركيز، استخدم قالب CSV (category، type، amount؛ واختياري period، scenario، currency).';
+      BUDGET_REPORT_STRINGS.en.budgetDisclaimerLegal = 'This analysis is automated and indicative only. It is not an audit, investment advice, tax opinion, or substitute for qualified professionals. You remain responsible for decisions based on these figures.';
+      BUDGET_REPORT_STRINGS.ar.budgetDisclaimerLegal = 'هذا التحليل آلية وإرشادي فقط. وليس تدقيقاً ولا استشارة استثمارية ولا رأياً ضريبياً ولا بديلاً عن مختصين مؤهلين. تبقى مسؤولية القرارات على أساس هذه الأرقام على عاتقك.';
+      BUDGET_REPORT_STRINGS.en.budgetDisclaimerContact = 'Contact';
+      BUDGET_REPORT_STRINGS.ar.budgetDisclaimerContact = 'اتصل بنا';
+      BUDGET_REPORT_STRINGS.en.budgetSourceTitle = 'Data sources';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceTitle = 'مصادر البيانات';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFile = 'Uploaded file';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFile = 'الملف المرفوع';
+      BUDGET_REPORT_STRINGS.en.budgetSourceTime = 'Parsed at (timestamp)';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceTime = 'وقت القراءة';
+      BUDGET_REPORT_STRINGS.en.budgetSourceCounts = 'Counts — revenue lines: {r}, expense lines: {e}, structured rows: {l}.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceCounts = 'الأعداد — بنود إيراد: {r}، بنود مصروف: {e}، صفوف منظمة: {l}.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceRestored = 'Restored from a saved browser draft (not a new file upload).';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceRestored = 'مستعاد من مسودة محفوظة في المتصفح (وليس رفع ملف جديد).';
+      BUDGET_REPORT_STRINGS.en.budgetSourceUnknown = 'No file metadata available.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceUnknown = 'لا تتوفر بيانات وصفية للملف.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFormNote = 'Numbers and text in sections below may also use the optional context form on this page (manual entry), mixed with file-based lines.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFormNote = 'قد تُستخدم حقول النموذج الاختياري في الصفحة (إدخال يدوي) مع بنود الملف في الأقسام التالية.';
+      BUDGET_REPORT_STRINGS.en.budgetSourceFileOnly = 'Figures from the uploaded file drive the core totals unless you add optional context fields.';
+      BUDGET_REPORT_STRINGS.ar.budgetSourceFileOnly = 'المجاميع الأساسية من الملف المرفوع ما لم تُضِف حقول السياق الاختيارية.';
+      BUDGET_REPORT_STRINGS.en.budgetTargetsSection = 'Targets / approved budget vs actual';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetsSection = 'الأهداف / الميزانية المعتمدة مقابل الفعلي';
+      BUDGET_REPORT_STRINGS.en.budgetTargetRevLabel = 'Target revenue';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetRevLabel = 'إيراد مستهدف';
+      BUDGET_REPORT_STRINGS.en.budgetTargetExpLabel = 'Target expenses';
+      BUDGET_REPORT_STRINGS.ar.budgetTargetExpLabel = 'مصروف مستهدف';
+      BUDGET_REPORT_STRINGS.en.budgetVarianceCol = 'Variance %';
+      BUDGET_REPORT_STRINGS.ar.budgetVarianceCol = 'انحراف %';
+      BUDGET_REPORT_STRINGS.en.budgetAuditTitle = 'Recent budget uploads (this browser)';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditTitle = 'آخر عمليات رفع الميزانية (هذا المتصفح)';
+      BUDGET_REPORT_STRINGS.en.budgetAuditNote = 'Local log for admins only; not a server-side audit trail. Clear browser data to erase.';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditNote = 'سجل محلي للمسؤولين فقط؛ وليس سجلاً على الخادم. مسح بيانات المتصفح يحذفه.';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColTime = 'Time';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColTime = 'الوقت';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColFile = 'File name';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColFile = 'اسم الملف';
+      BUDGET_REPORT_STRINGS.en.budgetAuditColRows = 'Rows (r/e/L)';
+      BUDGET_REPORT_STRINGS.ar.budgetAuditColRows = 'صفوف (إيراد/مصروف/منظم)';
+
+      function aggregateBudgetLineItemsByCategory(lineItems, itemType) {
+        var map = {};
+        (lineItems || []).forEach(function (row) {
+          if (!row || row.type !== itemType) return;
+          var k = (row.category || '—').trim() || '—';
+          map[k] = (map[k] || 0) + (row.amount || 0);
+        });
+        return Object.keys(map).map(function (k) { return { name: k, amount: map[k] }; }).sort(function (a, b) { return b.amount - a.amount; });
+      }
+      function budgetExpenseHHI(expByCat, totalExp) {
+        if (!totalExp || !expByCat || !expByCat.length) return 0;
+        var h = 0;
+        expByCat.forEach(function (row) {
+          var s = row.amount / totalExp;
+          h += s * s;
+        });
+        return h;
+      }
 
       function parseBankLoans(text) {
         var lines = (text || '').split(/[\n\r]+/);
@@ -18444,6 +8644,22 @@
 
       function buildBudgetReport(revenues, expenses, lang, opts) {
         opts = opts || {};
+        var prim = opts.primaryScenario || 'actual';
+        var itemsForScale = budgetLineItemsPrimarySlice(opts.lineItems || [], prim);
+        var scaled0 = applyBudgetScenario(revenues, expenses, itemsForScale, opts);
+        revenues = scaled0.revenues;
+        expenses = scaled0.expenses;
+        var lineItems = scaled0.lineItems;
+        var revM = 1 + (parseFloat(opts.scenarioRevPct) || 0) / 100;
+        var expM = 1 + (parseFloat(opts.scenarioExpPct) || 0) / 100;
+        var rollupReport = opts.rollup ? scaleBudgetRollup(opts.rollup, revM, expM) : null;
+        var byPeriodReport = null;
+        if (opts.byPeriod) {
+          byPeriodReport = {};
+          Object.keys(opts.byPeriod).forEach(function (k) {
+            byPeriodReport[k] = scaleBudgetRollup(opts.byPeriod[k], revM, expM);
+          });
+        }
         var L = BUDGET_REPORT_STRINGS[lang] || BUDGET_REPORT_STRINGS.en;
         var totalRev = revenues.reduce(function (a, b) { return a + b; }, 0);
         var totalExp = expenses.reduce(function (a, b) { return a + b; }, 0);
@@ -18480,9 +8696,38 @@
         var cogs = parseFloat(opts.cogs) || 0;
         var supplierPayables = parseFloat(opts.supplierPayables) || 0;
         var bankLoansList = typeof parseBankLoans === 'function' ? parseBankLoans(opts.bankLoans || '') : [];
+        var targetRevenue = parseFloat(opts.targetRevenue) || 0;
+        var targetExpenses = parseFloat(opts.targetExpenses) || 0;
+        var hasFormSupplement = !!(companyName || officeIssued || dateFrom || dateTo || prevRev || prevExp || totalAssets || prevAssets || totalLiab || equity || currentAssets || currentLiab || (opts.numEntities && String(opts.numEntities).trim()) || isConsolidated || cogs || avgInventory || supplierPayables || newPPE || depRate || depExpense || (opts.bankLoans && String(opts.bankLoans).trim()) || opts.businessActivity || opts.country || targetRevenue || targetExpenses);
 
         var html = '<div class="budget-analysis-report" dir="' + dir + '">';
+        var scenR = parseFloat(opts.scenarioRevPct) || 0;
+        var scenE = parseFloat(opts.scenarioExpPct) || 0;
+        if (scenR !== 0 || scenE !== 0) {
+          var sb = (L.scenarioBanner || '').replace(/\{r\}/g, String(scenR)).replace(/\{e\}/g, String(scenE));
+          html += '<div class="budget-scenario-banner">' + sb + '</div>';
+        }
         html += '<h4>' + L.title + '</h4>';
+        html += '<div class="budget-legal-box report-section"><p style="font-size:0.82rem;line-height:1.55;margin:0;">' + (L.budgetDisclaimerLegal || '') + ' <a href="#contact">' + (L.budgetDisclaimerContact || '') + '</a></p></div>';
+        html += '<div class="report-section budget-data-source"><h5>' + (L.budgetSourceTitle || '') + '</h5>';
+        var um = opts.uploadMeta;
+        if (um) {
+          html += '<p>' + (L.budgetSourceFile || '') + ': <strong>' + escapeHtml(um.fileName || '—') + '</strong></p>';
+          if (um.at) html += '<p>' + (L.budgetSourceTime || '') + ': ' + escapeHtml(um.at) + '</p>';
+          html += '<p>' + (L.budgetSourceCounts || '').replace(/\{r\}/g, String(um.revCount != null ? um.revCount : revenues.length)).replace(/\{e\}/g, String(um.expCount != null ? um.expCount : expenses.length)).replace(/\{l\}/g, String(um.lineCount != null ? um.lineCount : lineItems.length)) + '</p>';
+          if (um.restored) html += '<p style="color:#e8a54b;">' + (L.budgetSourceRestored || '') + '</p>';
+        } else {
+          html += '<p>' + (L.budgetSourceUnknown || '') + '</p>';
+        }
+        if (hasFormSupplement) html += '<p>' + (L.budgetSourceFormNote || '') + '</p>';
+        else html += '<p>' + (L.budgetSourceFileOnly || '') + '</p>';
+        if (opts.currencies && opts.currencies.length > 1) {
+          html += '<p style="color:#e8a54b;font-size:0.88rem;">' + (L.budgetMultiCurrencyNote || '') + '</p>';
+        }
+        if (opts.currencies && opts.currencies.length === 1) {
+          html += '<p style="font-size:0.88rem;color:var(--color-text-muted);">' + (L.budgetSingleCurrencyLabel || '') + ': <strong>' + escapeHtml(opts.currencies[0]) + '</strong></p>';
+        }
+        html += '</div>';
         if (companyName || officeIssued || dateFrom || dateTo) {
           html += '<div class="report-section report-header"><h5>' + L.companyName + '</h5><p><strong>' + (companyName || '—') + '</strong></p>';
           if (officeIssued) { html += '<h5>' + L.officeIssued + '</h5><p>' + officeIssued + '</p>'; }
@@ -18501,6 +8746,131 @@
         html += '<tr><td>' + L.revenue + '</td><td class="result-total">' + totalRev.toFixed(2) + '</td></tr>';
         html += '<tr><td>' + L.expenses + '</td><td class="result-total">' + totalExp.toFixed(2) + '</td></tr>';
         html += '<tr><td><strong>' + L.balance + ' (' + balanceLabel + ')</strong></td><td class="result-total">' + balance.toFixed(2) + '</td></tr></table></div>';
+        if (targetRevenue > 0 || targetExpenses > 0) {
+          html += '<div class="report-section"><h5>' + (L.budgetTargetsSection || '') + '</h5><table class="analysis-result-table"><tr><th></th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.budgetVarianceCol || '') + '</th></tr>';
+          if (targetRevenue > 0) {
+            var vRev = targetRevenue ? ((totalRev - targetRevenue) / targetRevenue * 100) : 0;
+            html += '<tr><td>' + (L.budgetTargetRevLabel || '') + '</td><td class="result-total">' + targetRevenue.toFixed(2) + '</td><td class="result-total">' + vRev.toFixed(1) + '%</td></tr>';
+          }
+          if (targetExpenses > 0) {
+            var vExp = targetExpenses ? ((totalExp - targetExpenses) / targetExpenses * 100) : 0;
+            html += '<tr><td>' + (L.budgetTargetExpLabel || '') + '</td><td class="result-total">' + targetExpenses.toFixed(2) + '</td><td class="result-total">' + vExp.toFixed(1) + '%</td></tr>';
+          }
+          html += '</table></div>';
+        }
+        var rollup = rollupReport;
+        if (rollup && rollup.revenue && rollup.expense) {
+          var scenUsed = ['approved', 'actual', 'forecast'].filter(function (k) {
+            return Math.abs(rollup.revenue[k] || 0) > 1e-9 || Math.abs(rollup.expense[k] || 0) > 1e-9;
+          });
+          if (scenUsed.length >= 2) {
+            html += '<div class="report-section"><h5>' + (L.budgetScenarioRollupTitle || '') + '</h5>';
+            html += '<table class="analysis-result-table"><tr><th></th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th></tr>';
+            html += '<tr><td>' + L.revenue + '</td><td>' + (rollup.revenue.approved || 0).toFixed(2) + '</td><td>' + (rollup.revenue.actual || 0).toFixed(2) + '</td><td>' + (rollup.revenue.forecast || 0).toFixed(2) + '</td></tr>';
+            html += '<tr><td>' + L.expenses + '</td><td>' + (rollup.expense.approved || 0).toFixed(2) + '</td><td>' + (rollup.expense.actual || 0).toFixed(2) + '</td><td>' + (rollup.expense.forecast || 0).toFixed(2) + '</td></tr>';
+            html += '</table>';
+            html += '<p style="font-size:0.82rem;color:var(--color-text-muted);margin:0.5rem 0 0;">' + (L.budgetScenarioRollupNote || '') + '</p>';
+            html += '</div>';
+          }
+        }
+        var bp = byPeriodReport || {};
+        var pKeys = Object.keys(bp).filter(function (k) { return k !== '_all'; }).sort();
+        if (pKeys.length) {
+          html += '<div class="report-section"><h5>' + (L.budgetPeriodBreakdownTitle || '') + '</h5>';
+          html += '<table class="analysis-result-table"><tr><th>' + (L.budgetColPeriod || '') + '</th><th colspan="3">' + L.revenue + '</th><th colspan="3">' + L.expenses + '</th></tr>';
+          html += '<tr><th></th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th><th>' + (L.budgetScenarioApproved || '') + '</th><th>' + (L.budgetScenarioActual || '') + '</th><th>' + (L.budgetScenarioForecast || '') + '</th></tr>';
+          pKeys.forEach(function (pk) {
+            var slice = bp[pk] || { revenue: {}, expense: {} };
+            html += '<tr><td>' + escapeHtml(pk) + '</td>';
+            html += '<td>' + ((slice.revenue && slice.revenue.approved) || 0).toFixed(2) + '</td><td>' + ((slice.revenue && slice.revenue.actual) || 0).toFixed(2) + '</td><td>' + ((slice.revenue && slice.revenue.forecast) || 0).toFixed(2) + '</td>';
+            html += '<td>' + ((slice.expense && slice.expense.approved) || 0).toFixed(2) + '</td><td>' + ((slice.expense && slice.expense.actual) || 0).toFixed(2) + '</td><td>' + ((slice.expense && slice.expense.forecast) || 0).toFixed(2) + '</td>';
+            html += '</tr>';
+          });
+          html += '</table></div>';
+        }
+        var maxBar = Math.max(totalRev, totalExp, 1);
+        var wRev = (totalRev / maxBar * 100);
+        var wExp = (totalExp / maxBar * 100);
+        html += '<div class="report-section"><h5>' + (L.chartComparison || 'Comparison') + '</h5>';
+        html += '<div class="budget-bar-chart" role="img" aria-label="' + (L.chartComparison || '') + '">';
+        html += '<div class="budget-bar-chart__row"><span class="budget-bar-chart__label">' + L.revenue + '</span><div class="budget-bar-chart__track"><div class="budget-bar-chart__fill budget-bar-chart__fill--rev" style="width:' + wRev + '%"></div></div><span class="budget-bar-chart__val">' + totalRev.toFixed(2) + '</span></div>';
+        html += '<div class="budget-bar-chart__row"><span class="budget-bar-chart__label">' + L.expenses + '</span><div class="budget-bar-chart__track"><div class="budget-bar-chart__fill budget-bar-chart__fill--exp" style="width:' + wExp + '%"></div></div><span class="budget-bar-chart__val">' + totalExp.toFixed(2) + '</span></div>';
+        html += '</div></div>';
+        html += '<div class="report-section budget-chartjs-section"><h5>' + (L.chartVisualTitle || '') + '</h5><p style="font-size:0.85rem;color:var(--color-text-muted);margin:0 0 var(--space-2);">' + (L.chartVisualIntro || '') + '</p>';
+        html += '<div class="budget-chartjs-grid">';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-rev-exp" aria-hidden="false"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-exp-pie"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap"><canvas id="budget-chart-rev-pie"></canvas></div>';
+        html += '<div class="budget-chartjs-wrap budget-chartjs-wrap--full"><canvas id="budget-chart-scenarios"></canvas></div>';
+        html += '</div></div>';
+        var revByCat = aggregateBudgetLineItemsByCategory(lineItems, 'revenue');
+        var expByCat = aggregateBudgetLineItemsByCategory(lineItems, 'expense');
+        html += '<div class="report-section"><h5>' + (L.deepAnalysisTitle || '') + '</h5>';
+        if (!lineItems.length) {
+          html += '<p style="font-size:0.9rem;color:var(--color-text-muted);">' + (L.deepNoLines || '') + '</p>';
+        }
+        if (revByCat.length) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepCategoryRev || '') + '</h5><table class="budget-deep-table"><tr><th>' + (L.deepColItem || '') + '</th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.deepColShare || '') + '</th></tr>';
+          revByCat.forEach(function (row) {
+            var pct = totalRev ? row.amount / totalRev * 100 : 0;
+            html += '<tr><td>' + escapeHtml(row.name) + '</td><td>' + row.amount.toFixed(2) + '</td><td>' + pct.toFixed(1) + '%</td></tr>';
+          });
+          html += '</table>';
+        }
+        if (expByCat.length) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepCategoryExp || '') + '</h5><table class="budget-deep-table"><tr><th>' + (L.deepColItem || '') + '</th><th>' + (L.deepColAmount || '') + '</th><th>' + (L.deepColShare || '') + '</th></tr>';
+          expByCat.forEach(function (row) {
+            var pct = totalExp ? row.amount / totalExp * 100 : 0;
+            html += '<tr><td>' + escapeHtml(row.name) + '</td><td>' + row.amount.toFixed(2) + '</td><td>' + pct.toFixed(1) + '%</td></tr>';
+          });
+          html += '</table>';
+        }
+        if (revByCat.length || expByCat.length || totalRev > 0 || totalExp > 0) {
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepConcentration || '') + '</h5>';
+          if (totalRev > 0 && revByCat.length) {
+            var topRevPct = revByCat[0].amount / totalRev * 100;
+            html += '<p>' + (L.deepTopRevShare || '') + ': ' + topRevPct.toFixed(1) + '% (' + escapeHtml(revByCat[0].name) + ')</p>';
+          }
+          if (totalExp > 0 && expByCat.length) {
+            var topExpPct = expByCat[0].amount / totalExp * 100;
+            html += '<p>' + (L.deepTopExpShare || '') + ': ' + topExpPct.toFixed(1) + '% (' + escapeHtml(expByCat[0].name) + ')</p>';
+          }
+          if (totalExp > 0 && expByCat.length > 1) {
+            var hhi = budgetExpenseHHI(expByCat, totalExp);
+            html += '<p>' + (L.deepHHI || '') + ': ' + hhi.toFixed(3) + '</p>';
+            if (hhi >= 0.28) html += '<p>' + (L.deepHHIHigh || '') + '</p>';
+            else if (hhi >= 0.18) html += '<p>' + (L.deepHHIModerate || '') + '</p>';
+          }
+        }
+        if (totalRev > 0) {
+          var bal10 = totalRev * 0.9 - totalExp;
+          var bal20 = totalRev * 0.8 - totalExp;
+          html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepSensitivity || '') + '</h5>';
+          html += '<p>' + (L.deepSens10 || '') + ' <strong>' + bal10.toFixed(2) + '</strong></p>';
+          html += '<p>' + (L.deepSens20 || '') + ' <strong>' + bal20.toFixed(2) + '</strong></p>';
+        }
+        var flags = [];
+        if (totalExp > totalRev && totalRev >= 0) flags.push({ cls: 'budget-flag--crit', t: L.flagExpExceedsRev });
+        if (totalRev > 0 && expToRev > 90 && balance >= 0) flags.push({ cls: 'budget-flag--warn', t: L.flagExpNearRev });
+        if (balance > 0 && savingsRate < 5 && totalRev > 0) flags.push({ cls: 'budget-flag--warn', t: L.flagThinMargin });
+        if (totalRev > 0 && revByCat.length && revByCat[0].amount / totalRev > 0.5) flags.push({ cls: 'budget-flag--warn', t: L.flagRevConcentrated });
+        if (totalExp > 0 && expByCat.length && expByCat[0].amount / totalExp > 0.4) flags.push({ cls: 'budget-flag--warn', t: L.flagExpConcentrated });
+        html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepFlagsTitle || '') + '</h5>';
+        if (flags.length) {
+          html += '<ul class="budget-flag-list">';
+          flags.forEach(function (f) { html += '<li class="' + f.cls + '">' + f.t + '</li>'; });
+          html += '</ul>';
+        } else {
+          html += '<p>' + (L.noDeepFlags || '') + '</p>';
+        }
+        var recs = [];
+        if (totalExp > totalRev || expToRev > 90) recs.push(L.recReduceExp);
+        if (totalRev > 0 && revByCat.length && revByCat[0].amount / totalRev > 0.45) recs.push(L.recDiversifyRev);
+        if (totalExp > totalRev || expToRev > 85) recs.push(L.recForecast);
+        recs.push(L.recExpert);
+        html += '<h5 style="margin-top:0.75rem;font-size:0.95rem;">' + (L.deepRecTitle || '') + '</h5><ul class="budget-flag-list">';
+        recs.forEach(function (t) { html += '<li>' + t + '</li>'; });
+        html += '</ul></div>';
         if (prevRev > 0 || prevExp > 0) {
           var revPct = prevRev ? ((totalRev - prevRev) / prevRev * 100) : 0;
           var expPct = prevExp ? ((totalExp - prevExp) / prevExp * 100) : 0;
@@ -18608,6 +8978,17 @@
         html += '<div class="report-section"><h5>' + L.counts + '</h5><p>' + L.revItems + ': ' + revenues.length + '</p><p>' + L.expItems + ': ' + expenses.length + '</p></div>';
         html += '<div class="report-section"><h5>' + L.averages + '</h5><p>' + L.avgRev + ': ' + avgRev.toFixed(2) + '</p><p>' + L.avgExp + ': ' + avgExp.toFixed(2) + '</p></div>';
         html += '<div class="report-section"><h5>' + L.extremes + '</h5><p>' + L.maxRev + ': ' + maxRev.toFixed(2) + '</p><p>' + L.maxExp + ': ' + maxExp.toFixed(2) + '</p></div>';
+        if (typeof isAdmin === 'function' && isAdmin()) {
+          var alog = typeof getBudgetAuditLog === 'function' ? getBudgetAuditLog() : [];
+          if (alog.length) {
+            html += '<div class="report-section budget-audit-section"><h5>' + (L.budgetAuditTitle || '') + '</h5><p style="font-size:0.8rem;color:var(--color-text-muted);">' + (L.budgetAuditNote || '') + '</p>';
+            html += '<table class="budget-deep-table"><tr><th>' + (L.budgetAuditColTime || '') + '</th><th>' + (L.budgetAuditColFile || '') + '</th><th>' + (L.budgetAuditColRows || '') + '</th></tr>';
+            alog.forEach(function (row) {
+              html += '<tr><td>' + escapeHtml(row.at || '') + '</td><td>' + escapeHtml(row.fileName || '') + '</td><td>r:' + (row.revCount | 0) + ' e:' + (row.expCount | 0) + ' L:' + (row.lineCount | 0) + '</td></tr>';
+            });
+            html += '</table></div>';
+          }
+        }
         html += '</div>';
         return html;
       }
@@ -18627,11 +9008,10 @@
         var html = '<table class="analysis-result-table"><tr><th>Metric</th><th>Value</th></tr><tr><td>Initial investment</td><td>' + initial.toFixed(2) + '</td></tr><tr><td>NPV (r=' + rate + '%)</td><td class="result-total">' + npv.toFixed(2) + '</td></tr><tr><td>Payback (years)</td><td class="result-total">' + payback.toFixed(2) + '</td></tr></table>';
         var resF = document.getElementById('feasibility-results');
         var noF = document.getElementById('feas-no-permission');
-        var noFAr = document.getElementById('feas-no-permission-ar');
         if (!resF) return;
         resF.innerHTML = html; resF.style.display = 'block';
-        if (canViewFeasibility()) { if (noF) noF.style.display = 'none'; if (noFAr) noFAr.style.display = 'none'; resF.style.display = 'block'; }
-        else { if (noF) noF.style.display = 'block'; if (noFAr) noFAr.style.display = 'block'; resF.style.display = 'none'; }
+        if (canViewFeasibility()) { if (noF) noF.style.display = 'none'; resF.style.display = 'block'; }
+        else { if (noF) noF.style.display = 'block'; resF.style.display = 'none'; }
       });
 
       /* تمثيل ومركز أبحاث — أقسام مدمجة من representative.html و research-center.html */
@@ -18640,6 +9020,15 @@
         var formEl = document.getElementById('rep-form-block');
         var form = document.getElementById('representative-form');
         if (!form) return;
+        function repI18n(key) {
+          var L = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+          var pack = window.IIF_I18N && window.IIF_I18N.T;
+          var t = pack && (pack[L] || pack.en);
+          var en = pack && pack.en;
+          var v = t && t[key];
+          if (v == null && en) v = en[key];
+          return v != null ? v : '';
+        }
         var TOP_TIER = 'premium_4143';
         var isTop = typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.getMembershipType && IIF_MEMBERSHIP_AUTH.getMembershipType() === TOP_TIER && IIF_MEMBERSHIP_AUTH.hasValidMembership && IIF_MEMBERSHIP_AUTH.hasValidMembership();
         if (typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.syncMembershipStatus) IIF_MEMBERSHIP_AUTH.syncMembershipStatus();
@@ -18647,7 +9036,34 @@
         var REP_APP_KEY = 'iif_representative_applications';
         function getRepApps() { try { return JSON.parse(localStorage.getItem(REP_APP_KEY) || '[]'); } catch (e) { return []; } }
         function saveRepApps(arr) { try { localStorage.setItem(REP_APP_KEY, JSON.stringify(arr)); } catch (e) { } }
-        form.addEventListener('submit', function (e) { e.preventDefault(); var cb = document.getElementById('rep-accept-terms'); if (cb && !cb.checked) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'يرجى الموافقة على الشروط أولاً.' : 'Please accept the terms first.'); return; } var fd = new FormData(this); var obj = { id: 'rep_' + Date.now(), status: 'pending', submittedAt: new Date().toISOString() }; fd.forEach(function (v, k) { obj[k] = v; }); var adminEmail = (typeof localStorage !== 'undefined' && localStorage.getItem('iif-user-email')) || ''; if (adminEmail) obj.linkedToAdminEmail = adminEmail; try { var extra = localStorage.getItem('iif-rep-link-emails'); if (extra) { var arr = []; try { arr = JSON.parse(extra); } catch (e) { } if (arr.length) obj.linkedToEmails = arr; } } catch (e) { } obj.linkedToAdminEmail = obj.linkedToAdminEmail || adminEmail; var apps = getRepApps(); apps.push(obj); saveRepApps(apps); this.reset(); if (cb) cb.checked = false; alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم إرسال الطلب. سيُربط ببريد إدارة الصندوق وستراجع من لوحة التحكم.' : 'Application submitted. It will be linked to Fund management emails and reviewed from the dashboard.'); });
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var cb = document.getElementById('rep-accept-terms');
+          if (cb && !cb.checked) {
+            alert(repI18n('repAlertAcceptTerms') || 'Please accept the terms first.');
+            return;
+          }
+          var fd = new FormData(this);
+          var obj = { id: 'rep_' + Date.now(), status: 'pending', submittedAt: new Date().toISOString() };
+          fd.forEach(function (v, k) { obj[k] = v; });
+          var adminEmail = (typeof localStorage !== 'undefined' && localStorage.getItem('iif-user-email')) || '';
+          if (adminEmail) obj.linkedToAdminEmail = adminEmail;
+          try {
+            var extra = localStorage.getItem('iif-rep-link-emails');
+            if (extra) {
+              var arr = [];
+              try { arr = JSON.parse(extra); } catch (e2) { }
+              if (arr.length) obj.linkedToEmails = arr;
+            }
+          } catch (e1) { }
+          obj.linkedToAdminEmail = obj.linkedToAdminEmail || adminEmail;
+          var apps = getRepApps();
+          apps.push(obj);
+          saveRepApps(apps);
+          this.reset();
+          if (cb) cb.checked = false;
+          alert(repI18n('repAlertSubmitted') || 'Application submitted. It will be linked to Fund management emails and reviewed from the dashboard.');
+        });
       })();
       (function initResearchCenterSection() {
         var msgEl = document.getElementById('research-members-only');
@@ -18656,18 +9072,47 @@
         var searchInput = document.getElementById('research-search');
         var searchBtn = document.getElementById('research-search-btn');
         if (!listEl) return;
+        function researchI18n(key) {
+          var L = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+          var pack = window.IIF_I18N && window.IIF_I18N.T;
+          var t = pack && (pack[L] || pack.en);
+          var en = pack && pack.en;
+          var v = t && t[key];
+          if (v == null && en) v = en[key];
+          return v != null ? v : '';
+        }
         var isMember = typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.hasValidMembership && IIF_MEMBERSHIP_AUTH.hasValidMembership();
         if (typeof IIF_MEMBERSHIP_AUTH !== 'undefined' && IIF_MEMBERSHIP_AUTH.syncMembershipStatus) IIF_MEMBERSHIP_AUTH.syncMembershipStatus();
         if (isMember) { if (msgEl) msgEl.style.display = 'none'; if (gateEl) gateEl.style.display = 'block'; } else { if (msgEl) msgEl.style.display = 'block'; if (gateEl) gateEl.style.display = 'none'; }
-        var lang = (document.documentElement.getAttribute('data-lang') || 'ar').toLowerCase();
-        var isAr = lang !== 'en';
-        if (searchInput) searchInput.placeholder = isAr ? 'ابحث عن موضوع أو مركز...' : 'Search topic or center...';
+        var lang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+        var isAr = lang === 'ar';
         var centers = [{ id: 1, ar: 'مركز أبحاث السوق المالية العالمية', en: 'Global Financial Markets Research Center', tag: 'مالي', tagEn: 'Finance' }, { id: 2, ar: 'مركز أبحاث الاستثمار المستدام', en: 'Sustainable Investment Research Center', tag: 'استثمار', tagEn: 'Investment' }, { id: 3, ar: 'مركز أبحاث الاقتصاد الناشئ', en: 'Emerging Economy Research Center', tag: 'اقتصاد', tagEn: 'Economy' }, { id: 4, ar: 'مركز أبحاث التكنولوجيا والابتكار', en: 'Technology & Innovation Research Center', tag: 'تقنية', tagEn: 'Tech' }, { id: 5, ar: 'مركز أبحاث الطاقة المتجددة', en: 'Renewable Energy Research Center', tag: 'طاقة', tagEn: 'Energy' }];
-        function renderCenters(filter) { var f = (filter || '').toLowerCase(); var items = centers.filter(function (c) { if (!f) return true; return (c.ar && c.ar.toLowerCase().indexOf(f) !== -1) || (c.en && c.en.toLowerCase().indexOf(f) !== -1) || (c.tag && c.tag.toLowerCase().indexOf(f) !== -1) || (c.tagEn && c.tagEn.toLowerCase().indexOf(f) !== -1); }); listEl.innerHTML = ''; items.forEach(function (c) { var li = document.createElement('li'); var title = isAr ? c.ar : c.en; var tag = isAr ? c.tag : c.tagEn; li.innerHTML = '<div><strong>' + (title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</strong><br><small style="color:var(--color-text-muted);">' + (tag || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</small></div><a href="#" class="btn btn--ghost btn-sm" data-id="' + c.id + '">' + (isAr ? 'تنزيل' : 'Download') + '</a>'; listEl.appendChild(li); }); }
+        function renderCenters(filter) {
+          var f = (filter || '').toLowerCase();
+          var items = centers.filter(function (c) {
+            if (!f) return true;
+            return (c.ar && c.ar.toLowerCase().indexOf(f) !== -1) || (c.en && c.en.toLowerCase().indexOf(f) !== -1) || (c.tag && c.tag.toLowerCase().indexOf(f) !== -1) || (c.tagEn && c.tagEn.toLowerCase().indexOf(f) !== -1);
+          });
+          listEl.innerHTML = '';
+          var dl = researchI18n('researchDownload') || 'Download';
+          items.forEach(function (c) {
+            var li = document.createElement('li');
+            var title = isAr ? c.ar : c.en;
+            var tag = isAr ? c.tag : c.tagEn;
+            li.innerHTML = '<div><strong>' + (title || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</strong><br><small style="color:var(--color-text-muted);">' + (tag || '').replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</small></div><a href="#" class="btn btn--ghost btn-sm" data-id="' + c.id + '">' + dl.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</a>';
+            listEl.appendChild(li);
+          });
+        }
         renderCenters();
         if (searchBtn) searchBtn.addEventListener('click', function () { renderCenters(searchInput ? searchInput.value : ''); });
         if (searchInput) searchInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') { e.preventDefault(); renderCenters(searchInput.value); } });
-        listEl.addEventListener('click', function (e) { var a = e.target.closest('a[data-id]'); if (a) { e.preventDefault(); alert(isAr ? 'سيتم تنزيل الملف حسب إعدادات الموقع لاحقاً.' : 'Download will be available when configured.'); } });
+        listEl.addEventListener('click', function (e) {
+          var a = e.target.closest('a[data-id]');
+          if (a) {
+            e.preventDefault();
+            alert(researchI18n('researchDownloadAlert') || 'Download will be available when configured.');
+          }
+        });
       })();
 
       var currentUploadTab = 'docs';
@@ -18681,7 +9126,7 @@
           var li = document.createElement('li');
           li.dataset.id = item.id;
           var label = item.name || item.kind || item.at || item.id;
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(label) + '</strong><small>' + (item.at || '') + '</small></div><div class="actions"><button type="button" class="btn-edit assign-specialist" data-id="' + escapeHtml(item.id) + '"><span class="lang-en">Assign</span><span class="lang-ar">توزيع</span></button><button type="button" class="btn-delete upload-delete" data-id="' + escapeHtml(item.id) + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(label) + '</strong><small>' + (item.at || '') + '</small></div><div class="actions"><button type="button" class="btn-edit assign-specialist" data-id="' + escapeHtml(item.id) + '">' + iifBilingualSpans('dashBtnAssign', 'Assign', 'توزيع') + '</button><button type="button" class="btn-delete upload-delete" data-id="' + escapeHtml(item.id) + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button></div>';
           ul.appendChild(li);
         });
         ul.querySelectorAll('.upload-delete').forEach(function (btn) {
@@ -18696,9 +9141,9 @@
           btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-id');
             var email = (document.getElementById('assign-specialist-email') && document.getElementById('assign-specialist-email').value) || '';
-            if (!email.trim()) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أدخل بريد المختص.' : 'Enter specialist email.'); return; }
+            if (!email.trim()) { alert(iifMessage('jsEnterSpecialistEmail')); return; }
             try { var a = JSON.parse(localStorage.getItem(UPLOADS_ASSIGN_KEY) || '[]'); a.push({ id: id, type: currentUploadTab, email: email.trim(), at: new Date().toISOString() }); localStorage.setItem(UPLOADS_ASSIGN_KEY, JSON.stringify(a)); } catch (e) { }
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم تسجيل التوزيع على المختص.' : 'Assigned to specialist.'); if (document.getElementById('assign-specialist-email')) document.getElementById('assign-specialist-email').value = '';
+            alert(iifMessage('jsAssignedToSpecialist')); if (document.getElementById('assign-specialist-email')) document.getElementById('assign-specialist-email').value = '';
           });
         });
       }
@@ -18716,15 +9161,18 @@
         if (!email.trim()) return;
         var list = getStoredUploads(getUploadsKeyForTab(currentUploadTab));
         list.forEach(function (item) { try { var a = JSON.parse(localStorage.getItem(UPLOADS_ASSIGN_KEY) || '[]'); a.push({ id: item.id, type: currentUploadTab, email: email.trim(), at: new Date().toISOString() }); localStorage.setItem(UPLOADS_ASSIGN_KEY, JSON.stringify(a)); } catch (e) { } });
-        alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم تسجيل الإرسال للمختص لجميع عناصر هذا النوع.' : 'All items of this type assigned to specialist.'); if (document.getElementById('assign-specialist-email')) document.getElementById('assign-specialist-email').value = '';
+        alert(iifMessage('jsAllItemsAssignedSpecialist')); if (document.getElementById('assign-specialist-email')) document.getElementById('assign-specialist-email').value = '';
       });
       function renderDashboardPermLists() {
         var budgetList = getPermittedBudget();
         var feasList = getPermittedFeasibility();
+        var svcList = getPermittedServiceForms();
         var ulB = document.getElementById('dashboard-perm-budget-list');
         var ulF = document.getElementById('dashboard-perm-feasibility-list');
-        if (ulB) { ulB.innerHTML = ''; budgetList.forEach(function (em) { var li = document.createElement('li'); li.innerHTML = '<div class="content"><strong>' + escapeHtml(em) + '</strong></div><div class="actions"><button type="button" class="btn-delete perm-remove" data-type="budget" data-email="' + escapeHtml(em) + '"><span class="lang-en">Remove</span><span class="lang-ar">إزالة</span></button></div>'; ulB.appendChild(li); }); ulB.querySelectorAll('.perm-remove').forEach(function (btn) { btn.addEventListener('click', function () { var em = btn.getAttribute('data-email'); var arr = getPermittedBudget().filter(function (e) { return e !== em; }); try { localStorage.setItem(PERM_BUDGET_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); }); }); }
-        if (ulF) { ulF.innerHTML = ''; feasList.forEach(function (em) { var li = document.createElement('li'); li.innerHTML = '<div class="content"><strong>' + escapeHtml(em) + '</strong></div><div class="actions"><button type="button" class="btn-delete perm-remove" data-type="feasibility" data-email="' + escapeHtml(em) + '"><span class="lang-en">Remove</span><span class="lang-ar">إزالة</span></button></div>'; ulF.appendChild(li); }); ulF.querySelectorAll('.perm-remove').forEach(function (btn) { btn.addEventListener('click', function () { var em = btn.getAttribute('data-email'); var arr = getPermittedFeasibility().filter(function (e) { return e !== em; }); try { localStorage.setItem(PERM_FEASIBILITY_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); }); }); }
+        var ulS = document.getElementById('dashboard-perm-service-forms-list');
+        if (ulB) { ulB.innerHTML = ''; budgetList.forEach(function (em) { var li = document.createElement('li'); li.innerHTML = '<div class="content"><strong>' + escapeHtml(em) + '</strong></div><div class="actions"><button type="button" class="btn-delete perm-remove" data-type="budget" data-email="' + escapeHtml(em) + '">' + iifBilingualSpans('dashBtnRemove', 'Remove', 'إزالة') + '</button></div>'; ulB.appendChild(li); }); ulB.querySelectorAll('.perm-remove').forEach(function (btn) { btn.addEventListener('click', function () { var em = btn.getAttribute('data-email'); var arr = getPermittedBudget().filter(function (e) { return e !== em; }); try { localStorage.setItem(PERM_BUDGET_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); if (typeof updateServiceFormsGates === 'function') updateServiceFormsGates(); }); }); }
+        if (ulF) { ulF.innerHTML = ''; feasList.forEach(function (em) { var li = document.createElement('li'); li.innerHTML = '<div class="content"><strong>' + escapeHtml(em) + '</strong></div><div class="actions"><button type="button" class="btn-delete perm-remove" data-type="feasibility" data-email="' + escapeHtml(em) + '">' + iifBilingualSpans('dashBtnRemove', 'Remove', 'إزالة') + '</button></div>'; ulF.appendChild(li); }); ulF.querySelectorAll('.perm-remove').forEach(function (btn) { btn.addEventListener('click', function () { var em = btn.getAttribute('data-email'); var arr = getPermittedFeasibility().filter(function (e) { return e !== em; }); try { localStorage.setItem(PERM_FEASIBILITY_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); if (typeof updateServiceFormsGates === 'function') updateServiceFormsGates(); }); }); }
+        if (ulS) { ulS.innerHTML = ''; svcList.forEach(function (em) { var li = document.createElement('li'); li.innerHTML = '<div class="content"><strong>' + escapeHtml(em) + '</strong></div><div class="actions"><button type="button" class="btn-delete perm-remove" data-type="service_forms" data-email="' + escapeHtml(em) + '">' + iifBilingualSpans('dashBtnRemove', 'Remove', 'إزالة') + '</button></div>'; ulS.appendChild(li); }); ulS.querySelectorAll('.perm-remove').forEach(function (btn) { btn.addEventListener('click', function () { var em = btn.getAttribute('data-email'); var arr = getPermittedServiceForms().filter(function (e) { return e !== em; }); try { localStorage.setItem(PERM_SERVICE_FORMS_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); if (typeof updateServiceFormsGates === 'function') updateServiceFormsGates(); }); }); }
       }
       if (document.getElementById('perm-budget-btn')) document.getElementById('perm-budget-btn').addEventListener('click', function () {
         var em = (document.getElementById('perm-email') && document.getElementById('perm-email').value || '').trim().toLowerCase();
@@ -18735,6 +9183,11 @@
         var em = (document.getElementById('perm-email') && document.getElementById('perm-email').value || '').trim().toLowerCase();
         if (!em) return;
         var arr = getPermittedFeasibility(); if (arr.indexOf(em) < 0) arr.push(em); try { localStorage.setItem(PERM_FEASIBILITY_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); if (document.getElementById('perm-email')) document.getElementById('perm-email').value = '';
+      });
+      if (document.getElementById('perm-service-forms-btn')) document.getElementById('perm-service-forms-btn').addEventListener('click', function () {
+        var em = (document.getElementById('perm-email') && document.getElementById('perm-email').value || '').trim().toLowerCase();
+        if (!em) return;
+        var arr = getPermittedServiceForms(); if (arr.indexOf(em) < 0) arr.push(em); try { localStorage.setItem(PERM_SERVICE_FORMS_KEY, JSON.stringify(arr)); } catch (e) { } renderDashboardPermLists(); if (typeof updateServiceFormsGates === 'function') updateServiceFormsGates(); if (document.getElementById('perm-email')) document.getElementById('perm-email').value = '';
       });
 
       /* الموظفون والصلاحيات — إضافة من لوحة التحكم فقط، تحديد المهام والدور والصلاحيات بدقة */
@@ -19007,7 +9460,6 @@
       function applyDashboardAccessRules() {
         resetDashboardSectionStyles();
         var type = getDashboardAccessType();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var welcomeEl = document.getElementById('dashboard-role-welcome');
         var welcomeText = document.getElementById('dashboard-role-welcome-text');
         if (type === 'owner') {
@@ -19036,11 +9488,11 @@
         if (welcomeEl && welcomeText) {
           welcomeEl.style.display = 'block';
           if (type === 'staff') {
-            welcomeText.textContent = isAr ? 'أنت مسجّل كموظف. استخدم قسم «محتواي» أعلاه لحفظ اسمك ونبذتك وصور بطاقة العضوية الرقمية. تظهر باقي الأقسام حسب الصلاحيات (التقارير، الخطابات، إلخ).' : 'You are signed in as staff. Use «My content» above to save your name, bio, and digital membership card images. Other sections follow your permissions (reports, letters, etc.).';
+            welcomeText.textContent = iifMessage('dashWelcomeStaff');
           } else if (type === 'member') {
-            welcomeText.textContent = isAr ? 'أنت عضو بصلاحية اشتراك. استخدم «محتواي» لتحديث ظهورك العام والصور؛ وستجد الرفوعات والمزايا حسب اشتراكك.' : 'You are a member. Use «My content» to update your public display and images; uploads and tools follow your subscription.';
+            welcomeText.textContent = iifMessage('dashWelcomeMember');
           } else {
-            welcomeText.textContent = isAr ? 'أنت مسجّل كمستخدم. يمكنك حفظ معلوماتك وصورك من قسم «محتواي»؛ لإكمال العضوية المدفوعة راجع قسم الاشتراك في الموقع.' : 'You are registered. Save your info and images under «My content»; for paid membership see the subscription section on the site.';
+            welcomeText.textContent = iifMessage('dashWelcomeRegistered');
           }
         }
         var vis = document.getElementById('dashboard-visitor-counter');
@@ -19094,6 +9546,7 @@
           return;
         }
         if (document.getElementById('dashboard-section-overview')) document.getElementById('dashboard-section-overview').style.display = '';
+        /* مستخدم مسجّل فقط: لا تخفِ فهرس الأقسام بالكامل — يبدو وكأن اللوحة «اسم بلا مكوّنات». أظهر انتقالاً إلى نظرة عامة / محتواي فقط */
         var toc = document.getElementById('dashboard-toc-nav');
         if (toc) {
           toc.style.display = '';
@@ -19193,7 +9646,6 @@
         if (pst) pst.textContent = '';
       }
       function saveDashboardMyPassword() {
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
         var st = document.getElementById('dash-my-pw-status');
         var curEl = document.getElementById('dash-my-pw-current');
@@ -19203,40 +9655,39 @@
         var nw = (nwEl && nwEl.value) || '';
         var nw2 = (nw2El && nw2El.value) || '';
         function setStatus(msg) { if (st) st.textContent = msg || ''; }
-        if (!email) { setStatus(isAr ? 'لا يوجد بريد مسجّل.' : 'No signed-in email.'); return; }
-        if (!nw || !nw2) { setStatus(isAr ? 'أدخل كلمة المرور الجديدة مرتين.' : 'Enter the new password twice.'); return; }
-        if (nw !== nw2) { setStatus(isAr ? 'كلمتا المرور الجديدتان غير متطابقتين.' : 'New passwords do not match.'); return; }
+        if (!email) { setStatus(iifMessage('dashMyNoSignedEmail')); return; }
+        if (!nw || !nw2) { setStatus(iifMessage('dashMyEnterNewPwTwice')); return; }
+        if (nw !== nw2) { setStatus(iifMessage('dashMyNewPwMismatch')); return; }
         if (typeof isStrongPassword === 'function' && !isStrongPassword(nw)) {
-          setStatus(isAr ? 'كلمة ضعيفة: 8+ أحرف، حرف كبير وصغير ورقم ورمز.' : 'Weak: 8+ chars with upper, lower, digit, and symbol.');
+          setStatus(iifMessage('dashMyPwWeakPolicy'));
           return;
         }
         var cred = typeof getCredentialForEmail === 'function' ? getCredentialForEmail(email) : null;
         if (cred && cred.hash) {
-          if (!cur) { setStatus(isAr ? 'أدخل كلمة المرور الحالية.' : 'Enter your current password.'); return; }
+          if (!cur) { setStatus(iifMessage('dashMyEnterCurrentPw')); return; }
           if (typeof verifyPasswordForEmail !== 'function' || typeof setCredentialForEmail !== 'function') {
-            setStatus(isAr ? 'وظائف كلمة المرور غير متوفرة.' : 'Password helpers unavailable.');
+            setStatus(iifMessage('dashMyPwHelpersUnavailable'));
             return;
           }
           verifyPasswordForEmail(email, cur).then(function (ok) {
-            if (!ok) { setStatus(isAr ? 'كلمة المرور الحالية غير صحيحة.' : 'Current password is incorrect.'); return; }
+            if (!ok) { setStatus(iifMessage('dashMyCurrentPwWrong')); return; }
             setCredentialForEmail(email, nw).then(function (sok) {
-              setStatus(sok ? (isAr ? 'تم تحديث كلمة المرور.' : 'Password updated.') : (isAr ? 'فشل الحفظ.' : 'Save failed.'));
+              setStatus(sok ? iifMessage('dashMyPwUpdated') : iifMessage('dashMySaveFailed'));
               if (sok && curEl) curEl.value = '';
               if (sok && nwEl) nwEl.value = '';
               if (sok && nw2El) nw2El.value = '';
             });
           });
         } else {
-          if (typeof setCredentialForEmail !== 'function') { setStatus(isAr ? 'وظائف كلمة المرور غير متوفرة.' : 'Password helpers unavailable.'); return; }
+          if (typeof setCredentialForEmail !== 'function') { setStatus(iifMessage('dashMyPwHelpersUnavailable')); return; }
           setCredentialForEmail(email, nw).then(function (sok) {
-            setStatus(sok ? (isAr ? 'تم تعيين كلمة المرور.' : 'Password set.') : (isAr ? 'فشل الحفظ.' : 'Save failed.'));
+            setStatus(sok ? iifMessage('dashMyPwSet') : iifMessage('dashMySaveFailed'));
             if (sok && nwEl) nwEl.value = '';
             if (sok && nw2El) nw2El.value = '';
           });
         }
       }
       function saveDashboardMyContent() {
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
         if (!email) return;
         var ne = (document.getElementById('dash-my-name-en') && document.getElementById('dash-my-name-en').value) || '';
@@ -19283,7 +9734,7 @@
           localStorage.setItem('iif-user-profile', JSON.stringify(prof));
         } catch (eProf2) { }
         var st = document.getElementById('dash-my-save-status');
-        if (st) st.textContent = isAr ? 'تم الحفظ.' : 'Saved.';
+        if (st) st.textContent = iifMessage('dashSavedStatus');
         setTimeout(function () { var s = document.getElementById('dash-my-save-status'); if (s) s.textContent = ''; }, 3500);
       }
       function initDashboardMyContentPanel() {
@@ -19300,13 +9751,13 @@
             var f = inp.files && inp.files[0];
             if (!f) return;
             if (typeof SAFE_IMAGE_MIMES !== 'undefined' && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) {
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'نوع الملف غير مسموح.' : 'File type not allowed.');
+              alert(iifMessage('jsFileTypeNotAllowedShort'));
               inp.value = '';
               return;
             }
             var max = typeof getCertImageMaxSize === 'function' ? getCertImageMaxSize() : 2 * 1024 * 1024;
             if (f.size > max) {
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الملف كبير جداً.' : 'File too large.');
+              alert(iifMessage('jsFileTooLargeShort'));
               inp.value = '';
               return;
             }
@@ -19379,17 +9830,17 @@
       function fillStaffPresetSelect() {
         var sel = document.getElementById('staff-perm-preset-select');
         if (!sel) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var keep = sel.value;
         sel.innerHTML = '';
         var opt0 = document.createElement('option');
         opt0.value = '';
-        opt0.textContent = isAr ? '— قالب سريع (اختياري) —' : '— Quick preset (optional) —';
+        opt0.textContent = iifMessage('dashStaffQuickPresetBlank');
         sel.appendChild(opt0);
+        var presetLang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
         STAFF_PERM_QUICK_PRESETS.forEach(function (pr) {
           var o = document.createElement('option');
           o.value = pr.id;
-          o.textContent = isAr ? pr.ar : pr.en;
+          o.textContent = presetLang === 'ar' ? pr.ar : pr.en;
           sel.appendChild(o);
         });
         var kf = false;
@@ -19419,11 +9870,10 @@
         if (!sel) return;
         var prev = sel.value;
         var list = getStaffList();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         sel.innerHTML = '';
         var optNew = document.createElement('option');
         optNew.value = '__new__';
-        optNew.textContent = isAr ? '— شخص جديد (أدخل البيانات أدناه) —' : '— New person (enter details below) —';
+        optNew.textContent = iifMessage('dashStaffNewPerson');
         sel.appendChild(optNew);
         list.forEach(function (s) {
           var o = document.createElement('option');
@@ -19474,7 +9924,7 @@
         renderStaffCustomPermList();
         renderStaffPermissionsGrid('staff-permissions-grid', staff.permissions || []);
         var addBtn = document.getElementById('staff-add-btn');
-        if (addBtn) addBtn.innerHTML = '<span class="lang-en">Save changes</span><span class="lang-ar">حفظ التعديل</span>';
+        if (addBtn) addBtn.innerHTML = iifBilingualSpans('dashSaveChanges', 'Save changes', 'حفظ التعديل');
         var cancelBtn = document.getElementById('staff-cancel-edit-btn');
         if (cancelBtn) cancelBtn.style.display = 'inline-flex';
         var selPicker = document.getElementById('staff-permissions-assign-picker');
@@ -19496,7 +9946,7 @@
         renderStaffCustomPermList();
         if (document.getElementById('staff-photo-data')) document.getElementById('staff-photo-data').value = '';
         var ab = document.getElementById('staff-add-btn');
-        if (ab) ab.innerHTML = '<span class="lang-en">Add staff</span><span class="lang-ar">إضافة موظف</span>';
+        if (ab) ab.innerHTML = iifBilingualSpans('dashAddStaff', 'Add staff', 'إضافة موظف');
         renderStaffPermissionsGrid('staff-permissions-grid', []);
         var staffCancelEditBtn = document.getElementById('staff-cancel-edit-btn');
         if (staffCancelEditBtn) staffCancelEditBtn.style.display = 'none';
@@ -19542,13 +9992,13 @@
             var p = STAFF_PERMISSIONS.find(function (x) { return x.id === pid; });
             return p ? (isAr ? p.ar : p.en) : pid;
           }).concat(s.customPermissions || []).join(', ');
-          if (!permLabels) permLabels = isAr ? '— لا صلاحيات' : '— No permissions';
+          if (!permLabels) permLabels = iifMessage('dashStaffNoPerms');
           var photoSrc = s.photoUrl || '';
           var staffImgSrc = getDisplayImageSrc(photoSrc, 'photo');
           var staffPh = IIF_IMAGES && IIF_IMAGES.getPlaceholder ? IIF_IMAGES.getPlaceholder('photo') : '';
           var photoHtml = '<div class="staff-list-photo-wrap"><img class="staff-list-photo" src="' + escapeHtml(staffImgSrc) + '" alt="" onerror="this.onerror=null;this.src=\'' + (staffPh || '').replace(/'/g, '\\\'') + '\';" /></div>';
           var bioHtml = (s.bio && s.bio.trim()) ? '<p class="staff-list-bio">' + escapeHtml((s.bio || '').slice(0, 120)) + (s.bio.length > 120 ? '…' : '') + '</p>' : '';
-          var actionsHtml = canEditStaff ? '<div class="actions"><button type="button" class="btn-edit staff-edit" data-index="' + idx + '"><span class="lang-en">Edit</span><span class="lang-ar">تعديل</span></button><button type="button" class="btn-delete staff-delete" data-index="' + idx + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button></div>' : '';
+          var actionsHtml = canEditStaff ? '<div class="actions"><button type="button" class="btn-edit staff-edit" data-index="' + idx + '">' + iifBilingualSpans('dashBtnEdit', 'Edit', 'تعديل') + '</button><button type="button" class="btn-delete staff-delete" data-index="' + idx + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button></div>' : '';
           li.innerHTML = '<div class="content">' + photoHtml + '<div class="staff-list-body"><strong>' + escapeHtml(s.name || '') + '</strong> <small>' + escapeHtml(s.email || '') + '</small><br><small><span style="color:var(--color-accent-gold-soft);">' + escapeHtml(typeLabel) + '</span>' + (s.roleTitle ? ' · ' + escapeHtml(s.roleTitle) : '') + (s.duties ? ' · ' + escapeHtml(s.duties) : '') + '</small><br><small style="color:var(--color-text-muted);">' + escapeHtml(permLabels) + '</small>' + bioHtml + '</div></div>' + actionsHtml;
           ul.appendChild(li);
         });
@@ -19563,11 +10013,11 @@
         ul.querySelectorAll('.staff-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
             if (typeof staffHasExplicitPermission === 'function' && !staffHasExplicitPermission('manage_staff')) {
-              alert(isAr ? 'ليس لديك صلاحية حذف أو تعديل الموظفين.' : 'You do not have permission to delete or edit staff.');
+              alert(iifMessage('dashStaffNoDeleteEditPerm'));
               return;
             }
             var idx = parseInt(btn.getAttribute('data-index'), 10);
-            if (!confirm(isAr ? 'حذف هذا الموظف؟' : 'Delete this staff member?')) return;
+            if (!confirm(iifMessage('dashStaffConfirmDelete'))) return;
             var list = getStaffList();
             list.splice(idx, 1);
             saveStaffList(list);
@@ -19625,9 +10075,8 @@
       var staffCancelEditBtn = document.getElementById('staff-cancel-edit-btn');
       if (staffForm) staffForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        var isArGuard = document.documentElement.getAttribute('data-lang') === 'ar';
         if (typeof staffHasExplicitPermission === 'function' && !staffHasExplicitPermission('manage_staff')) {
-          alert(isArGuard ? 'ليس لديك صلاحية تعديل الموظفين وصلاحياتهم.' : 'You do not have permission to edit staff and their access.');
+          alert(iifMessage('dashStaffNoEditPerm'));
           return;
         }
         var editId = (document.getElementById('staff-edit-id') && document.getElementById('staff-edit-id').value) || '';
@@ -19646,12 +10095,11 @@
         if (!name || !email) return;
         var permissions = getStaffFormPermissions();
         var list = getStaffList();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var dupOther = list.some(function (s) {
           return (s.email || '').trim().toLowerCase() === email && String(s.id) !== String(editId || '');
         });
         if (dupOther) {
-          alert(isAr ? 'هذا البريد مسجّل لموظف آخر. استخدم «تعديل» من القائمة أو غيّر البريد.' : 'This email is already assigned to another person. Pick them from the list to edit, or use a different email.');
+          alert(iifMessage('dashStaffEmailConflict'));
           return;
         }
         var pw1 = (document.getElementById('staff-login-password') && document.getElementById('staff-login-password').value) || '';
@@ -19664,20 +10112,20 @@
         function applyOptionalStaffLoginPassword(thenFn) {
           if (!pw1 && !pw2) { if (thenFn) thenFn(); return; }
           if (pw1 !== pw2) {
-            alert(isAr ? 'كلمتا مرور الدخول غير متطابقتين.' : 'Login passwords do not match.');
+            alert(iifMessage('dashStaffLoginPwMismatch'));
             return;
           }
           if (typeof isStrongPassword === 'function' && !isStrongPassword(pw1)) {
-            alert(isAr ? 'كلمة مرور الدخول ضعيفة (8+ أحرف، كبير وصغير ورقم ورمز).' : 'Login password is too weak (8+ chars, upper, lower, digit, symbol).');
+            alert(iifMessage('dashStaffLoginPwWeak'));
             return;
           }
           if (typeof setCredentialForEmail !== 'function') {
-            alert(isAr ? 'لا يمكن حفظ كلمة المرور.' : 'Cannot save password.');
+            alert(iifMessage('dashStaffCannotSavePw'));
             return;
           }
           setCredentialForEmail(email, pw1).then(function (ok) {
             if (!ok) {
-              alert(isAr ? 'فشل حفظ كلمة المرور.' : 'Failed to save password.');
+              alert(iifMessage('dashStaffFailedSavePw'));
               return;
             }
             var slp = document.getElementById('staff-login-password');
@@ -19710,9 +10158,9 @@
         if (fileInput && dataInput) fileInput.addEventListener('change', function () {
           var f = fileInput.files && fileInput.files[0];
           if (!f) { dataInput.value = ''; return; }
-          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'نوع الملف غير مسموح. استخدم JPEG، PNG، GIF أو WebP.' : 'File type not allowed. Use JPEG, PNG, GIF or WebP.'); fileInput.value = ''; dataInput.value = ''; return; }
+          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(iifMessage('jsFileTypeNotAllowedDetailed')); fileInput.value = ''; dataInput.value = ''; return; }
           var staffMax = getCertImageMaxSize();
-          if (f.size > staffMax) { var mb = Math.round(staffMax / 1024 / 1024); alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الملف كبير جداً. الحد ' + mb + ' ميجا.' : 'File too large. Max ' + mb + ' MB.'); fileInput.value = ''; dataInput.value = ''; return; }
+          if (f.size > staffMax) { var mb = Math.round(staffMax / 1024 / 1024); alert(iifMessageFmt('jsFileTooLargeMb', { mb: mb })); fileInput.value = ''; dataInput.value = ''; return; }
           fileInput.disabled = true;
           var r = new FileReader();
           r.onload = function () {
@@ -19722,12 +10170,12 @@
               fileInput.disabled = false;
               if (!ck.safe) { alert(getContentRejectMessage(ck.reason)); fileInput.value = ''; dataInput.value = ''; return; }
               dataInput.value = res; if (urlInput) urlInput.value = '';
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم رفع صورة الموظف بنجاح.' : 'Staff photo uploaded successfully.');
+              alert(iifMessage('jsStaffPhotoUploaded'));
             });
           };
           r.onerror = function () {
             fileInput.disabled = false;
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل قراءة الملف.' : 'Failed to read file.');
+            alert(iifMessage('jsFileReadFailed'));
           };
           r.readAsDataURL(f);
         });
@@ -19825,7 +10273,7 @@
           if (m.showWorksLinks && Array.isArray(m.worksLinks) && m.worksLinks.length > 0) {
             var safeLinks = m.worksLinks.filter(function (l) { return l && l.url && isMemberLinkSafe(l.url); });
             if (safeLinks.length > 0) {
-              linksHtml = '<div class="members-card__links"><p class="members-card__links-title">' + (isAr ? 'أعماله / روابط شركاته' : 'Works / company links') + '</p><ul class="members-card__links-list">';
+              linksHtml = '<div class="members-card__links"><p class="members-card__links-title">' + escapeHtml(iifMessage('membersCardWorksLinksTitle')) + '</p><ul class="members-card__links-list">';
               safeLinks.forEach(function (l) {
                 var lbl = escapeHtml((l.label || l.url || '').trim() || (l.url || ''));
                 var safeUrl = l.url.trim();
@@ -19836,10 +10284,10 @@
             }
           }
           var tier = m.tier || 'cooperating';
-          var tierLabel = (typeof getTierLabel === 'function') ? getTierLabel(tier, isAr ? 'ar' : 'en') : (tier === 'premium_4143' ? (isAr ? 'عضوية بلاتينية مميزة' : 'Premium Platinum') : tier === 'premium_3143' ? (isAr ? 'عضوية ذهبية مميزة' : 'Premium Gold') : tier === 'premium_2143' ? (isAr ? 'عضوية فضية مميزة' : 'Premium Silver') : tier === 'shared' ? (isAr ? 'عضو مشترك' : 'Shared Member') : (isAr ? 'عضو متعاون' : 'Cooperating Member'));
+          var tierLabel = (typeof getTierLabel === 'function') ? getTierLabel(tier) : String(tier || '');
           var tierBlock = '<p class="members-card__tier members-card__tier--' + escapeHtml(tier) + '"><span class="members-card__tier-emblem" aria-hidden="true"></span>' + escapeHtml(tierLabel) + '</p>';
-          var memberPageLink = '<a href="#member-' + escapeHtml((m.id || '').replace(/"/g, '')) + '" class="members-card__link-page">' + (isAr ? 'صفحته — جميع أعماله' : 'View page — all their works') + '</a>';
-          li.innerHTML = photoHtml + '<h4 class="members-card__name lang-en">' + escapeHtml(m.nameEn || '') + '</h4><h4 class="members-card__name lang-ar">' + escapeHtml(m.nameAr || '') + '</h4>' + tierBlock + '<p class="members-card__bio">' + escapeHtml(bio) + '</p>' + linksHtml + '<div class="members-card__qr-wrap" id="' + qrId + '"></div><p class="members-card__qr-label">' + (isAr ? 'كيو آر العضوية في الصندوق' : 'Membership QR') + '</p>' + memberPageLink;
+          var memberPageLink = '<a href="#member-' + escapeHtml((m.id || '').replace(/"/g, '')) + '" class="members-card__link-page">' + escapeHtml(iifMessage('membersCardViewPageLink')) + '</a>';
+          li.innerHTML = photoHtml + '<h4 class="members-card__name lang-en">' + escapeHtml(m.nameEn || '') + '</h4><h4 class="members-card__name lang-ar">' + escapeHtml(m.nameAr || '') + '</h4>' + tierBlock + '<p class="members-card__bio">' + escapeHtml(bio) + '</p>' + linksHtml + '<div class="members-card__qr-wrap" id="' + qrId + '"></div><p class="members-card__qr-label">' + escapeHtml(iifText('dashMembershipQrLabel', 'Membership QR')) + '</p>' + memberPageLink;
           ul.appendChild(li);
           if (typeof QRCode !== 'undefined') {
             try {
@@ -19853,12 +10301,11 @@
         var ul = document.getElementById('dashboard-fund-members-list');
         if (!ul) return;
         var list = getFundMembers();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         ul.innerHTML = '';
         list.forEach(function (m, idx) {
           var li = document.createElement('li');
           var qrWrapId = 'dash-member-qr-' + idx;
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(m.nameEn || m.nameAr || '') + '</strong> <small>' + escapeHtml(m.email || '') + '</small> <span style="color:var(--color-accent-gold-soft);font-size:0.8rem;">' + escapeHtml(m.membershipId || '') + '</span><br><small>' + escapeHtml((m.bioEn || m.bioAr || '').slice(0, 80)) + '…</small></div><div class="members-dash-qr" id="' + qrWrapId + '"></div><div class="actions"><button type="button" class="btn-edit fund-member-edit" data-index="' + idx + '">' + (isAr ? 'تعديل' : 'Edit') + '</button><button type="button" class="btn-delete fund-member-delete" data-index="' + idx + '">' + (isAr ? 'حذف' : 'Delete') + '</button></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(m.nameEn || m.nameAr || '') + '</strong> <small>' + escapeHtml(m.email || '') + '</small> <span style="color:var(--color-accent-gold-soft);font-size:0.8rem;">' + escapeHtml(m.membershipId || '') + '</span><br><small>' + escapeHtml((m.bioEn || m.bioAr || '').slice(0, 80)) + '…</small></div><div class="members-dash-qr" id="' + qrWrapId + '"></div><div class="actions"><button type="button" class="btn-edit fund-member-edit" data-index="' + idx + '">' + iifBilingualSpans('dashBtnEdit', 'Edit', 'تعديل') + '</button><button type="button" class="btn-delete fund-member-delete" data-index="' + idx + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button></div>';
           ul.appendChild(li);
           if (typeof QRCode !== 'undefined' && m.membershipId) {
             try {
@@ -19893,14 +10340,14 @@
             renderFundMemberLinksList();
             var linksWrap = document.getElementById('fund-member-links-wrap');
             if (linksWrap) linksWrap.style.display = m.showWorksLinks ? '' : 'none';
-            document.getElementById('fund-member-add-btn').innerHTML = isAr ? '<span class="lang-en">Save changes</span><span class="lang-ar">حفظ التعديل</span>' : '<span class="lang-en">Save changes</span><span class="lang-ar">حفظ التعديل</span>';
+            document.getElementById('fund-member-add-btn').innerHTML = iifBilingualSpans('dashSaveChanges', 'Save changes', 'حفظ التعديل');
             document.getElementById('fund-member-cancel-btn').style.display = 'inline-flex';
           });
         });
         ul.querySelectorAll('.fund-member-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var idx = parseInt(btn.getAttribute('data-index'), 10);
-            if (!confirm(isAr ? 'حذف هذا العضو؟' : 'Delete this member?')) return;
+            if (!confirm(iifMessage('dashConfirmDeleteMember'))) return;
             var arr = getFundMembers();
             arr.splice(idx, 1);
             saveFundMembers(arr);
@@ -19917,9 +10364,9 @@
         if (photoFile && photoData) photoFile.addEventListener('change', function () {
           var f = photoFile.files && photoFile.files[0];
           if (!f) { photoData.value = ''; return; }
-          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'نوع الملف غير مسموح. استخدم JPEG، PNG، GIF أو WebP.' : 'File type not allowed. Use JPEG, PNG, GIF or WebP.'); photoFile.value = ''; photoData.value = ''; return; }
+          if (f.type && SAFE_IMAGE_MIMES && SAFE_IMAGE_MIMES.indexOf(f.type) === -1) { alert(iifMessage('jsFileTypeNotAllowedDetailed')); photoFile.value = ''; photoData.value = ''; return; }
           var memberMax = getCertImageMaxSize();
-          if (f.size > memberMax) { var mb = Math.round(memberMax / 1024 / 1024); alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الملف كبير جداً. الحد ' + mb + ' ميجا.' : 'File too large. Max ' + mb + ' MB.'); photoFile.value = ''; photoData.value = ''; return; }
+          if (f.size > memberMax) { var mb = Math.round(memberMax / 1024 / 1024); alert(iifMessageFmt('jsFileTooLargeMb', { mb: mb })); photoFile.value = ''; photoData.value = ''; return; }
           photoFile.disabled = true;
           var r = new FileReader();
           r.onload = function () {
@@ -19929,12 +10376,12 @@
               photoFile.disabled = false;
               if (!ck.safe) { alert(getContentRejectMessage(ck.reason)); photoFile.value = ''; photoData.value = ''; return; }
               photoData.value = res; if (photoUrl) photoUrl.value = '';
-              alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم رفع صورة العضو بنجاح.' : 'Member photo uploaded successfully.');
+              alert(iifMessage('jsMemberPhotoUploaded'));
             });
           };
           r.onerror = function () {
             photoFile.disabled = false;
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل قراءة الملف.' : 'Failed to read file.');
+            alert(iifMessage('jsFileReadFailed'));
           };
           r.readAsDataURL(f);
         });
@@ -19969,7 +10416,7 @@
               form.reset();
               document.getElementById('fund-member-edit-id').value = '';
               document.getElementById('fund-member-photo-data').value = '';
-              document.getElementById('fund-member-add-btn').innerHTML = '<span class="lang-en">Add member</span><span class="lang-ar">إضافة عضو</span>';
+              document.getElementById('fund-member-add-btn').innerHTML = iifBilingualSpans('dashAddMember', 'Add member', 'إضافة عضو');
               document.getElementById('fund-member-cancel-btn').style.display = 'none';
               return;
             }
@@ -19986,7 +10433,7 @@
           form.reset();
           document.getElementById('fund-member-photo-data').value = '';
           document.getElementById('fund-member-edit-id').value = '';
-          document.getElementById('fund-member-add-btn').innerHTML = '<span class="lang-en">Add member</span><span class="lang-ar">إضافة عضو</span>';
+          document.getElementById('fund-member-add-btn').innerHTML = iifBilingualSpans('dashAddMember', 'Add member', 'إضافة عضو');
           document.getElementById('fund-member-cancel-btn').style.display = 'none';
         });
         var cancelBtn = document.getElementById('fund-member-cancel-btn');
@@ -19995,7 +10442,7 @@
           form.reset();
           document.getElementById('fund-member-photo-data').value = '';
           cancelBtn.style.display = 'none';
-          document.getElementById('fund-member-add-btn').innerHTML = '<span class="lang-en">Add member</span><span class="lang-ar">إضافة عضو</span>';
+          document.getElementById('fund-member-add-btn').innerHTML = iifBilingualSpans('dashAddMember', 'Add member', 'إضافة عضو');
         });
       })();
       renderPublicMembersList();
@@ -20041,7 +10488,7 @@
             tierEl.style.display = '';
           }
           if (bioEl) bioEl.textContent = bio;
-          if (worksEl) worksEl.textContent = works || (document.documentElement.getAttribute('data-lang') === 'ar' ? 'لا محتوى بعد.' : 'No content yet.');
+          if (worksEl) worksEl.textContent = works || iifMessage('jsNoContentYet');
           var qrWrap = document.getElementById('member-page-qr');
           if (qrWrap && typeof QRCode !== 'undefined' && m.membershipId) {
             qrWrap.innerHTML = '';
@@ -20138,11 +10585,10 @@
         var ul = document.getElementById('suggestions-inbox-list');
         if (!ul) return;
         var list = getSuggestions().filter(function (s) { return !s.archived; });
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         ul.innerHTML = '';
         list.forEach(function (s) {
           var li = document.createElement('li');
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(s.name || '') + '</strong> · ' + escapeHtml(s.email || '') + (s.phone ? ' · ' + escapeHtml(s.phone) : '') + (s.country ? ' · ' + escapeHtml(s.country) : '') + '<br><strong>' + escapeHtml(s.subject || '') + '</strong><br><small>' + escapeHtml((s.message || '').slice(0, 150)) + (s.message && s.message.length > 150 ? '…' : '') + '</small><br><small>' + escapeHtml(s.date ? s.date.slice(0, 10) : '') + '</small></div><div class="actions"><button type="button" class="btn btn--ghost btn-sm suggestion-to-archive" data-id="' + escapeHtml(s.id || '') + '">' + (isAr ? 'نقل للأرشيف' : 'To archive') + '</button></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(s.name || '') + '</strong> · ' + escapeHtml(s.email || '') + (s.phone ? ' · ' + escapeHtml(s.phone) : '') + (s.country ? ' · ' + escapeHtml(s.country) : '') + '<br><strong>' + escapeHtml(s.subject || '') + '</strong><br><small>' + escapeHtml((s.message || '').slice(0, 150)) + (s.message && s.message.length > 150 ? '…' : '') + '</small><br><small>' + escapeHtml(s.date ? s.date.slice(0, 10) : '') + '</small></div><div class="actions"><button type="button" class="btn btn--ghost btn-sm suggestion-to-archive" data-id="' + escapeHtml(s.id || '') + '">' + escapeHtml(iifMessage('suggestionToArchiveBtn')) + '</button></div>';
           ul.appendChild(li);
         });
         ul.querySelectorAll('.suggestion-to-archive').forEach(function (btn) {
@@ -20158,11 +10604,10 @@
         var ul = document.getElementById('suggestions-archive-list');
         if (!ul) return;
         var list = getSuggestions().filter(function (s) { return !!s.archived; });
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         ul.innerHTML = '';
         list.forEach(function (s) {
           var li = document.createElement('li');
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(s.name || '') + '</strong><br><small>' + (isAr ? 'البريد: ' : 'Email: ') + escapeHtml(s.email || '') + '</small><br><small>' + (isAr ? 'الهاتف: ' : 'Phone: ') + escapeHtml(s.phone || '') + '</small><br><small>' + (isAr ? 'الدولة: ' : 'Country: ') + escapeHtml(s.country || '') + '</small><br><strong>' + escapeHtml(s.subject || '') + '</strong><br><p style="white-space:pre-wrap;margin:0.35rem 0;">' + escapeHtml(s.message || '') + '</p><small>' + escapeHtml(s.date || '') + '</small></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(s.name || '') + '</strong><br><small>' + escapeHtml(iifMessage('formLabelEmailShort')) + escapeHtml(s.email || '') + '</small><br><small>' + escapeHtml(iifMessage('formLabelPhoneShort')) + escapeHtml(s.phone || '') + '</small><br><small>' + escapeHtml(iifMessage('formLabelCountryShort')) + escapeHtml(s.country || '') + '</small><br><strong>' + escapeHtml(s.subject || '') + '</strong><br><p style="white-space:pre-wrap;margin:0.35rem 0;">' + escapeHtml(s.message || '') + '</p><small>' + escapeHtml(s.date || '') + '</small></div>';
           ul.appendChild(li);
         });
       }
@@ -20187,27 +10632,32 @@
       /* تقييم أداء الموظفين — مؤتمت، بأعلى معايير التقييم */
       var STAFF_EVALUATIONS_KEY = 'iif-staff-evaluations';
       var STAFF_EVAL_CRITERIA = [
-        { id: 'quality', en: 'Quality of work', ar: 'جودة العمل' },
-        { id: 'discipline', en: 'Discipline', ar: 'الانضباط' },
-        { id: 'collaboration', en: 'Collaboration', ar: 'التعاون' },
-        { id: 'punctuality', en: 'Punctuality', ar: 'الالتزام بالمواعيد' },
-        { id: 'goals', en: 'Achieving goals', ar: 'إنجاز الأهداف' },
-        { id: 'initiative', en: 'Initiative & innovation', ar: 'المبادرة والابتكار' },
-        { id: 'communication', en: 'Communication', ar: 'التواصل' },
-        { id: 'standards', en: 'Professional standards', ar: 'الالتزام بالمعايير المهنية' }
+        { id: 'quality', en: 'Quality of work', ar: 'جودة العمل', fr: 'Qualité du travail' },
+        { id: 'discipline', en: 'Discipline', ar: 'الانضباط', fr: 'Discipline' },
+        { id: 'collaboration', en: 'Collaboration', ar: 'التعاون', fr: 'Collaboration' },
+        { id: 'punctuality', en: 'Punctuality', ar: 'الالتزام بالمواعيد', fr: 'Ponctualité' },
+        { id: 'goals', en: 'Achieving goals', ar: 'إنجاز الأهداف', fr: 'Atteinte des objectifs' },
+        { id: 'initiative', en: 'Initiative & innovation', ar: 'المبادرة والابتكار', fr: 'Initiative et innovation' },
+        { id: 'communication', en: 'Communication', ar: 'التواصل', fr: 'Communication' },
+        { id: 'standards', en: 'Professional standards', ar: 'الالتزام بالمعايير المهنية', fr: 'Normes professionnelles' }
       ];
+      function staffEvalCriterionLabel(c) {
+        var lg = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+        if (lg === 'ar') return c.ar;
+        if (lg === 'fr' && c.fr) return c.fr;
+        return c.en;
+      }
       function getStaffEvaluations() { try { var r = localStorage.getItem(STAFF_EVALUATIONS_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
       function saveStaffEvaluations(arr) { try { localStorage.setItem(STAFF_EVALUATIONS_KEY, JSON.stringify(arr)); } catch (e) { } }
       function renderStaffEvalCriteria() {
         var container = document.getElementById('staff-eval-criteria');
         if (!container) return;
         container.innerHTML = '';
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         STAFF_EVAL_CRITERIA.forEach(function (c) {
           var row = document.createElement('div');
           row.className = 'criterion-row';
           var label = document.createElement('label');
-          label.textContent = isAr ? c.ar : c.en;
+          label.textContent = staffEvalCriterionLabel(c);
           var sel = document.createElement('select');
           sel.name = 'eval_' + c.id;
           sel.dataset.criterion = c.id;
@@ -20234,7 +10684,6 @@
         var ul = document.getElementById('staff-eval-list');
         if (!ul) return;
         ul.innerHTML = '';
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         list.slice().reverse().forEach(function (ev, idx) {
           var realIdx = list.length - 1 - idx;
           var li = document.createElement('li');
@@ -20243,18 +10692,18 @@
           if (ev.criteria) {
             Object.keys(ev.criteria).forEach(function (k) {
               var c = STAFF_EVAL_CRITERIA.find(function (x) { return x.id === k; });
-              criteriaText.push((c ? (isAr ? c.ar : c.en) : k) + ': ' + ev.criteria[k]);
+              criteriaText.push((c ? staffEvalCriterionLabel(c) : k) + ': ' + ev.criteria[k]);
             });
           }
-          var detail = (ev.date ? ev.date + ' · ' : '') + (ev.overall != null ? (isAr ? 'المجموع: ' : 'Overall: ') + ev.overall : '') + (criteriaText.length ? ' · ' + criteriaText.join(' | ') : '');
-          var delBtnHtml = (typeof isAdmin === 'function' && isAdmin()) ? '<div class="actions" style="margin-top:0.5rem;"><button type="button" class="btn-delete staff-eval-delete" data-index="' + realIdx + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button></div>' : '';
+          var detail = (ev.date ? ev.date + ' · ' : '') + (ev.overall != null ? iifMessage('dashEvalOverallPrefix') + ev.overall : '') + (criteriaText.length ? ' · ' + criteriaText.join(' | ') : '');
+          var delBtnHtml = (typeof isAdmin === 'function' && isAdmin()) ? '<div class="actions" style="margin-top:0.5rem;"><button type="button" class="btn-delete staff-eval-delete" data-index="' + realIdx + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button></div>' : '';
           li.innerHTML = '<div class="eval-summary"><strong>' + escapeHtml(ev.staffName || ev.staffEmail || '') + '</strong> ' + (ev.overall != null ? '<span style="color:var(--color-accent-gold);">' + ev.overall + '/10</span>' : '') + '</div><div class="eval-detail">' + escapeHtml(detail) + '</div>' + (ev.comment ? '<div class="eval-detail">' + escapeHtml(ev.comment) + '</div>' : '') + delBtnHtml;
           ul.appendChild(li);
         });
         ul.querySelectorAll('.staff-eval-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var i = parseInt(btn.getAttribute('data-index'), 10);
-            if (!confirm(isAr ? 'حذف هذا التقييم؟' : 'Delete this evaluation?')) return;
+            if (!confirm(iifMessage('dashEvalDeleteConfirm'))) return;
             var arr = getStaffEvaluations();
             arr.splice(i, 1);
             saveStaffEvaluations(arr);
@@ -20272,9 +10721,8 @@
       var staffEvalForm = document.getElementById('staff-eval-form');
       if (staffEvalForm) staffEvalForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        var isArEv = document.documentElement.getAttribute('data-lang') === 'ar';
         if (typeof hasStaffPermission === 'function' && !hasStaffPermission('staff_eval_manage')) {
-          alert(isArEv ? 'ليس لديك صلاحية إنشاء أو تعديل تقييمات الموظفين.' : 'You do not have permission to create or edit staff evaluations.');
+          alert(iifMessage('dashStaffEvalNoPerm'));
           return;
         }
         var empSel = document.getElementById('staff-eval-employee');
@@ -20346,7 +10794,7 @@
           var name = item.nameEn || item.nameAr || item.country || '';
           var extra = [item.phone, item.email, item.website].filter(Boolean).join(' · ');
           if (extra) name += ' — ' + (extra.length > 60 ? extra.slice(0, 60) + '…' : extra);
-          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.country || '') + '</strong> ' + escapeHtml(name) + '</div><div class="actions"><button type="button" class="btn-edit gov-dir-edit" data-cat="' + cat + '" data-index="' + idx + '"><span class="lang-en">Edit</span><span class="lang-ar">تعديل</span></button><button type="button" class="btn-delete gov-dir-delete" data-cat="' + cat + '" data-index="' + idx + '"><span class="lang-en">Delete</span><span class="lang-ar">حذف</span></button></div>';
+          li.innerHTML = '<div class="content"><strong>' + escapeHtml(item.country || '') + '</strong> ' + escapeHtml(name) + '</div><div class="actions"><button type="button" class="btn-edit gov-dir-edit" data-cat="' + cat + '" data-index="' + idx + '">' + iifBilingualSpans('dashBtnEdit', 'Edit', 'تعديل') + '</button><button type="button" class="btn-delete gov-dir-delete" data-cat="' + cat + '" data-index="' + idx + '">' + iifBilingualSpans('dashBtnDelete', 'Delete', 'حذف') + '</button></div>';
           ul.appendChild(li);
         });
         ul.querySelectorAll('.gov-dir-edit').forEach(function (btn) {
@@ -20370,7 +10818,7 @@
         });
         ul.querySelectorAll('.gov-dir-delete').forEach(function (btn) {
           btn.addEventListener('click', function () {
-            if (!confirm(document.documentElement.getAttribute('data-lang') === 'ar' ? 'حذف هذا السجل؟' : 'Delete this entry?')) return;
+            if (!confirm(iifMessage('jsConfirmDeleteGovEntry'))) return;
             var c = btn.getAttribute('data-cat');
             var idx = parseInt(btn.getAttribute('data-index'), 10);
             var list = getGovDirList(c).filter(function (_, i) { return i !== idx; });
@@ -20447,10 +10895,10 @@
           var f = getGovDirFields(cat);
           var country = (f.country && f.country.value) ? f.country.value.trim() : '';
           if (!country) {
-            setGovDirStatus(cat, document.documentElement.getAttribute('data-lang') === 'ar' ? 'أدخل اسم الدولة أولاً' : 'Enter country first', true);
+            setGovDirStatus(cat, iifMessage('jsGovEnterCountryFirst'), true);
             return;
           }
-          setGovDirStatus(cat, document.documentElement.getAttribute('data-lang') === 'ar' ? 'جاري الجلب…' : 'Fetching…', false);
+          setGovDirStatus(cat, iifMessage('jsGovFetching'), false);
           var query = (GOV_DIR_SEARCH_QUERIES[cat] || 'Government') + ' ' + country;
           var apiBase = 'https://en.wikipedia.org/w/api.php';
           var searchUrl = apiBase + '?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&format=json&origin=*';
@@ -20459,7 +10907,7 @@
             .then(function (data) {
               var results = (data.query && data.query.search) || [];
               if (results.length === 0) {
-                setGovDirStatus(cat, document.documentElement.getAttribute('data-lang') === 'ar' ? 'لم نجد نتائج. جرّب تعديل اسم الدولة.' : 'No results. Try adjusting the country name.', true);
+                setGovDirStatus(cat, iifMessage('jsGovNoResultsAdjustCountry'), true);
                 return;
               }
               var title = results[0].title;
@@ -20477,11 +10925,11 @@
                 }
                 if (!url) url = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(title.replace(/\s/g, '_'));
                 if (f.website && !f.website.value) f.website.value = url;
-                setGovDirStatus(cat, document.documentElement.getAttribute('data-lang') === 'ar' ? 'تم جلب اقتراح من النت' : 'Suggestions fetched from web', false);
+                setGovDirStatus(cat, iifMessage('jsGovSuggestionsFetched'), false);
               });
             })
             .catch(function (err) {
-              setGovDirStatus(cat, document.documentElement.getAttribute('data-lang') === 'ar' ? 'فشل الجلب. تحقق من الاتصال.' : 'Fetch failed. Check connection.', true);
+              setGovDirStatus(cat, iifMessage('jsGovFetchFailed'), true);
             });
         });
       });
@@ -20525,8 +10973,16 @@
         var sections = [];
         var rest = null;
         var cca3 = null;
-        var lang = document.documentElement.getAttribute('data-lang') || 'en';
-        var isAr = lang === 'ar';
+        var lang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+        function rpt(k) {
+          try {
+            if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
+              var s = window.IIF_I18N.text(k, lang);
+              if (s) return s;
+            }
+          } catch (eR) { }
+          return '';
+        }
 
         return fetch('https://restcountries.com/v3.1/name/' + encodeURIComponent(countryName) + '?fullText=true')
           .then(function (r) { return r.json(); })
@@ -20535,8 +10991,8 @@
               rest = data[0];
               cca3 = rest.cca3 || rest.cca2;
               var name = (rest.name && rest.name.official) ? rest.name.official : countryName;
-              sections.push('<h4>' + (isAr ? 'الاسم الرسمي والسكان والمنطقة' : 'Official name, population & region') + '</h4><p>' + escapeReportHtml(name) + '. ' + (isAr ? 'عدد السكان (تقدير): ' : 'Population (est.): ') + (rest.population != null ? rest.population.toLocaleString() : '—') + '. ' + (isAr ? 'المنطقة: ' : 'Region: ') + escapeReportHtml(rest.region || '—') + (rest.subregion ? ', ' + escapeReportHtml(rest.subregion) : '') + '. ' + (rest.capital && rest.capital[0] ? (isAr ? 'العاصمة: ' : 'Capital: ') + escapeReportHtml(rest.capital[0]) : '') + '.</p>');
-              sections.push('<h4>' + (isAr ? 'العملات واللغات' : 'Currencies & languages') + '</h4><p>' + (rest.currencies ? Object.keys(rest.currencies).map(function (k) { var c = rest.currencies[k]; return (c.name || k) + (c.symbol ? ' (' + c.symbol + ')' : ''); }).join(', ') : '—') + '. ' + (rest.languages ? Object.values(rest.languages).join(', ') : '—') + '.</p>');
+              sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingOfficialPopulation')) + '</h4><p>' + escapeReportHtml(name) + '. ' + escapeReportHtml(rpt('reportPopEst')) + (rest.population != null ? rest.population.toLocaleString() : '—') + '. ' + escapeReportHtml(rpt('reportRegion')) + escapeReportHtml(rest.region || '—') + (rest.subregion ? ', ' + escapeReportHtml(rest.subregion) : '') + '. ' + (rest.capital && rest.capital[0] ? escapeReportHtml(rpt('reportCapital')) + escapeReportHtml(rest.capital[0]) : '') + '.</p>');
+              sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingCurrenciesLanguages')) + '</h4><p>' + (rest.currencies ? Object.keys(rest.currencies).map(function (k) { var c = rest.currencies[k]; return (c.name || k) + (c.symbol ? ' (' + c.symbol + ')' : ''); }).join(', ') : '—') + '. ' + (rest.languages ? Object.values(rest.languages).join(', ') : '—') + '.</p>');
             }
             var wikiPromises = [];
             var wikiBase = 'https://en.wikipedia.org/w/api.php';
@@ -20589,20 +11045,20 @@
                 var leader = extractInfoboxValue(countryWiki.text, 'leader_name') || extractInfoboxValue(countryWiki.text, 'leader_title') || extractInfoboxValue(countryWiki.text, 'president') || extractInfoboxValue(countryWiki.text, 'monarch');
                 var leaderTitle = extractInfoboxValue(countryWiki.text, 'leader_title') || extractInfoboxValue(countryWiki.text, 'government_type');
                 if (leader || leaderTitle) {
-                  sections.push('<h4>' + (isAr ? 'الرئيس/الحاكم وتاريخ الحكم' : 'Head of state / ruler & term') + '</h4><p>' + escapeReportHtml(leaderTitle || '') + (leader ? ': ' + escapeReportHtml(leader) : '') + '.</p>');
+                  sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingHeadRuler')) + '</h4><p>' + escapeReportHtml(leaderTitle || '') + (leader ? ': ' + escapeReportHtml(leader) : '') + '.</p>');
                 }
               }
               if (economyWiki && economyWiki.text) {
                 var intro = economyWiki.text.replace(/\{\{[\s\S]*?\}\}/g, '').replace(/<[^>]+>/g, '');
                 var firstPara = intro.split(/\n\n+/).filter(function (p) { return p.length > 80; })[0] || intro.slice(0, 1200);
                 firstPara = firstPara.replace(/\[\[([^\]|]+)\|?([^\]]*)\]\]/g, '$2').replace(/\[\[([^\]]+)\]\]/g, '$1').replace(/['']+/g, "'").slice(0, 1500);
-                sections.push('<h4>' + (isAr ? 'أنظمة الاستثمار والموارد الاقتصادية' : 'Investment system & economic resources') + '</h4><p>' + escapeReportHtml(firstPara) + '</p>');
-                sections.push('<h4>' + (isAr ? 'المقدرة المالية على السداد والضمان السيادي ومخاطر التعامل' : 'Repayment capacity, sovereign guarantee & transaction risks') + '</h4><p>' + (isAr ? 'يُستمد من تحليل الاقتصاد الكلي والتصنيف الائتماني (مصادر خارجية). التقرير الحالي يعتمد على ويكيبيديا وبيانات البنك الدولي؛ للدقة العالية يُنصح بالرجوع إلى تقارير موديز/فيتش/ستاندرد آند بورز ووزارة المالية للدولة.' : 'Derived from macroeconomic analysis and credit rating (external sources). This report relies on Wikipedia and World Bank data; for highest accuracy refer to Moody\'s/Fitch/S&P and the country\'s ministry of finance.') + '</p>');
-                sections.push('<h4>' + (isAr ? 'نظام التحويلات المالية' : 'Financial transfer system') + '</h4><p>' + (isAr ? 'يعتمد على القوانين المحلية والبنك المركزي واتفاقيات SWIFT. للتفاصيل الدقيقة راجع البنك المركزي للدولة ووزارة المالية.' : 'Depends on local regulations, central bank and SWIFT agreements. For exact details refer to the country\'s central bank and ministry of finance.') + '</p>');
+                sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingInvestmentResources')) + '</h4><p>' + escapeReportHtml(firstPara) + '</p>');
+                sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingRepaymentRisks')) + '</h4><p>' + escapeReportHtml(rpt('reportBodyRepaymentRisks')) + '</p>');
+                sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingTransferSystem')) + '</h4><p>' + escapeReportHtml(rpt('reportBodyTransferSystem')) + '</p>');
               }
-              sections.push('<h4>' + (isAr ? 'الوضع الأمني' : 'Security situation') + '</h4><p>' + (isAr ? 'لم تُستخرج تلقائياً من المصادر المفتوحة؛ يُنصح بالرجوع إلى تقارير وزارة الخارجية والمنظمات الدولية.' : 'Not auto-extracted from open sources; refer to foreign ministry and international organization reports.') + '</p>');
+              sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingSecurity')) + '</h4><p>' + escapeReportHtml(rpt('reportBodySecurity')) + '</p>');
               if (rest && rest.population != null) {
-                sections.push('<h4>' + (isAr ? 'عدد السكان' : 'Population') + '</h4><p>' + rest.population.toLocaleString() + '.</p>');
+                sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingPopulation')) + '</h4><p>' + rest.population.toLocaleString() + '.</p>');
               }
               if (cca3) {
                 return fetch('https://api.worldbank.org/v2/country/' + cca3 + '/indicator/NY.GDP.PCAP.CD?format=json&date=2019:2023&per_page=5')
@@ -20611,7 +11067,7 @@
                     var gdpData = (Array.isArray(wb) && wb[1]) ? wb[1] : [];
                     var gdpLast = gdpData.filter(function (x) { return x.value != null; }).sort(function (a, b) { return (b.date || '') - (a.date || ''); })[0];
                     if (gdpLast) {
-                      sections.push('<h4>' + (isAr ? 'دخل الفرد (ناتج محلي إجمالي للفرد)' : 'Per capita income (GDP per capita)') + '</h4><p>' + (gdpLast.value != null ? Math.round(gdpLast.value).toLocaleString() + ' USD (' + gdpLast.date + ')' : '—') + '.</p>');
+                      sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingGdpPerCapita')) + '</h4><p>' + (gdpLast.value != null ? Math.round(gdpLast.value).toLocaleString() + ' USD (' + gdpLast.date + ')' : '—') + '.</p>');
                     }
                     return fetch('https://api.worldbank.org/v2/country/' + cca3 + '/indicator/NV.IND.TOTL.KD?format=json&date=2019:2023&per_page=5')
                       .then(function (r) { return r.json(); })
@@ -20619,7 +11075,7 @@
                         var indData = (Array.isArray(wb2) && wb2[1]) ? wb2[1] : [];
                         var indLast = indData.filter(function (x) { return x.value != null; }).sort(function (a, b) { return (b.date || '') - (a.date || ''); })[0];
                         if (indLast && indLast.value != null) {
-                          sections.push('<h4>' + (isAr ? 'حجم الصناعة (قيمة مضافة)' : 'Industry size (value added)') + '</h4><p>' + (isAr ? 'مؤشر الصناعة (قيمة ثابتة): ' : 'Industry indicator (constant value): ') + Math.round(indLast.value).toLocaleString() + ' (' + indLast.date + ').</p>');
+                          sections.push('<h4>' + escapeReportHtml(rpt('reportHeadingIndustrySize')) + '</h4><p>' + escapeReportHtml(rpt('reportIndustryIndicatorLabel')) + Math.round(indLast.value).toLocaleString() + ' (' + indLast.date + ').</p>');
                         }
                         return sections;
                       })
@@ -20633,7 +11089,7 @@
           .catch(function () { return sections || []; })
           .then(function (sections) {
             var t = new Date().toISOString();
-            var html = '<p><strong>' + (isAr ? 'الدولة: ' : 'Country: ') + escapeReportHtml(countryName) + '</strong></p>' + (sections && sections.length ? sections.join('') : '<p>' + (isAr ? 'لم يتوفر بيانات كافية لهذه الدولة.' : 'Insufficient data for this country.') + '</p>') + '<p class="report-meta">' + (isAr ? 'تم بناء التقرير من مصادر أونلاين (REST Countries، ويكيبيديا، البنك الدولي). التاريخ: ' : 'Report built from online sources (REST Countries, Wikipedia, World Bank). Date: ') + t + '</p>';
+            var html = '<p><strong>' + escapeReportHtml(rpt('reportCountryLabel')) + escapeReportHtml(countryName) + '</strong></p>' + (sections && sections.length ? sections.join('') : '<p>' + escapeReportHtml(rpt('reportInsufficientData')) + '</p>') + '<p class="report-meta">' + escapeReportHtml(rpt('reportMetaBuiltFrom')) + escapeReportHtml(t) + '</p>';
             return html;
           });
       }
@@ -20642,7 +11098,7 @@
         govReportGenerateBtn.addEventListener('click', function () {
           var country = (govReportCountryInput.value || '').trim();
           if (!country) {
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'أدخل اسم الدولة أولاً.' : 'Enter the country name first.');
+            alert(iifMessage('jsEnterCountryFirstDot'));
             return;
           }
           openGovReportModal();
@@ -20650,7 +11106,7 @@
           buildCountryReport(country).then(function (html) {
             setReportContent(html);
           }).catch(function () {
-            setReportContent('<p>' + (document.documentElement.getAttribute('data-lang') === 'ar' ? 'حدث خطأ أثناء بناء التقرير.' : 'An error occurred while building the report.') + '</p>');
+            setReportContent('<p>' + escapeHtml(iifMessage('jsReportBuildError')) + '</p>');
           });
         });
       }
@@ -20694,17 +11150,73 @@
           if (typeof updateDashboardNav === 'function') updateDashboardNav();
         } catch (e) { }
       }
+
+      /* Diagnostics: quick view of session keys (for support/dev) */
+      (function bindSessionDiagnostics() {
+        function safeGet(k) {
+          try { return localStorage.getItem(k); } catch (e) { return null; }
+        }
+        function safeGetS(k) {
+          try { return sessionStorage.getItem(k); } catch (e) { return null; }
+        }
+        function fmt(v) {
+          if (v == null) return '∅';
+          if (v === '') return '""';
+          if (String(v).length > 160) return String(v).slice(0, 160) + '…';
+          return String(v);
+        }
+        function show() {
+          var lines = [];
+          lines.push('Session diagnostics');
+          lines.push('—');
+          lines.push('iif-logged-in (local): ' + fmt(safeGet('iif-logged-in')));
+          lines.push('iif-logged-in (session): ' + fmt(safeGetS('iif-logged-in')));
+          lines.push('iif-user-email: ' + fmt(safeGet('iif-user-email')));
+          lines.push('iif-user-name: ' + fmt(safeGet('iif-user-name')));
+          lines.push('iif-is-admin: ' + fmt(safeGet('iif-is-admin')));
+          lines.push('iif-device-bound-email: ' + fmt(safeGet('iif-device-bound-email')));
+          lines.push('iif-device-fingerprint: ' + fmt(safeGet('iif-device-fingerprint')));
+          lines.push('iif-token: ' + fmt(safeGet('iif-token')));
+          lines.push('iif-user: ' + fmt(safeGet('iif-user')));
+          alert(lines.join('\n'));
+        }
+        document.addEventListener('keydown', function (e) {
+          try {
+            if (!e) return;
+            if (!e.altKey || !e.shiftKey) return;
+            var k = String(e.key || '').toLowerCase();
+            if (k !== 's') return;
+            e.preventDefault();
+            show();
+          } catch (e2) { }
+        });
+        // Optional: expose for support
+        try { window.IIF_showSessionDiagnostics = show; } catch (e3) { }
+      })();
+
+      (function bindSessionDiagnosticsButton() {
+        try {
+          var btn = document.getElementById('auth-session-diagnostics');
+          if (!btn) return;
+          btn.addEventListener('click', function () {
+            try {
+              if (typeof window.IIF_showSessionDiagnostics === 'function') window.IIF_showSessionDiagnostics();
+            } catch (e) { }
+          });
+        } catch (e2) { }
+      })();
+      /** بعد اكتمال التخزين الآمن واستعادة الجلسة: افتح اللوحة إن طُلب open_dashboard ولم يفتح المؤقت المبكر */
       function iifTryPendingDashboardAfterSecureInit() {
         try {
           var want = false;
           try {
             want = sessionStorage.getItem('iif_pending_open_dashboard') === '1';
-          } catch (eS) {}
+          } catch (eS) { }
           if (!want) {
             try {
               var sp = new URLSearchParams(window.location.search || '');
               want = sp.get('open_dashboard') === '1' || sp.get('iif_open_dashboard') === '1' || sp.get('iif_admin_portal') === '1';
-            } catch (eQ) {}
+            } catch (eQ) { }
           }
           if (!want) return;
           if (typeof canAccessDashboard !== 'function' || !canAccessDashboard()) return;
@@ -20719,10 +11231,10 @@
                 if (typeof canAccessDashboard === 'function' && canAccessDashboard() && typeof openDashboardEnhanced === 'function') {
                   openDashboardEnhanced();
                 }
-              } catch (e) {}
+              } catch (e) { }
             }, ms);
           });
-        } catch (e) {}
+        } catch (e) { }
       }
       (function runAfterSecureStorage() {
         var load = window.IIF_SECURE_STORAGE && window.IIF_SECURE_STORAGE.load;
@@ -20731,14 +11243,14 @@
           renderActivitiesSection();
           updateDashboardNav();
           iifTryPendingDashboardAfterSecureInit();
-          /* مالك: فتح اللوحة فقط عند نية صريحة — لا فتح من الرئيسية */
+          /* مالك: فتح اللوحة فقط عند نية صريحة (نفس شرط DOMContentLoaded) — لا فتح من الرئيسية */
           try {
             var emailAuto = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
             if (emailAuto && typeof setAdminByEmail === 'function') setAdminByEmail(emailAuto);
             if (emailAuto && typeof getDashboardAccessType === 'function' && getDashboardAccessType() === 'owner' &&
-                iifExplicitDashboardEntryIntent() &&
-                (typeof canAccessDashboard !== 'function' || canAccessDashboard()) &&
-                typeof openDashboardEnhanced === 'function') {
+              iifExplicitDashboardEntryIntent() &&
+              (typeof canAccessDashboard !== 'function' || canAccessDashboard()) &&
+              typeof openDashboardEnhanced === 'function') {
               try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eSs) { }
               openDashboardEnhanced();
             }
@@ -20760,9 +11272,9 @@
               var emailAuto2 = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
               if (emailAuto2 && typeof setAdminByEmail === 'function') setAdminByEmail(emailAuto2);
               if (emailAuto2 && typeof getDashboardAccessType === 'function' && getDashboardAccessType() === 'owner' &&
-                  iifExplicitDashboardEntryIntent() &&
-                  (typeof canAccessDashboard !== 'function' || canAccessDashboard()) &&
-                  typeof openDashboardEnhanced === 'function') {
+                iifExplicitDashboardEntryIntent() &&
+                (typeof canAccessDashboard !== 'function' || canAccessDashboard()) &&
+                typeof openDashboardEnhanced === 'function') {
                 try { sessionStorage.setItem('iif_admin_portal_mode', '1'); } catch (eSs2) { }
                 openDashboardEnhanced();
               }
@@ -20818,8 +11330,6 @@
               e.preventDefault();
               var calcOpen = document.getElementById('calc-open');
               if (calcOpen) calcOpen.click();
-              closeDropdown();
-              return;
             }
             closeDropdown();
           });
@@ -20962,11 +11472,9 @@
         var saved = getSavedPaymentChoice() === 'bank_transfer';
         ['urgent', 'investor'].forEach(function (scope) {
           var cb = document.getElementById('payment-remember-' + scope);
-          var hintEn = document.getElementById('payment-saved-hint-' + scope);
-          var hintAr = document.getElementById('payment-saved-hint-' + scope + '-ar');
+          var hint = document.getElementById('payment-saved-hint-' + scope);
           if (cb) cb.checked = saved;
-          if (hintEn) hintEn.hidden = !saved;
-          if (hintAr) hintAr.hidden = !saved;
+          if (hint) hint.hidden = !saved;
         });
       }
       ['payment-remember-urgent', 'payment-remember-investor'].forEach(function (id) {
@@ -21024,21 +11532,24 @@
         var el = regPhoneCodeSelect || document.getElementById('reg-phone-code');
         if (!el) return;
         if (el.options.length > 1) return;
+        var phoneLangInit = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
         phoneCodeOptions.forEach(function (o) {
           var opt = document.createElement('option');
           opt.value = o.v;
-          opt.textContent = (document.documentElement.getAttribute('data-lang') === 'ar' ? o.ar : o.en) || o.ar || o.en;
+          opt.textContent = (phoneLangInit === 'ar' ? o.ar : o.en) || o.ar || o.en;
           el.appendChild(opt);
         });
       }
       function updateRegPhoneCodeLabels() {
         var codeEl = regPhoneCodeSelect || document.getElementById('reg-phone-code');
         if (!codeEl || codeEl.options.length < 2) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var opts = codeEl.querySelectorAll('option');
-        if (opts[0]) opts[0].textContent = isAr ? '— المفتاح —' : '— Code —';
+        if (opts[0]) {
+          opts[0].textContent = typeof iifMessage === 'function' ? iifMessage('authPhoneCodeOptionBlank') : '— Code —';
+        }
+        var phoneLang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
         phoneCodeOptions.forEach(function (o, i) {
-          if (opts[i + 1]) opts[i + 1].textContent = (isAr ? o.ar : o.en) || o.ar || o.en;
+          if (opts[i + 1]) opts[i + 1].textContent = (phoneLang === 'ar' ? o.ar : o.en) || o.ar || o.en;
         });
       }
       function syncRegPhoneCodeFromCountry() {
@@ -21119,24 +11630,509 @@
           finish();
         }
       }
-      function iifNonBindingDisclaimer(isAr) {
-        return isAr
-          ? 'تعبير اهتمام فقط — لا موافقة أو تمويل أو عرض ملزم. انظر الشروط.'
-          : 'Expression of interest only — no approval, financing, or binding offer. See Terms.';
+      function iifNonBindingDisclaimer() {
+        return typeof iifMessage === 'function' ? iifMessage('legalNonBindingDisclaimer') : 'Expression of interest only — no approval, financing, or binding offer. See Terms.';
       }
-      function iifSubmissionAcknowledgmentMsg(isAr) {
-        var main = isAr ? 'تم استلام طلبك.' : 'Your request was received.';
-        return main + '\n\n' + iifNonBindingDisclaimer(isAr);
+      function iifSubmissionAcknowledgmentMsg() {
+        return (typeof iifMessage === 'function' ? iifMessage('jsRequestReceivedShort') : 'Your request was received.') + '\n\n' + iifNonBindingDisclaimer();
       }
       function addSubmission(type, data, location) {
         var list = getSubmissions();
         list.push({ type: type, data: data, location: location || {}, at: new Date().toISOString(), id: 's' + Date.now() });
         saveSubmissions(list);
       }
+
+      /* Project analysis (free): Ollama local + World Bank + SearXNG.
+         This is isolated to dashboard-project-analysis only. */
+      (function projectAnalysisAI() {
+        var STORE_KEY = 'iif-project-analysis-records';
+        function getStore() { try { var r = localStorage.getItem(STORE_KEY); var o = r ? JSON.parse(r) : {}; return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } }
+        function saveStore(o) { try { localStorage.setItem(STORE_KEY, JSON.stringify(o || {})); } catch (e) { } }
+
+        function esc(s) { return escapeHtml(String(s == null ? '' : s)); }
+
+        function normalizeCountry(raw) {
+          var s = (raw || '').toString().trim();
+          if (!s) return '';
+          // Basic cleanup for common punctuation / extra parts.
+          return s.replace(/\s+/g, ' ').replace(/[،]/g, '').trim();
+        }
+
+        function getAnalysisItems() {
+          var items = [];
+          try {
+            var subs = (typeof getSubmissions === 'function') ? getSubmissions() : [];
+            (subs || []).forEach(function (s) {
+              if (!s || !s.id) return;
+              var d = s.data || {};
+              var title = (d.project || d.subject || d.entity || d.name || '') || ('Submission: ' + (s.type || ''));
+              var country = normalizeCountry(d.country || d.kyc_country || d.nationality || '');
+              var desc = (d.message || d.desc || d.details || '').toString();
+              items.push({
+                id: String(s.id),
+                kind: 'submission',
+                subType: s.type || '',
+                title: String(title).trim() || ('Submission ' + String(s.id)),
+                country: country,
+                submitterEmail: (d.email || '').toString(),
+                createdAt: s.at || '',
+                raw: s,
+                projectText: [title, desc, country].filter(Boolean).join('\n')
+              });
+            });
+          } catch (e1) { }
+          try {
+            if (typeof getStoredUploads === 'function') {
+              [UPLOADS_DOCS_KEY, UPLOADS_IMAGES_KEY, UPLOADS_VIDEO_KEY, UPLOADS_LIVE_KEY].forEach(function (k) {
+                var arr = getStoredUploads(k) || [];
+                (arr || []).forEach(function (u) {
+                  if (!u || !u.id) return;
+                  items.push({
+                    id: String(u.id),
+                    kind: 'upload',
+                    subType: k,
+                    title: (u.name || 'Upload') + ' (' + (k || '').replace('iif-uploads-', '') + ')',
+                    country: '',
+                    submitterEmail: '',
+                    createdAt: u.at || '',
+                    raw: u,
+                    projectText: [u.name, u.type, u.size ? ('size:' + u.size) : ''].filter(Boolean).join('\n')
+                  });
+                });
+              });
+            }
+          } catch (e2) { }
+          // Most recent first
+          items.sort(function (a, b) { return String(b.createdAt || '').localeCompare(String(a.createdAt || '')); });
+          return items;
+        }
+
+        async function checkOllama(model) {
+          var base = window.location.origin + '/api/ollama';
+          var r = await fetch(base + '/api/tags', { method: 'GET' });
+          if (!r.ok) throw new Error('Ollama: HTTP ' + r.status);
+          var data = await r.json();
+          var tags = (data && data.models) ? data.models.map(function (m) { return m && m.name; }).filter(Boolean) : [];
+          var has = tags.indexOf(model) >= 0;
+          return { ok: true, hasModel: has, models: tags };
+        }
+
+        async function getCountryCca3(countryName) {
+          var name = normalizeCountry(countryName);
+          if (!name) return '';
+          // restcountries: free, no key.
+          var url = 'https://restcountries.com/v3.1/name/' + encodeURIComponent(name) + '?fields=cca3,name';
+          var r = await fetch(url, { method: 'GET' });
+          if (!r.ok) return '';
+          var arr = await r.json();
+          if (!Array.isArray(arr) || !arr.length) return '';
+          return (arr[0] && arr[0].cca3) ? String(arr[0].cca3).trim().toUpperCase() : '';
+        }
+
+        async function fetchWorldBank(cca3) {
+          if (!cca3) return { ok: true, indicators: {}, series: {} };
+          var indicators = {
+            gdp: 'NY.GDP.MKTP.CD',
+            gdpPerCapita: 'NY.GDP.PCAP.CD',
+            inflation: 'FP.CPI.TOTL.ZG',
+            unemployment: 'SL.UEM.TOTL.ZS'
+          };
+          var out = {};
+          var series = {};
+          var keys = Object.keys(indicators);
+          for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            var code = indicators[k];
+            try {
+              var url = 'https://api.worldbank.org/v2/country/' + encodeURIComponent(cca3) + '/indicator/' + encodeURIComponent(code) + '?format=json&per_page=60';
+              var r = await fetch(url, { method: 'GET' });
+              if (!r.ok) continue;
+              var data = await r.json();
+              var rows = Array.isArray(data) ? data[1] : null;
+              if (!Array.isArray(rows)) continue;
+              var cleaned = rows.filter(function (x) { return x && x.date && (x.value !== null && x.value !== undefined); })
+                .slice(0, 8)
+                .map(function (x) { return { year: String(x.date), value: x.value }; });
+              series[k] = cleaned;
+              if (cleaned.length) out[k] = cleaned[0].value;
+            } catch (e) { }
+          }
+          return { ok: true, indicators: out, series: series };
+        }
+
+        function iifResolveSearxPackUrl(paramsStr) {
+          var h = (typeof location !== 'undefined' && location.hostname) ? String(location.hostname).toLowerCase() : '';
+          var isLocal = h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
+          if (isLocal) {
+            return (typeof location !== 'undefined' ? location.origin : '') + '/api/searx/search?' + paramsStr;
+          }
+          try {
+            var m = typeof document !== 'undefined' && document.querySelector && document.querySelector('meta[name="iif-searx-proxy-base"]');
+            var base = m && m.getAttribute('content');
+            base = base ? String(base).trim().replace(/\/$/, '') : '';
+            if (base && /^https?:\/\//i.test(base)) {
+              return base + '/api/searx/search?' + paramsStr;
+            }
+          } catch (eM) { }
+          return (typeof location !== 'undefined' ? location.origin : '') + '/api/searx/search?' + paramsStr;
+        }
+
+        async function fetchSearxPack(query) {
+          var q = (query || '').trim();
+          if (!q) return { ok: true, results: [] };
+          var paramsStr = new URLSearchParams({ q: q, format: 'json', language: 'en', categories: 'general' }).toString();
+          var url = iifResolveSearxPackUrl(paramsStr);
+          var r;
+          try {
+            r = await fetch(url, { method: 'GET', cache: 'no-store', mode: 'cors' });
+          } catch (eNet) {
+            return { ok: false, results: [], error: 'network' };
+          }
+          if (!r.ok) {
+            var errCode = 'HTTP ' + r.status;
+            if (r.status === 429) errCode = 'rate_limited';
+            return { ok: false, results: [], error: errCode };
+          }
+          var data;
+          try {
+            data = await r.json();
+          } catch (eJ) {
+            return { ok: false, results: [], error: 'invalid_json' };
+          }
+          if (data && data.error === 'rate_limited') {
+            return { ok: false, results: [], error: 'rate_limited' };
+          }
+          var results = (data && Array.isArray(data.results)) ? data.results.slice(0, 6).map(function (x) {
+            return { title: x.title || '', url: x.url || '', engine: x.engine || '', content: (x.content || '').slice(0, 400) };
+          }) : [];
+          return { ok: true, results: results };
+        }
+
+        async function ollamaJson(model, system, user) {
+          var base = window.location.origin + '/api/ollama';
+          var body = {
+            model: model,
+            stream: false,
+            format: 'json',
+            messages: [
+              { role: 'system', content: system },
+              { role: 'user', content: user }
+            ],
+            options: { temperature: 0.2 }
+          };
+          var r = await fetch(base + '/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          if (!r.ok) throw new Error('Ollama chat HTTP ' + r.status);
+          var data = await r.json();
+          var txt = data && data.message && data.message.content ? data.message.content : '';
+          var parsed = null;
+          try { parsed = JSON.parse(txt); } catch (e) { parsed = null; }
+          if (!parsed) throw new Error('Ollama returned non-JSON');
+          return parsed;
+        }
+
+        async function runAnalysis(item, model) {
+          var store = getStore();
+          var key = item.id;
+          store[key] = store[key] || {};
+          store[key].status = 'running';
+          store[key].updatedAt = new Date().toISOString();
+          saveStore(store);
+          render();
+
+          var countryName = normalizeCountry(item.country || '');
+          var cca3 = '';
+          var wb = { ok: true, indicators: {}, series: {} };
+          if (countryName) {
+            cca3 = await getCountryCca3(countryName);
+            wb = await fetchWorldBank(cca3);
+          }
+          var webQuery = [item.title, countryName, 'economic outlook', 'risk'].filter(Boolean).join(' ');
+          var searx = await fetchSearxPack(webQuery);
+          try {
+            if (searx && searx.error === 'rate_limited') {
+              setStatus(iifT('dashPaSearxRateLimited', 'Search proxy rate limit — continuing without live web results. Retry in about one minute.'));
+            } else if (searx && searx.ok === false && searx.error && searx.error !== 'rate_limited') {
+              setStatus(iifT('dashPaSearxSkipped', 'Web search unavailable — analysis continues with World Bank data only.'));
+            }
+          } catch (eSt) { }
+
+          var system = 'You are an institutional investment analyst. Output STRICT JSON only. No markdown. No extra text.';
+          var user = JSON.stringify({
+            task: 'Analyze the project and country context, then produce a structured analysis suitable for filling a dashboard.',
+            project: {
+              title: item.title,
+              kind: item.kind,
+              type: item.subType,
+              submitterEmail: item.submitterEmail || '',
+              country: countryName,
+              text: (item.projectText || '').slice(0, 7000)
+            },
+            countryData: {
+              countryName: countryName,
+              cca3: cca3,
+              worldBankLatest: wb.indicators,
+              worldBankSeries: wb.series
+            },
+            webSearchStatus: searx && searx.ok ? 'ok' : (searx && searx.error ? String(searx.error) : 'unknown'),
+            webSources: (searx && Array.isArray(searx.results)) ? searx.results : []
+          }, null, 2) + '\n\n' +
+            'Return JSON with keys: responsibleAuthority, workRegulations, financialCenter, debt, sovereignGuarantee, security, economicAnalysis, risks, confidence (0-1), sources (array of {title,url}).';
+
+          var out = await ollamaJson(model, system, user);
+          var clean = {
+            responsibleAuthority: (out.responsibleAuthority || '').toString(),
+            workRegulations: (out.workRegulations || '').toString(),
+            financialCenter: (out.financialCenter || '').toString(),
+            debt: (out.debt || '').toString(),
+            sovereignGuarantee: (out.sovereignGuarantee || '').toString(),
+            security: (out.security || '').toString(),
+            economicAnalysis: (out.economicAnalysis || '').toString(),
+            risks: (out.risks || '').toString(),
+            confidence: typeof out.confidence === 'number' ? out.confidence : null,
+            sources: Array.isArray(out.sources) ? out.sources.slice(0, 10).map(function (s) { return { title: (s && s.title) ? String(s.title) : '', url: (s && s.url) ? String(s.url) : '' }; }) : [],
+            countryName: countryName,
+            cca3: cca3,
+            worldBank: wb.indicators,
+            searx: searx.results
+          };
+
+          var store2 = getStore();
+          store2[key] = Object.assign({}, store2[key] || {}, { status: 'done', analysis: clean, updatedAt: new Date().toISOString() });
+          saveStore(store2);
+          render();
+        }
+
+        function render() {
+          var listEl = document.getElementById('dashboard-project-analysis-list');
+          if (!listEl) return;
+          var items = getAnalysisItems();
+          var store = getStore();
+          if (!items.length) {
+            listEl.innerHTML = '<li><div class="content"><strong>' + esc(iifT('dashPaNoItems', 'No items yet.')) + '</strong><small>' + esc(iifT('dashPaNoItemsHint', 'Submit a request or upload files to see items here.')) + '</small></div></li>';
+            return;
+          }
+          var html = '';
+          items.slice(0, 60).forEach(function (it) {
+            var rec = store[it.id] || {};
+            var st = rec.status || '';
+            var a = rec.analysis || null;
+            var meta = [it.kind, it.subType, it.country, it.createdAt ? String(it.createdAt).slice(0, 10) : ''].filter(Boolean).join(' · ');
+            html += '<li><div class="content">';
+            html += '<strong>' + esc(it.title) + '</strong>';
+            html += '<small>' + esc(meta) + '</small>';
+            if (a && (a.economicAnalysis || a.risks)) {
+              html += '<small>' + esc((a.economicAnalysis || '').slice(0, 160)) + (a.economicAnalysis && a.economicAnalysis.length > 160 ? '…' : '') + '</small>';
+            }
+            html += '</div><div class="actions">';
+            if (st === 'running') {
+              html += '<button type="button" class="btn btn--primary btn-sm" disabled>' + esc(iifT('dashPaAnalyzing', 'Analyzing…')) + '</button>';
+            } else {
+              html += '<button type="button" class="btn btn--primary btn-sm" data-pa-analyze="' + esc(it.id) + '">' + esc(iifT('dashPaAiAnalyze', 'AI analyze')) + '</button>';
+            }
+            if (a) {
+              html += '<button type="button" class="btn btn--ghost btn-sm" data-pa-toggle="' + esc(it.id) + '">' + esc(iifT('dashPaView', 'View')) + '</button>';
+            }
+            html += '</div></li>';
+            if (a) {
+              html += '<li id="pa-details-' + esc(it.id) + '" style="display:none;"><div class="content" style="width:100%;">';
+              html += '<div class="card" style="padding: var(--space-4);">';
+              html += '<p style="margin:0 0 var(--space-3); opacity:.9;"><strong>' + esc(iifT('dashPaAnalysisTitle', 'Analysis')) + '</strong>' + (a.confidence != null ? (' · ' + esc(iifT('dashPaConfidence', 'Confidence')) + ': ' + esc((Math.round(a.confidence * 100) || 0) + '%')) : '') + '</p>';
+              html += '<div style="display:grid;gap:10px;">';
+              function row(i18nKey, val, fallbackEn) {
+                if (!val) return '';
+                return '<div><div style="font-size:.85rem;opacity:.75;margin-bottom:4px;">' + esc(iifT(i18nKey, fallbackEn)) + '</div><div style="white-space:pre-wrap;">' + esc(val) + '</div></div>';
+              }
+              html += row('dashPaResponsibleAuthority', a.responsibleAuthority, 'Responsible authority');
+              html += row('dashPaWorkRegulations', a.workRegulations, 'Work regulations');
+              html += row('dashPaFinancialCenter', a.financialCenter, 'Financial center');
+              html += row('dashPaDebt', a.debt, 'Debt');
+              html += row('dashPaSovereignGuarantee', a.sovereignGuarantee, 'Sovereign guarantee');
+              html += row('dashPaSecurity', a.security, 'Security');
+              html += row('dashPaEconomicAnalysis', a.economicAnalysis, 'Economic analysis');
+              html += row('dashPaRisks', a.risks, 'Risks');
+              if (a.sources && a.sources.length) {
+                html += '<div><div style="font-size:.85rem;opacity:.75;margin-bottom:4px;">' + esc(iifT('dashPaSources', 'Sources')) + '</div>';
+                html += '<ul style="margin:0; padding-inline-start: 1.25rem;">' + a.sources.map(function (s) {
+                  var u = (s && s.url) ? String(s.url) : '';
+                  var t = (s && s.title) ? String(s.title) : u;
+                  return '<li><a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(t) + '</a></li>';
+                }).join('') + '</ul></div>';
+              }
+              html += '</div></div></div></li>';
+            }
+          });
+          listEl.innerHTML = html;
+
+          // Bind events (delegation)
+          listEl.querySelectorAll('[data-pa-toggle]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var id = btn.getAttribute('data-pa-toggle');
+              var row = document.getElementById('pa-details-' + id);
+              if (!row) return;
+              row.style.display = row.style.display === 'none' ? '' : 'none';
+            });
+          });
+          listEl.querySelectorAll('[data-pa-analyze]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var id = btn.getAttribute('data-pa-analyze');
+              var modelEl = document.getElementById('pa-ollama-model');
+              var model = (modelEl && modelEl.value) ? modelEl.value.trim() : 'llama3.1:8b';
+              var it = items.find(function (x) { return x.id === id; });
+              if (!it) return;
+              runAnalysis(it, model).catch(function (e) {
+                var st = document.getElementById('pa-ai-status');
+                if (st) st.textContent = iifT('dashPaErrorPrefix', 'Error: ') + (e && e.message ? e.message : String(e));
+                var store = getStore();
+                store[id] = Object.assign({}, store[id] || {}, { status: 'error', error: String(e && e.message ? e.message : e), updatedAt: new Date().toISOString() });
+                saveStore(store);
+                render();
+              });
+            });
+          });
+        }
+
+        function setStatus(msg) {
+          var el = document.getElementById('pa-ai-status');
+          if (el) el.textContent = msg || '';
+        }
+
+        function safeFileNameBase() {
+          var dt = new Date();
+          function pad(n) { return (n < 10 ? '0' : '') + n; }
+          return (
+            'iif-project-analysis-' +
+            dt.getFullYear() +
+            pad(dt.getMonth() + 1) +
+            pad(dt.getDate()) +
+            '-' +
+            pad(dt.getHours()) +
+            pad(dt.getMinutes()) +
+            pad(dt.getSeconds())
+          );
+        }
+
+        function downloadJson(obj, filename) {
+          try {
+            var data = JSON.stringify(obj, null, 2);
+            var blob = new Blob([data], { type: 'application/json;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+              try { URL.revokeObjectURL(url); } catch (e) { }
+              try { a.remove(); } catch (e2) { }
+            }, 50);
+            return true;
+          } catch (e) { return false; }
+        }
+
+        function exportStore() {
+          var payload = {
+            kind: 'iif-project-analysis-export',
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            storeKey: STORE_KEY,
+            records: getStore()
+          };
+          var ok = downloadJson(payload, safeFileNameBase() + '.json');
+          setStatus(ok ? iifT('dashPaExported', 'Exported.') : iifT('dashPaExportFailed', 'Export failed.'));
+        }
+
+        function mergeStores(target, incoming) {
+          target = target && typeof target === 'object' ? target : {};
+          incoming = incoming && typeof incoming === 'object' ? incoming : {};
+          Object.keys(incoming).forEach(function (k) {
+            var inc = incoming[k];
+            if (!inc || typeof inc !== 'object') return;
+            var prev = target[k];
+            if (!prev) { target[k] = inc; return; }
+            var pAt = prev.updatedAt ? String(prev.updatedAt) : '';
+            var iAt = inc.updatedAt ? String(inc.updatedAt) : '';
+            // keep newest; fallback: prefer incoming if it has analysis
+            if (iAt && (!pAt || iAt >= pAt)) target[k] = inc;
+            else if (!pAt && (inc.analysis || inc.status === 'done')) target[k] = inc;
+          });
+          return target;
+        }
+
+        function importFromText(text) {
+          var payload = null;
+          try { payload = JSON.parse(text || ''); } catch (e) { payload = null; }
+          if (!payload || typeof payload !== 'object') {
+            setStatus(iifT('dashPaInvalidFile', 'Invalid file.'));
+            return;
+          }
+          var rec = payload.records;
+          // allow importing raw store object directly
+          if (!rec && payload.kind !== 'iif-project-analysis-export') rec = payload;
+          if (!rec || typeof rec !== 'object') {
+            setStatus(iifT('dashPaNoRecordsImport', 'No records to import.'));
+            return;
+          }
+          var current = getStore();
+          var merged = mergeStores(current, rec);
+          saveStore(merged);
+          render();
+          setStatus(iifT('dashPaImported', 'Imported.'));
+        }
+
+        function bind() {
+          var refreshBtn = document.getElementById('pa-refresh-list-btn');
+          if (refreshBtn) refreshBtn.addEventListener('click', function () { render(); });
+          var chkBtn = document.getElementById('pa-check-ai-btn');
+          if (chkBtn) chkBtn.addEventListener('click', function () {
+            var modelEl = document.getElementById('pa-ollama-model');
+            var model = (modelEl && modelEl.value) ? modelEl.value.trim() : 'llama3.1:8b';
+            setStatus(iifT('dashPaChecking', 'Checking…'));
+            checkOllama(model).then(function (r) {
+              if (r.hasModel) setStatus(iifT('dashPaOllamaOkModel', 'Ollama OK · model found: {model}').replace(/\{model\}/g, model));
+              else setStatus(iifT('dashPaOllamaNoModel', 'Ollama running but model missing. Run: ollama pull {model}').replace(/\{model\}/g, model));
+            }).catch(function (e) {
+              setStatus(iifT('dashPaOllamaNotReady', 'Ollama not ready. Install/run Ollama then: ollama pull {model}').replace(/\{model\}/g, model));
+            });
+          });
+
+          var exportBtn = document.getElementById('pa-export-btn');
+          if (exportBtn) exportBtn.addEventListener('click', function () { exportStore(); });
+
+          var importBtn = document.getElementById('pa-import-btn');
+          var importFile = document.getElementById('pa-import-file');
+          if (importBtn && importFile) {
+            importBtn.addEventListener('click', function () {
+              try { importFile.value = ''; } catch (e) { }
+              importFile.click();
+            });
+            importFile.addEventListener('change', function () {
+              var f = importFile.files && importFile.files[0];
+              if (!f) return;
+              if (f.size > 3 * 1024 * 1024) {
+                setStatus(iifT('dashPaImportFileTooLarge', 'File too large.'));
+                return;
+              }
+              var r = new FileReader();
+              r.onload = function () { importFromText(String(r.result || '')); };
+              r.onerror = function () { setStatus(iifT('dashPaCouldNotReadFile', 'Could not read file.')); };
+              r.readAsText(f);
+            });
+          }
+        }
+
+        // expose for debugging
+        try { window.renderDashboardProjectAnalysisList = render; } catch (e) { }
+        // init
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bind(); render(); });
+        else { bind(); render(); }
+      })();
       var formContact = document.getElementById('form-contact');
       if (formContact) formContact.addEventListener('submit', function (e) {
         e.preventDefault();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var fd0 = new FormData(formContact);
         var data = {};
         try {
@@ -21144,7 +12140,7 @@
         } catch (errFd) { }
         var email = String(data.email || '').trim().toLowerCase();
         if (!isValidEmail(email)) {
-          alert(isAr ? 'البريد غير صالح.' : 'Invalid email.');
+          alert(typeof iifMessage === 'function' ? iifMessage('jsInvalidEmailShort') : 'Invalid email.');
           return;
         }
         var submitBtn = formContact.querySelector('button[type="submit"]');
@@ -21173,14 +12169,12 @@
           addSubmission('contact', data, loc || {});
           var endpoint = getContactEndpoint();
           function contactDoneOk() {
-            alert(iifSubmissionAcknowledgmentMsg(isAr));
+            alert(iifSubmissionAcknowledgmentMsg());
             formContact.reset();
             setContactBusy(false);
           }
           function contactDoneErr() {
-            alert(isAr
-              ? 'تعذّر الإرسال إلى خدمة البريد. تم حفظ الطلب في هذا المتصفح.'
-              : (typeof iifMessage === 'function' ? iifMessage('contactSendFailed') : 'Could not reach the mail service. Your message was saved in this browser.'));
+            alert(typeof iifMessage === 'function' ? iifMessage('contactSendFailed') : 'Could not reach the mail service. Your message was saved in this browser.');
             setContactBusy(false);
           }
           if (!endpoint || !/^https?:\/\//i.test(endpoint)) {
@@ -21216,23 +12210,22 @@
       });
       if (formMembership) formMembership.addEventListener('submit', function (e) {
         e.preventDefault();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         try {
           var fd = new FormData(formMembership);
           var data = {};
           fd.forEach(function (v, k) { data[k] = typeof v === 'string' ? v.trim() : v; });
           var email = (data.email || '').trim().toLowerCase();
-          if (!isValidEmail(email)) { alert(isAr ? 'البريد غير صالح.' : 'Invalid email.'); return; }
-          if (!(data.entity_name || '').trim()) { alert(isAr ? 'يرجى إدخال الاسم أو الكيان.' : 'Please enter name or entity.'); return; }
+          if (!isValidEmail(email)) { alert(iifMessage('jsInvalidEmailShort')); return; }
+          if (!(data.entity_name || '').trim()) { alert(iifMessage('membershipEnterNameEntity')); return; }
           getSubmissionLocation(function (loc) {
             if (typeof addSubmission === 'function') addSubmission('membership_request', data, loc || {});
             if (typeof addMembershipApplicationRecord === 'function') addMembershipApplicationRecord(data);
             formMembership.reset();
-            alert(isAr ? 'تم استلام طلب العضوية. سيتم مراجعته من الإدارة.' : 'Your membership request was received. It will be reviewed by administration.');
+            alert(iifMessage('membershipRequestReceived'));
             if (typeof getDashboardAccessType === 'function' && getDashboardAccessType() === 'owner' && typeof renderDashboardUserRegistry === 'function') renderDashboardUserRegistry();
           });
         } catch (err) {
-          alert(isAr ? 'تعذّر إرسال الطلب.' : 'Could not submit the request.');
+          alert(iifMessage('membershipSubmitFailed'));
         }
       });
       if (formFinancing) formFinancing.addEventListener('submit', function (e) {
@@ -21241,18 +12234,17 @@
           if (typeof showMembershipRequiredModal === 'function') showMembershipRequiredModal();
           return;
         }
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         try {
           var fd = new FormData(formFinancing);
           var data = {};
           fd.forEach(function (v, k) { data[k] = typeof v === 'string' ? v.trim() : v; });
           getSubmissionLocation(function (loc) {
             addSubmission('financing', data, loc || {});
-            alert(iifSubmissionAcknowledgmentMsg(isAr));
+            alert(iifSubmissionAcknowledgmentMsg());
             formFinancing.reset();
           });
         } catch (err1) {
-          alert(isAr ? 'تعذّر إرسال الطلب.' : 'Could not submit the request.');
+          alert(iifMessage('membershipSubmitFailed'));
         }
       });
       var formFeasibility = document.getElementById('form-feasibility-study');
@@ -21262,7 +12254,6 @@
           if (typeof showMembershipRequiredModal === 'function') showMembershipRequiredModal();
           return;
         }
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var feasibilityFiles = document.getElementById('feasibility-files');
         var fd = new FormData(formFeasibility);
         var data = {};
@@ -21272,7 +12263,7 @@
         function finishFeasibility() {
           getSubmissionLocation(function (loc) {
             addSubmission('feasibility', data, loc || {});
-            alert(iifSubmissionAcknowledgmentMsg(isAr));
+            alert(iifSubmissionAcknowledgmentMsg());
             formFeasibility.reset();
           });
         }
@@ -21293,14 +12284,13 @@
           if (typeof showMembershipRequiredModal === 'function') showMembershipRequiredModal();
           return;
         }
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
         var name = (document.getElementById('inv-name') && document.getElementById('inv-name').value) || '';
         var email = (document.getElementById('inv-email') && document.getElementById('inv-email').value) || '';
         var entity = (document.getElementById('inv-entity') && document.getElementById('inv-entity').value) || '';
         var country = (document.getElementById('inv-country') && document.getElementById('inv-country').value) || '';
         getSubmissionLocation(function (loc) {
           addSubmission('investor', { name: name, email: email, entity: entity, country: country }, loc || {});
-          alert(iifSubmissionAcknowledgmentMsg(isAr));
+          alert(iifSubmissionAcknowledgmentMsg());
           formInvestor.reset();
         });
       });
@@ -21385,15 +12375,10 @@
         var container = document.getElementById('video-call-jitsi-container');
         var iframe = document.getElementById('video-call-iframe');
         var shareLink = document.getElementById('video-call-share-link');
-        var shareLinkAr = document.getElementById('video-call-share-link-ar');
         if (!overlay) return;
         var roomName = IIF_VIDEO_ROOM_PREFIX;
         var jitsiUrl = IIF_VIDEO_SERVER + '/' + roomName;
         if (shareLink) shareLink.href = jitsiUrl;
-        if (shareLinkAr) shareLinkAr.href = jitsiUrl;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-        overlay.querySelectorAll('.video-call-modal__head .lang-en').forEach(function (el) { el.style.display = isAr ? 'none' : ''; });
-        overlay.querySelectorAll('.video-call-modal__head .lang-ar').forEach(function (el) { el.style.display = isAr ? '' : 'none'; });
         overlay.classList.add('is-open');
         overlay.style.display = 'flex';
         overlay.setAttribute('aria-hidden', 'false');
@@ -21496,27 +12481,12 @@
           if (urgentOnlineSuccess) {
             var leadEl = urgentOnlineSuccess.querySelector('.urgent-online-success__lead');
             var nextEl = urgentOnlineSuccess.querySelector('.urgent-online-success__next');
-            var msgEn = 'Request received. The Fund will contact you to arrange the secure online session.';
-            var msgAr = 'تم استلام الطلب. سيتواصل الصندوق معك لترتيب الجلسة الآمنة أونلاين.';
-            var msgNextEn = 'You should hear back within about 1–2 business days at the email you provided. This message is not financing approval or a mandate — see Terms.';
-            var msgNextAr = 'غالباً ستصلك إشارة خلال نحو يومي عمل على البريد الذي ذكرتَه. هذه الرسالة ليست موافقة تمويل ولا تفويضاً — انظر الشروط.';
-            var isAr0 = document.documentElement.getAttribute('data-lang') === 'ar';
-            if (leadEl && nextEl) {
-              var nxt;
-              if (typeof iifMessage === 'function') {
-                leadEl.textContent = iifMessage('urgentOnlineSuccessMsg');
-                nxt = iifMessage('urgentOnlineSuccessNext');
-                nextEl.textContent = nxt || '';
-              } else {
-                leadEl.textContent = isAr0 ? msgAr : msgEn;
-                nxt = isAr0 ? msgNextAr : msgNextEn;
-                nextEl.textContent = nxt;
-              }
-              nextEl.hidden = !nxt;
-            } else {
-              urgentOnlineSuccess.textContent = typeof iifMessage === 'function'
-                ? iifMessage('urgentOnlineSuccessMsg')
-                : (isAr0 ? msgAr : msgEn);
+            var msgLead = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessMsg') : 'Request received. The Fund will contact you to arrange the secure online session.';
+            var msgNext = typeof iifMessage === 'function' ? iifMessage('urgentOnlineSuccessNext') : 'You should hear back within about 1–2 business days at the email you provided. This message is not financing approval or a mandate — see Terms.';
+            if (leadEl) leadEl.textContent = msgLead;
+            if (nextEl) {
+              nextEl.textContent = msgNext || '';
+              nextEl.hidden = !msgNext;
             }
             urgentOnlineSuccess.hidden = false;
             formUrgentOnline.reset();
@@ -21605,15 +12575,15 @@
         return name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '');
       }
       function validateFileName(name) {
-        if (!name || typeof name !== 'string') return { valid: false, msg: 'Invalid file name.' };
-        if (name.length > 200) return { valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar') ? 'اسم الملف طويل جداً.' : 'File name too long.' };
+        if (!name || typeof name !== 'string') return { valid: false, msg: typeof iifMessage === 'function' ? iifMessage('jsInvalidFileName') : 'Invalid file name.' };
+        if (name.length > 200) return { valid: false, msg: typeof iifMessage === 'function' ? iifMessage('jsFileNameTooLong') : 'File name too long.' };
         if (name.indexOf('\0') !== -1 || /\.\.|[\\/]/.test(name))
-          return { valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar') ? 'اسم الملف يحتوي على أحرف غير مسموحة.' : 'File name contains invalid characters.' };
+          return { valid: false, msg: typeof iifMessage === 'function' ? iifMessage('jsFileNameInvalidChars') : 'File name contains invalid characters.' };
         var parts = name.toLowerCase().split('.');
         for (var p = 0; p < parts.length; p++) {
           var seg = parts[p].replace(/[^a-z0-9]/g, '');
           if (seg && DANGEROUS_EXT.indexOf(seg) !== -1)
-            return { valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar') ? 'نوع الملف غير مسموح لأسباب أمنية.' : 'File type not allowed for security.' };
+            return { valid: false, msg: typeof iifMessage === 'function' ? iifMessage('jsFileExtensionBlockedSecurity') : 'File type not allowed for security.' };
         }
         return { valid: true };
       }
@@ -21634,8 +12604,7 @@
         if (!allowed || !files || !files.length) return { valid: true };
         if (files.length > maxCount)
           return {
-            valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar')
-              ? 'الحد الأقصى ' + maxCount + ' ملفات.' : 'Maximum ' + maxCount + ' files.'
+            valid: false, msg: typeof iifMessageFmt === 'function' ? iifMessageFmt('jsFileMaxCount', { n: maxCount }) : ('Maximum ' + maxCount + ' files.')
           };
         var total = 0;
         for (var i = 0; i < files.length; i++) {
@@ -21645,9 +12614,7 @@
           var ext = getExt(f.name);
           if (allowed.indexOf(ext) === -1)
             return {
-              valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar')
-                ? 'نوع غير مسموح: ' + (ext || f.name) + '.'
-                : 'File type not allowed: ' + (ext || f.name) + '.'
+              valid: false, msg: typeof iifMessageFmt === 'function' ? iifMessageFmt('jsFileTypeNotAllowed', { name: ext || f.name }) : ('File type not allowed: ' + (ext || f.name) + '.')
             };
           /* فحص MIME للصور والفيديو والمستندات في دراسة الجدوى والرفع العام */
           if ((profile === 'feasibility' || profile === 'upload') && f.type) {
@@ -21655,24 +12622,18 @@
             var mimeList = cat && MIME_BY_CATEGORY[cat];
             if (mimeList && mimeList.indexOf(f.type) === -1)
               return {
-                valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar')
-                  ? 'نوع الملف (MIME) لا يطابق الامتداد — مرفوض لأسباب أمنية.'
-                  : 'File type (MIME) does not match extension — rejected for security.'
+                valid: false, msg: typeof iifMessage === 'function' ? iifMessage('jsFileMimeMismatchSecurity') : 'File type (MIME) does not match extension — rejected for security.'
               };
           }
           if (f.size > maxSize)
             return {
-              valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar')
-                ? 'الملف كبير جداً: ' + f.name + ' (الحد ' + (maxSize / 1024 / 1024) + ' ميجا).'
-                : 'File too large: ' + f.name + ' (max ' + (maxSize / 1024 / 1024) + ' MB).'
+              valid: false, msg: typeof iifMessageFmt === 'function' ? iifMessageFmt('jsFileTooLarge', { name: f.name, mb: maxSize / 1024 / 1024 }) : ('File too large: ' + f.name + ' (max ' + (maxSize / 1024 / 1024) + ' MB).')
             };
           total += f.size;
         }
         if (total > maxTotal)
           return {
-            valid: false, msg: (document.documentElement.getAttribute('data-lang') === 'ar')
-              ? 'إجمالي الملفات يتجاوز ' + (maxTotal / 1024 / 1024) + ' ميجا.'
-              : 'Total size exceeds ' + (maxTotal / 1024 / 1024) + ' MB.'
+            valid: false, msg: typeof iifMessageFmt === 'function' ? iifMessageFmt('jsFileTotalTooLarge', { mb: maxTotal / 1024 / 1024 }) : ('Total size exceeds ' + (maxTotal / 1024 / 1024) + ' MB.')
           };
         return { valid: true };
       }
@@ -21683,10 +12644,9 @@
           var r = validateFileList(el.files, profile);
           if (!r.valid) { alert(r.msg); el.value = ''; return; }
           if (el.files && el.files.length) {
-            var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
             var msg = el.files.length === 1
-              ? (isAr ? 'تم اختيار الملف بنجاح.' : 'File selected successfully.')
-              : (isAr ? 'تم اختيار ' + el.files.length + ' ملفات بنجاح.' : el.files.length + ' files selected successfully.');
+              ? iifMessage('jsFileSelectedSuccess')
+              : iifMessageFmt('jsFilesSelectedCountSuccess', { n: el.files.length });
             alert(msg);
           }
         });
@@ -21769,7 +12729,7 @@
         voiceInputBtn.addEventListener('click', function () {
           var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
           if (!SpeechRecognition) {
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'الإدخال الصوتي غير مدعوم في متصفحك. جرّب Chrome أو Edge.' : 'Voice input is not supported in your browser. Try Chrome or Edge.');
+            alert(iifMessage('jsVoiceInputNotSupported'));
             return;
           }
           var rec = new SpeechRecognition();
@@ -21785,7 +12745,7 @@
             }
           };
           rec.onerror = function (e) {
-            if (e.error !== 'aborted') alert(e.error === 'not-allowed' ? (document.documentElement.getAttribute('data-lang') === 'ar' ? 'يُرجى السماح بالميكروفون.' : 'Please allow microphone access.') : (e.error || ''));
+            if (e.error !== 'aborted') alert(e.error === 'not-allowed' ? iifMessage('jsPleaseAllowMicrophone') : (e.error || ''));
           };
           rec.start();
           voiceInputBtn.disabled = true;
@@ -21798,7 +12758,7 @@
         listenBtn.addEventListener('click', function () {
           var text = (textResult.textContent || '').trim();
           if (!text) {
-            alert(document.documentElement.getAttribute('data-lang') === 'ar' ? 'لا توجد نتيجة ترجمة للسماع.' : 'No translation result to listen to.');
+            alert(iifMessage('jsNoTranslationToListen'));
             return;
           }
           if (window.speechSynthesis.cancel) window.speechSynthesis.cancel();
@@ -21833,10 +12793,7 @@
         } catch (e) { }
         if (!isLoggedIn()) {
           if (typeof openAuth === 'function') openAuth();
-          var msg = document.documentElement.getAttribute('data-lang') === 'ar'
-            ? 'يجب تسجيل الدخول أولاً.'
-            : 'Please sign in first.';
-          alert(msg);
+          alert(typeof iifMessage === 'function' ? iifMessage('jsPleaseSignInFirst') : 'Please sign in first.');
           return;
         }
         if (typeof callback === 'function') callback();
@@ -21844,13 +12801,11 @@
       if (textBtn) textBtn.addEventListener('click', function () {
         var text = (textInput && textInput.value) ? textInput.value.trim() : '';
         if (!text) {
-          if (textResult) textResult.textContent = (document.documentElement.getAttribute('data-lang') === 'ar') ? 'أدخل النص لترجمته.' : 'Enter text to translate.';
+          if (textResult) textResult.textContent = typeof iifMessage === 'function' ? iifMessage('jsTranslationEnterText') : 'Enter text to translate.';
           return;
         }
         if (textResult) {
-          textResult.textContent = (document.documentElement.getAttribute('data-lang') === 'ar')
-            ? 'سيتم تفعيل الترجمة الفعلية عند ربط الخدمة بخادم الترجمة. النص المدخل: ' + text.length + ' حرف.'
-            : 'Live translation will be available when connected to a translation backend. Entered length: ' + text.length + ' characters.';
+          textResult.textContent = typeof iifMessageFmt === 'function' ? iifMessageFmt('jsTranslationBackendStub', { n: text.length }) : ('Live translation will be available when connected to a translation backend. Entered length: ' + text.length + ' characters.');
           textResult.classList.add('has-result');
         }
       });
@@ -21902,18 +12857,18 @@
         var el = document.getElementById('suggested-for-you');
         if (!el) return;
         var visited = getVisitedSections();
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
+        var sugLang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
         if (visited.length === 0) {
-          el.innerHTML = isAr ? '<strong>اقتراحات مخصصة:</strong> زُر أقسام الموقع لرؤية اقتراحات حسب اهتمامك.' : '<strong>Suggested for you:</strong> Visit site sections to see personalized suggestions.';
+          el.innerHTML = typeof iifMessage === 'function' ? iifMessage('suggestionsBannerHtml') : '<strong>Suggested for you:</strong> Visit site sections to see personalized suggestions.';
           return;
         }
-        var names = visited.slice(-5).map(function (id) { return SECTION_NAMES[id] ? (isAr ? SECTION_NAMES[id].ar : SECTION_NAMES[id].en) : id; });
+        var names = visited.slice(-5).map(function (id) { return SECTION_NAMES[id] ? (sugLang === 'ar' ? SECTION_NAMES[id].ar : SECTION_NAMES[id].en) : id; });
         var suggestId = visited.indexOf('investor-registration') !== -1 ? 'feasibility-study' : visited.indexOf('financing-request') !== -1 ? 'investor-registration' : 'financial-consultation';
-        var suggestName = SECTION_NAMES[suggestId] ? (isAr ? SECTION_NAMES[suggestId].ar : SECTION_NAMES[suggestId].en) : suggestId;
-        var label = isAr ? 'اقتراح مخصص:' : 'Suggested for you:';
-        var visitedLabel = isAr ? 'زرت:' : 'You visited:';
+        var suggestName = SECTION_NAMES[suggestId] ? (sugLang === 'ar' ? SECTION_NAMES[suggestId].ar : SECTION_NAMES[suggestId].en) : suggestId;
+        var label = typeof iifMessage === 'function' ? iifMessage('suggestionsForYouLabel') : 'Suggested for you:';
+        var visitedLabel = typeof iifMessage === 'function' ? iifMessage('suggestionsVisitedLabel') : 'You visited: ';
         var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
-        el.innerHTML = '<strong>' + label + '</strong> ' + visitedLabel + ' ' + esc(names.join(' · ')) + '.<br>' + (isAr ? 'قد يهمك: ' : 'You might like: ') + '<a href="#' + esc(suggestId) + '">' + esc(suggestName) + '</a>';
+        el.innerHTML = '<strong>' + esc(label) + '</strong> ' + esc(visitedLabel) + ' ' + esc(names.join(' · ')) + '.<br>' + esc(typeof iifMessage === 'function' ? iifMessage('suggestionsYouMightLike') : 'You might like: ') + '<a href="#' + esc(suggestId) + '">' + esc(suggestName) + '</a>';
       }
       (function initSectionTracking() {
         var sections = document.querySelectorAll('section[id]');
@@ -21939,13 +12894,25 @@
       (function initVerificationCollapse() {
         var toggle = document.getElementById('verification-toggle');
         var content = document.getElementById('verification-content');
+        function updateVerificationToggleLabel() {
+          var label = document.getElementById('verification-toggle-label');
+          if (!toggle || !label) return;
+          var expanded = toggle.getAttribute('aria-expanded') === 'true';
+          var lang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+          var pack = window.IIF_I18N && window.IIF_I18N.T;
+          var t = pack && (pack[lang] || pack.en);
+          var en = pack && pack.en;
+          var key = expanded ? 'verifHide' : 'verifShow';
+          var val = (t && t[key] != null) ? t[key] : (en && en[key] != null ? en[key] : null);
+          if (val != null) label.textContent = val;
+        }
+        window.IIF_updateVerificationToggleLabel = updateVerificationToggleLabel;
         if (!toggle || !content) return;
         toggle.addEventListener('click', function () {
           var hidden = content.hidden;
           content.hidden = !hidden;
           toggle.setAttribute('aria-expanded', !hidden ? 'true' : 'false');
-          toggle.querySelector('.lang-en').textContent = hidden ? 'Hide' : 'Show';
-          toggle.querySelector('.lang-ar').textContent = hidden ? 'إخفاء' : 'إظهار';
+          updateVerificationToggleLabel();
         });
       })();
 
@@ -21961,7 +12928,15 @@
       (function initIpCheck() {
         var el = document.getElementById('ip-check-result');
         if (!el) return;
-        var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
+        function ipCheckT(key) {
+          var lang = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase();
+          var pack = window.IIF_I18N && window.IIF_I18N.T;
+          var t = pack && (pack[lang] || pack.en);
+          var en = pack && pack.en;
+          var v = t && t[key];
+          if (v == null && en) v = en[key];
+          return v;
+        }
         fetch('https://ipapi.co/json/').then(function (r) { return r.json(); }).then(function (data) {
           var country = (data.country_name || data.country || '—').toString();
           var region = (data.region || data.region_code || '—').toString();
@@ -21969,12 +12944,13 @@
           var ip = maskIp(data.ip);
           var payload = { country: country, region: region, city: city, ip_masked: ip, timestamp: new Date().toISOString() };
           try { localStorage.setItem(SESSION_DATA_KEY, JSON.stringify(payload)); } catch (e) { }
-          var proxyNote = isAr ? 'التحقق من البروكسي/VPN يتم عند الإرسال (خادم).' : 'Proxy/VPN check on submit (backend).';
+          var sessionLbl = ipCheckT('verifIpSessionLabel') || 'Current session:';
+          var proxyNote = ipCheckT('verifIpProxyNote') || 'Proxy/VPN check on submit (backend).';
           var esc = typeof escapeHtml === 'function' ? escapeHtml : function (s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
-          el.innerHTML = '<strong>' + (isAr ? 'الجلسة الحالية:' : 'Current session:') + '</strong> ' + esc(country) + ', ' + esc(region) + (city ? ', ' + esc(city) : '') + '. IP: ' + esc(ip) + '. ' + proxyNote;
+          el.innerHTML = '<strong>' + esc(sessionLbl) + '</strong> ' + esc(country) + ', ' + esc(region) + (city ? ', ' + esc(city) : '') + '. IP: ' + esc(ip) + '. ' + esc(proxyNote);
         }).catch(function () {
           try { localStorage.removeItem(SESSION_DATA_KEY); } catch (e) { }
-          el.textContent = isAr ? 'فحص الجلسة غير متاح حالياً. التحقق من الموقع والبروكسي يتم عند ربط الخادم.' : 'Session check unavailable. Location and proxy verification run when backend is connected.';
+          el.textContent = ipCheckT('verifIpUnavailable') || 'Session check unavailable. Location and proxy verification run when backend is connected.';
         });
       })();
       /* User Dashboard: Personal Profile Management */
@@ -21999,10 +12975,92 @@
           }
         }
 
+        function iifProfileMoveMapKey(storageKey, fromKey, toKey) {
+          try {
+            var raw = localStorage.getItem(storageKey);
+            var obj = raw ? JSON.parse(raw) : {};
+            if (!obj || typeof obj !== 'object') return;
+            if (obj[fromKey] && !obj[toKey]) obj[toKey] = obj[fromKey];
+            if (obj[fromKey]) delete obj[fromKey];
+            localStorage.setItem(storageKey, JSON.stringify(obj));
+          } catch (eM) { }
+        }
+
+        function iifProfileMovePrefixKey(prefix, fromEmail, toEmail) {
+          try {
+            var fromK = prefix + fromEmail;
+            var toK = prefix + toEmail;
+            var v = localStorage.getItem(fromK);
+            if (v && !localStorage.getItem(toK)) localStorage.setItem(toK, v);
+          } catch (eP) { }
+        }
+
+        /**
+         * @param {string} oldEmail
+         * @param {string} newEmail
+         * @param {{ showAlert?: boolean, reload?: boolean }} opts
+         */
+        function iifMigrateLoggedAccountEmail(oldEmail, newEmail, opts) {
+          opts = opts || {};
+          var showAlert = opts.showAlert === true;
+          var reload = opts.reload !== false;
+          oldEmail = (oldEmail || '').trim().toLowerCase();
+          newEmail = (newEmail || '').trim().toLowerCase();
+          if (!oldEmail || !newEmail || oldEmail === newEmail) return;
+
+          iifProfileMoveMapKey(USER_PROFILE_KEY, oldEmail, newEmail);
+          if (typeof IIF_USER_CREDENTIALS_KEY !== 'undefined') iifProfileMoveMapKey(IIF_USER_CREDENTIALS_KEY, oldEmail, newEmail);
+          if (typeof IIF_ADMIN_PASSWORD_PLAIN_KEY !== 'undefined') iifProfileMoveMapKey(IIF_ADMIN_PASSWORD_PLAIN_KEY, oldEmail, newEmail);
+          if (typeof MEMBERSHIP_EXPIRY_PREFIX !== 'undefined') iifProfileMovePrefixKey(MEMBERSHIP_EXPIRY_PREFIX, oldEmail, newEmail);
+          if (typeof CERT_PHOTO_KEY !== 'undefined') iifProfileMovePrefixKey(CERT_PHOTO_KEY, oldEmail, newEmail);
+          if (typeof CERT_LOGO_KEY !== 'undefined') iifProfileMovePrefixKey(CERT_LOGO_KEY, oldEmail, newEmail);
+          if (typeof CERT_FLAG_KEY !== 'undefined') iifProfileMovePrefixKey(CERT_FLAG_KEY, oldEmail, newEmail);
+
+          try {
+            if (typeof getSiteUsers === 'function' && typeof saveSiteUsers === 'function') {
+              var users = getSiteUsers();
+              for (var i = 0; i < users.length; i++) {
+                if ((users[i].email || '').trim().toLowerCase() === oldEmail) {
+                  users[i] = Object.assign({}, users[i], { email: newEmail, updatedAt: new Date().toISOString() });
+                }
+              }
+              saveSiteUsers(users);
+            }
+          } catch (eUsers) { }
+
+          try {
+            if (typeof getFundMembers === 'function' && typeof saveFundMembers === 'function') {
+              var list = getFundMembers();
+              for (var j = 0; j < list.length; j++) {
+                if ((list[j].email || '').trim().toLowerCase() === oldEmail) {
+                  list[j] = Object.assign({}, list[j], { email: newEmail });
+                }
+              }
+              saveFundMembers(list);
+            }
+          } catch (eFm) { }
+
+          try { localStorage.setItem('iif-user-email', newEmail); } catch (eSet) { }
+          try { localStorage.setItem(DEVICE_BOUND_EMAIL_KEY, newEmail); } catch (eDev) { }
+          try {
+            if (window.IIF_MEMBERSHIP_AUTH && IIF_MEMBERSHIP_AUTH.setLoggedMember) IIF_MEMBERSHIP_AUTH.setLoggedMember(newEmail);
+          } catch (eMem) { }
+          try { setAdminByEmail(newEmail); } catch (eAdm) { }
+
+          if (reload) {
+            try { loadUserProfile(); } catch (eLoad) { }
+            try { if (typeof updateDashboardNav === 'function') updateDashboardNav(); } catch (eNav) { }
+            try { if (typeof loadDashboardMyContent === 'function') loadDashboardMyContent(); } catch (eMy) { }
+          }
+          if (showAlert) alert(iifMessage('emailUpdatedSuccess'));
+        }
+
         function iifPairFieldVal(mainId, dashId) {
           var m = document.getElementById(mainId);
           var d = document.getElementById(dashId);
-          var raw = m ? m.value : d ? d.value : '';
+          var mv = m ? (m.value || '') : '';
+          var dv = d ? (d.value || '') : '';
+          var raw = (mv && mv.trim()) ? mv : dv;
           return (raw || '').trim();
         }
         function iifPairSelectVal(mainId, dashId) {
@@ -22086,51 +13144,145 @@
             var el = document.getElementById(pid);
             if (el) el.innerHTML = innerPhoto;
           });
+          try {
+            setDashProfileLocked(true);
+          } catch (eLock) { }
+        }
+
+        function setDashProfileLocked(lock) {
+          var root = document.getElementById('dashboard-user-profile');
+          if (!root) return;
+          root.setAttribute('data-profile-edit-locked', lock ? '1' : '0');
+          var textIds = [
+            'dash-profile-full-name',
+            'dash-profile-email',
+            'dash-profile-phone',
+            'dash-profile-company',
+            'dash-profile-position',
+            'dash-profile-website',
+            'dash-profile-location'
+          ];
+          textIds.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (lock) el.setAttribute('readonly', 'readonly');
+            else el.removeAttribute('readonly');
+          });
+          var bio = document.getElementById('dash-profile-bio');
+          if (bio) {
+            if (lock) bio.setAttribute('readonly', 'readonly');
+            else bio.removeAttribute('readonly');
+          }
+          var sel = document.getElementById('dash-profile-contact-visibility');
+          if (sel) sel.disabled = !!lock;
+          ['dash-profile-allow-admin', 'dash-profile-allow-members', 'dash-profile-allow-public'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.disabled = !!lock;
+          });
+          var phBtn = document.getElementById('dash-profile-change-photo-btn');
+          if (phBtn) phBtn.disabled = !!lock;
+          var editBtn = document.getElementById('dash-profile-edit-toggle-btn');
+          var saveAct = document.getElementById('dash-profile-save-actions');
+          if (editBtn) editBtn.style.display = lock ? '' : 'none';
+          root.querySelectorAll('.dash-profile-locked-hint').forEach(function (h) {
+            h.style.display = lock ? '' : 'none';
+          });
+          if (saveAct) saveAct.style.display = lock ? 'none' : 'flex';
         }
 
         function saveProfileData() {
-          var email = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
-          if (!email) {
-            var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isAr ? 'يجب تسجيل الدخول أولاً' : 'Please sign in first');
+          var loggedEmail = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+          if (!loggedEmail) {
+            alert(iifMessage('jsPleaseSignInFirst'));
             return;
           }
 
-          var profile = getUserProfile();
-          var fullName = iifPairFieldVal('user-full-name', 'dash-profile-full-name');
+          var emailEl = document.getElementById('dash-profile-email');
+          var fieldEmail = emailEl ? (emailEl.value || '').trim().toLowerCase() : loggedEmail;
+          if (!fieldEmail) {
+            alert(iifMessage('emailInvalidShort'));
+            return;
+          }
 
-          profile[email] = {
-            fullName: fullName,
-            email: email,
-            phone: iifPairFieldVal('user-phone', 'dash-profile-phone'),
-            company: iifPairFieldVal('user-company', 'dash-profile-company'),
-            position: iifPairFieldVal('user-position', 'dash-profile-position'),
-            bio: iifPairFieldVal('user-bio', 'dash-profile-bio'),
-            website: iifPairFieldVal('user-website', 'dash-profile-website'),
-            location: iifPairFieldVal('user-location', 'dash-profile-location'),
-            contactVisibility: iifPairSelectVal('contact-visibility', 'dash-profile-contact-visibility'),
-            allowAdmin: iifPairChecked('allow-admin', 'dash-profile-allow-admin', true),
-            allowMembers: iifPairChecked('allow-members', 'dash-profile-allow-members', false),
-            allowPublic: iifPairChecked('allow-public', 'dash-profile-allow-public', false),
-            updatedAt: new Date().toISOString()
+          function finishSave(emailKey) {
+            var profile = getUserProfile();
+            var fullName = iifPairFieldVal('user-full-name', 'dash-profile-full-name');
+            var prevSnap = profile[emailKey] || {};
+
+            profile[emailKey] = {
+              fullName: fullName,
+              email: emailKey,
+              phone: iifPairFieldVal('user-phone', 'dash-profile-phone'),
+              company: iifPairFieldVal('user-company', 'dash-profile-company'),
+              position: iifPairFieldVal('user-position', 'dash-profile-position'),
+              bio: iifPairFieldVal('user-bio', 'dash-profile-bio'),
+              website: iifPairFieldVal('user-website', 'dash-profile-website'),
+              location: iifPairFieldVal('user-location', 'dash-profile-location'),
+              contactVisibility: iifPairSelectVal('contact-visibility', 'dash-profile-contact-visibility'),
+              allowAdmin: iifPairChecked('allow-admin', 'dash-profile-allow-admin', true),
+              allowMembers: iifPairChecked('allow-members', 'dash-profile-allow-members', false),
+              allowPublic: iifPairChecked('allow-public', 'dash-profile-allow-public', false),
+              updatedAt: new Date().toISOString()
+            };
+            if (prevSnap.avatarDataUrl && String(prevSnap.avatarDataUrl).indexOf('data:image') === 0) {
+              profile[emailKey].avatarDataUrl = prevSnap.avatarDataUrl;
+            }
+
+            if (saveUserProfile(profile)) {
+              try {
+                if (fullName) localStorage.setItem('iif-user-name', fullName);
+              } catch (eN) { }
+              try {
+                if (typeof loadDashboardMyContent === 'function') loadDashboardMyContent();
+              } catch (eL) { }
+              try {
+                loadUserProfile();
+              } catch (eSync) { }
+              try {
+                setDashProfileLocked(true);
+              } catch (eLk) { }
+              alert(iifMessage('jsYourInfoSaved'));
+            } else {
+              alert(iifMessage('jsAccountSaveError'));
+            }
+          }
+
+          if (fieldEmail === loggedEmail) {
+            finishSave(loggedEmail);
+            return;
+          }
+
+          if (typeof isValidEmail === 'function' && !isValidEmail(fieldEmail)) {
+            alert(iifMessage('emailInvalidShort'));
+            return;
+          }
+          if (typeof isEmailBlockedFromSite === 'function' && isEmailBlockedFromSite(fieldEmail)) {
+            alert(iifMessage('emailBlockedSite'));
+            return;
+          }
+
+          var runMigrateThenSave = function () {
+            iifMigrateLoggedAccountEmail(loggedEmail, fieldEmail, { showAlert: false, reload: false });
+            finishSave(fieldEmail);
           };
 
-          if (saveUserProfile(profile)) {
-            try {
-              if (fullName) localStorage.setItem('iif-user-name', fullName);
-            } catch (eN) { }
-            try {
-              if (typeof loadDashboardMyContent === 'function') loadDashboardMyContent();
-            } catch (eL) { }
-            try {
-              loadUserProfile();
-            } catch (eSync) { }
-            var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isAr ? 'تم حفظ معلوماتك بنجاح' : 'Your information has been saved successfully');
-          } else {
-            var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isAr ? 'حدث خطأ أثناء الحفظ' : 'Error occurred while saving');
-          }
+          try {
+            var cred = typeof getCredentialForEmail === 'function' ? getCredentialForEmail(loggedEmail) : null;
+            if (cred && cred.hash && typeof verifyPasswordForEmail === 'function') {
+              var pw = prompt(iifMessage('emailChangeConfirmPwPrompt')) || '';
+              if (!pw) return;
+              verifyPasswordForEmail(loggedEmail, pw).then(function (ok) {
+                if (!ok) {
+                  alert(iifMessage('jsIncorrectPasswordShort'));
+                  return;
+                }
+                runMigrateThenSave();
+              });
+              return;
+            }
+          } catch (eCred) { }
+
+          runMigrateThenSave();
         }
 
         // Event listeners
@@ -22149,6 +13301,49 @@
 
         var dashSave = document.getElementById('dash-profile-save-btn');
         if (dashSave) dashSave.addEventListener('click', saveProfileData);
+        var dashChangeEmail = document.getElementById('dash-profile-change-email-btn');
+        function iifChangeLoggedEmail() {
+          var oldEmail = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+          if (!oldEmail) {
+            alert(iifMessage('jsPleaseSignInFirst'));
+            return;
+          }
+
+          var newEmailRaw = prompt(iifMessage('emailChangePromptNew'), oldEmail) || '';
+          var newEmail = (newEmailRaw || '').trim().toLowerCase();
+          if (!newEmail || newEmail === oldEmail) return;
+          if (typeof isValidEmail === 'function' && !isValidEmail(newEmail)) {
+            alert(iifMessage('emailInvalidShort'));
+            return;
+          }
+          if (typeof isEmailBlockedFromSite === 'function' && isEmailBlockedFromSite(newEmail)) {
+            alert(iifMessage('emailBlockedSite'));
+            return;
+          }
+
+          function applyMigrate() {
+            iifMigrateLoggedAccountEmail(oldEmail, newEmail, { showAlert: true, reload: true });
+          }
+
+          try {
+            var cred = typeof getCredentialForEmail === 'function' ? getCredentialForEmail(oldEmail) : null;
+            if (cred && cred.hash && typeof verifyPasswordForEmail === 'function') {
+              var pw = prompt(iifMessage('emailChangeConfirmPwPrompt')) || '';
+              if (!pw) return;
+              verifyPasswordForEmail(oldEmail, pw).then(function (ok) {
+                if (!ok) {
+                  alert(iifMessage('jsIncorrectPasswordShort'));
+                  return;
+                }
+                applyMigrate();
+              });
+              return;
+            }
+          } catch (eCred2) { }
+
+          applyMigrate();
+        }
+        if (dashChangeEmail) dashChangeEmail.addEventListener('click', iifChangeLoggedEmail);
         var dashCancel = document.getElementById('dash-profile-cancel-btn');
         if (dashCancel) {
           dashCancel.addEventListener('click', function () {
@@ -22173,29 +13368,22 @@
         function onChangeProfilePhotoClick(e) {
           e.preventDefault();
           if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
-            var isAr0 = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isAr0 ? 'يجب تسجيل الدخول أولاً لرفع الصورة.' : 'Please sign in first to upload.');
+            alert(typeof iifMessage === 'function' ? iifMessage('dashProfilePhotoSignInFirst') : 'Please sign in first to upload.');
             return;
           }
           var dashOv = document.getElementById('dashboard-overlay');
           var dashOpen = dashOv && dashOv.classList.contains('is-open');
           var dashFile = document.getElementById('dash-profile-photo-file');
           var certInput = (dashOpen && dashFile) ? dashFile : document.getElementById('cert-photo-input');
-          if (dashOpen && dashFile && certInput === dashFile) {
+          if (dashFile && certInput === dashFile) {
             var dRoot = document.getElementById('dashboard-user-profile');
             if (dRoot && dRoot.getAttribute('data-profile-edit-locked') === '1') {
-              var isArL = document.documentElement.getAttribute('data-lang') === 'ar';
-              alert(
-                isArL
-                  ? 'اضغط «تعديل المعلومات» أولاً لتغيير الصورة أو البيانات.'
-                  : 'Tap «Edit information» first to change your photo or details.'
-              );
+              alert(typeof iifMessage === 'function' ? iifMessage('dashProfileTapEditFirst') : 'Tap «Edit information» first to change your photo or details.');
               return;
             }
           }
           if (!certInput) {
-            var isArMiss = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(isArMiss ? 'تعذر العثور على حقل رفع الصورة.' : 'Photo upload field not found.');
+            alert(typeof iifMessage === 'function' ? iifMessage('dashProfilePhotoFieldMissing') : 'Photo upload field not found.');
             return;
           }
           var hasPhoto = false;
@@ -22203,21 +13391,13 @@
             if (typeof hasCertImageKind === 'function') hasPhoto = hasCertImageKind('photo');
           } catch (eH) { }
           if (hasPhoto) {
-            var isArC = document.documentElement.getAttribute('data-lang') === 'ar';
-            var cmsg = isArC
-              ? 'هذه الصورة مرفوعة مسبقاً. هل تريد حذف السابق ورفعها مرة أخرى؟'
-              : 'This image is already uploaded. Do you want to remove the previous one and upload again?';
+            var cmsg = typeof iifMessage === 'function' ? iifMessage('dashProfilePhotoReplaceConfirm') : 'This image is already uploaded. Do you want to remove the previous one and upload again?';
             if (!confirm(cmsg)) return;
           }
           try {
             certInput.click();
           } catch (eClick) {
-            var isArF = document.documentElement.getAttribute('data-lang') === 'ar';
-            alert(
-              isArF
-                ? 'تعذر فتح نافذة الملفات. افتح قسم العضوية واستخدم «من الملفات» بجوار صورتك في بطاقة العضوية الرقمية.'
-                : 'Could not open the file picker. Open the Membership section and use «From files» next to your photo under digital membership card.'
-            );
+            alert(typeof iifMessage === 'function' ? iifMessage('dashProfilePhotoPickerFailed') : 'Could not open the file picker. Open the Membership section and use «From files» next to your photo under digital membership card.');
           }
         }
         var changePhotoBtn = document.getElementById('change-photo-btn');
@@ -22365,9 +13545,7 @@
               if (typeof IIF_proactiveRefreshUI === 'function') IIF_proactiveRefreshUI();
 
               // إظهار رسالة للمستخدم
-              var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
-              var message = isAr ? 'تم تصحيح تسجيل الدخول تلقائياً' : 'Login status corrected automatically';
-              console.log(message);
+              console.log(typeof iifMessage === 'function' ? iifMessage('jsLoginStatusCorrected') : 'Login status corrected automatically');
             }, 200);
           }
         }
@@ -22443,328 +13621,18 @@
             sendTo: { email: 'talalkenani@gmail.com', whatsapp: '+966567566616' }
           };
           try { localStorage.setItem(PENDING_SUMMARY_KEY, JSON.stringify(payload)); } catch (e) { }
-          var isAr = document.documentElement.getAttribute('data-lang') === 'ar';
           var lines = [];
-          if (session.country) lines.push((isAr ? 'الموقع: ' : 'Location: ') + [session.country, session.region, session.city].filter(Boolean).join(', '));
-          if (session.ip_masked) lines.push((isAr ? 'IP: ' : 'IP: ') + session.ip_masked);
-          if (visited.length) lines.push((isAr ? 'الأقسام المزارة: ' : 'Visited sections: ') + visited.join(', '));
-          if (note) lines.push((isAr ? 'ملاحظة: ' : 'Note: ') + note);
+          if (session.country) lines.push(iifMessage('sessionLocationPrefix') + [session.country, session.region, session.city].filter(Boolean).join(', '));
+          if (session.ip_masked) lines.push(iifMessage('sessionIpPrefix') + session.ip_masked);
+          if (visited.length) lines.push(iifMessage('sessionVisitedSections') + visited.join(', '));
+          if (note) lines.push(iifMessage('sessionNotePrefix') + note);
           lines.push('');
-          lines.push(isAr ? 'تم حفظ الملخص. عند ربط الخادم سيُرسل إلى talalkenani@gmail.com وواتساب +966 56 756 6616.' : 'Summary saved. When backend is connected it will be sent to talalkenani@gmail.com and WhatsApp +966 56 756 6616.');
+          lines.push(iifMessage('sessionSummarySavedBackend'));
           summaryPreview.textContent = lines.join('\n');
           summaryPreview.hidden = false;
           if (summaryNote) summaryNote.value = '';
         });
       }
 
-      /* شريطا الأسواق الآسيوية والعربية — مربوطة بالأسواق فقط (مصادر اقتصادية)، حركة مستمرة تُكرر من جديد */
-      (function loadTickersAsianArab() {
-        var LS_ASIAN = 'iif-ticker-country-asian';
-        var LS_ARAB = 'iif-ticker-country-arab';
-        var LS_PAUSED = 'iif-ticker-paused';
-        var copyAsian = document.getElementById('ticker-asian-copy');
-        var copyAsian2 = document.getElementById('ticker-asian-copy2');
-        var copyArab = document.getElementById('ticker-arab-copy');
-        var copyArab2 = document.getElementById('ticker-arab-copy2');
-        if (!copyAsian || !copyAsian2) copyAsian = copyAsian2 = null;
-        if (!copyArab || !copyArab2) copyArab = copyArab2 = null;
-        if (!copyAsian && !copyArab) return;
-        function restoreTickerCountries() {
-          try {
-            var ea = document.getElementById('iif-ticker-country-asian');
-            var va = localStorage.getItem(LS_ASIAN) || '';
-            if (ea && va && ea.querySelector('option[value="' + va + '"]')) ea.value = va;
-            var er = document.getElementById('iif-ticker-country-arab');
-            var vr = localStorage.getItem(LS_ARAB) || '';
-            if (er && vr && er.querySelector('option[value="' + vr + '"]')) er.value = vr;
-          } catch (eR) { }
-        }
-        restoreTickerCountries();
-        function getCountryForCat(cat) {
-          try {
-            if (cat === 'asian') {
-              var el = document.getElementById('iif-ticker-country-asian');
-              var v = el && el.value ? String(el.value).toUpperCase().trim() : '';
-              return /^[A-Z]{2}$/.test(v) ? v : '';
-            }
-            if (cat === 'arabic') {
-              var el2 = document.getElementById('iif-ticker-country-arab');
-              var v2 = el2 && el2.value ? String(el2.value).toUpperCase().trim() : '';
-              return /^[A-Z]{2}$/.test(v2) ? v2 : '';
-            }
-          } catch (eC) { }
-          return '';
-        }
-        (function initTickerToolbarPause() {
-          var wrap = document.querySelector('.site-header__tickers');
-          var btn = document.getElementById('iif-ticker-motion-toggle');
-          if (!wrap || !btn) return;
-          function updatePauseLabel(paused) {
-            var key = paused ? 'tickerMotionResume' : 'tickerMotionPause';
-            try {
-              if (window.IIF_I18N && typeof window.IIF_I18N.text === 'function') {
-                var tx = window.IIF_I18N.text(key);
-                if (tx) { btn.textContent = tx; return; }
-              }
-            } catch (eL) { }
-            btn.textContent = paused ? 'Resume' : 'Pause';
-          }
-          function setPaused(on) {
-            wrap.classList.toggle('site-header__tickers--paused', on);
-            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            try { localStorage.setItem(LS_PAUSED, on ? '1' : '0'); } catch (eP) { }
-            updatePauseLabel(on);
-          }
-          try {
-            if (localStorage.getItem(LS_PAUSED) === '1') setPaused(true);
-            else updatePauseLabel(false);
-          } catch (eI) { updatePauseLabel(false); }
-          btn.addEventListener('click', function () {
-            setPaused(!wrap.classList.contains('site-header__tickers--paused'));
-          });
-          window.addEventListener('iif-lang-change', function () {
-            updatePauseLabel(wrap.classList.contains('site-header__tickers--paused'));
-          });
-        })();
-        var selAsian = document.getElementById('iif-ticker-country-asian');
-        if (selAsian) selAsian.addEventListener('change', function () {
-          try { localStorage.setItem(LS_ASIAN, this.value || ''); } catch (e) { }
-          if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
-        });
-        var selArab = document.getElementById('iif-ticker-country-arab');
-        if (selArab) selArab.addEventListener('change', function () {
-          try { localStorage.setItem(LS_ARAB, this.value || ''); } catch (e) { }
-          if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
-        });
-        function escapeHtml(s) { return String(s).replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
-        function tickerDisplayTitles(item) {
-          var fb = item.title || '';
-          var te = item.titleEn;
-          var ta = item.titleAr;
-          var hasEn = te != null && String(te).trim().length > 0;
-          var hasAr = ta != null && String(ta).trim().length > 0;
-          return {
-            titleEn: hasEn ? String(te).trim() : (hasAr ? String(ta).trim() : fb),
-            titleAr: hasAr ? String(ta).trim() : (hasEn ? String(te).trim() : fb)
-          };
-        }
-        function renderTickerBilingual(items, copy1, copy2) {
-          var html = '';
-          if (!items || items.length === 0) {
-            var placeEn = escapeHtml('No items at the moment.');
-            var placeAr = escapeHtml('لا توجد عناصر حالياً.');
-            html = '<span class="ticker-item" style="pointer-events:none;"><span class="lang-en">' + placeEn + '</span><span class="lang-ar">' + placeAr + '</span></span>';
-          } else {
-            items.forEach(function (item) {
-              var link = (item.link || '#').replace(/"/g, '&quot;');
-              var dt = tickerDisplayTitles(item);
-              var titleEn = escapeHtml(dt.titleEn);
-              var titleAr = escapeHtml(dt.titleAr);
-              var src = (item.source) ? ' <span>' + escapeHtml(item.source) + '</span>' : '';
-              html += '<a href="' + link + '" target="_blank" rel="noopener noreferrer" class="ticker-item"><span class="lang-en">' + titleEn + '</span><span class="lang-ar">' + titleAr + '</span>' + src + '</a>';
-            });
-          }
-          if (copy1) copy1.innerHTML = html || '';
-          if (copy2) copy2.innerHTML = html || '';
-          if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
-        }
-        function loadCat(cat, copy1, copy2) {
-          if (!copy1 || !copy2) return;
-          var base = (typeof window !== 'undefined' && window.IIF_FUNCS_BASE && window.IIF_FUNCS_BASE.trim()) ? window.IIF_FUNCS_BASE.trim() : '';
-          if (!base && document.querySelector) { var meta = document.querySelector('meta[name="iif-funcs-base"]'); base = (meta && meta.getAttribute('content')) ? meta.getAttribute('content').trim() : ''; }
-          base = typeof ensureHttpsUrl === 'function' ? ensureHttpsUrl(base) : base;
-          try {
-            if (typeof location !== 'undefined' && location.hostname === '127.0.0.1' && String(location.port || '') === '3333') base = '';
-          } catch (eLoc) { }
-          var docLangTicker = (document.documentElement.getAttribute('data-lang') || 'en').toLowerCase().trim() || 'en';
-          var qs = '?lang=' + encodeURIComponent(docLangTicker) + '&cat=' + encodeURIComponent(cat);
-          var cc = getCountryForCat(cat);
-          if (cc) qs += '&country=' + encodeURIComponent(cc);
-          var api = (base ? base : '') + (typeof IIF_FUNCS_PREFIX !== 'undefined' ? IIF_FUNCS_PREFIX : '/api') + '/news' + qs;
-          fetch(api).then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('')); }).then(function (data) {
-            var items = (data && data.items && data.items.length) ? data.items : [];
-            var slice = items.slice(0, 20);
-            if (!slice.length) return;
-            var bilingual = slice.map(function (it) {
-              return { title: it.title, titleEn: it.titleEn, titleAr: it.titleAr, link: it.link, source: it.source };
-            });
-            renderTickerBilingual(bilingual, copy1, copy2);
-          }).catch(function () { });
-        }
-        function reload() {
-          if (copyAsian && copyAsian2) loadCat('asian', copyAsian, copyAsian2);
-          if (copyArab && copyArab2) loadCat('arabic', copyArab, copyArab2);
-        }
-        reload();
-        window.IIF_reloadTickers = reload;
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
-          });
-        });
-      })();
     })();
 
-  </script>
-
-  <!-- قفل ملء الشفّافة: يُحمّل بعد كل الأنماط في <head> فيفوق التعارضات -->
-  <style id="iif-dashboard-fullpage-lock">
-    #dashboard-overlay.dashboard-overlay.is-open,
-    html.iif-dashboard-open #dashboard-overlay.dashboard-overlay.is-open {
-      position: fixed !important;
-      inset: 0 !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
-      min-width: 100vw !important;
-      max-width: none !important;
-      min-height: 100vh !important;
-      min-height: 100dvh !important;
-      height: 100vh !important;
-      height: 100dvh !important;
-      max-height: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      transform: none !important;
-      box-sizing: border-box !important;
-      z-index: 2147483647 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      justify-content: flex-start !important;
-      background-color: #070a10 !important;
-      background: linear-gradient(165deg, #03050a 0%, #0b1018 38%, #070a10 100%) !important;
-    }
-
-    /* بعد نقل اللوحة لآخر body: إخفاء #main-content لا يعمل بـ ~ — استخدم :has */
-    body:has(#dashboard-overlay.is-open) #main-content {
-      display: none !important;
-    }
-
-    html.iif-dashboard-open body::before,
-    html.iif-admin-embed body::before {
-      opacity: 0 !important;
-      visibility: hidden !important;
-    }
-
-    html.iif-dashboard-open,
-    html.iif-dashboard-open body,
-    html.iif-admin-embed:has(#dashboard-overlay.is-open),
-    html.iif-admin-embed:has(#dashboard-overlay.is-open) body {
-      transform: none !important;
-      filter: none !important;
-      perspective: none !important;
-      contain: none !important;
-    }
-
-    #dashboard-overlay.is-open #dashboard-page-shell.dashboard-page-shell {
-      width: 100% !important;
-      min-width: 100% !important;
-      max-width: none !important;
-      flex: 1 1 auto !important;
-      min-height: 100vh !important;
-      min-height: 100dvh !important;
-      height: auto !important;
-      margin: 0 !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      box-sizing: border-box !important;
-    }
-
-    #dashboard-overlay.is-open .dashboard-header-bar {
-      width: 100% !important;
-      max-width: none !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      box-sizing: border-box !important;
-    }
-
-    #dashboard-overlay.is-open .dashboard-main {
-      max-width: none !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-      padding-left: max(var(--space-4), env(safe-area-inset-left)) !important;
-      padding-right: max(var(--space-4), env(safe-area-inset-right)) !important;
-    }
-
-    /* شريط العنوان داخل اللوحة — بعرض الشاشة بالكامل */
-    #dashboard-overlay.is-open .dashboard-header-bar .site-header__inner {
-      max-width: none !important;
-      width: 100% !important;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      box-sizing: border-box !important;
-    }
-
-    /* إخفاء كل محتوى الصفحة خلف اللوحة عند الفتح — لا يبقى هيدر/محتوى ظاهراً كخلفية */
-    body:has(#dashboard-overlay.is-open)>*:not(#dashboard-overlay):not(script) {
-      display: none !important;
-    }
-
-    /* بدون :has() — Safari/متصفحات قديمة؛ الصنف iif-dashboard-open يُضاف مع فتح اللوحة فقط */
-    html.iif-dashboard-open body>*:not(#dashboard-overlay):not(script) {
-      display: none !important;
-    }
-  </style>
-
-  <script nonce="iif2026">
-    (function () {
-      function syncDashboardScrollOffsetsImpl() {
-        try {
-          var dash = document.getElementById('dashboard-overlay');
-          var bar = dash && dash.querySelector('.dashboard-header-bar');
-          if (!dash || !bar || !dash.classList.contains('is-open')) return;
-          var dst = window.getComputedStyle(dash);
-          if (dst.display === 'none' || dst.visibility === 'hidden') return;
-          var br = bar.getBoundingClientRect();
-          var h = Math.ceil(br.height);
-          if (h >= 40) dash.style.setProperty('--dash-header-height', h + 'px');
-          var cr = dash.getBoundingClientRect();
-          var toc = dash.querySelector('#dashboard-toc-nav, .dashboard-toc');
-          var stickyBottom = br.bottom;
-          if (toc) {
-            var tcs = window.getComputedStyle(toc);
-            var tr = toc.getBoundingClientRect();
-            if (tcs.display !== 'none' && tcs.visibility !== 'hidden' && tr.height >= 4) {
-              stickyBottom = Math.max(stickyBottom, tr.bottom);
-            }
-          }
-          var gapPx = 12;
-          var inset = Math.max(48, Math.ceil(stickyBottom - cr.top) + gapPx);
-          dash.style.setProperty('--dash-scroll-inset', inset + 'px');
-        } catch (eDash) { }
-      }
-      function run() {
-        requestAnimationFrame(syncDashboardScrollOffsetsImpl);
-      }
-      try {
-        window.IIF_syncDashboardScrollOffsets = syncDashboardScrollOffsetsImpl;
-      } catch (eEx) { }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', run);
-      } else {
-        run();
-      }
-      window.addEventListener('resize', run);
-      window.addEventListener('load', run);
-      try {
-        var dashEl = document.getElementById('dashboard-overlay');
-        var dashBar = dashEl && dashEl.querySelector('.dashboard-header-bar');
-        if (dashBar && typeof ResizeObserver !== 'undefined') {
-          new ResizeObserver(run).observe(dashBar);
-        }
-        var dashToc = dashEl && dashEl.querySelector('#dashboard-toc-nav, .dashboard-toc');
-        if (dashToc && typeof ResizeObserver !== 'undefined') {
-          new ResizeObserver(run).observe(dashToc);
-        }
-      } catch (eRO) { }
-    })();
-  </script>
-
-</body>
-
-</html>

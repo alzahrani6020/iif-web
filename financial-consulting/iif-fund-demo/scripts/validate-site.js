@@ -9,6 +9,7 @@ var path = require('path');
 
 var root = path.join(__dirname, '..');
 var indexPath = path.join(root, 'index.html');
+var appBundlePath = path.join(root, 'js', 'iif-index-app-bundle.js');
 var errors = [];
 var warnings = [];
 
@@ -19,6 +20,18 @@ function readIndex() {
     errors.push('لا يمكن قراءة index.html: ' + e.message);
     return '';
   }
+}
+
+/** نص للبحث عن رموز JS بعد نقل المنطق من inline إلى ملفات الحزمة */
+function readAppBundleSlice() {
+  try {
+    if (fs.existsSync(appBundlePath)) {
+      return fs.readFileSync(appBundlePath, 'utf8');
+    }
+  } catch (e) {
+    warnings.push('تعذّر قراءة js/iif-index-app-bundle.js: ' + e.message);
+  }
+  return '';
 }
 
 function checkHttpsMeta(html) {
@@ -63,12 +76,14 @@ function checkEnsureHttpsUrl(html) {
 }
 
 var html = readIndex();
+var bundleJs = readAppBundleSlice();
+var htmlPlusApp = html + '\n' + bundleJs;
 if (html) {
   checkHttpsMeta(html);
   checkFormActions(html);
-  checkProactiveRefresh(html);
+  checkProactiveRefresh(htmlPlusApp);
   checkHttpsWarning(html);
-  checkEnsureHttpsUrl(html);
+  checkEnsureHttpsUrl(htmlPlusApp);
 }
 
 if (errors.length) {

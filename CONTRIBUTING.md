@@ -73,7 +73,7 @@ $env:EXTERNAL_URL_STRICT='1'; node scripts/maintenance-full-audit.mjs --external
 | الفحص | الوصف |
 |--------|--------|
 | **`CI / verify`** | `npm ci` في الجذر، ثم `npm run verify`، `maintenance-full-audit`، مزامنة حزم i18n، `check:deploy`، تدقيق SearX، و`check-i18n-keys --strict`. |
-| **`CI / IIF public site (anchors + Playwright + a11y)`** | بعد نجاح `verify`: في `financial-consulting/iif-fund-demo` يُشغَّل `npm run test:site` (مراسي ثابتة، E2E، وaxe محدود النطاق على `#trust-entry` و`#contact`). |
+| **`CI / IIF public site (anchors + Playwright + a11y)`** | بعد نجاح `verify`: في `financial-consulting/iif-fund-demo` يُشغَّل `npm run test:site` (مراسي ثابتة، E2E، وaxe محدود النطاق على `#trust-entry` و`#contact` و`#partners-trust`). |
 
 تشغيل محلي مكافئ لاختبارات موقع الصندوق (من جذر المستودع):
 
@@ -89,3 +89,7 @@ npm run test:site
 ```
 
 متغيرات مفيدة: `SKIP_PLAYWRIGHT_INSTALL=1` عند `npm ci` إن كنت تثبّت المتصفحات يدوياً؛ `PLAYWRIGHT_BASE_URL` لتوجيه E2E نحو خادم محلي غير الافتراضي (انظر `playwright.config.cjs`).
+
+**حماية الفرع `main`:** اضبط فحصين مطلوبين كما في [docs/BRANCH-PROTECTION.md](./docs/BRANCH-PROTECTION.md).
+
+**Lighthouse (إعلامي):** سير العمل [`.github/workflows/lighthouse-scheduled.yml`](./.github/workflows/lighthouse-scheduled.yml) يشغّل تقريراً شهرياً على URL نشر GitHub Pages ويرفع `reports/lh-latest.html` كـ artifact — لا يُشترط لدمج PR.

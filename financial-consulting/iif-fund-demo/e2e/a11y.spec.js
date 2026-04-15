@@ -1,5 +1,5 @@
 /**
- * E2E: فحص إتاحة محدود (axe) على قسم الثقة — ليس تدقيقاً كاملاً للصفحة الضخمة.
+ * E2E: فحص إتاحة محدود (axe) على أقسام مختارة — ليس تدقيقاً كاملاً للصفحة الضخمة.
  */
 'use strict';
 
@@ -31,6 +31,24 @@ test.describe('Accessibility (axe)', function () {
 
     var results = await new AxeBuilder({ page })
       .include('#contact')
+      .disableRules(['color-contrast'])
+      .analyze();
+
+    var critical = results.violations.filter(function (v) {
+      return v.impact === 'critical';
+    });
+    expect(
+      critical,
+      critical.length ? JSON.stringify(critical, null, 2) : ''
+    ).toHaveLength(0);
+  });
+
+  test('partners-trust: no critical axe violations (scoped)', async function ({ page }) {
+    await page.goto('/index.html#partners-trust', { waitUntil: 'domcontentloaded' });
+    await page.locator('#partners-trust').waitFor({ state: 'visible', timeout: 30 * 1000 });
+
+    var results = await new AxeBuilder({ page })
+      .include('#partners-trust')
       .disableRules(['color-contrast'])
       .analyze();
 
