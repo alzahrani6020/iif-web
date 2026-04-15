@@ -64,6 +64,27 @@
     })();
   </script>
   <script>
+    /* تثبيت اللغة/الاتجاه مبكراً لتجنب وميض RTL/LTR عند ?lang=ar */
+    (function () {
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var qLang = (params.get('lang') || '').trim().toLowerCase();
+        if (!qLang) return;
+        var html = document.documentElement;
+        if (!html) return;
+        if (qLang === 'ar') {
+          html.setAttribute('lang', 'ar');
+          html.setAttribute('dir', 'rtl');
+          html.setAttribute('data-lang', 'ar');
+        } else if (qLang === 'en') {
+          html.setAttribute('lang', 'en');
+          html.setAttribute('dir', 'ltr');
+          html.setAttribute('data-lang', 'en');
+        }
+      } catch (e) { }
+    })();
+  </script>
+  <script>
     /* إذا فتح المستخدم index.html كملف محلي عبر file:// فلن تعمل مسارات dev-server ولا اختصارات الأدمن.
        نحول تلقائياً إلى خادم التطوير على 3333 لتكون السلوكيات ثابتة. */
     try {
@@ -85,13 +106,17 @@
   <meta property="og:title" content="International Investment Fund · IIF · Paris" />
   <meta property="og:description"
     content="International Investment Fund (IIF), Paris — institutional project finance, sovereign & government capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed France & USA." />
+  <meta property="og:url" content="https://iiffund.com/financial-consulting/iif-fund-demo/index.html" />
+  <meta property="og:image" content="https://iiffund.com/financial-consulting/iif-fund-demo/assets/emblem.jpg" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="International Investment Fund · IIF · Paris" />
   <meta name="twitter:description"
     content="Institutional project finance, sovereign capital, BOT & feasibility. EU Transparency Register; licensed France & USA. Investors & governments." />
+  <meta name="twitter:url" content="https://iiffund.com/financial-consulting/iif-fund-demo/index.html" />
+  <meta name="twitter:image" content="https://iiffund.com/financial-consulting/iif-fund-demo/assets/emblem.jpg" />
   <!-- عند النشر: عنوان GitHub Pages (يُستخدم لـ hreflang و SEO) -->
-  <link rel="canonical" href="https://alzahrani6020.github.io/iif-web/" />
+  <link rel="canonical" href="https://iiffund.com/financial-consulting/iif-fund-demo/index.html" />
   <meta name="iif-funcs-base" content="https://iif-fund-dr-talal.vercel.app" />
   <script type="application/ld+json">
   {
@@ -100,8 +125,8 @@
     "name": "International Investment Fund",
     "alternateName": ["IIF", "FII"],
     "description": "International economic and financial organization — institutional project finance, sovereign and government-aligned capital, BOT coordination, feasibility studies, mediation and governance. EU Transparency Register; licensed in France and the United States.",
-    "url": "https://alzahrani6020.github.io/iif-web/",
-    "logo": "https://alzahrani6020.github.io/iif-web/assets/emblem.jpg",
+    "url": "https://iiffund.com/financial-consulting/iif-fund-demo/index.html",
+    "logo": "https://iiffund.com/financial-consulting/iif-fund-demo/assets/emblem.jpg",
     "areaServed": "Worldwide",
     "knowsAbout": ["Project finance", "BOT", "Government PPP", "Feasibility studies", "Institutional investment", "Sovereign finance", "Investor relations", "KYC", "AML compliance"]
   }
@@ -112,12 +137,12 @@
     "@type": "WebPage",
     "name": "International Investment Fund · IIF · Paris",
     "description": "International Investment Fund (IIF), Paris — institutional project finance, sovereign & government-aligned capital, BOT coordination, feasibility studies, mediation & governance. EU Transparency Register; licensed in France & USA.",
-    "url": "https://alzahrani6020.github.io/iif-web/",
+    "url": "https://iiffund.com/financial-consulting/iif-fund-demo/index.html",
     "inLanguage": "en",
     "isPartOf": {
       "@type": "WebSite",
       "name": "International Investment Fund",
-      "url": "https://alzahrani6020.github.io/iif-web/"
+      "url": "https://iiffund.com/"
     },
     "about": {
       "@type": "Thing",
@@ -856,6 +881,64 @@
       .iif-section-links-toggle:hover,
       .iif-header-toolbar-panel .site-header__auth-btn:hover {
         transform: none;
+      }
+    }
+
+    /* Mobile header compaction (prevents ticker/toolbar collisions) */
+    @media (max-width: 720px) {
+      .site-header__inner {
+        padding: 0.45rem var(--space-3) 0.4rem;
+        gap: var(--space-3);
+      }
+
+      .iif-header-primary-bar {
+        padding: 0.42rem 0.55rem;
+        gap: 0.4rem 0.5rem;
+        border-radius: 12px;
+      }
+
+      .site-logo__emblem {
+        width: 44px;
+        height: 44px;
+      }
+
+      .site-logo__title {
+        font-size: 0.95rem;
+        letter-spacing: 0.08em;
+      }
+
+      .site-logo__subtitle {
+        font-size: 0.7rem;
+      }
+
+      .site-header__clock-lang {
+        flex: 1 1 100%;
+        min-width: 0;
+      }
+
+      .iif-header-toolbar-panel {
+        flex: 1 1 100%;
+        min-width: 0;
+        justify-content: space-between;
+      }
+
+      .iif-header-brand-account {
+        width: 100%;
+        margin-inline-start: 0;
+        justify-content: space-between;
+      }
+
+      .ticker-toolbar {
+        padding: 0.35rem 0.5rem 0.45rem;
+        gap: 0.35rem 0.55rem;
+      }
+
+      .ticker-toolbar .btn--ticker-pause {
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+        flex: 1 1 100%;
+        width: 100%;
+        justify-content: center;
       }
     }
 
@@ -4378,6 +4461,17 @@
       display: block !important;
     }
 
+    /* Ticker bilingual mode (opt-in): show both language spans in tickers */
+    html[data-iif-ticker-bilingual="1"] .site-header__tickers .ticker-item .lang-en,
+    html[data-iif-ticker-bilingual="1"] .site-header__tickers .ticker-item .lang-ar {
+      display: inline !important;
+    }
+
+    html[data-iif-ticker-bilingual="1"] .site-header__tickers .ticker-item .lang-en::after {
+      content: " · ";
+      opacity: 0.7;
+    }
+
     /* Language picker (50+ languages) — خلفية فاتحة وكتابة سوداء */
     .lang-picker-wrap {
       position: relative;
@@ -5600,7 +5694,7 @@
     .ticker-track {
       display: flex;
       width: max-content;
-      animation: ticker-marquee 120s linear infinite;
+      animation: ticker-marquee var(--iif-ticker-duration, 120s) linear infinite;
       will-change: transform;
       backface-visibility: hidden;
     }
@@ -10272,6 +10366,10 @@
     <div class="site-header__tickers">
       <div class="ticker-toolbar" role="toolbar" aria-label="Ticker options">
         <button type="button" class="btn btn--ghost btn-sm btn--ticker-pause" id="iif-ticker-motion-toggle" aria-pressed="false" data-i18n="tickerMotionPause">Pause tickers</button>
+        <label style="display:inline-flex; align-items:center; gap:0.4rem;">
+          <input type="checkbox" id="iif-ticker-bilingual" />
+          <span data-i18n="tickerBilingualToggle">Bilingual</span>
+        </label>
         <label><span data-i18n="tickerFilterAsia">Asia focus</span>
           <select id="iif-ticker-country-asian" title="Asian markets region" aria-label="Asian markets region">
             <option value="" data-i18n="tickerCountryAll">All</option>
@@ -10712,9 +10810,16 @@
           <div class="form-group">
             <label class="auth-checkbox-label">
               <input type="checkbox" id="login-trust-device" checked />
-              <span data-i18n="authTrustDevice">Trust this device for quick sign-in later</span>
+              <span data-i18n="authTrustDevice">Remember me on this device</span>
             </label>
+            <div class="auth-form-hint" style="margin-top: 0.4rem; font-size: 0.78rem; color: var(--color-text-muted);">
+              <span data-i18n="authTrustDeviceHint">If unchecked, you’ll be signed out when the browser closes.</span>
+            </div>
           </div>
+          <button type="button" class="btn btn--ghost btn-sm" id="auth-session-diagnostics"
+            style="margin-top: 0.35rem; width: 100%; justify-content: center;">
+            <span data-i18n="authSessionDiagnostics">Session diagnostics</span>
+          </button>
           <button type="submit" class="btn btn--primary"><span data-i18n="btnSignIn">Sign in</span></button>
           <div class="auth-recovery-hint" id="login-recovery-hint"
             style="display:none; margin-top: var(--space-4); padding: var(--space-3); background: rgba(201, 162, 39, 0.08); border-radius: var(--radius); border: 1px solid rgba(201, 162, 39, 0.25);">
@@ -18222,12 +18327,27 @@ Generated: ${new Date().toLocaleString()}
         var p = iifTextPair(key, fallbackEn, fallbackAr);
         return '<span class="lang-en">' + escapeHtml(p.en) + '</span><span class="lang-ar">' + escapeHtml(p.ar) + '</span>';
       }
-      function setLoggedIn(value) {
-        try { localStorage.setItem('iif-logged-in', value ? '1' : ''); } catch (e) { }
+      function setLoggedIn(value, opts) {
+        opts = opts || {};
+        var v = value ? '1' : '';
+        var persist = opts.persist !== false; // default: persist in localStorage
+        try {
+          if (persist) localStorage.setItem('iif-logged-in', v);
+          else sessionStorage.setItem('iif-logged-in', v);
+        } catch (e) { }
+        try {
+          if (value) {
+            if (persist) sessionStorage.removeItem('iif-logged-in');
+            else localStorage.removeItem('iif-logged-in');
+          } else {
+            localStorage.removeItem('iif-logged-in');
+            sessionStorage.removeItem('iif-logged-in');
+          }
+        } catch (e2) { }
       }
       function isLoggedIn() {
         try {
-          var loggedIn = localStorage.getItem('iif-logged-in') === '1';
+          var loggedIn = localStorage.getItem('iif-logged-in') === '1' || sessionStorage.getItem('iif-logged-in') === '1';
           if (loggedIn) return true;
           /* /admin-direct وغيره: قد يُضبط iif-is-admin مع البريد دون اكتمال مسار iif-logged-in */
           if (localStorage.getItem('iif-is-admin') === '1' && (localStorage.getItem('iif-user-email') || '').trim()) return true;
@@ -18237,7 +18357,7 @@ Generated: ${new Date().toLocaleString()}
           if (email && typeof iifAuthEmailKey === 'function') {
             try {
               if (iifAuthEmailKey(email) === iifAuthEmailKey(ownerEmail)) {
-                setLoggedIn(true);
+                setLoggedIn(true, { persist: true });
                 var uiDelay = (window.IIF_TIMING && window.IIF_TIMING.ui) || 100;
                 setTimeout(function () {
                   if (typeof updateAuthUI === 'function') updateAuthUI();
@@ -18250,7 +18370,7 @@ Generated: ${new Date().toLocaleString()}
           return false;
         } catch (e) {
           try {
-            return localStorage.getItem('iif-logged-in') === '1' || (localStorage.getItem('iif-is-admin') === '1' && !!(localStorage.getItem('iif-user-email') || '').trim());
+            return localStorage.getItem('iif-logged-in') === '1' || sessionStorage.getItem('iif-logged-in') === '1' || (localStorage.getItem('iif-is-admin') === '1' && !!(localStorage.getItem('iif-user-email') || '').trim());
           } catch (e2) {
             return false;
           }
@@ -20100,8 +20220,12 @@ Generated: ${new Date().toLocaleString()}
         try {
           if (window.IIF_SECURE_STORAGE && typeof window.IIF_SECURE_STORAGE.clearSecure === 'function') window.IIF_SECURE_STORAGE.clearSecure();
           localStorage.removeItem('iif-logged-in');
+          sessionStorage.removeItem('iif-logged-in');
           localStorage.removeItem('iif-is-admin');
           localStorage.removeItem('iif-device-fingerprint');
+          localStorage.removeItem('iif-device-bound-email');
+          localStorage.removeItem('iif-user-email');
+          localStorage.removeItem('iif-user-name');
         } catch (e) { }
         if (typeof closeServicePage === 'function') closeServicePage();
 
@@ -20333,7 +20457,8 @@ Generated: ${new Date().toLocaleString()}
           return;
         }
         try {
-          setLoggedIn(true);
+          var shouldPersist = opts.trustDevice !== false;
+          setLoggedIn(true, { persist: shouldPersist });
           setAdminByEmail(loginEmail);
           localStorage.setItem('iif-user-email', loginEmail);
           if (opts.trustDevice !== false) {
@@ -23585,8 +23710,43 @@ Generated: ${new Date().toLocaleString()}
       }
       document.querySelectorAll('.protected-results').forEach(function (el) {
         if (!el) return;
-        el.addEventListener('contextmenu', function (e) { if (!isAdmin()) e.preventDefault(); });
-        el.addEventListener('copy', function (e) { if (!isAdmin()) e.preventDefault(); });
+        function allowCopyTarget(t) {
+          try {
+            if (!t) return false;
+            var tag = (t.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea') return true;
+            if (t.isContentEditable) return true;
+            if (t.closest && t.closest('a[href]')) return true; // allow copying links
+            return false;
+          } catch (eAllow) { return false; }
+        }
+        function allowCopySelection() {
+          try {
+            var sel = (window.getSelection && window.getSelection()) ? String(window.getSelection().toString() || '') : '';
+            sel = sel.trim();
+            if (!sel) return false;
+            // Allow copying link-like snippets (URL or common page/path tokens) without unlocking full protected content.
+            if (sel.length > 260) return false;
+            if (/^https?:\/\//i.test(sel)) return true;
+            if (/^www\./i.test(sel)) return true;
+            if (/[A-Za-z0-9.-]+\.[A-Za-z]{2,}(\/\S*)?/i.test(sel)) return true;
+            if (/(^|\/)[\w.-]+\.html?(\\?|#|$)/i.test(sel)) return true;
+            if (/financial-consulting\/iif-fund-demo/i.test(sel)) return true;
+            return false;
+          } catch (eSel) { return false; }
+        }
+        el.addEventListener('contextmenu', function (e) {
+          if (isAdmin()) return;
+          if (allowCopyTarget(e && e.target)) return;
+          if (allowCopySelection()) return;
+          e.preventDefault();
+        });
+        el.addEventListener('copy', function (e) {
+          if (isAdmin()) return;
+          if (allowCopyTarget(e && e.target)) return;
+          if (allowCopySelection()) return;
+          e.preventDefault();
+        });
       });
       function updateAdminBodyClass() {
         try {
@@ -27686,6 +27846,61 @@ Generated: ${new Date().toLocaleString()}
           if (typeof updateDashboardNav === 'function') updateDashboardNav();
         } catch (e) { }
       }
+
+      /* Diagnostics: quick view of session keys (for support/dev) */
+      (function bindSessionDiagnostics() {
+        function safeGet(k) {
+          try { return localStorage.getItem(k); } catch (e) { return null; }
+        }
+        function safeGetS(k) {
+          try { return sessionStorage.getItem(k); } catch (e) { return null; }
+        }
+        function fmt(v) {
+          if (v == null) return '∅';
+          if (v === '') return '""';
+          if (String(v).length > 160) return String(v).slice(0, 160) + '…';
+          return String(v);
+        }
+        function show() {
+          var lines = [];
+          lines.push('Session diagnostics');
+          lines.push('—');
+          lines.push('iif-logged-in (local): ' + fmt(safeGet('iif-logged-in')));
+          lines.push('iif-logged-in (session): ' + fmt(safeGetS('iif-logged-in')));
+          lines.push('iif-user-email: ' + fmt(safeGet('iif-user-email')));
+          lines.push('iif-user-name: ' + fmt(safeGet('iif-user-name')));
+          lines.push('iif-is-admin: ' + fmt(safeGet('iif-is-admin')));
+          lines.push('iif-device-bound-email: ' + fmt(safeGet('iif-device-bound-email')));
+          lines.push('iif-device-fingerprint: ' + fmt(safeGet('iif-device-fingerprint')));
+          lines.push('iif-token: ' + fmt(safeGet('iif-token')));
+          lines.push('iif-user: ' + fmt(safeGet('iif-user')));
+          alert(lines.join('\n'));
+        }
+        document.addEventListener('keydown', function (e) {
+          try {
+            if (!e) return;
+            if (!e.altKey || !e.shiftKey) return;
+            var k = String(e.key || '').toLowerCase();
+            if (k !== 's') return;
+            e.preventDefault();
+            show();
+          } catch (e2) { }
+        });
+        // Optional: expose for support
+        try { window.IIF_showSessionDiagnostics = show; } catch (e3) { }
+      })();
+
+      (function bindSessionDiagnosticsButton() {
+        try {
+          var btn = document.getElementById('auth-session-diagnostics');
+          if (!btn) return;
+          btn.addEventListener('click', function () {
+            try {
+              if (typeof window.IIF_showSessionDiagnostics === 'function') window.IIF_showSessionDiagnostics();
+            } catch (e) { }
+          });
+        } catch (e2) { }
+      })();
       /** بعد اكتمال التخزين الآمن واستعادة الجلسة: افتح اللوحة إن طُلب open_dashboard ولم يفتح المؤقت المبكر */
       function iifTryPendingDashboardAfterSecureInit() {
         try {
@@ -28819,7 +29034,7 @@ Generated: ${new Date().toLocaleString()}
             return new URL('assets/emblem.jpg', window.location.origin + window.IIF_DOCUMENT_BASE).href;
           }
         } catch (e2) { }
-        return 'https://alzahrani6020.github.io/iif-web/assets/emblem.jpg';
+        return 'https://iiffund.com/financial-consulting/iif-fund-demo/assets/emblem.jpg';
       })();
       var videoCallJitsiApi = null;
       function createJitsiMeetingInContainer(container, iframe, roomName, jitsiUrl) {
@@ -30120,6 +30335,7 @@ Generated: ${new Date().toLocaleString()}
         var LS_ASIAN = 'iif-ticker-country-asian';
         var LS_ARAB = 'iif-ticker-country-arab';
         var LS_PAUSED = 'iif-ticker-paused';
+        var LS_BILINGUAL = 'iif-ticker-bilingual';
         var copyAsian = document.getElementById('ticker-asian-copy');
         var copyAsian2 = document.getElementById('ticker-asian-copy2');
         var copyArab = document.getElementById('ticker-arab-copy');
@@ -30138,6 +30354,25 @@ Generated: ${new Date().toLocaleString()}
           } catch (eR) { }
         }
         restoreTickerCountries();
+        (function initTickerBilingualToggle() {
+          try {
+            var cb = document.getElementById('iif-ticker-bilingual');
+            if (!cb) return;
+            var on = false;
+            try { on = localStorage.getItem(LS_BILINGUAL) === '1'; } catch (e) { }
+            if (on) document.documentElement.setAttribute('data-iif-ticker-bilingual', '1');
+            cb.checked = !!on;
+            cb.addEventListener('change', function () {
+              var v = !!cb.checked;
+              try {
+                if (v) document.documentElement.setAttribute('data-iif-ticker-bilingual', '1');
+                else document.documentElement.removeAttribute('data-iif-ticker-bilingual');
+              } catch (e2) { }
+              try { localStorage.setItem(LS_BILINGUAL, v ? '1' : '0'); } catch (e3) { }
+              try { if (typeof window.IIF_applyTickerDurations === 'function') window.IIF_applyTickerDurations(); } catch (e4) { }
+            });
+          } catch (e0) { }
+        })();
         function getCountryForCat(cat) {
           try {
             if (cat === 'asian') {
@@ -30167,22 +30402,69 @@ Generated: ${new Date().toLocaleString()}
             } catch (eL) { }
             btn.textContent = paused ? 'Resume' : 'Pause';
           }
-          function setPaused(on) {
+          function setPaused(on, opts) {
+            opts = opts || {};
+            var persist = opts.persist !== false; // default: persist
             wrap.classList.toggle('site-header__tickers--paused', on);
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            try { localStorage.setItem(LS_PAUSED, on ? '1' : '0'); } catch (eP) { }
+            if (persist) { try { localStorage.setItem(LS_PAUSED, on ? '1' : '0'); } catch (eP) { } }
             updatePauseLabel(on);
           }
           try {
-            if (localStorage.getItem(LS_PAUSED) === '1') setPaused(true);
-            else updatePauseLabel(false);
+            var stored = localStorage.getItem(LS_PAUSED);
+            if (stored === '1') setPaused(true, { persist: true });
+            else if (stored === '0') setPaused(false, { persist: true });
+            else {
+              var isMobile = false;
+              try { isMobile = window.matchMedia && window.matchMedia('(max-width: 720px)').matches; } catch (eM) { }
+              var reduce = false;
+              try { reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (eR) { }
+              if (isMobile || reduce) setPaused(true, { persist: false }); // default pause on mobile unless user chose otherwise
+              else updatePauseLabel(false);
+            }
           } catch (eI) { updatePauseLabel(false); }
           btn.addEventListener('click', function () {
-            setPaused(!wrap.classList.contains('site-header__tickers--paused'));
+            setPaused(!wrap.classList.contains('site-header__tickers--paused'), { persist: true });
           });
           window.addEventListener('iif-lang-change', function () {
             updatePauseLabel(wrap.classList.contains('site-header__tickers--paused'));
+            try { if (typeof window.IIF_applyTickerDurations === 'function') window.IIF_applyTickerDurations(); } catch (e) { }
           });
+
+          // Mobile UX: pause tickers while the user interacts (read/copy/click).
+          (function bindPauseOnTouch() {
+            var timer = 0;
+            function pauseTemporarily(ms) {
+              try {
+                if (wrap.classList.contains('site-header__tickers--paused')) return; // user explicitly paused
+                setPaused(true, { persist: false });
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                  try { setPaused(false, { persist: false }); } catch (e2) { }
+                }, Math.max(600, ms | 0));
+              } catch (e) { }
+            }
+            function isInsideTicker(el) {
+              try { return !!(el && el.closest && el.closest('.site-header__tickers')); } catch (e) { return false; }
+            }
+            // Pointer/touch interactions
+            wrap.addEventListener('pointerdown', function (e) {
+              if (!isInsideTicker(e && e.target)) return;
+              pauseTemporarily(9000);
+            }, { passive: true });
+            wrap.addEventListener('touchstart', function () { pauseTemporarily(9000); }, { passive: true });
+            wrap.addEventListener('touchmove', function () { pauseTemporarily(9000); }, { passive: true });
+            wrap.addEventListener('mouseenter', function () { pauseTemporarily(4500); });
+            wrap.addEventListener('mouseleave', function () {
+              try {
+                if (wrap.classList.contains('site-header__tickers--paused')) return;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                  try { setPaused(false, { persist: false }); } catch (e2) { }
+                }, 250);
+              } catch (e) { }
+            });
+          })();
         })();
         var selAsian = document.getElementById('iif-ticker-country-asian');
         if (selAsian) selAsian.addEventListener('change', function () {
@@ -30195,6 +30477,30 @@ Generated: ${new Date().toLocaleString()}
           if (typeof window.IIF_reloadTickers === 'function') window.IIF_reloadTickers();
         });
         function escapeHtml(s) { return String(s).replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+        function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+        function ensureRepeatCopies(copy1, copy2) {
+          try {
+            if (!copy1 || !copy2) return;
+            if (!String(copy2.innerHTML || '').trim()) copy2.innerHTML = copy1.innerHTML || '';
+          } catch (e) { }
+        }
+        function applyTickerDuration(trackId) {
+          try {
+            var track = document.getElementById(trackId);
+            if (!track) return;
+            var w = track.scrollWidth || 0;
+            if (!w) return;
+            // ~26 px/sec target (slower) → seconds = width / 26. Clamp to sane bounds.
+            var seconds = clamp(Math.round(w / 26), 90, 260);
+            track.style.setProperty('--iif-ticker-duration', seconds + 's');
+          } catch (e) { }
+        }
+        function applyAllTickerDurations() {
+          applyTickerDuration('ticker-track');
+          applyTickerDuration('ticker-asian-track');
+          applyTickerDuration('ticker-arab-track');
+        }
+        try { window.IIF_applyTickerDurations = applyAllTickerDurations; } catch (e) { }
         function tickerDisplayTitles(item) {
           var fb = item.title || '';
           var te = item.titleEn;
@@ -30229,7 +30535,9 @@ Generated: ${new Date().toLocaleString()}
           }
           if (copy1) copy1.innerHTML = html || '';
           if (copy2) copy2.innerHTML = html || '';
+          ensureRepeatCopies(copy1, copy2);
           if (typeof window.IIF_restartTickerMarquees === 'function') window.IIF_restartTickerMarquees();
+          setTimeout(applyAllTickerDurations, 0);
         }
         function loadCat(cat, copy1, copy2) {
           if (!copy1 || !copy2) return;
@@ -30260,6 +30568,10 @@ Generated: ${new Date().toLocaleString()}
         function reload() {
           if (copyAsian && copyAsian2) loadCat('asian', copyAsian, copyAsian2);
           if (copyArab && copyArab2) loadCat('arabic', copyArab, copyArab2);
+          // Keep default HTML seamless even if API is unreachable.
+          if (copyAsian && copyAsian2) ensureRepeatCopies(copyAsian, copyAsian2);
+          if (copyArab && copyArab2) ensureRepeatCopies(copyArab, copyArab2);
+          setTimeout(applyAllTickerDurations, 0);
         }
         reload();
         window.IIF_reloadTickers = reload;
@@ -30416,10 +30728,61 @@ Generated: ${new Date().toLocaleString()}
       } catch (eGt) { }
     };
   </script>
+  <script nonce="iif2026">
+    (function () {
+      // Some Google Translate widget builds inject an English "languages supported" notice.
+      // We never want that text visible anywhere on the page.
+      var RX = /languages\\s+supported\\b[\\s\\S]*?no\\s+content/i;
+      function scrub(node) {
+        try {
+          if (!node) return;
+          if (node.nodeType === Node.TEXT_NODE) {
+            var t = String(node.nodeValue || '');
+            if (RX.test(t)) node.nodeValue = '';
+            return;
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) return;
+          var el = node;
+          // Remove any small gadget blocks that contain the notice.
+          if (el.textContent && RX.test(el.textContent)) {
+            el.remove();
+            return;
+          }
+          var kids = el.childNodes;
+          if (!kids || !kids.length) return;
+          for (var i = kids.length - 1; i >= 0; i--) scrub(kids[i]);
+        } catch (e) { }
+      }
+      function run() {
+        try { scrub(document.body); } catch (e) { }
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+      else run();
+      try {
+        var mo = new MutationObserver(function (mutations) {
+          mutations.forEach(function (m) {
+            if (m.addedNodes) m.addedNodes.forEach(scrub);
+          });
+        });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+      } catch (e2) { }
+    })();
+  </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" nonce="iif2026"
     defer></script>
   <style nonce="iif2026">
+    /* Google Translate: never render visible UI/placeholder text */
     .iif-gtranslate-host { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+    #google_translate_element { display: none !important; }
+    .goog-te-gadget,
+    .goog-te-gadget-simple,
+    .goog-te-menu-value,
+    .goog-te-combo,
+    .goog-te-gadget span,
+    .goog-te-gadget-simple span {
+      display: none !important;
+      visibility: hidden !important;
+    }
     body { top: 0 !important; position: static !important; }
     .goog-te-banner-frame { display: none !important; visibility: hidden !important; }
     #goog-gt-tt { display: none !important; }

@@ -29,6 +29,25 @@ export class AuthManager {
         this.logout();
       }
     }
+
+    // Compatibility: index.html login keys (email + logged-in)
+    try {
+      if (!this.isAuthenticated) {
+        const legacyLogged = localStorage.getItem('iif-logged-in') === '1' || sessionStorage.getItem('iif-logged-in') === '1';
+        const legacyEmail = (localStorage.getItem('iif-user-email') || '').trim().toLowerCase();
+        if (legacyLogged && legacyEmail) {
+          // Minimal user object for SPA modules
+          const role = localStorage.getItem('iif-is-admin') === '1' ? 'admin' : 'user';
+          const legacyUser = { id: legacyEmail, name: legacyEmail, email: legacyEmail, role };
+          this.currentUser = legacyUser;
+          this.isAuthenticated = true;
+          this.token = token || `legacy-token-${Date.now()}`;
+          // Persist into StorageManager keys so SPA uses the same state
+          this.storage.set('user', legacyUser, { ttl: 0 });
+          this.storage.set('token', this.token, { ttl: 0 });
+        }
+      }
+    } catch (eLegacy) { }
   }
 
   async validateToken(token) {
@@ -53,9 +72,9 @@ export class AuthManager {
       if (response.success) {
         const { user, token } = response.data;
         
-        // Store session
-        this.storage.set('user', user);
-        this.storage.set('token', token);
+        // Store session (persist across browser restarts)
+        this.storage.set('user', user, { ttl: 0 });
+        this.storage.set('token', token, { ttl: 0 });
         
         // Update state
         this.currentUser = user;
@@ -96,9 +115,9 @@ export class AuthManager {
       if (response.success) {
         const { user, token } = response.data;
         
-        // Store session
-        this.storage.set('user', user);
-        this.storage.set('token', token);
+        // Store session (persist across browser restarts)
+        this.storage.set('user', user, { ttl: 0 });
+        this.storage.set('token', token, { ttl: 0 });
         
         // Update state
         this.currentUser = user;
@@ -129,6 +148,17 @@ export class AuthManager {
     // Clear storage
     this.storage.delete('user');
     this.storage.delete('token');
+
+    // Clear legacy/index.html keys
+    try {
+      localStorage.removeItem('iif-logged-in');
+      sessionStorage.removeItem('iif-logged-in');
+      localStorage.removeItem('iif-is-admin');
+      localStorage.removeItem('iif-user-email');
+      localStorage.removeItem('iif-user-name');
+      localStorage.removeItem('iif-device-fingerprint');
+      localStorage.removeItem('iif-device-bound-email');
+    } catch (eLegacyClear) { }
     
     // Clear state
     this.currentUser = null;
@@ -332,8 +362,8 @@ export class AuthManager {
       // Update user data
       const updatedUser = { ...this.currentUser, ...updates };
       
-      // Store updated user
-      this.storage.set('user', updatedUser);
+      // Store updated user (persist)
+      this.storage.set('user', updatedUser, { ttl: 0 });
       this.currentUser = updatedUser;
       
       console.log('✅ Profile updated successfully');

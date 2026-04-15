@@ -44,6 +44,11 @@
   status = 200
 
 [[redirects]]
+  from = "/"
+  to = "/financial-consulting/iif-fund-demo/index.html"
+  status = 200
+
+[[redirects]]
   from = "/fund"
   to = "/financial-consulting/iif-fund-demo/index.html"
   status = 302
