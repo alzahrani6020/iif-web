@@ -52,3 +52,28 @@ nav a {
 body.gateway-manual h1 {
   color: #b45309;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0b1220;
+    color: #e5e7eb;
+  }
+
+  .lead {
+    color: #cbd5e1;
+  }
+
+  nav a {
+    color: #93c5fd;
+  }
+
+  #gateway-manual-reason {
+    border-color: rgba(251, 146, 60, 0.55);
+    background: rgba(124, 45, 18, 0.2);
+    color: #fdba74;
+  }
+
+  body.gateway-manual h1 {
+    color: #fdba74;
+  }
+}
