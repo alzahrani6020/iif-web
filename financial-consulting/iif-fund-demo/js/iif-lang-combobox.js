@@ -30,10 +30,31 @@
     var sel = document.getElementById(cfg.selectId);
     var input = document.getElementById(cfg.inputId);
     var list = document.getElementById(cfg.listId);
+    var toggle = cfg.toggleId ? document.getElementById(cfg.toggleId) : null;
     if (!sel || !input || !list) return;
     if (wrap) wrap.setAttribute('data-iif-combobox-init', '1');
 
     fillSelect(sel);
+
+    /* Reduce Chrome password-manager attachment to this field */
+    try {
+      input.setAttribute('readonly', 'readonly');
+      input.setAttribute('data-lpignore', 'true');
+      input.setAttribute('data-1p-ignore', 'true');
+      input.setAttribute('data-bwignore', 'true');
+    } catch (eRO) { }
+
+    if (wrap) {
+      wrap.addEventListener(
+        'pointerdown',
+        function () {
+          try {
+            input.removeAttribute('readonly');
+          } catch (eU) { }
+        },
+        { capture: true, passive: true }
+      );
+    }
 
     var items = [];
     function rebuildList() {
@@ -82,18 +103,36 @@
       setActive(activeIdx >= 0 ? vis[activeIdx] : null);
     }
 
+    function setExpanded(on) {
+      var v = on ? 'true' : 'false';
+      input.setAttribute('aria-expanded', v);
+      if (toggle) toggle.setAttribute('aria-expanded', v);
+    }
+
     function openList() {
       list.hidden = false;
       list.style.display = 'block';
-      input.setAttribute('aria-expanded', 'true');
+      setExpanded(true);
     }
 
     function closeList() {
       list.hidden = true;
       list.style.display = 'none';
-      input.setAttribute('aria-expanded', 'false');
+      setExpanded(false);
       activeIdx = -1;
       setActive(null);
+      try {
+        input.setAttribute('readonly', 'readonly');
+      } catch (eC) { }
+    }
+
+    /**
+     * When opening for browsing, do NOT filter by the displayed language name —
+     * that hides all other languages (input shows e.g. "English").
+     */
+    function openAllLanguages() {
+      openList();
+      filterItems('');
     }
 
     function chooseValue(code) {
@@ -106,15 +145,17 @@
     }
 
     input.addEventListener('focus', function () {
-      openList();
-      filterItems(input.value);
+      try {
+        input.removeAttribute('readonly');
+      } catch (eF) { }
+      openAllLanguages();
     });
 
-    // Some browsers (and some overlays) won't focus reliably on first tap;
-    // ensure click always opens the list.
     input.addEventListener('click', function () {
-      openList();
-      filterItems(input.value);
+      try {
+        input.removeAttribute('readonly');
+      } catch (eC2) { }
+      openAllLanguages();
     });
 
     input.addEventListener('input', function () {
@@ -131,7 +172,7 @@
         return;
       }
       if (e.key === 'ArrowDown') {
-        if (list.hidden) openList();
+        if (list.hidden) openAllLanguages();
         vis = visibleItems();
         if (!vis.length) return;
         activeIdx = Math.min(activeIdx + 1, vis.length - 1);
@@ -157,6 +198,24 @@
       }
     });
 
+    if (toggle) {
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+          input.removeAttribute('readonly');
+        } catch (eT) { }
+        var closed = list.hidden;
+        if (closed) {
+          input.focus();
+          openAllLanguages();
+        } else {
+          closeList();
+          syncInputFromSelect(sel, input);
+        }
+      });
+    }
+
     list.addEventListener('mousedown', function (e) {
       e.preventDefault();
     });
@@ -177,6 +236,7 @@
     });
 
     syncInputFromSelect(sel, input);
+    setExpanded(false);
   }
 
   window.IIF_fillLangSelectFromI18n = fillSelect;
@@ -191,7 +251,8 @@
         wrapId: 'iif-lang-combobox-wrap',
         selectId: 'iif-lang-picker',
         inputId: 'iif-lang-picker-input',
-        listId: 'iif-lang-picker-list'
+        listId: 'iif-lang-picker-list',
+        toggleId: 'iif-lang-picker-toggle'
       });
     }
 
@@ -200,7 +261,8 @@
         wrapId: 'iif-lang-combobox-wrap-dashboard',
         selectId: 'iif-lang-picker-dashboard',
         inputId: 'iif-lang-picker-dashboard-input',
-        listId: 'iif-lang-picker-dashboard-list'
+        listId: 'iif-lang-picker-dashboard-list',
+        toggleId: 'iif-lang-picker-dashboard-toggle'
       });
     }
   };
